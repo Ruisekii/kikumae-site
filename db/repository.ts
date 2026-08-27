@@ -82,17 +82,17 @@ async function initialise(): Promise<D1Database> {
   ]);
 
   // Additive migration for the first anonymous-question schema.
-  await Promise.all([
-    safeRun(db, "ALTER TABLE faqs ADD COLUMN status TEXT NOT NULL DEFAULT 'published'"),
-    safeRun(db, 'ALTER TABLE questions ADD COLUMN body_original TEXT'),
-    safeRun(db, "ALTER TABLE questions ADD COLUMN ai_summary TEXT NOT NULL DEFAULT ''"),
-    safeRun(db, 'ALTER TABLE questions ADD COLUMN summary_edited INTEGER NOT NULL DEFAULT 0'),
-    safeRun(db, "ALTER TABLE questions ADD COLUMN contact_type TEXT NOT NULL DEFAULT 'anonymous'"),
-    safeRun(db, 'ALTER TABLE questions ADD COLUMN answer_body TEXT'),
-    safeRun(db, 'ALTER TABLE questions ADD COLUMN answer_used_ai INTEGER NOT NULL DEFAULT 0'),
-    safeRun(db, "ALTER TABLE questions ADD COLUMN answer_grounds TEXT NOT NULL DEFAULT '[]'"),
-    safeRun(db, 'ALTER TABLE questions ADD COLUMN answered_at INTEGER'),
-  ]);
+  for (const migration of [
+    "ALTER TABLE faqs ADD COLUMN status TEXT NOT NULL DEFAULT 'published'",
+    'ALTER TABLE questions ADD COLUMN body_original TEXT',
+    "ALTER TABLE questions ADD COLUMN ai_summary TEXT NOT NULL DEFAULT ''",
+    'ALTER TABLE questions ADD COLUMN summary_edited INTEGER NOT NULL DEFAULT 0',
+    "ALTER TABLE questions ADD COLUMN contact_type TEXT NOT NULL DEFAULT 'anonymous'",
+    'ALTER TABLE questions ADD COLUMN answer_body TEXT',
+    'ALTER TABLE questions ADD COLUMN answer_used_ai INTEGER NOT NULL DEFAULT 0',
+    "ALTER TABLE questions ADD COLUMN answer_grounds TEXT NOT NULL DEFAULT '[]'",
+    'ALTER TABLE questions ADD COLUMN answered_at INTEGER',
+  ]) await safeRun(db, migration);
   await safeRun(db, 'UPDATE questions SET body_original = body WHERE body_original IS NULL');
   await db.batch(SEED_FAQS.map((faq) => db.prepare("INSERT OR IGNORE INTO faqs (question, answer, category, status, updated_at) VALUES (?, ?, ?, 'published', ?)").bind(faq.question, faq.answer, faq.category, now)));
   return db;
