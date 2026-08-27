@@ -159,6 +159,7 @@ export async function createQuestion(body: string, requestedSummary = '', reques
 export async function claimAdministrator(userId: string): Promise<boolean> {
   const db = await initialise();
   const ownerUserId = configuredOwnerUserId();
+  if (!ownerUserId) return false;
   if (ownerUserId && ownerUserId !== userId) return false;
   const current = await db.prepare('SELECT user_id FROM admin_state WHERE singleton = 1').first<{ user_id: string }>();
   if (!current) await db.prepare('INSERT INTO admin_state (singleton, user_id, created_at) VALUES (1, ?, ?)').bind(userId, Date.now()).run();
@@ -170,6 +171,7 @@ export async function claimAdministrator(userId: string): Promise<boolean> {
 export async function isAdministrator(userId: string): Promise<boolean> {
   const db = await initialise();
   const ownerUserId = configuredOwnerUserId();
+  if (!ownerUserId) return false;
   if (ownerUserId && ownerUserId !== userId) return false;
   const state = await db.prepare('SELECT user_id FROM admin_state WHERE singleton = 1').first<{ user_id: string }>();
   return state?.user_id === userId;
