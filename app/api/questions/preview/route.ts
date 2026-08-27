@@ -1,0 +1,34 @@
+import { listRelatedFaqs } from '../../../../db/repository';
+import { categorizeQuestion, containsPii, generateLocalSummary } from '../../../../db/local-ai';
+
+export const runtime = 'edge';
+
+const MAX_REQUEST_BYTES = 4096;
+const MAX_QUESTION_CHARS = 500;
+
+function sameOrigin(request: Request): boolean {
+  const origin = request.headers.get('origin');
+  return !origin || origin === new URL(request.url).origin;
+}
+
+function json(payload: Record<string, unknown>, status = 200): Response {
+  return Response.json(payload, { status, headers: { 'Cache-Control': 'no-store' } });
+}
+
+export async function POST(request: Request): Promise<Response> {
+  if (!sameOrigin(request)) return json({ message: 'この送信元は許可されていません。' }, 403);
+  const contentLength = Number(request.headers.get('content-length') ?? '0');
+  if (!Number.isFinite(contentLength) || contentLength > MAX_REQUEST_BYTES) return json({ message: '質問は500文字以内で入力してください。' }, 413);
+  try {
+    const raw = await request.text();
+    if (new TextEncoder().encode(raw).byteLength > MAX_REQUEST_BYTES) return json({ message: '質問は500文字以内で入力してください。' }, 413);
+    const payload = JSON.parse(raw) as Record<string, unknown>;
+    const body = typeof payload.body === 'string' ? payload.body.trim() : '';
+    if (!body || body.length > MAX_QUESTION_CHARS) return json({ message: '質問は1〜500文字で入力してください。' }, 400);
+    if (containsPii(body)) return json({ message: '個人情報やURLは入力できません。該当箇所を削除してください。' }, 400);
+    const related = await listRelatedFaqs(body, 3);
+    return json({ body, summary: generateLocalSummary(body), category: categorizeQuestion(body), related, aiMode: 'local-rules' });
+  } catch {
+    return json({ message: '入力形式が正しくありません。' }, 400);
+  }
+}

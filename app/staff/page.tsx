@@ -5,5 +5,5 @@ export const dynamic = 'force-dynamic';
 
 export default async function StaffPage() {
   const user = await requireChatGPTUser('/staff');
-  return <StaffDashboard displayName={user.displayName} />;
+  return <StaffDashboard displayName={user.fullName ?? 'サイトオーナー'} />;
 }
