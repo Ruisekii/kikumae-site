@@ -45,7 +45,6 @@ export type SubmittedQuestion = {
   candidate: FaqCandidate | null;
 };
 
-const RETENTION_MS = 14 * 24 * 60 * 60 * 1000;
 
 const SEED_FAQS: Omit<Faq, 'id' | 'status' | 'updatedAt'>[] = [
   { question: '見学は予約なしでも可能ですか？', answer: '予約なしでも見学できます。事前に連絡していただけると、案内がよりスムーズです。', category: '見学・参加方法' },
@@ -103,12 +102,6 @@ async function initialise(): Promise<D1Database> {
   return db;
 }
 
-async function purgeExpiredQuestions(db: D1Database): Promise<void> {
-  const cutoff = Date.now() - RETENTION_MS;
-  await db.prepare('DELETE FROM faq_candidates WHERE question_id IN (SELECT id FROM questions WHERE created_at < ?)').bind(cutoff).run();
-  await db.prepare('DELETE FROM questions WHERE created_at < ?').bind(cutoff).run();
-}
-
 function parseGrounds(value: string | null): string[] {
   if (!value) return [];
   try {
@@ -142,7 +135,6 @@ export async function listRelatedFaqs(query: string, limit = 3): Promise<Related
 
 export async function createQuestion(body: string, requestedSummary = '', requestedCategory = ''): Promise<SubmittedQuestion> {
   const db = await initialise();
-  await purgeExpiredQuestions(db);
   const createdAt = Date.now();
   const canonicalSummary = generateLocalSummary(body);
   const aiSummary = requestedSummary.trim().slice(0, 300) || canonicalSummary;
@@ -205,7 +197,7 @@ const QUESTION_SELECT = `SELECT q.id, q.body, q.body_original, q.ai_summary, q.s
   FROM questions q LEFT JOIN faq_candidates c ON c.question_id = q.id AND c.status = 'pending'`;
 
 export async function listQuestionsForAdministrator(): Promise<SubmittedQuestion[]> {
-  const db = await initialise(); await purgeExpiredQuestions(db);
+  const db = await initialise();
   const result = await db.prepare(`${QUESTION_SELECT} ORDER BY q.created_at DESC LIMIT 100`).all<Record<string, unknown>>();
   return (result.results ?? []).map(mapQuestion);
 }
