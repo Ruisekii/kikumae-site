@@ -32,7 +32,9 @@ export async function getChatGPTUser(): Promise<ChatGPTUser | null> {
       : null;
 
   return {
-    userId,
+    // Sites supplies a stable account email for the authenticated owner. Use it
+    // as the app-level subject so the worker and Sites owner policy agree.
+    userId: email.trim().toLowerCase(),
     displayName: fullName ?? email,
     email,
     fullName,
