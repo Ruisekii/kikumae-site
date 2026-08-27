@@ -232,6 +232,7 @@ export async function actOnCandidate(candidateId: number, action: string, qText:
   const safeAnswer = (aText.trim() || candidate.a_text).slice(0, 2000);
   const safeCategory = category.trim().slice(0, 64) || candidate.category;
   if (action === 'publish' || action === 'publish_edited') {
+    if (containsPii(safeQuestion) || containsPii(safeAnswer)) throw new Error('個人情報やURLを含むFAQは公開できません。');
     const existing = await db.prepare('SELECT id FROM faqs WHERE question = ?').bind(safeQuestion).first<{ id: number }>();
     if (existing) {
       await db.prepare("UPDATE faqs SET answer = ?, category = ?, status = 'published', updated_at = ? WHERE id = ?").bind(safeAnswer, safeCategory, Date.now(), existing.id).run();
