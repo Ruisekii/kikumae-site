@@ -60,6 +60,11 @@ function database(): D1Database {
   return env.DB;
 }
 
+function configuredOwnerUserId(): string | null {
+  const value = env.KIKUMAE_OWNER_USER_ID?.trim();
+  return value || null;
+}
+
 async function safeRun(db: D1Database, sql: string): Promise<void> {
   try {
     await db.prepare(sql).run();
@@ -153,13 +158,19 @@ export async function createQuestion(body: string, requestedSummary = '', reques
 
 export async function claimAdministrator(userId: string): Promise<boolean> {
   const db = await initialise();
-  await db.prepare('INSERT OR IGNORE INTO admin_state (singleton, user_id, created_at) VALUES (1, ?, ?)').bind(userId, Date.now()).run();
+  const ownerUserId = configuredOwnerUserId();
+  if (ownerUserId && ownerUserId !== userId) return false;
+  const current = await db.prepare('SELECT user_id FROM admin_state WHERE singleton = 1').first<{ user_id: string }>();
+  if (!current) await db.prepare('INSERT INTO admin_state (singleton, user_id, created_at) VALUES (1, ?, ?)').bind(userId, Date.now()).run();
+  else if (ownerUserId && current.user_id !== userId) await db.prepare('UPDATE admin_state SET user_id = ? WHERE singleton = 1').bind(userId).run();
   const state = await db.prepare('SELECT user_id FROM admin_state WHERE singleton = 1').first<{ user_id: string }>();
   return state?.user_id === userId;
 }
 
 export async function isAdministrator(userId: string): Promise<boolean> {
   const db = await initialise();
+  const ownerUserId = configuredOwnerUserId();
+  if (ownerUserId && ownerUserId !== userId) return false;
   const state = await db.prepare('SELECT user_id FROM admin_state WHERE singleton = 1').first<{ user_id: string }>();
   return state?.user_id === userId;
 }
