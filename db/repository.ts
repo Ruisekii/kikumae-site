@@ -235,6 +235,12 @@ export async function approveAnswer(questionId: number, body: string, usedAi: bo
   return { id: Number(result.meta.last_row_id), questionId, qText: candidate.q, aText: candidate.a, category: candidate.category, status: 'pending', createdAt: answeredAt };
 }
 
+export async function deleteQuestion(questionId: number): Promise<void> {
+  const db = await initialise();
+  await db.prepare('DELETE FROM faq_candidates WHERE question_id = ?').bind(questionId).run();
+  await db.prepare('DELETE FROM questions WHERE id = ?').bind(questionId).run();
+}
+
 export async function actOnCandidate(candidateId: number, action: string, qText: string, aText: string, category: string): Promise<void> {
   const db = await initialise();
   const candidate = await db.prepare("SELECT id, q_text, a_text, category FROM faq_candidates WHERE id = ? AND status = 'pending'").bind(candidateId).first<{ id: number; q_text: string; a_text: string; category: string }>();
