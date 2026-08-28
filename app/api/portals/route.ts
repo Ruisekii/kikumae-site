@@ -2,7 +2,13 @@ import { createPortal } from '../../../db/portals';
 
 export const runtime = 'edge';
 
+function sameOrigin(request: Request): boolean {
+  const origin = request.headers.get('origin');
+  return !origin || origin === new URL(request.url).origin;
+}
+
 export async function POST(request: Request): Promise<Response> {
+  if (!sameOrigin(request)) return Response.json({ message: 'この送信元は許可されていません。' }, { status: 403 });
   try {
     const body = await request.json() as { name?: string; slug?: string; description?: string; password?: string; passwordConfirmation?: string };
     const name = String(body.name ?? '').trim(); const slug = String(body.slug ?? '').trim().toLowerCase(); const description = String(body.description ?? '').trim(); const password = String(body.password ?? '');
