@@ -39,5 +39,5 @@ export async function POST(request: Request): Promise<Response> {
   if (summary && containsPii(summary)) return json('要約にも個人情報やURLは含められません。', 400);
 
   const question = await createQuestion(body, summary, category);
-  return Response.json({ id: question.id, checkUrl: `${new URL(request.url).origin}/questions/${question.checkToken}`, message: '質問を受け付けました。回答者が確認します。' }, { status: 201, headers: { 'Cache-Control': 'no-store' } });
+  return Response.json({ id: question.id, checkUrl: `${new URL(request.url).origin}/questions/${question.checkToken}`, message: '質問を受け付けました。管理者が確認します。' }, { status: 201, headers: { 'Cache-Control': 'no-store' } });
 }

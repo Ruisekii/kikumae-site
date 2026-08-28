@@ -1,9 +1,5 @@
-import { StaffDashboard } from '../components/staff-dashboard';
-import { requireChatGPTUser } from '../chatgpt-auth';
+import { redirect } from 'next/navigation';
 
-export const dynamic = 'force-dynamic';
-
-export default async function StaffPage() {
-  const user = await requireChatGPTUser('/staff');
-  return <StaffDashboard displayName={user.fullName ?? 'サイトオーナー'} />;
+export default function LegacyStaffPage() {
+  redirect('/admin');
 }

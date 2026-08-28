@@ -1,6 +1,7 @@
 import { env } from 'cloudflare:workers';
 
 export type Portal = { id: number; name: string; slug: string; description: string; passwordHash: string; createdAt: number };
+export type PortalSummary = { id: number; name: string; slug: string; createdAt: number };
 
 function db(): D1Database { if (!env.DB) throw new Error('D1 database binding is unavailable.'); return env.DB; }
 
@@ -60,6 +61,36 @@ export async function getPortal(slug: string): Promise<Portal | null> {
   await ensureTable();
   const row = await db().prepare('SELECT id, name, slug, description, password_hash, created_at FROM portals WHERE slug = ? LIMIT 1').bind(slug).first<Record<string, unknown>>();
   return row ? { id: Number(row.id), name: String(row.name), slug: String(row.slug), description: String(row.description ?? ''), passwordHash: String(row.password_hash), createdAt: Number(row.created_at) } : null;
+}
+
+/** The Sites owner is the only service operator. Keep this check server-side. */
+export function isOperator(userId: string): boolean {
+  const configured = env.KIKUMAE_OWNER_USER_ID?.trim().toLowerCase();
+  return Boolean(configured && configured === userId.trim().toLowerCase());
+}
+
+export async function listPortals(search = ''): Promise<PortalSummary[]> {
+  await ensureTable();
+  const term = search.trim().slice(0, 80);
+  const result = term
+    ? await db().prepare("SELECT id, name, slug, created_at FROM portals WHERE name LIKE ? OR slug LIKE ? ORDER BY created_at DESC LIMIT 200").bind(`%${term}%`, `%${term}%`).all<Record<string, unknown>>()
+    : await db().prepare('SELECT id, name, slug, created_at FROM portals ORDER BY created_at DESC LIMIT 200').all<Record<string, unknown>>();
+  return (result.results ?? []).map((row) => ({ id: Number(row.id), name: String(row.name ?? ''), slug: String(row.slug ?? ''), createdAt: Number(row.created_at ?? 0) }));
+}
+
+async function safeDelete(sql: string, ...values: unknown[]): Promise<void> {
+  try { await db().prepare(sql).bind(...values).run(); } catch { /* The related table may not exist on an older database. */ }
+}
+
+/** Delete one portal and every record that is explicitly scoped to it. */
+export async function deletePortal(portalId: number): Promise<void> {
+  await ensureTable();
+  await safeDelete('DELETE FROM faq_candidates WHERE portal_id = ? OR question_id IN (SELECT id FROM questions WHERE portal_id = ?)', portalId, portalId);
+  await safeDelete('DELETE FROM audit_logs WHERE question_id IN (SELECT id FROM questions WHERE portal_id = ?)', portalId);
+  await safeDelete('DELETE FROM questions WHERE portal_id = ?', portalId);
+  await safeDelete('DELETE FROM faqs WHERE portal_id = ?', portalId);
+  await safeDelete('DELETE FROM portal_sessions WHERE portal_id = ?', portalId);
+  await db().prepare('DELETE FROM portals WHERE id = ?').bind(portalId).run();
 }
 
 async function tokenHash(token: string): Promise<string> { const digest = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(token)); return bytesToHex(new Uint8Array(digest)); }

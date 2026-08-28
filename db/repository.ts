@@ -86,6 +86,7 @@ async function initialise(): Promise<D1Database> {
     db.prepare('CREATE TABLE IF NOT EXISTS admin_state (singleton INTEGER PRIMARY KEY CHECK (singleton = 1), user_id TEXT NOT NULL, created_at INTEGER NOT NULL)'),
     db.prepare("CREATE TABLE IF NOT EXISTS faq_candidates (id INTEGER PRIMARY KEY AUTOINCREMENT, question_id INTEGER NOT NULL, q_text TEXT NOT NULL, a_text TEXT NOT NULL, category TEXT NOT NULL, status TEXT NOT NULL DEFAULT 'pending', created_at INTEGER NOT NULL)"),
     db.prepare("CREATE TABLE IF NOT EXISTS audit_logs (id INTEGER PRIMARY KEY AUTOINCREMENT, actor_user_id TEXT, action TEXT NOT NULL, question_id INTEGER, detail TEXT NOT NULL DEFAULT '', created_at INTEGER NOT NULL)"),
+    db.prepare("CREATE TABLE IF NOT EXISTS schema_meta (key TEXT PRIMARY KEY, value TEXT NOT NULL)"),
     db.prepare('CREATE INDEX IF NOT EXISTS questions_created_at_idx ON questions (created_at DESC)'),
     db.prepare('CREATE INDEX IF NOT EXISTS faq_candidates_status_idx ON faq_candidates (status, created_at DESC)'),
   ]);
@@ -108,9 +109,34 @@ async function initialise(): Promise<D1Database> {
     'ALTER TABLE questions ADD COLUMN portal_id INTEGER',
     'ALTER TABLE faq_candidates ADD COLUMN portal_id INTEGER',
   ]) await safeRun(db, migration);
+  await ensureFaqIsolationSchema(db);
   await safeRun(db, 'UPDATE questions SET body_original = body WHERE body_original IS NULL');
   await db.batch(SEED_FAQS.map((faq) => db.prepare("INSERT OR IGNORE INTO faqs (question, answer, category, status, updated_at) VALUES (?, ?, ?, 'published', ?)").bind(faq.question, faq.answer, faq.category, now)));
   return db;
+}
+
+/**
+ * The original MVP made FAQ questions globally unique. That allowed a portal
+ * to accidentally update the root FAQ (and prevented two portals from using
+ * the same wording). Rebuild the table once with scope-aware unique indexes.
+ */
+async function ensureFaqIsolationSchema(db: D1Database): Promise<void> {
+  const marker = await db.prepare("SELECT value FROM schema_meta WHERE key = 'faqs_scope_v1' LIMIT 1").first<{ value: string }>();
+  if (marker?.value === 'ready') return;
+  try {
+    await db.batch([
+      db.prepare('CREATE TABLE IF NOT EXISTS faqs_scope_rebuild (id INTEGER PRIMARY KEY AUTOINCREMENT, question TEXT NOT NULL, answer TEXT NOT NULL, category TEXT NOT NULL, status TEXT NOT NULL DEFAULT \'published\', updated_at INTEGER NOT NULL, portal_id INTEGER)'),
+      db.prepare('INSERT OR IGNORE INTO faqs_scope_rebuild (id, question, answer, category, status, updated_at, portal_id) SELECT id, question, answer, category, status, updated_at, portal_id FROM faqs'),
+      db.prepare('DROP TABLE faqs'),
+      db.prepare('ALTER TABLE faqs_scope_rebuild RENAME TO faqs'),
+      db.prepare('CREATE UNIQUE INDEX IF NOT EXISTS faqs_question_root_unique ON faqs (question) WHERE portal_id IS NULL'),
+      db.prepare('CREATE UNIQUE INDEX IF NOT EXISTS faqs_question_portal_unique ON faqs (question, portal_id) WHERE portal_id IS NOT NULL'),
+      db.prepare("INSERT OR REPLACE INTO schema_meta (key, value) VALUES ('faqs_scope_v1', 'ready')"),
+    ]);
+  } catch {
+    // Keep the existing table usable if a legacy database is being migrated by
+    // another request at the same time. The next request retries the marker.
+  }
 }
 
 function parseGrounds(value: string | null): string[] {
@@ -286,7 +312,9 @@ export async function actOnCandidate(candidateId: number, action: string, qText:
   const safeCategory = category.trim().slice(0, 64) || candidate.category;
   if (action === 'publish' || action === 'publish_edited') {
     if (containsPii(safeQuestion) || containsPii(safeAnswer)) throw new Error('個人情報やURLを含むFAQは公開できません。');
-    const existing = await db.prepare('SELECT id FROM faqs WHERE question = ?').bind(safeQuestion).first<{ id: number }>();
+    const existing = candidate.portal_id == null
+      ? await db.prepare('SELECT id FROM faqs WHERE question = ? AND portal_id IS NULL').bind(safeQuestion).first<{ id: number }>()
+      : await db.prepare('SELECT id FROM faqs WHERE question = ? AND portal_id = ?').bind(safeQuestion, candidate.portal_id).first<{ id: number }>();
     if (existing) {
       await db.prepare("UPDATE faqs SET answer = ?, category = ?, status = 'published', portal_id = ?, updated_at = ? WHERE id = ?").bind(safeAnswer, safeCategory, candidate.portal_id, Date.now(), existing.id).run();
     } else {
