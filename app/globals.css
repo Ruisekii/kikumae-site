@@ -36,3 +36,22 @@ footer { padding: 28px 24px; background: var(--navy); color: #fff; text-align: c
 .draft-options .draft-option:nth-child(3)::before { content: '🟡 回答案2：少し丁寧に説明する'; }
 .draft-options .draft-option:nth-child(4)::before { content: '🟡 回答案3：別の観点から案内する'; }
 .draft-options .draft-option span { display: block; margin-top: 4px; font-size: .9rem; }
+ .value-section, .cycle-section, .places-section, .open-portal-cta { margin-top: 28px; }
+ .feature-grid, .places-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+ .feature-card, .place-card { padding: 18px; border: 2px solid var(--line); border-radius: 16px; background: #fffdf3; }
+ .feature-card h3 { margin: 10px 0 6px; color: var(--navy); }
+ .feature-card p, .place-card span { margin: 0; color: var(--muted); }
+ .cycle-list { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 10px; }
+ .cycle-list span { padding: 10px 14px; border-radius: 999px; background: #fff8d8; border: 2px solid #f0c44c; color: var(--navy); font-weight: 800; }
+ .cycle-list i { color: var(--muted); font-style: normal; }
+ .place-card { display: grid; gap: 6px; border-radius: 999px; min-height: 90px; align-content: center; }
+ .place-card b { color: var(--navy); }
+ .open-portal-cta { padding: 32px; border: 2px solid #f0c44c; border-radius: 22px; background: #fff8d8; box-shadow: 6px 6px 0 #f0c44c; }
+ .open-portal-cta p { max-width: 680px; }
+ .portal-create-page, .public-page { min-height: 100vh; padding-bottom: 60px; background: #f4fbff; }
+ .portal-create-card, .portal-complete, .portal-admin-login { max-width: 720px; margin: 70px auto; padding: 28px; border: 2px solid var(--ink); border-radius: 20px; background: var(--paper); box-shadow: 6px 6px 0 var(--ink); }
+ .portal-create-card form, .portal-admin-login form { display: grid; gap: 14px; margin-top: 22px; }
+ .portal-create-card label, .portal-admin-login label { display: grid; gap: 6px; font-weight: 800; }
+ .portal-create-card input, .portal-create-card textarea, .portal-admin-login input { width: 100%; }
+ .portal-hero { max-width: 900px; margin: 60px auto; padding: 28px; text-align: center; }
+ @media (max-width: 720px) { .feature-grid, .places-grid { grid-template-columns: 1fr; } .cycle-list { display: grid; } .cycle-list i { text-align: center; } .hero h1 { font-size: clamp(2rem, 10vw, 3.4rem); } }
