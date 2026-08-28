@@ -248,12 +248,12 @@ export async function getQuestionByCheckToken(token: string): Promise<SubmittedQ
   return result ? mapQuestion(result) : null;
 }
 
-export async function generateAnswerDraft(questionId: number, portalId?: number | null): Promise<{ draft: string; grounds: string[]; mode: 'local-rules' }> {
+export async function generateAnswerDraft(questionId: number, portalId?: number | null): Promise<{ draft: string; alternatives: string[]; grounds: string[]; mode: 'local-rules' }> {
   const question = await getQuestionForAdministrator(questionId);
   if (!question) throw new Error('質問が見つかりません。');
   if (portalId !== undefined && question.portalId !== portalId) throw new Error('この窓口の質問ではありません。');
   const related = await listRelatedFaqs(question.aiSummary || question.bodyOriginal, 3, question.portalId);
-  return { draft: generateLocalDraft(question.aiSummary || question.bodyOriginal, question.bodyOriginal, related), grounds: related.map((faq) => faq.question), mode: 'local-rules' };
+  return { draft: generateLocalDraft(question.aiSummary || question.bodyOriginal, question.bodyOriginal, related), alternatives: generateAlternativeDrafts(question.aiSummary || question.bodyOriginal, question.bodyOriginal, related), grounds: related.map((faq) => faq.question), mode: 'local-rules' };
 }
 
 export async function approveAnswer(questionId: number, body: string, usedAi: boolean, grounds: string[]): Promise<FaqCandidate | null> {

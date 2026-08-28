@@ -4,10 +4,36 @@
 import { FormEvent, useState } from 'react';
 import Link from 'next/link';
 
+type CreatedPortal = { name: string; slug: string; description: string };
+
 export default function OpenPortalPage() {
-  const [message, setMessage] = useState(''); const [created, setCreated] = useState<{ name: string; slug: string; description: string } | null>(null); const [busy, setBusy] = useState(false);
+  const [message, setMessage] = useState('');
+  const [created, setCreated] = useState<CreatedPortal | null>(null);
+  const [busy, setBusy] = useState(false);
   const [copied, setCopied] = useState(false);
-  async function submit(event: FormEvent<HTMLFormElement>) { event.preventDefault(); setBusy(true); setMessage(''); const data = new FormData(event.currentTarget); const body = Object.fromEntries(data.entries()); try { const response = await fetch('/api/portals', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) }); const payload = await response.json() as { message?: string; portal?: typeof created }; if (!response.ok || !payload.portal) { setMessage(payload.message ?? '作成できませんでした。'); return; } setCreated(payload.portal); } catch { setMessage('通信に失敗しました。'); } finally { setBusy(false); } }
-  if (created) { const publicUrl = typeof window !== 'undefined' ? `${window.location.origin}/${created.slug}` : `/${created.slug}`; const adminUrl = typeof window !== 'undefined' ? `${window.location.origin}/${created.slug}/admin` : `/${created.slug}/admin`; return <main className="portal-create-page"><div className="portal-complete"><p className="eyebrow">窓口ができました！</p><h1>あなたのきくまえ窓口です</h1><p>{created.name}の質問を、聞きやすく受け付けられます。</p><dl><dt>公開ページ</dt><dd><code>{publicUrl}</code></dd><dt>管理ページ</dt><dd><code>{adminUrl}</code></dd></dl><div className="portal-qr"><p><b>公開ページのQRコード</b></p><img src={`https://quickchart.io/qr?size=180&margin=1&text=${encodeURIComponent(publicUrl)}`} alt={`${created.name} 公開ページのQRコード`} width="180" height="180" loading="eager" /><p className="input-hint">QRコードには公開ページのURLだけが入ります。</p></div><div className="form-actions"><Link className="button accent" href={`/${created.slug}`}>公開ページを見る</Link><Link className="button secondary" href={`/${created.slug}/admin`}>管理画面を開く</Link><button className="button secondary" type="button" onClick={() => { void navigator.clipboard?.writeText(publicUrl).then(() => setCopied(true)); }}>{copied ? 'コピーしました' : '公開URLをコピー'}</button></div><div className="next-steps"><b>次にすること</b><ol><li>管理画面で最初のFAQを確認・追加</li><li>公開URLをメンバーに共有</li><li>届いた質問に回答し、FAQ候補を承認</li></ol></div></div></main>; }
-  return <main className="portal-create-page"><header className="site-header"><Link className="brand" href="/">🐣 きくまえ</Link><Link href="/">公開ページへ</Link></header><section className="portal-create-card"><p className="eyebrow">きくまえ窓口を開く</p><h1>あなたの場所専用の、聞きやすい窓口。</h1><p>部活・研究室・学校・会社・イベントのFAQと匿名質問ページを作れます。</p><form onSubmit={submit}><label>団体名<input name="name" required maxLength={80} placeholder="例：豊田高専ロボコン部" /></label><label>URL用の名前<input name="slug" required pattern="[a-z0-9]+(?:-[a-z0-9]+)*" maxLength={48} placeholder="例：toyota-robocon" /><span className="input-hint">公開URL：/団体のURL用の名前</span></label><label>簡単な説明<textarea name="description" maxLength={300} placeholder="入部、見学、活動について気軽に質問できます。" /></label><label>管理者パスワード<input name="password" type="password" required minLength={10} maxLength={128} autoComplete="new-password" /></label><label>パスワード（確認）<input name="passwordConfirmation" type="password" required minLength={10} maxLength={128} autoComplete="new-password" /></label><button className="button accent" type="submit" disabled={busy}>{busy ? '窓口を開いています…' : 'きくまえ窓口を開く'}</button>{message && <p className="form-status" role="status">{message}</p>}</form></section></main>;
+  const [slug, setSlug] = useState('');
+
+  async function submit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    setBusy(true);
+    setMessage('');
+    const data = new FormData(event.currentTarget);
+    const body = Object.fromEntries(data.entries());
+    try {
+      const response = await fetch('/api/portals', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+      const payload = await response.json() as { message?: string; portal?: CreatedPortal };
+      if (!response.ok || !payload.portal) { setMessage(payload.message ?? '作成できませんでした。入力内容を確認してください。'); return; }
+      setCreated(payload.portal);
+    } catch { setMessage('通信に失敗しました。時間をおいてもう一度お試しください。'); }
+    finally { setBusy(false); }
+  }
+
+  if (created) {
+    const publicUrl = typeof window !== 'undefined' ? `${window.location.origin}/${created.slug}` : `/${created.slug}`;
+    const adminUrl = typeof window !== 'undefined' ? `${window.location.origin}/${created.slug}/admin` : `/${created.slug}/admin`;
+    return <main className="portal-create-page"><div className="portal-complete"><p className="eyebrow">窓口ができました！</p><h1>あなたのきくまえ窓口です</h1><p>{created.name}の質問を、聞きやすく受け付けられます。</p><dl><dt>公開ページ</dt><dd><code>{publicUrl}</code></dd><dt>管理ページ</dt><dd><code>{adminUrl}</code></dd></dl><div className="portal-qr"><p><b>公開ページのQRコード</b></p><img src={`https://quickchart.io/qr?size=180&margin=1&text=${encodeURIComponent(publicUrl)}`} alt={`${created.name} 公開ページのQRコード`} width="180" height="180" loading="eager" /><p className="input-hint">QRコードには公開ページのURLだけが入ります。</p></div><div className="form-actions"><Link className="button accent" href={`/${created.slug}`}>公開ページを見る</Link><Link className="button secondary" href={`/${created.slug}/admin`}>管理画面を開く</Link><button className="button secondary" type="button" onClick={() => { void navigator.clipboard?.writeText(publicUrl).then(() => setCopied(true)); }}>{copied ? 'コピーしました' : '公開URLをコピー'}</button></div><div className="next-steps"><b>次にすること</b><ol><li>管理画面で最初のFAQを確認・追加</li><li>公開URLをメンバーに共有</li><li>届いた質問に回答し、FAQ候補を承認</li></ol></div></div></main>;
+  }
+
+  const safeSlug = slug.match(/^[a-z0-9]+(?:-[a-z0-9]+)*$/)?.[0] ?? '';
+  return <main className="portal-create-page"><header className="site-header"><Link className="brand" href="/">🐣 きくまえ</Link><Link href="/">公開ページへ</Link></header><section className="portal-create-card"><p className="eyebrow">きくまえ窓口を開く</p><h1>あなたの場所専用の、聞きやすい窓口。</h1><p>部活・研究室・学校・会社・採用・イベントのFAQと匿名質問ページを作れます。</p><form onSubmit={submit}><label htmlFor="portal-name">団体名<input id="portal-name" name="name" required maxLength={80} placeholder="例：豊田高専ロボコン部 / ○○株式会社 人事" /></label><label htmlFor="portal-slug">URL用の名前<input id="portal-slug" name="slug" value={slug} onChange={(event) => setSlug(event.target.value.toLowerCase())} required pattern="[a-z0-9]+(?:-[a-z0-9]+)*" maxLength={48} placeholder="例：toyota-robocon / company-hr" /><span className="input-hint">英小文字・数字・ハイフンで入力してください。公開URL：/{safeSlug || 'あなたのURL'}</span></label><label htmlFor="portal-description">簡単な説明<textarea id="portal-description" name="description" maxLength={300} placeholder="社内ルールや手続きについて気軽に質問できます。" /></label><label htmlFor="portal-password">管理者パスワード<input id="portal-password" name="password" type="password" required minLength={10} maxLength={128} autoComplete="new-password" aria-describedby="password-hint" /></label><span id="password-hint" className="input-hint">10文字以上。作成後に表示されないため、安全な場所に保管してください。</span><label htmlFor="portal-password-confirmation">パスワード（確認）<input id="portal-password-confirmation" name="passwordConfirmation" type="password" required minLength={10} maxLength={128} autoComplete="new-password" /></label><button className="button accent" type="submit" disabled={busy}>{busy ? '窓口を開いています…' : 'きくまえ窓口を開く'}</button>{message && <p className="form-status" role="status">{message}</p>}</form></section></main>;
 }

@@ -37,7 +37,8 @@ footer { padding: 28px 24px; background: var(--navy); color: #fff; text-align: c
 .draft-options .draft-option:nth-child(3)::before { content: '🟡 回答案2：少し丁寧に説明する'; }
 .draft-options .draft-option:nth-child(4)::before { content: '🟡 回答案3：別の観点から案内する'; }
 .draft-options .draft-option span { display: block; margin-top: 4px; font-size: .9rem; }
- .value-section, .cycle-section, .places-section, .open-portal-cta { margin-top: 28px; }
+ .value-section, .cycle-section, .places-section, .company-section, .open-portal-cta { margin-top: 28px; }
+ .section-lead { max-width: 720px; color: var(--muted); }
  .feature-grid, .places-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
  .feature-card, .place-card { padding: 18px; border: 2px solid var(--line); border-radius: 16px; background: #fffdf3; }
  .feature-card h3 { margin: 10px 0 6px; color: var(--navy); }
@@ -47,6 +48,12 @@ footer { padding: 28px 24px; background: var(--navy); color: #fff; text-align: c
  .cycle-list i { color: var(--muted); font-style: normal; }
  .place-card { display: grid; gap: 6px; border-radius: 999px; min-height: 90px; align-content: center; }
  .place-card b { color: var(--navy); }
+ .company-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; }
+ .company-card { display: grid; gap: 8px; padding: 18px; border: 2px solid #f0c44c; border-radius: 16px; background: #fff8d8; }
+ .company-card h3 { margin: 4px 0; color: var(--navy); font-size: 1.05rem; line-height: 1.5; }
+ .company-card p { margin: 0; color: var(--muted); font-size: .92rem; }
+ .company-flow { margin-top: 18px; padding: 18px; border: 2px dashed #f0c44c; border-radius: 16px; background: #fffdf3; }
+ .company-flow p { margin: 6px 0 0; }
  .open-portal-cta { padding: 32px; border: 2px solid #f0c44c; border-radius: 22px; background: #fff8d8; box-shadow: 6px 6px 0 #f0c44c; }
  .open-portal-cta p { max-width: 680px; }
  .portal-create-page, .public-page { min-height: 100vh; padding-bottom: 60px; background: #f4fbff; }
@@ -68,5 +75,6 @@ footer { padding: 28px 24px; background: var(--navy); color: #fff; text-align: c
  .faq-card details { margin-top: 14px; }
  .check-link { margin-top: 12px; font-weight: 800; color: var(--navy); }
  .check-link a { text-underline-offset: 4px; }
- @media (max-width: 720px) { .feature-grid, .places-grid { grid-template-columns: 1fr; } .cycle-list { display: grid; } .cycle-list i { text-align: center; } .hero h1 { font-size: clamp(2rem, 10vw, 3.4rem); } .hero-line { white-space: normal; } }
+ @media (max-width: 900px) { .company-grid { grid-template-columns: repeat(2, 1fr); } }
+ @media (max-width: 720px) { .feature-grid, .places-grid, .company-grid { grid-template-columns: 1fr; } .cycle-list { display: grid; } .cycle-list i { text-align: center; } .hero h1 { font-size: clamp(2rem, 10vw, 3.4rem); } .hero-line { white-space: normal; } }
  .hero-line { display: block; white-space: nowrap; }

@@ -14,7 +14,13 @@ type Preview = {
 
 type Props = { faqs: Faq[] };
 const normalize = (value: string) => value.toLocaleLowerCase('ja-JP').replace(/\s/g, '');
-const categories = ['見学・参加方法', '初心者向け', '活動内容', '部費・持ち物', 'その他'];
+const categories = ['利用方法', '申請・手続き', '日程・場所', '料金・費用', 'ルール・制度', '困りごと・トラブル', 'その他'];
+const companyUseCases = [
+  ['人事・総務', '有給ってどこから申請するんだっけ？', '制度や手続きの問い合わせを、次の人もFAQで確認できます。'],
+  ['情報システム・社内IT', 'パスワードを忘れたらどうすればいい？', '情シスへの繰り返しの質問を減らし、解決した手順を残せます。'],
+  ['新人・オンボーディング', '最初に何を設定すればいい？', '「こんなこと聞いていいのかな」を、匿名で聞きやすくします。'],
+  ['採用・会社説明会', '服装はスーツですか？', '応募前の小さな疑問を、担当者に連絡する前に解決できます。'],
+] as const;
 
 export function KikumaeClient({ faqs }: Props) {
   const [query, setQuery] = useState('');
@@ -75,8 +81,9 @@ export function KikumaeClient({ faqs }: Props) {
       </section>
       <section className="section value-section" aria-labelledby="value-title"><p className="eyebrow">きくまえが手伝うこと</p><h2 id="value-title">聞く人も、答える人も、AIでもっと楽に。</h2><div className="feature-grid"><article className="feature-card"><span className="tag">質問者</span><h3>似たFAQを探して整理</h3><p>思ったままの文章で質問でき、AIが既存FAQや要点を整理します。</p></article><article className="feature-card"><span className="tag">回答者</span><h3>回答のたたき台を用意</h3><p>関連FAQと複数の回答案をもとに、編集して答えられます。</p></article><article className="feature-card"><span className="tag">みんな</span><h3>答えがFAQとして育つ</h3><p>人が確認した回答だけが次の「聞く前」の答えになります。</p></article></div></section>
       <section className="section cycle-section" aria-labelledby="cycle-title"><p className="eyebrow">きくまえの循環</p><h2 id="cycle-title">答えるほど、FAQが育つ。</h2><div className="cycle-list"><span>質問する</span><i>↓</i><span>AIが似たFAQを探す・質問を整理</span><i>↓</i><span>AIが回答候補を用意</span><i>↓</i><span>人が確認して回答・FAQを承認</span><i>↓</i><span>次の人はFAQで解決</span></div></section>
-      <section className="section places-section" aria-labelledby="places-title"><p className="eyebrow">こんな場所で使えます</p><h2 id="places-title">あなたの場所に、聞きやすい窓口を。</h2><div className="places-grid">{[['部活','見学や入部について'],['研究室','研究内容や見学について'],['学校','新入生や案内について'],['会社','採用や社内問い合わせ'],['イベント','参加者からの質問'],['サークル','参加方法や活動内容']].map(([title, text]) => <article className="place-card" key={title}><b>● {title}</b><span>{text}の質問に</span></article>)}</div></section>
-      <section className="section open-portal-cta" aria-labelledby="open-title"><p className="eyebrow">自分たちの窓口を開く</p><h2 id="open-title">きくまえ窓口を開きませんか？</h2><p>部活、研究室、学校、会社、イベントなど、あなたの場所専用の「聞きやすい窓口」を作れます。FAQを用意して、分からないことは匿名で質問してもらいましょう。</p><Link className="button accent" href="/open">きくまえ窓口を開く</Link></section>
+      <section className="section places-section" aria-labelledby="places-title"><p className="eyebrow">こんな場所で使えます</p><h2 id="places-title">あなたの場所に、聞きやすい窓口を。</h2><p className="section-lead">学校でも会社でも。「誰に聞けばいい？」を減らし、答えたことを次の人のFAQにできます。</p><div className="places-grid">{[['部活','見学・入部・活動について'],['研究室','研究内容・見学・配属前について'],['学校','新入生・保護者・案内について'],['会社','社内ルール・人事・総務・情シスについて'],['採用','応募前・説明会・選考について'],['イベント','参加方法・当日の案内について']].map(([title, text]) => <article className="place-card" key={title}><b>● {title}</b><span>{text}の質問に</span></article>)}</div></section>
+      <section className="section company-section" aria-labelledby="company-title"><p className="eyebrow">会社でも、きくまえ</p><h2 id="company-title">同じ質問に、何度も答えなくていい。</h2><p className="section-lead">人事・総務・情シス・採用の「聞けば分かるけど、毎回聞くのは面倒」を、やさしい窓口にまとめます。</p><div className="company-grid">{companyUseCases.map(([title, question, value]) => <article className="company-card" key={title}><span className="tag">{title}</span><h3>「{question}」</h3><p>{value}</p></article>)}</div><div className="company-flow"><b>会社での使い方</b><p>質問 → AIが似たFAQを探す → なければ要約と3案を用意 → 人が確認して回答 → FAQ候補を承認。</p><p className="input-hint">担当者の頭の中や個別DMに残っていた答えも、人が承認すれば組織のFAQとして残ります。</p></div></section>
+      <section className="section open-portal-cta" aria-labelledby="open-title"><p className="eyebrow">自分たちの窓口を開く</p><h2 id="open-title">きくまえ窓口を開きませんか？</h2><p>部活、研究室、学校、会社、採用、イベントまで。あなたの場所専用の「聞きやすい窓口」を開けます。</p><p>聞く人も、答える人も少し楽に。答えた内容は、次の「聞く前」のFAQとして育っていきます。</p><Link className="button accent" href="/open">きくまえ窓口を開く</Link></section>
       <section className="section" id="faq" aria-labelledby="faq-title">
         <div className="section-heading"><div><p className="eyebrow">よくある質問</p><h2 id="faq-title">言葉のままで探せます</h2></div><label className="search-label"><span className="sr-only">FAQを検索</span><input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="例：急に見学に行っても大丈夫？" maxLength={100} type="search" /></label></div>
         <div className="faq-grid" aria-live="polite">
