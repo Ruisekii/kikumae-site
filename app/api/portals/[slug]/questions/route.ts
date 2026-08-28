@@ -29,7 +29,7 @@ export async function POST(request: Request, { params }: { params: Promise<{ slu
     if (containsPii(body) || (summary && containsPii(summary))) return Response.json({ message: '個人情報やURLは保存できません。内容を取り除いてから送信してください。' }, { status: 400 });
     if (summary.length > 300) return Response.json({ message: '要約は300文字以内で入力してください。' }, { status: 400 });
     const question = await createQuestion(body, summary, category, portal.id);
-    return Response.json({ id: question.id, message: '質問を受け付けました。回答者が確認します。' }, { status: 201, headers: { 'Cache-Control': 'no-store' } });
+    return Response.json({ id: question.id, checkUrl: `${new URL(request.url).origin}/questions/${question.checkToken}`, message: '質問を受け付けました。回答者が確認します。' }, { status: 201, headers: { 'Cache-Control': 'no-store' } });
   } catch {
     return Response.json({ message: '質問を保存できませんでした。' }, { status: 400 });
   }

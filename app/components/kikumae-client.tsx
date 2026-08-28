@@ -21,6 +21,7 @@ export function KikumaeClient({ faqs }: Props) {
   const [question, setQuestion] = useState('');
   const [preview, setPreview] = useState<Preview | null>(null);
   const [status, setStatus] = useState('');
+  const [checkUrl, setCheckUrl] = useState('');
   const [sending, setSending] = useState(false);
 
   const matches = useMemo(() => {
@@ -53,9 +54,9 @@ export function KikumaeClient({ faqs }: Props) {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ body: preview.body, summary: preview.summary, category: preview.category }),
       });
-      const payload = await response.json() as { message?: string };
+      const payload = await response.json() as { message?: string; checkUrl?: string };
       if (!response.ok) { setStatus(payload.message ?? '送信できませんでした。'); return; }
-      setQuestion(''); setPreview(null); setStatus('質問を受け付けました。回答者が確認し、FAQ改善のため基本的に継続保存されます。');
+      setQuestion(''); setPreview(null); setCheckUrl(payload.checkUrl ?? ''); setStatus('質問を受け付けました。回答者が確認し、FAQ改善のため基本的に継続保存されます。');
     } catch { setStatus('通信に失敗しました。時間をおいてもう一度お試しください。'); }
     finally { setSending(false); }
   }
@@ -86,7 +87,7 @@ export function KikumaeClient({ faqs }: Props) {
       <section className="ask-section" id="ask" aria-labelledby="ask-title">
          <div><p className="eyebrow">匿名の質問窓口</p><h2 id="ask-title">文章は、かしこまらなくて大丈夫。</h2><p>まずFAQを探し、見つからなければ思ったままの文章で質問してください。質問者はログイン不要です。</p><ul><li>外部AIへ質問内容を送信しません</li><li>原文はそのまま回答者に表示します</li><li>質問・回答・FAQ候補はFAQ改善のため基本的に継続保存します</li><li>不要になった記録は回答者が管理画面から削除できます</li></ul></div>
         {!preview ? (
-          <form className="ask-form" onSubmit={previewQuestion}><label htmlFor="question">質問</label><textarea id="question" value={question} onChange={(event) => setQuestion(event.target.value)} placeholder="例：途中からでも参加できますか？" maxLength={500} required /><p className="input-hint">500文字まで。氏名・連絡先・住所・URLなどの個人情報は書かないでください。</p><button className="button accent" disabled={sending} type="submit">{sending ? '確認中…' : 'FAQを探して内容を確認'}</button>{status && <p className="form-status" role="status">{status}</p>}</form>
+          <form className="ask-form" onSubmit={previewQuestion}><label htmlFor="question">質問</label><textarea id="question" value={question} onChange={(event) => setQuestion(event.target.value)} placeholder="例：途中からでも参加できますか？" maxLength={500} required /><p className="input-hint">500文字まで。氏名・連絡先・住所・URLなどの個人情報は書かないでください。</p><button className="button accent" disabled={sending} type="submit">{sending ? '確認中…' : 'FAQを探して内容を確認'}</button>{status && <p className="form-status" role="status">{status}</p>}{checkUrl && <p className="check-link"><a href={checkUrl}>回答の確認ページを保存する</a></p>}</form>
         ) : (
           <form className="ask-form" onSubmit={submitQuestion}>
             <div className="step-card"><span className="tag">AIが質問を整理</span><h3>回答者向けの要約</h3><textarea value={preview.summary} onChange={(event) => setPreview({ ...preview, summary: event.target.value })} maxLength={300} /><p className="input-hint">要約は参考情報です。自由に直せます。原文は変わりません。</p></div>

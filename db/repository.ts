@@ -47,6 +47,7 @@ export type SubmittedQuestion = {
   answeredAt: number | null;
   portalId: number | null;
   candidate: FaqCandidate | null;
+  checkToken?: string;
 };
 
 
@@ -102,6 +103,7 @@ async function initialise(): Promise<D1Database> {
     'ALTER TABLE questions ADD COLUMN answer_used_ai INTEGER NOT NULL DEFAULT 0',
     "ALTER TABLE questions ADD COLUMN answer_grounds TEXT NOT NULL DEFAULT '[]'",
     'ALTER TABLE questions ADD COLUMN answered_at INTEGER',
+    'ALTER TABLE questions ADD COLUMN check_token_hash TEXT',
     'ALTER TABLE faqs ADD COLUMN portal_id INTEGER',
     'ALTER TABLE questions ADD COLUMN portal_id INTEGER',
     'ALTER TABLE faq_candidates ADD COLUMN portal_id INTEGER',
@@ -124,6 +126,11 @@ function parseGrounds(value: string | null): string[] {
 function parseAlternatives(value: string | null): string[] {
   if (!value) return [];
   try { const parsed = JSON.parse(value) as unknown; return Array.isArray(parsed) ? parsed.filter((item): item is string => typeof item === 'string').slice(0, 3) : []; } catch { return []; }
+}
+
+async function hashCheckToken(token: string): Promise<string> {
+  const digest = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(token));
+  return Array.from(new Uint8Array(digest), (byte) => byte.toString(16).padStart(2, '0')).join('');
 }
 
 function mapFaq(row: Record<string, unknown>): Faq {
@@ -158,12 +165,13 @@ export async function createQuestion(body: string, requestedSummary = '', reques
   const related = await listRelatedFaqs(aiSummary || body, 3, portalId);
   const draft = generateLocalDraft(aiSummary, body, related);
   const alternatives = generateAlternativeDrafts(aiSummary, body, related);
-  const result = await db.prepare("INSERT INTO questions (body, body_original, ai_summary, summary_edited, category, status, contact_type, answer_draft, answer_alternatives, answer_grounds, portal_id, created_at) VALUES (?, ?, ?, ?, ?, 'open', 'anonymous', ?, ?, ?, ?, ?)").bind(body, body, aiSummary, aiSummary !== canonicalSummary ? 1 : 0, category, draft, JSON.stringify(alternatives), JSON.stringify(related.map((faq) => faq.question)), portalId, createdAt).run();
+  const checkToken = crypto.randomUUID() + crypto.randomUUID();
+  const result = await db.prepare("INSERT INTO questions (body, body_original, ai_summary, summary_edited, category, status, contact_type, answer_draft, answer_alternatives, answer_grounds, portal_id, check_token_hash, created_at) VALUES (?, ?, ?, ?, ?, 'open', 'anonymous', ?, ?, ?, ?, ?, ?)").bind(body, body, aiSummary, aiSummary !== canonicalSummary ? 1 : 0, category, draft, JSON.stringify(alternatives), JSON.stringify(related.map((faq) => faq.question)), portalId, await hashCheckToken(checkToken), createdAt).run();
   const id = Number(result.meta.last_row_id);
   return {
     id, body, bodyOriginal: body, aiSummary, summaryEdited: aiSummary !== canonicalSummary,
     category, status: 'open', createdAt, answerBody: null, answerDraft: draft, answerAlternatives: alternatives, answerUsedAi: false,
-    answerGrounds: related.map((faq) => faq.question), answeredAt: null, portalId, candidate: null,
+    answerGrounds: related.map((faq) => faq.question), answeredAt: null, portalId, candidate: null, checkToken,
   };
 }
 
@@ -230,6 +238,13 @@ export async function listQuestionsForAdministrator(portalId: number | null = nu
 export async function getQuestionForAdministrator(questionId: number): Promise<SubmittedQuestion | null> {
   const db = await initialise();
   const result = await db.prepare(`${QUESTION_SELECT} WHERE q.id = ? LIMIT 1`).bind(questionId).first<Record<string, unknown>>();
+  return result ? mapQuestion(result) : null;
+}
+
+export async function getQuestionByCheckToken(token: string): Promise<SubmittedQuestion | null> {
+  const db = await initialise();
+  if (!/^[0-9a-f-]{32,80}$/i.test(token)) return null;
+  const result = await db.prepare(`${QUESTION_SELECT} WHERE q.check_token_hash = ? LIMIT 1`).bind(await hashCheckToken(token)).first<Record<string, unknown>>();
   return result ? mapQuestion(result) : null;
 }
 
