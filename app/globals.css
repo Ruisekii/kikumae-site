@@ -55,3 +55,4 @@ footer { padding: 28px 24px; background: var(--navy); color: #fff; text-align: c
  .portal-create-card input, .portal-create-card textarea, .portal-admin-login input { width: 100%; }
  .portal-hero { max-width: 900px; margin: 60px auto; padding: 28px; text-align: center; }
  @media (max-width: 720px) { .feature-grid, .places-grid { grid-template-columns: 1fr; } .cycle-list { display: grid; } .cycle-list i { text-align: center; } .hero h1 { font-size: clamp(2rem, 10vw, 3.4rem); } }
+ .hero-line { display: block; white-space: nowrap; }
