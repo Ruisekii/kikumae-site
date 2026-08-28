@@ -39,6 +39,7 @@ export type SubmittedQuestion = {
   status: string;
   createdAt: number;
   answerBody: string | null;
+  answerDraft: string;
   answerUsedAi: boolean;
   answerGrounds: string[];
   answeredAt: number | null;
@@ -93,6 +94,7 @@ async function initialise(): Promise<D1Database> {
     'ALTER TABLE questions ADD COLUMN summary_edited INTEGER NOT NULL DEFAULT 0',
     "ALTER TABLE questions ADD COLUMN contact_type TEXT NOT NULL DEFAULT 'anonymous'",
     'ALTER TABLE questions ADD COLUMN answer_body TEXT',
+    "ALTER TABLE questions ADD COLUMN answer_draft TEXT NOT NULL DEFAULT ''",
     'ALTER TABLE questions ADD COLUMN answer_used_ai INTEGER NOT NULL DEFAULT 0',
     "ALTER TABLE questions ADD COLUMN answer_grounds TEXT NOT NULL DEFAULT '[]'",
     'ALTER TABLE questions ADD COLUMN answered_at INTEGER',
@@ -139,17 +141,19 @@ export async function createQuestion(body: string, requestedSummary = '', reques
   const canonicalSummary = generateLocalSummary(body);
   const aiSummary = requestedSummary.trim().slice(0, 300) || canonicalSummary;
   const category = categorizeQuestion(body, requestedCategory);
-  const result = await db.prepare("INSERT INTO questions (body, body_original, ai_summary, summary_edited, category, status, contact_type, created_at) VALUES (?, ?, ?, ?, ?, 'open', 'anonymous', ?)").bind(body, body, aiSummary, aiSummary !== canonicalSummary ? 1 : 0, category, createdAt).run();
+  const related = await listRelatedFaqs(aiSummary || body, 3);
+  const draft = generateLocalDraft(aiSummary, body, related);
+  const result = await db.prepare("INSERT INTO questions (body, body_original, ai_summary, summary_edited, category, status, contact_type, answer_draft, answer_grounds, created_at) VALUES (?, ?, ?, ?, ?, 'open', 'anonymous', ?, ?, ?)").bind(body, body, aiSummary, aiSummary !== canonicalSummary ? 1 : 0, category, draft, JSON.stringify(related.map((faq) => faq.question)), createdAt).run();
   const id = Number(result.meta.last_row_id);
   return {
     id, body, bodyOriginal: body, aiSummary, summaryEdited: aiSummary !== canonicalSummary,
-    category, status: 'open', createdAt, answerBody: null, answerUsedAi: false,
-    answerGrounds: [], answeredAt: null, candidate: null,
+    category, status: 'open', createdAt, answerBody: null, answerDraft: draft, answerUsedAi: false,
+    answerGrounds: related.map((faq) => faq.question), answeredAt: null, candidate: null,
   };
 }
 
 export async function claimAdministrator(userId: string): Promise<boolean> {
-  const db = await initialise();
+  const db = database();
   const ownerUserId = configuredOwnerUserId();
   if (!ownerUserId) return false;
   if (ownerUserId && ownerUserId !== userId) return false;
@@ -161,7 +165,7 @@ export async function claimAdministrator(userId: string): Promise<boolean> {
 }
 
 export async function isAdministrator(userId: string): Promise<boolean> {
-  const db = await initialise();
+  const db = database();
   const ownerUserId = configuredOwnerUserId();
   if (!ownerUserId) return false;
   if (ownerUserId && ownerUserId !== userId) return false;
@@ -186,13 +190,14 @@ function mapQuestion(row: Record<string, unknown>): SubmittedQuestion {
     summaryEdited: Boolean(Number(row.summary_edited ?? 0)), category: String(row.category ?? 'その他'),
     status: String(row.status ?? 'open'), createdAt: Number(row.created_at ?? 0),
     answerBody: row.answer_body == null ? null : String(row.answer_body),
+    answerDraft: String(row.answer_draft ?? ''),
     answerUsedAi: Boolean(Number(row.answer_used_ai ?? 0)),
     answerGrounds: parseGrounds(row.answer_grounds == null ? null : String(row.answer_grounds)),
     answeredAt: row.answered_at == null ? null : Number(row.answered_at), candidate: mapCandidate(row),
   };
 }
 
-const QUESTION_SELECT = `SELECT q.id, q.body, q.body_original, q.ai_summary, q.summary_edited, q.category, q.status, q.created_at, q.answer_body, q.answer_used_ai, q.answer_grounds, q.answered_at,
+const QUESTION_SELECT = `SELECT q.id, q.body, q.body_original, q.ai_summary, q.summary_edited, q.category, q.status, q.created_at, q.answer_body, q.answer_draft, q.answer_used_ai, q.answer_grounds, q.answered_at,
   c.id AS candidate_id, c.question_id, c.q_text, c.a_text, c.category AS candidate_category, c.status AS candidate_status, c.created_at AS candidate_created_at
   FROM questions q LEFT JOIN faq_candidates c ON c.question_id = q.id AND c.status = 'pending'`;
 

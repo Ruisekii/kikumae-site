@@ -38,7 +38,7 @@ export function StaffDashboard({ displayName }: Props) {
   const selected = useMemo(() => questions.find((question) => question.id === selectedId) ?? null, [questions, selectedId]);
 
   function selectQuestion(question: SubmittedQuestion) {
-    setSelectedId(question.id); setAnswerText(question.answerBody ?? ''); setAnswerUsesAi(false); setMessage('');
+    setSelectedId(question.id); setAnswerText(question.answerBody ?? question.answerDraft ?? ''); setAnswerUsesAi(!question.answerBody && Boolean(question.answerDraft)); setMessage('');
   }
 
   async function generateDraft() {
