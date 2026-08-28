@@ -20,6 +20,7 @@ export async function POST(request: Request): Promise<Response> {
     const portal = await createPortal(name, slug, description, password);
     return Response.json({ portal: { name: portal.name, slug: portal.slug, description: portal.description } }, { status: 201, headers: { 'Cache-Control': 'no-store' } });
   } catch (error) {
+    console.error('portal creation failed', error instanceof Error ? error.name : 'unknown');
     const message = error instanceof Error && /unique/i.test(error.message) ? 'そのURL用の名前はすでに使われています。' : '窓口を作成できませんでした。';
     return Response.json({ message }, { status: 400 });
   }
