@@ -67,8 +67,8 @@ export function KikumaeClient({ faqs }: Props) {
       </header>
       <section className="hero" id="top">
         <p className="eyebrow">聞きにくいを、聞きやすく。</p>
-        <h1>まずは、FAQを探してみよう。</h1>
-        <p>「人に聞くほどでもない」気持ちを受け止める、小さな質問窓口です。AIは下書きを手伝い、最後は必ず人が確認します。</p>
+        <h1>聞きにくいを、聞きやすく。<br />答える手間も、もっと軽く。</h1>
+        <p>きくまえは、AIが似たFAQを探し、質問を分かりやすく整理し、回答者には回答案を用意するサービスです。人が確認した答えはFAQとして育ち、次の人が質問する前に解決できるようになります。</p>
         <div className="hero-actions"><a className="button primary" href="#faq">FAQを探す</a><a className="button accent" href="#ask">匿名で質問する</a></div>
       </section>
       <section className="section" id="faq" aria-labelledby="faq-title">
@@ -84,7 +84,7 @@ export function KikumaeClient({ faqs }: Props) {
           <form className="ask-form" onSubmit={previewQuestion}><label htmlFor="question">質問</label><textarea id="question" value={question} onChange={(event) => setQuestion(event.target.value)} placeholder="例：途中からでも参加できますか？" maxLength={500} required /><p className="input-hint">500文字まで。氏名・連絡先・住所・URLなどの個人情報は書かないでください。</p><button className="button accent" disabled={sending} type="submit">{sending ? '確認中…' : 'FAQを探して内容を確認'}</button>{status && <p className="form-status" role="status">{status}</p>}</form>
         ) : (
           <form className="ask-form" onSubmit={submitQuestion}>
-            <div className="step-card"><span className="tag">{preview.aiMode === 'local-rules' ? '外部送信なし・ローカル補助AI' : 'AI補助'}</span><h3>回答者向けの要約</h3><textarea value={preview.summary} onChange={(event) => setPreview({ ...preview, summary: event.target.value })} maxLength={300} /><p className="input-hint">要約は参考情報です。自由に直せます。原文は変わりません。</p></div>
+            <div className="step-card"><span className="tag">AIが質問を整理</span><h3>回答者向けの要約</h3><textarea value={preview.summary} onChange={(event) => setPreview({ ...preview, summary: event.target.value })} maxLength={300} /><p className="input-hint">要約は参考情報です。自由に直せます。原文は変わりません。</p></div>
             <div className="original-card"><h3>質問の原文</h3><p>{preview.body}</p></div>
             <label htmlFor="category">カテゴリ（AI候補）</label><select id="category" value={preview.category} onChange={(event) => setPreview({ ...preview, category: event.target.value })}>{categories.map((category) => <option key={category}>{category}</option>)}</select>
             {preview.related.length > 0 && <div className="related-card"><h3>もしかして、このFAQで解決しませんか？</h3>{preview.related.map((faq) => <div className="related-item" key={faq.id}><b>Q. {faq.question}</b><p>A. {faq.answer}</p></div>)}<p className="input-hint">解決しなければ、そのまま質問を送れます。</p></div>}
@@ -92,7 +92,7 @@ export function KikumaeClient({ faqs }: Props) {
           </form>
         )}
       </section>
-      <footer>きくまえ — ローカル補助AIは下書きを手伝います。公式回答とFAQの公開は、必ず人が承認します。</footer>
+      <footer>きくまえ — AIがFAQ検索・質問整理・回答案作成を支援します。公式回答とFAQの公開は、必ず人が承認します。</footer>
     </main>
   );
 }

@@ -3,7 +3,7 @@ import './globals.css';
 
 export const metadata: Metadata = {
   title: 'きくまえ | 聞きにくいを、聞きやすく。',
-  description: '個人情報を収集せず、質問を短期間だけ保存するプライバシー重視の質問窓口です。',
+  description: 'AIがFAQ検索・質問整理・回答案作成を支援し、人の承認でFAQが育つ匿名質問サービスです。',
 };
 
 export default function RootLayout({
