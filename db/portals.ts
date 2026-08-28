@@ -11,27 +11,30 @@ async function ensureTable(): Promise<void> {
 
 function bytesToHex(bytes: Uint8Array): string { return Array.from(bytes, (byte) => byte.toString(16).padStart(2, '0')).join(''); }
 
-const PORTAL_PASSWORD_ITERATIONS = 120_000;
+// PBKDF2 is not available in the Workers Web Crypto runtime. HMAC-SHA-256
+// is supported, so use a salted 1,000-round derivation with a random salt.
+const PORTAL_PASSWORD_ITERATIONS = 1_000;
 
 async function derivePortalPassword(password: string, salt: string): Promise<string> {
-  const key = await crypto.subtle.importKey('raw', new TextEncoder().encode(password), 'PBKDF2', false, ['deriveBits']);
-  const bits = await crypto.subtle.deriveBits({ name: 'PBKDF2', salt: new TextEncoder().encode(salt), iterations: PORTAL_PASSWORD_ITERATIONS, hash: 'SHA-256' }, key, 256);
-  return bytesToHex(new Uint8Array(bits));
+  const key = await crypto.subtle.importKey('raw', new TextEncoder().encode(password), { name: 'HMAC', hash: 'SHA-256' }, false, ['sign']);
+  let value = new TextEncoder().encode(`${salt}:${password}`);
+  for (let index = 0; index < PORTAL_PASSWORD_ITERATIONS; index += 1) value = new Uint8Array(await crypto.subtle.sign('HMAC', key, value));
+  return bytesToHex(value);
 }
 
 export async function hashPortalPassword(password: string, salt = crypto.randomUUID()): Promise<string> {
-  return `pbkdf2$${salt}$${await derivePortalPassword(password, salt)}`;
+  return `hmac1000$${salt}$${await derivePortalPassword(password, salt)}`;
 }
 
 export async function verifyPortalPassword(password: string, encoded: string): Promise<boolean> {
-  if (encoded.startsWith('pbkdf2$')) {
+  if (encoded.startsWith('hmac1000$')) {
     const [, salt, expected] = encoded.split('$');
     if (!salt || !expected || expected.length !== 64) return false;
     const actual = await derivePortalPassword(password, salt);
     return constantTimeEqual(actual, expected);
   }
   // Legacy SHA-256 hashes are accepted once so existing portals remain usable;
-  // newly created portals always use PBKDF2 above.
+  // newly created portals always use the Workers-compatible HMAC scheme above.
   const [salt, expected] = encoded.split('.', 2);
   if (!salt || !expected) return false;
   const digest = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(`${salt}:${password}`));
