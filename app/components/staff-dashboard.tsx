@@ -23,8 +23,8 @@ export function StaffDashboard({ displayName }: Props) {
     if (!response.ok) { const body = await response.json() as { message?: string }; setMessage(body.message ?? '質問一覧を読み込めませんでした。'); return; }
     const body = await response.json() as { questions: SubmittedQuestion[] };
     setQuestions(body.questions); setMessage('');
-    if (selectedId && !body.questions.some((question) => question.id === selectedId)) setSelectedId(null);
-  }, [selectedId]);
+    setSelectedId((current) => current && !body.questions.some((question) => question.id === current) ? null : current);
+  }, []);
 
   useEffect(() => {
     async function load() {
@@ -57,7 +57,7 @@ export function StaffDashboard({ displayName }: Props) {
       const response = await fetch(`/api/admin/questions/${selected.id}/draft`, { method: 'POST' });
       const body = await response.json() as Draft & { message?: string };
       if (!response.ok) { setMessage(body.message ?? '回答案を生成できませんでした。'); return; }
-      setDrafts((current) => ({ ...current, [selected.id]: body })); setAnswerText(body.draft); setAnswerUsesAi(true); setMessage('回答案を表示しました。原文と根拠を確認してから、人が承認・修正してください。');
+      setDrafts((current) => ({ ...current, [selected.id]: body })); setAnswerText(body.draft); setAnswerUsesAi(true); setMessage('');
     } catch { setMessage('回答案の生成に失敗しました。'); }
     finally { setBusy(false); }
   }
@@ -70,7 +70,7 @@ export function StaffDashboard({ displayName }: Props) {
       const response = await fetch(`/api/admin/questions/${selected.id}/answer`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ body: answerText, usedAi: answerUsesAi, grounds: draft?.grounds ?? [] }) });
       const body = await response.json() as { candidate?: FaqCandidate | null; message?: string };
       if (!response.ok) { setMessage(body.message ?? '回答を保存できませんでした。'); return; }
-      await loadQuestions(); setMessage(body.candidate ? '回答を承認しました。FAQ候補を作成しました。下の候補を確認してください。' : '回答を承認しました。個人情報の可能性があるためFAQ候補は作成していません。');
+      await loadQuestions(); setMessage('');
     } catch { setMessage('回答の保存に失敗しました。'); }
     finally { setBusy(false); }
   }
@@ -81,7 +81,7 @@ export function StaffDashboard({ displayName }: Props) {
       const response = await fetch(`/api/admin/candidates/${candidate.id}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action, qText, aText, category }) });
       const body = await response.json() as { message?: string };
       if (!response.ok) { setMessage(body.message ?? 'FAQ候補を更新できませんでした。'); return; }
-      await loadQuestions(); setMessage(action === 'publish_edited' ? '人の承認で公式FAQに公開しました。' : 'FAQ候補を更新しました。');
+      await loadQuestions(); setMessage('');
     } catch { setMessage('FAQ候補の更新に失敗しました。'); }
     finally { setBusy(false); }
   }
@@ -93,7 +93,7 @@ export function StaffDashboard({ displayName }: Props) {
       const response = await fetch(`/api/admin/questions/${selected.id}`, { method: 'DELETE' });
       const body = await response.json() as { message?: string };
       if (!response.ok) { setMessage(body.message ?? '質問を削除できませんでした。'); return; }
-      setSelectedId(null); await loadQuestions(); setMessage('質問と関連する回答・FAQ候補を削除しました。');
+      setSelectedId(null); await loadQuestions(); setMessage('');
     } catch { setMessage('質問の削除に失敗しました。'); }
     finally { setBusy(false); }
   }
