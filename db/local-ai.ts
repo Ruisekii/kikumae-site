@@ -114,7 +114,7 @@ export function generateLocalSummary(value: string): string {
 export function generateLocalDraft(summary: string, original: string, related: AiRelatedFaq[]): string {
   if (!related.length) return 'この質問に対応する承認済みFAQが見つかりませんでした。\nAIは推測せず、担当者による確認が必要です。';
   const answers = Array.from(new Set(related.map((faq) => faq.answer.trim()))).join('\n');
-  return `${answers}\n\n（質問の要約: ${summary || generateLocalSummary(original)}）`;
+  return answers;
 }
 
 export function generateAlternativeDrafts(summary: string, original: string, related: AiRelatedFaq[]): string[] {
