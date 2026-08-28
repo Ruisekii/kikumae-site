@@ -214,7 +214,9 @@ const QUESTION_SELECT = `SELECT q.id, q.body, q.body_original, q.ai_summary, q.s
 export async function listQuestionsForAdministrator(): Promise<SubmittedQuestion[]> {
   const db = await initialise();
   const result = await db.prepare(`${QUESTION_SELECT} ORDER BY q.created_at DESC LIMIT 100`).all<Record<string, unknown>>();
-  return (result.results ?? []).map(mapQuestion);
+  return (result.results ?? []).map(mapQuestion).map((question) => question.answerAlternatives.length || question.status !== 'open'
+    ? question
+    : { ...question, answerAlternatives: generateAlternativeDrafts(question.aiSummary, question.bodyOriginal, []) });
 }
 
 export async function getQuestionForAdministrator(questionId: number): Promise<SubmittedQuestion | null> {
