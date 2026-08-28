@@ -11,15 +11,38 @@ async function ensureTable(): Promise<void> {
 
 function bytesToHex(bytes: Uint8Array): string { return Array.from(bytes, (byte) => byte.toString(16).padStart(2, '0')).join(''); }
 
+const PORTAL_PASSWORD_ITERATIONS = 120_000;
+
+async function derivePortalPassword(password: string, salt: string): Promise<string> {
+  const key = await crypto.subtle.importKey('raw', new TextEncoder().encode(password), 'PBKDF2', false, ['deriveBits']);
+  const bits = await crypto.subtle.deriveBits({ name: 'PBKDF2', salt: new TextEncoder().encode(salt), iterations: PORTAL_PASSWORD_ITERATIONS, hash: 'SHA-256' }, key, 256);
+  return bytesToHex(new Uint8Array(bits));
+}
+
 export async function hashPortalPassword(password: string, salt = crypto.randomUUID()): Promise<string> {
-  const digest = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(`${salt}:${password}`));
-  return `${salt}.${bytesToHex(new Uint8Array(digest))}`;
+  return `pbkdf2$${salt}$${await derivePortalPassword(password, salt)}`;
 }
 
 export async function verifyPortalPassword(password: string, encoded: string): Promise<boolean> {
-  const [salt] = encoded.split('.', 1);
-  if (!salt) return false;
-  return (await hashPortalPassword(password, salt)).split('.')[1] === encoded.split('.')[1];
+  if (encoded.startsWith('pbkdf2$')) {
+    const [, salt, expected] = encoded.split('$');
+    if (!salt || !expected || expected.length !== 64) return false;
+    const actual = await derivePortalPassword(password, salt);
+    return constantTimeEqual(actual, expected);
+  }
+  // Legacy SHA-256 hashes are accepted once so existing portals remain usable;
+  // newly created portals always use PBKDF2 above.
+  const [salt, expected] = encoded.split('.', 2);
+  if (!salt || !expected) return false;
+  const digest = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(`${salt}:${password}`));
+  return constantTimeEqual(bytesToHex(new Uint8Array(digest)), expected);
+}
+
+function constantTimeEqual(left: string, right: string): boolean {
+  if (left.length !== right.length) return false;
+  let difference = 0;
+  for (let index = 0; index < left.length; index += 1) difference |= left.charCodeAt(index) ^ right.charCodeAt(index);
+  return difference === 0;
 }
 
 export async function createPortal(name: string, slug: string, description: string, password: string): Promise<Portal> {

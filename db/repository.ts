@@ -45,6 +45,7 @@ export type SubmittedQuestion = {
   answerUsedAi: boolean;
   answerGrounds: string[];
   answeredAt: number | null;
+  portalId: number | null;
   candidate: FaqCandidate | null;
 };
 
@@ -101,6 +102,9 @@ async function initialise(): Promise<D1Database> {
     'ALTER TABLE questions ADD COLUMN answer_used_ai INTEGER NOT NULL DEFAULT 0',
     "ALTER TABLE questions ADD COLUMN answer_grounds TEXT NOT NULL DEFAULT '[]'",
     'ALTER TABLE questions ADD COLUMN answered_at INTEGER',
+    'ALTER TABLE faqs ADD COLUMN portal_id INTEGER',
+    'ALTER TABLE questions ADD COLUMN portal_id INTEGER',
+    'ALTER TABLE faq_candidates ADD COLUMN portal_id INTEGER',
   ]) await safeRun(db, migration);
   await safeRun(db, 'UPDATE questions SET body_original = body WHERE body_original IS NULL');
   await db.batch(SEED_FAQS.map((faq) => db.prepare("INSERT OR IGNORE INTO faqs (question, answer, category, status, updated_at) VALUES (?, ?, ?, 'published', ?)").bind(faq.question, faq.answer, faq.category, now)));
@@ -133,31 +137,33 @@ function mapFaq(row: Record<string, unknown>): Faq {
   };
 }
 
-export async function listPublishedFaqs(): Promise<Faq[]> {
+export async function listPublishedFaqs(portalId: number | null = null): Promise<Faq[]> {
   const db = await initialise();
-  const result = await db.prepare("SELECT id, question, answer, category, status, updated_at FROM faqs WHERE status = 'published' ORDER BY updated_at DESC").all<Record<string, unknown>>();
+  const result = portalId == null
+    ? await db.prepare("SELECT id, question, answer, category, status, updated_at FROM faqs WHERE status = 'published' AND portal_id IS NULL ORDER BY updated_at DESC").all<Record<string, unknown>>()
+    : await db.prepare("SELECT id, question, answer, category, status, updated_at FROM faqs WHERE status = 'published' AND portal_id = ? ORDER BY updated_at DESC").bind(portalId).all<Record<string, unknown>>();
   return (result.results ?? []).map(mapFaq);
 }
 
-export async function listRelatedFaqs(query: string, limit = 3): Promise<RelatedFaq[]> {
-  return searchFaqs(query, await listPublishedFaqs(), limit);
+export async function listRelatedFaqs(query: string, limit = 3, portalId: number | null = null): Promise<RelatedFaq[]> {
+  return searchFaqs(query, await listPublishedFaqs(portalId), limit);
 }
 
-export async function createQuestion(body: string, requestedSummary = '', requestedCategory = ''): Promise<SubmittedQuestion> {
+export async function createQuestion(body: string, requestedSummary = '', requestedCategory = '', portalId: number | null = null): Promise<SubmittedQuestion> {
   const db = await initialise();
   const createdAt = Date.now();
   const canonicalSummary = generateLocalSummary(body);
   const aiSummary = requestedSummary.trim().slice(0, 300) || canonicalSummary;
   const category = categorizeQuestion(body, requestedCategory);
-  const related = await listRelatedFaqs(aiSummary || body, 3);
+  const related = await listRelatedFaqs(aiSummary || body, 3, portalId);
   const draft = generateLocalDraft(aiSummary, body, related);
   const alternatives = generateAlternativeDrafts(aiSummary, body, related);
-  const result = await db.prepare("INSERT INTO questions (body, body_original, ai_summary, summary_edited, category, status, contact_type, answer_draft, answer_alternatives, answer_grounds, created_at) VALUES (?, ?, ?, ?, ?, 'open', 'anonymous', ?, ?, ?, ?)").bind(body, body, aiSummary, aiSummary !== canonicalSummary ? 1 : 0, category, draft, JSON.stringify(alternatives), JSON.stringify(related.map((faq) => faq.question)), createdAt).run();
+  const result = await db.prepare("INSERT INTO questions (body, body_original, ai_summary, summary_edited, category, status, contact_type, answer_draft, answer_alternatives, answer_grounds, portal_id, created_at) VALUES (?, ?, ?, ?, ?, 'open', 'anonymous', ?, ?, ?, ?, ?)").bind(body, body, aiSummary, aiSummary !== canonicalSummary ? 1 : 0, category, draft, JSON.stringify(alternatives), JSON.stringify(related.map((faq) => faq.question)), portalId, createdAt).run();
   const id = Number(result.meta.last_row_id);
   return {
     id, body, bodyOriginal: body, aiSummary, summaryEdited: aiSummary !== canonicalSummary,
     category, status: 'open', createdAt, answerBody: null, answerDraft: draft, answerAlternatives: alternatives, answerUsedAi: false,
-    answerGrounds: related.map((faq) => faq.question), answeredAt: null, candidate: null,
+    answerGrounds: related.map((faq) => faq.question), answeredAt: null, portalId, candidate: null,
   };
 }
 
@@ -203,17 +209,19 @@ function mapQuestion(row: Record<string, unknown>): SubmittedQuestion {
     answerAlternatives: parseAlternatives(row.answer_alternatives == null ? null : String(row.answer_alternatives)),
     answerUsedAi: Boolean(Number(row.answer_used_ai ?? 0)),
     answerGrounds: parseGrounds(row.answer_grounds == null ? null : String(row.answer_grounds)),
-    answeredAt: row.answered_at == null ? null : Number(row.answered_at), candidate: mapCandidate(row),
+    answeredAt: row.answered_at == null ? null : Number(row.answered_at), portalId: row.portal_id == null ? null : Number(row.portal_id), candidate: mapCandidate(row),
   };
 }
 
-const QUESTION_SELECT = `SELECT q.id, q.body, q.body_original, q.ai_summary, q.summary_edited, q.category, q.status, q.created_at, q.answer_body, q.answer_draft, q.answer_alternatives, q.answer_used_ai, q.answer_grounds, q.answered_at,
+const QUESTION_SELECT = `SELECT q.id, q.body, q.body_original, q.ai_summary, q.summary_edited, q.category, q.status, q.created_at, q.answer_body, q.answer_draft, q.answer_alternatives, q.answer_used_ai, q.answer_grounds, q.answered_at, q.portal_id,
   c.id AS candidate_id, c.question_id, c.q_text, c.a_text, c.category AS candidate_category, c.status AS candidate_status, c.created_at AS candidate_created_at
   FROM questions q LEFT JOIN faq_candidates c ON c.question_id = q.id AND c.status = 'pending'`;
 
-export async function listQuestionsForAdministrator(): Promise<SubmittedQuestion[]> {
+export async function listQuestionsForAdministrator(portalId: number | null = null): Promise<SubmittedQuestion[]> {
   const db = await initialise();
-  const result = await db.prepare(`${QUESTION_SELECT} ORDER BY q.created_at DESC LIMIT 100`).all<Record<string, unknown>>();
+  const result = portalId == null
+    ? await db.prepare(`${QUESTION_SELECT} WHERE q.portal_id IS NULL ORDER BY q.created_at DESC LIMIT 100`).all<Record<string, unknown>>()
+    : await db.prepare(`${QUESTION_SELECT} WHERE q.portal_id = ? ORDER BY q.created_at DESC LIMIT 100`).bind(portalId).all<Record<string, unknown>>();
   return (result.results ?? []).map(mapQuestion).map((question) => question.answerAlternatives.length || question.status !== 'open'
     ? question
     : { ...question, answerAlternatives: generateAlternativeDrafts(question.aiSummary, question.bodyOriginal, []) });
@@ -225,10 +233,11 @@ export async function getQuestionForAdministrator(questionId: number): Promise<S
   return result ? mapQuestion(result) : null;
 }
 
-export async function generateAnswerDraft(questionId: number): Promise<{ draft: string; grounds: string[]; mode: 'local-rules' }> {
+export async function generateAnswerDraft(questionId: number, portalId?: number | null): Promise<{ draft: string; grounds: string[]; mode: 'local-rules' }> {
   const question = await getQuestionForAdministrator(questionId);
   if (!question) throw new Error('質問が見つかりません。');
-  const related = await listRelatedFaqs(question.aiSummary || question.bodyOriginal, 3);
+  if (portalId !== undefined && question.portalId !== portalId) throw new Error('この窓口の質問ではありません。');
+  const related = await listRelatedFaqs(question.aiSummary || question.bodyOriginal, 3, question.portalId);
   return { draft: generateLocalDraft(question.aiSummary || question.bodyOriginal, question.bodyOriginal, related), grounds: related.map((faq) => faq.question), mode: 'local-rules' };
 }
 
@@ -242,7 +251,7 @@ export async function approveAnswer(questionId: number, body: string, usedAi: bo
   await db.prepare("UPDATE questions SET answer_body = ?, answer_used_ai = ?, answer_grounds = ?, status = 'answered', answered_at = ? WHERE id = ?").bind(answer, usedAi ? 1 : 0, JSON.stringify(grounds.filter(Boolean).slice(0, 10)), answeredAt, questionId).run();
   const candidate = containsPii(question.bodyOriginal) || containsPii(answer) ? null : generateFaqCandidate(question.bodyOriginal, answer, question.category);
   if (!candidate) return null;
-  const result = await db.prepare("INSERT INTO faq_candidates (question_id, q_text, a_text, category, status, created_at) VALUES (?, ?, ?, ?, 'pending', ?)").bind(questionId, candidate.q, candidate.a, candidate.category, answeredAt).run();
+  const result = await db.prepare("INSERT INTO faq_candidates (question_id, q_text, a_text, category, portal_id, status, created_at) VALUES (?, ?, ?, ?, ?, 'pending', ?)").bind(questionId, candidate.q, candidate.a, candidate.category, question.portalId, answeredAt).run();
   return { id: Number(result.meta.last_row_id), questionId, qText: candidate.q, aText: candidate.a, category: candidate.category, status: 'pending', createdAt: answeredAt };
 }
 
@@ -252,10 +261,11 @@ export async function deleteQuestion(questionId: number): Promise<void> {
   await db.prepare('DELETE FROM questions WHERE id = ?').bind(questionId).run();
 }
 
-export async function actOnCandidate(candidateId: number, action: string, qText: string, aText: string, category: string): Promise<void> {
+export async function actOnCandidate(candidateId: number, action: string, qText: string, aText: string, category: string, portalId?: number | null): Promise<void> {
   const db = await initialise();
-  const candidate = await db.prepare("SELECT id, q_text, a_text, category FROM faq_candidates WHERE id = ? AND status = 'pending'").bind(candidateId).first<{ id: number; q_text: string; a_text: string; category: string }>();
+  const candidate = await db.prepare("SELECT id, q_text, a_text, category, portal_id FROM faq_candidates WHERE id = ? AND status = 'pending'").bind(candidateId).first<{ id: number; q_text: string; a_text: string; category: string; portal_id: number | null }>();
   if (!candidate) throw new Error('承認待ちのFAQ候補が見つかりません。');
+  if (portalId !== undefined && candidate.portal_id !== portalId) throw new Error('この窓口のFAQ候補ではありません。');
   const safeQuestion = (qText.trim() || candidate.q_text).slice(0, 300);
   const safeAnswer = (aText.trim() || candidate.a_text).slice(0, 2000);
   const safeCategory = category.trim().slice(0, 64) || candidate.category;
@@ -263,9 +273,9 @@ export async function actOnCandidate(candidateId: number, action: string, qText:
     if (containsPii(safeQuestion) || containsPii(safeAnswer)) throw new Error('個人情報やURLを含むFAQは公開できません。');
     const existing = await db.prepare('SELECT id FROM faqs WHERE question = ?').bind(safeQuestion).first<{ id: number }>();
     if (existing) {
-      await db.prepare("UPDATE faqs SET answer = ?, category = ?, status = 'published', updated_at = ? WHERE id = ?").bind(safeAnswer, safeCategory, Date.now(), existing.id).run();
+      await db.prepare("UPDATE faqs SET answer = ?, category = ?, status = 'published', portal_id = ?, updated_at = ? WHERE id = ?").bind(safeAnswer, safeCategory, candidate.portal_id, Date.now(), existing.id).run();
     } else {
-      await db.prepare("INSERT INTO faqs (question, answer, category, status, updated_at) VALUES (?, ?, ?, 'published', ?)").bind(safeQuestion, safeAnswer, safeCategory, Date.now()).run();
+      await db.prepare("INSERT INTO faqs (question, answer, category, portal_id, status, updated_at) VALUES (?, ?, ?, ?, 'published', ?)").bind(safeQuestion, safeAnswer, safeCategory, candidate.portal_id, Date.now()).run();
     }
     await db.prepare("UPDATE faq_candidates SET status = 'published', q_text = ?, a_text = ?, category = ? WHERE id = ?").bind(safeQuestion, safeAnswer, safeCategory, candidateId).run();
   } else if (action === 'individual' || action === 'reject') {

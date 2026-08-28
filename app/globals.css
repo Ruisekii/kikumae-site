@@ -54,5 +54,16 @@ footer { padding: 28px 24px; background: var(--navy); color: #fff; text-align: c
  .portal-create-card label, .portal-admin-login label { display: grid; gap: 6px; font-weight: 800; }
  .portal-create-card input, .portal-create-card textarea, .portal-admin-login input { width: 100%; }
  .portal-hero { max-width: 900px; margin: 60px auto; padding: 28px; text-align: center; }
+ .portal-complete dl { display: grid; grid-template-columns: 110px 1fr; gap: 8px 14px; padding: 16px; border-radius: 14px; background: #eaf7fc; }
+ .portal-complete dt { font-weight: 900; color: var(--navy); }
+ .portal-complete dd { margin: 0; overflow-wrap: anywhere; }
+ .portal-qr { margin: 20px 0; padding: 18px; border: 2px solid #f0c44c; border-radius: 16px; background: #fff8d8; text-align: center; }
+ .portal-qr p { margin: 4px 0 10px; }
+ .portal-qr img { display: block; margin: 0 auto; border: 8px solid #fff; border-radius: 8px; }
+ .next-steps { margin-top: 22px; padding: 16px; border-radius: 14px; background: #fff; border: 1px solid var(--line); }
+ .next-steps ol { margin: 8px 0 0; padding-left: 1.4rem; }
+ .faq-card-featured { max-width: 760px; margin: 0 auto; }
+ .faq-grid-inner { margin-top: 14px; grid-template-columns: 1fr; }
+ .faq-card details { margin-top: 14px; }
  @media (max-width: 720px) { .feature-grid, .places-grid { grid-template-columns: 1fr; } .cycle-list { display: grid; } .cycle-list i { text-align: center; } .hero h1 { font-size: clamp(2rem, 10vw, 3.4rem); } }
  .hero-line { display: block; white-space: nowrap; }
