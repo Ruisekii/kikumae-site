@@ -6,6 +6,7 @@ a { color: inherit; }
 button, input, textarea { font: inherit; }
 .site-header { display: flex; align-items: center; justify-content: space-between; gap: 1.2rem; max-width: 1120px; min-height: 74px; margin: auto; padding: 0 24px; }
 .site-header nav { display: flex; flex-wrap: wrap; gap: 18px; font-size: .92rem; font-weight: 700; }
+.header-actions { display: flex; align-items: center; flex-wrap: wrap; gap: 12px; }
 .site-header nav a, .site-header > a:last-child { text-underline-offset: 5px; }
 .brand { font-size: 1.3rem; font-weight: 900; text-decoration: none; letter-spacing: .04em; }
 .hero { max-width: 1120px; margin: 0 auto; padding: 92px 24px 86px; background: radial-gradient(circle at 77% 20%, #ffdf87 0 10%, transparent 10.2%), radial-gradient(circle at 88% 63%, #96d9f3 0 9%, transparent 9.2%); }
