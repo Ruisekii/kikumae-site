@@ -1,4 +1,4 @@
-import { requirePortalSession } from '../../../../../../../../db/portal-auth';
+import { requirePortalSession, sameOrigin } from '../../../../../../../../db/portal-auth';
 import { approveAnswer } from '../../../../../../../../db/repository';
 
 export const runtime = 'edge';
@@ -6,6 +6,7 @@ const MAX_BYTES = 12000;
 
 export async function POST(request: Request, { params }: { params: Promise<{ slug: string; id: string }> }): Promise<Response> {
   const { slug, id: rawId } = await params;
+  if (!sameOrigin(request)) return Response.json({ message: 'この送信元は許可されていません。' }, { status: 403 });
   const portal = await requirePortalSession(request, slug);
   if (!portal) return Response.json({ message: '管理者パスワードでログインしてください。' }, { status: 401 });
   const id = Number(rawId);

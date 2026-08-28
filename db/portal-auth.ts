@@ -6,6 +6,11 @@ function cookieValue(request: Request, name: string): string | null {
   return match ? decodeURIComponent(match.slice(name.length + 1)) : null;
 }
 
+export function sameOrigin(request: Request): boolean {
+  const origin = request.headers.get('origin');
+  return !origin || origin === new URL(request.url).origin;
+}
+
 export async function requirePortalSession(request: Request, slug: string): Promise<Portal | null> {
   const portal = await getPortal(slug);
   if (!portal) return null;
