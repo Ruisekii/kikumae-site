@@ -35,6 +35,13 @@ export function StaffDashboard({ displayName }: Props) {
     void load();
   }, [loadQuestions]);
 
+  // Keep transient success/status notices from hiding the dashboard itself.
+  useEffect(() => {
+    if (!message || message.includes('権限') || message.includes('確認しています')) return;
+    const timer = window.setTimeout(() => setMessage(''), 1800);
+    return () => window.clearTimeout(timer);
+  }, [message]);
+
   const selected = useMemo(() => questions.find((question) => question.id === selectedId) ?? null, [questions, selectedId]);
 
   function selectQuestion(question: SubmittedQuestion) {
