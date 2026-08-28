@@ -5,6 +5,7 @@ import {
   generateFaqCandidate,
   generateLocalSummary,
   generateLocalDraft,
+  generateAlternativeDrafts,
   searchFaqs,
 } from './local-ai';
 
@@ -40,6 +41,7 @@ export type SubmittedQuestion = {
   createdAt: number;
   answerBody: string | null;
   answerDraft: string;
+  answerAlternatives: string[];
   answerUsedAi: boolean;
   answerGrounds: string[];
   answeredAt: number | null;
@@ -95,6 +97,7 @@ async function initialise(): Promise<D1Database> {
     "ALTER TABLE questions ADD COLUMN contact_type TEXT NOT NULL DEFAULT 'anonymous'",
     'ALTER TABLE questions ADD COLUMN answer_body TEXT',
     "ALTER TABLE questions ADD COLUMN answer_draft TEXT NOT NULL DEFAULT ''",
+    "ALTER TABLE questions ADD COLUMN answer_alternatives TEXT NOT NULL DEFAULT '[]'",
     'ALTER TABLE questions ADD COLUMN answer_used_ai INTEGER NOT NULL DEFAULT 0',
     "ALTER TABLE questions ADD COLUMN answer_grounds TEXT NOT NULL DEFAULT '[]'",
     'ALTER TABLE questions ADD COLUMN answered_at INTEGER',
@@ -112,6 +115,11 @@ function parseGrounds(value: string | null): string[] {
   } catch {
     return [];
   }
+}
+
+function parseAlternatives(value: string | null): string[] {
+  if (!value) return [];
+  try { const parsed = JSON.parse(value) as unknown; return Array.isArray(parsed) ? parsed.filter((item): item is string => typeof item === 'string').slice(0, 3) : []; } catch { return []; }
 }
 
 function mapFaq(row: Record<string, unknown>): Faq {
@@ -143,11 +151,12 @@ export async function createQuestion(body: string, requestedSummary = '', reques
   const category = categorizeQuestion(body, requestedCategory);
   const related = await listRelatedFaqs(aiSummary || body, 3);
   const draft = generateLocalDraft(aiSummary, body, related);
-  const result = await db.prepare("INSERT INTO questions (body, body_original, ai_summary, summary_edited, category, status, contact_type, answer_draft, answer_grounds, created_at) VALUES (?, ?, ?, ?, ?, 'open', 'anonymous', ?, ?, ?)").bind(body, body, aiSummary, aiSummary !== canonicalSummary ? 1 : 0, category, draft, JSON.stringify(related.map((faq) => faq.question)), createdAt).run();
+  const alternatives = generateAlternativeDrafts(aiSummary, body, related);
+  const result = await db.prepare("INSERT INTO questions (body, body_original, ai_summary, summary_edited, category, status, contact_type, answer_draft, answer_alternatives, answer_grounds, created_at) VALUES (?, ?, ?, ?, ?, 'open', 'anonymous', ?, ?, ?, ?)").bind(body, body, aiSummary, aiSummary !== canonicalSummary ? 1 : 0, category, draft, JSON.stringify(alternatives), JSON.stringify(related.map((faq) => faq.question)), createdAt).run();
   const id = Number(result.meta.last_row_id);
   return {
     id, body, bodyOriginal: body, aiSummary, summaryEdited: aiSummary !== canonicalSummary,
-    category, status: 'open', createdAt, answerBody: null, answerDraft: draft, answerUsedAi: false,
+    category, status: 'open', createdAt, answerBody: null, answerDraft: draft, answerAlternatives: alternatives, answerUsedAi: false,
     answerGrounds: related.map((faq) => faq.question), answeredAt: null, candidate: null,
   };
 }
@@ -191,13 +200,14 @@ function mapQuestion(row: Record<string, unknown>): SubmittedQuestion {
     status: String(row.status ?? 'open'), createdAt: Number(row.created_at ?? 0),
     answerBody: row.answer_body == null ? null : String(row.answer_body),
     answerDraft: String(row.answer_draft ?? ''),
+    answerAlternatives: parseAlternatives(row.answer_alternatives == null ? null : String(row.answer_alternatives)),
     answerUsedAi: Boolean(Number(row.answer_used_ai ?? 0)),
     answerGrounds: parseGrounds(row.answer_grounds == null ? null : String(row.answer_grounds)),
     answeredAt: row.answered_at == null ? null : Number(row.answered_at), candidate: mapCandidate(row),
   };
 }
 
-const QUESTION_SELECT = `SELECT q.id, q.body, q.body_original, q.ai_summary, q.summary_edited, q.category, q.status, q.created_at, q.answer_body, q.answer_draft, q.answer_used_ai, q.answer_grounds, q.answered_at,
+const QUESTION_SELECT = `SELECT q.id, q.body, q.body_original, q.ai_summary, q.summary_edited, q.category, q.status, q.created_at, q.answer_body, q.answer_draft, q.answer_alternatives, q.answer_used_ai, q.answer_grounds, q.answered_at,
   c.id AS candidate_id, c.question_id, c.q_text, c.a_text, c.category AS candidate_category, c.status AS candidate_status, c.created_at AS candidate_created_at
   FROM questions q LEFT JOIN faq_candidates c ON c.question_id = q.id AND c.status = 'pending'`;
 

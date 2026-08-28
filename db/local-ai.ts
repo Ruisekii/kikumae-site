@@ -117,9 +117,18 @@ export function generateLocalDraft(summary: string, original: string, related: A
   return `${answers}\n\n（質問の要約: ${summary || generateLocalSummary(original)}）`;
 }
 
+export function generateAlternativeDrafts(summary: string, original: string, related: AiRelatedFaq[]): string[] {
+  const topic = summary || generateLocalSummary(original);
+  const basis = related.length ? related[0].answer.trim() : '';
+  return [
+    basis ? `${basis}\n\n（質問の要約: ${topic}）` : `ご質問ありがとうございます。${topic}について確認して回答します。`,
+    `ご質問の「${original.trim().slice(0, 80)}」について、担当者が確認してご案内します。\n\n（回答案のため、内容を確認・修正してください）`,
+    `お問い合わせの件は、現在の状況を確認のうえご案内します。\n必要に応じて担当者から補足します。\n\n（質問の要約: ${topic}）`,
+  ];
+}
+
 export function generateFaqCandidate(question: string, answer: string, category: string): { q: string; a: string; category: string } {
   const base = generateLocalSummary(question).replace(/知りたい。$/, '').replace(/^「|」$/g, '').slice(0, 50);
   const q = /[か?？]$/.test(base) ? `${base}${base.endsWith('か') ? '？' : ''}` : `${base}について教えてください。`;
   return { q, a: answer.trim().slice(0, 1000), category: categorizeQuestion(question, category) };
 }
-
