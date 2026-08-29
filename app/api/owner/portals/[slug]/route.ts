@@ -19,14 +19,19 @@ export async function DELETE(request: Request, { params }: { params: Promise<{ s
   if (!portal) return Response.json({ message: '窓口が見つかりません。' }, { status: 404 });
   const length = Number(request.headers.get('content-length') ?? '0');
   if (Number.isFinite(length) && length > MAX_BYTES) return Response.json({ message: '入力が長すぎます。' }, { status: 413 });
+  let body: { confirmName?: unknown };
   try {
     const raw = await request.text();
     if (new TextEncoder().encode(raw).byteLength > MAX_BYTES) return Response.json({ message: '入力が長すぎます。' }, { status: 413 });
-    const body = JSON.parse(raw) as { confirmName?: unknown };
-    if (typeof body.confirmName !== 'string' || body.confirmName !== portal.name) return Response.json({ message: '窓口名が一致しません。削除を中止しました。' }, { status: 400 });
+    body = JSON.parse(raw) as { confirmName?: unknown };
+  } catch {
+    return Response.json({ message: '入力形式が正しくありません。' }, { status: 400 });
+  }
+  if (typeof body.confirmName !== 'string' || body.confirmName !== portal.name) return Response.json({ message: '窓口名が一致しません。削除を中止しました。' }, { status: 400 });
+  try {
     await deletePortal(portal.id);
     return Response.json({ ok: true }, { headers: { 'Cache-Control': 'no-store' } });
-  } catch (error) {
-    return Response.json({ message: error instanceof Error ? error.message : '窓口を削除できませんでした。' }, { status: 400 });
+  } catch {
+    return Response.json({ message: '窓口を削除できませんでした。時間をおいて再度お試しください。' }, { status: 500 });
   }
 }

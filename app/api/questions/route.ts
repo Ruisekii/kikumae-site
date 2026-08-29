@@ -1,5 +1,6 @@
 import { createQuestion } from '../../../db/repository';
 import { containsPii } from '../../../db/local-ai';
+import { allowBurst } from '../../../db/request-guard';
 
 export const runtime = 'edge';
 
@@ -17,6 +18,7 @@ function json(message: string, status: number): Response {
 
 export async function POST(request: Request): Promise<Response> {
   if (!sameOrigin(request)) return json('この送信元は許可されていません。', 403);
+  if (!allowBurst(request, 'question-create:root', 30, 10 * 60 * 1000)) return json('送信が多すぎます。少し時間をおいて再度お試しください。', 429);
   const contentLength = Number(request.headers.get('content-length') ?? '0');
   if (!Number.isFinite(contentLength) || contentLength > MAX_REQUEST_BYTES) return json('質問は500文字以内で入力してください。', 413);
 

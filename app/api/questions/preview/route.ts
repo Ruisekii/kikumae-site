@@ -1,5 +1,6 @@
 import { listRelatedFaqs } from '../../../../db/repository';
 import { categorizeQuestion, containsPii, generateLocalSummary } from '../../../../db/local-ai';
+import { allowBurst } from '../../../../db/request-guard';
 
 export const runtime = 'edge';
 
@@ -17,6 +18,7 @@ function json(payload: Record<string, unknown>, status = 200): Response {
 
 export async function POST(request: Request): Promise<Response> {
   if (!sameOrigin(request)) return json({ message: 'この送信元は許可されていません。' }, 403);
+  if (!allowBurst(request, 'question-preview:root', 60, 10 * 60 * 1000)) return json({ message: 'プレビュー操作が多すぎます。少し時間をおいて再度お試しください。' }, 429);
   const contentLength = Number(request.headers.get('content-length') ?? '0');
   if (!Number.isFinite(contentLength) || contentLength > MAX_REQUEST_BYTES) return json({ message: '質問は500文字以内で入力してください。' }, 413);
   try {

@@ -77,6 +77,10 @@ async function safeRun(db: D1Database, sql: string): Promise<void> {
   }
 }
 
+async function ensureAdminState(db: D1Database): Promise<void> {
+  await db.prepare('CREATE TABLE IF NOT EXISTS admin_state (singleton INTEGER PRIMARY KEY CHECK (singleton = 1), user_id TEXT NOT NULL, created_at INTEGER NOT NULL)').run();
+}
+
 async function initialise(): Promise<D1Database> {
   const db = database();
   const now = Date.now();
@@ -105,6 +109,7 @@ async function initialise(): Promise<D1Database> {
     "ALTER TABLE questions ADD COLUMN answer_grounds TEXT NOT NULL DEFAULT '[]'",
     'ALTER TABLE questions ADD COLUMN answered_at INTEGER',
     'ALTER TABLE questions ADD COLUMN check_token_hash TEXT',
+    'ALTER TABLE questions ADD COLUMN check_token_expires_at INTEGER',
     'ALTER TABLE faqs ADD COLUMN portal_id INTEGER',
     'ALTER TABLE questions ADD COLUMN portal_id INTEGER',
     'ALTER TABLE faq_candidates ADD COLUMN portal_id INTEGER',
@@ -192,7 +197,11 @@ export async function createQuestion(body: string, requestedSummary = '', reques
   const draft = generateLocalDraft(aiSummary, body, related);
   const alternatives = generateAlternativeDrafts(aiSummary, body, related);
   const checkToken = crypto.randomUUID() + crypto.randomUUID();
-  const result = await db.prepare("INSERT INTO questions (body, body_original, ai_summary, summary_edited, category, status, contact_type, answer_draft, answer_alternatives, answer_grounds, portal_id, check_token_hash, created_at) VALUES (?, ?, ?, ?, ?, 'open', 'anonymous', ?, ?, ?, ?, ?, ?)").bind(body, body, aiSummary, aiSummary !== canonicalSummary ? 1 : 0, category, draft, JSON.stringify(alternatives), JSON.stringify(related.map((faq) => faq.question)), portalId, await hashCheckToken(checkToken), createdAt).run();
+  // Keep the question/FAQ data indefinitely, but limit the bearer URL used to
+  // check a private question to 30 days.  Legacy rows without an expiry remain
+  // readable so existing users are not broken during migration.
+  const checkTokenExpiresAt = createdAt + 30 * 24 * 60 * 60 * 1000;
+  const result = await db.prepare("INSERT INTO questions (body, body_original, ai_summary, summary_edited, category, status, contact_type, answer_draft, answer_alternatives, answer_grounds, portal_id, check_token_hash, check_token_expires_at, created_at) VALUES (?, ?, ?, ?, ?, 'open', 'anonymous', ?, ?, ?, ?, ?, ?, ?)").bind(body, body, aiSummary, aiSummary !== canonicalSummary ? 1 : 0, category, draft, JSON.stringify(alternatives), JSON.stringify(related.map((faq) => faq.question)), portalId, await hashCheckToken(checkToken), checkTokenExpiresAt, createdAt).run();
   const id = Number(result.meta.last_row_id);
   return {
     id, body, bodyOriginal: body, aiSummary, summaryEdited: aiSummary !== canonicalSummary,
@@ -203,6 +212,7 @@ export async function createQuestion(body: string, requestedSummary = '', reques
 
 export async function claimAdministrator(userId: string): Promise<boolean> {
   const db = database();
+  await ensureAdminState(db);
   const ownerUserId = configuredOwnerUserId();
   if (!ownerUserId) return false;
   if (ownerUserId && ownerUserId !== userId) return false;
@@ -215,6 +225,7 @@ export async function claimAdministrator(userId: string): Promise<boolean> {
 
 export async function isAdministrator(userId: string): Promise<boolean> {
   const db = database();
+  await ensureAdminState(db);
   const ownerUserId = configuredOwnerUserId();
   if (!ownerUserId) return false;
   if (ownerUserId && ownerUserId !== userId) return false;
@@ -261,45 +272,62 @@ export async function listQuestionsForAdministrator(portalId: number | null = nu
     : { ...question, answerAlternatives: generateAlternativeDrafts(question.aiSummary, question.bodyOriginal, []) });
 }
 
-export async function getQuestionForAdministrator(questionId: number): Promise<SubmittedQuestion | null> {
+/**
+ * Fetch a question inside an explicit portal scope.  `null` means the
+ * service-wide (root) inbox; a number means that portal; `undefined` is
+ * reserved for internal callers that have already performed their own check.
+ */
+export async function getQuestionForAdministrator(questionId: number, portalId?: number | null): Promise<SubmittedQuestion | null> {
   const db = await initialise();
-  const result = await db.prepare(`${QUESTION_SELECT} WHERE q.id = ? LIMIT 1`).bind(questionId).first<Record<string, unknown>>();
+  const scope = portalId === null ? ' AND q.portal_id IS NULL' : portalId === undefined ? '' : ' AND q.portal_id = ?';
+  const statement = db.prepare(`${QUESTION_SELECT} WHERE q.id = ?${scope} LIMIT 1`);
+  const result = portalId === undefined || portalId === null
+    ? await statement.bind(questionId).first<Record<string, unknown>>()
+    : await statement.bind(questionId, portalId).first<Record<string, unknown>>();
   return result ? mapQuestion(result) : null;
 }
 
 export async function getQuestionByCheckToken(token: string): Promise<SubmittedQuestion | null> {
   const db = await initialise();
   if (!/^[0-9a-f-]{32,80}$/i.test(token)) return null;
-  const result = await db.prepare(`${QUESTION_SELECT} WHERE q.check_token_hash = ? LIMIT 1`).bind(await hashCheckToken(token)).first<Record<string, unknown>>();
+  const result = await db.prepare(`${QUESTION_SELECT} WHERE q.check_token_hash = ? AND (q.check_token_expires_at IS NULL OR q.check_token_expires_at > ?) LIMIT 1`).bind(await hashCheckToken(token), Date.now()).first<Record<string, unknown>>();
   return result ? mapQuestion(result) : null;
 }
 
 export async function generateAnswerDraft(questionId: number, portalId?: number | null): Promise<{ draft: string; alternatives: string[]; grounds: string[]; mode: 'local-rules' }> {
-  const question = await getQuestionForAdministrator(questionId);
+  const question = await getQuestionForAdministrator(questionId, portalId);
   if (!question) throw new Error('質問が見つかりません。');
   if (portalId !== undefined && question.portalId !== portalId) throw new Error('この窓口の質問ではありません。');
   const related = await listRelatedFaqs(question.aiSummary || question.bodyOriginal, 3, question.portalId);
   return { draft: generateLocalDraft(question.aiSummary || question.bodyOriginal, question.bodyOriginal, related), alternatives: generateAlternativeDrafts(question.aiSummary || question.bodyOriginal, question.bodyOriginal, related), grounds: related.map((faq) => faq.question), mode: 'local-rules' };
 }
 
-export async function approveAnswer(questionId: number, body: string, usedAi: boolean, grounds: string[]): Promise<FaqCandidate | null> {
+export async function approveAnswer(questionId: number, body: string, usedAi: boolean, grounds: string[], portalId?: number | null): Promise<FaqCandidate | null> {
   const db = await initialise();
-  const question = await getQuestionForAdministrator(questionId);
+  const question = await getQuestionForAdministrator(questionId, portalId);
   if (!question) throw new Error('質問が見つかりません。');
   const answer = body.trim().slice(0, 4000);
   if (!answer) throw new Error('回答本文を入力してください。');
   const answeredAt = Date.now();
-  await db.prepare("UPDATE questions SET answer_body = ?, answer_used_ai = ?, answer_grounds = ?, status = 'answered', answered_at = ? WHERE id = ?").bind(answer, usedAi ? 1 : 0, JSON.stringify(grounds.filter(Boolean).slice(0, 10)), answeredAt, questionId).run();
+  const scope = portalId === null ? ' AND portal_id IS NULL' : portalId === undefined ? '' : ' AND portal_id = ?';
+  const update = db.prepare(`UPDATE questions SET answer_body = ?, answer_used_ai = ?, answer_grounds = ?, status = 'answered', answered_at = ? WHERE id = ?${scope}`);
+  if (portalId === undefined || portalId === null) await update.bind(answer, usedAi ? 1 : 0, JSON.stringify(grounds.filter(Boolean).slice(0, 10)), answeredAt, questionId).run();
+  else await update.bind(answer, usedAi ? 1 : 0, JSON.stringify(grounds.filter(Boolean).slice(0, 10)), answeredAt, questionId, portalId).run();
   const candidate = containsPii(question.bodyOriginal) || containsPii(answer) ? null : generateFaqCandidate(question.bodyOriginal, answer, question.category);
   if (!candidate) return null;
   const result = await db.prepare("INSERT INTO faq_candidates (question_id, q_text, a_text, category, portal_id, status, created_at) VALUES (?, ?, ?, ?, ?, 'pending', ?)").bind(questionId, candidate.q, candidate.a, candidate.category, question.portalId, answeredAt).run();
   return { id: Number(result.meta.last_row_id), questionId, qText: candidate.q, aText: candidate.a, category: candidate.category, status: 'pending', createdAt: answeredAt };
 }
 
-export async function deleteQuestion(questionId: number): Promise<void> {
+export async function deleteQuestion(questionId: number, portalId?: number | null): Promise<void> {
   const db = await initialise();
+  const question = await getQuestionForAdministrator(questionId, portalId);
+  if (!question) throw new Error('質問が見つかりません。');
   await db.prepare('DELETE FROM faq_candidates WHERE question_id = ?').bind(questionId).run();
-  await db.prepare('DELETE FROM questions WHERE id = ?').bind(questionId).run();
+  const scope = portalId === null ? ' AND portal_id IS NULL' : portalId === undefined ? '' : ' AND portal_id = ?';
+  const statement = db.prepare(`DELETE FROM questions WHERE id = ?${scope}`);
+  if (portalId === undefined || portalId === null) await statement.bind(questionId).run();
+  else await statement.bind(questionId, portalId).run();
 }
 
 export async function actOnCandidate(candidateId: number, action: string, qText: string, aText: string, category: string, portalId?: number | null): Promise<void> {

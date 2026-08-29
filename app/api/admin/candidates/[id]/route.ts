@@ -26,7 +26,7 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
     const qText = typeof data.qText === 'string' ? data.qText : '';
     const aText = typeof data.aText === 'string' ? data.aText : '';
     const category = typeof data.category === 'string' ? data.category : '';
-    await actOnCandidate(id, action, qText, aText, category);
+    await actOnCandidate(id, action, qText, aText, category, null);
     return Response.json({ ok: true }, { headers: { 'Cache-Control': 'no-store' } });
   } catch (error) {
     return Response.json({ message: error instanceof Error ? error.message : 'FAQ候補を更新できませんでした。' }, { status: 400 });

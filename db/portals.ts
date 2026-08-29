@@ -13,25 +13,30 @@ async function ensureTable(): Promise<void> {
 function bytesToHex(bytes: Uint8Array): string { return Array.from(bytes, (byte) => byte.toString(16).padStart(2, '0')).join(''); }
 
 // PBKDF2 is not available in the Workers Web Crypto runtime. HMAC-SHA-256
-// is supported, so use a salted 1,000-round derivation with a random salt.
-const PORTAL_PASSWORD_ITERATIONS = 1_000;
+// is supported, so use a salted, deliberately expensive derivation with a
+// random salt.  The iteration count is encoded in the stored value so older
+// hmac1000 hashes can be upgraded after the next successful login.
+const PORTAL_PASSWORD_ITERATIONS = 20_000;
 
-async function derivePortalPassword(password: string, salt: string): Promise<string> {
+async function derivePortalPassword(password: string, salt: string, iterations = PORTAL_PASSWORD_ITERATIONS): Promise<string> {
   const key = await crypto.subtle.importKey('raw', new TextEncoder().encode(password), { name: 'HMAC', hash: 'SHA-256' }, false, ['sign']);
   let value = new TextEncoder().encode(`${salt}:${password}`);
-  for (let index = 0; index < PORTAL_PASSWORD_ITERATIONS; index += 1) value = new Uint8Array(await crypto.subtle.sign('HMAC', key, value));
+  for (let index = 0; index < iterations; index += 1) value = new Uint8Array(await crypto.subtle.sign('HMAC', key, value));
   return bytesToHex(value);
 }
 
 export async function hashPortalPassword(password: string, salt = crypto.randomUUID()): Promise<string> {
-  return `hmac1000$${salt}$${await derivePortalPassword(password, salt)}`;
+  return `hmac${PORTAL_PASSWORD_ITERATIONS}$${salt}$${await derivePortalPassword(password, salt)}`;
 }
 
 export async function verifyPortalPassword(password: string, encoded: string): Promise<boolean> {
-  if (encoded.startsWith('hmac1000$')) {
-    const [, salt, expected] = encoded.split('$');
-    if (!salt || !expected || expected.length !== 64) return false;
-    const actual = await derivePortalPassword(password, salt);
+  const hmacMatch = encoded.match(/^hmac(\d+)\$([^$]+)\$([0-9a-f]{64})$/i);
+  if (hmacMatch) {
+    const iterations = Number(hmacMatch[1]);
+    const salt = hmacMatch[2];
+    const expected = hmacMatch[3];
+    if (!Number.isSafeInteger(iterations) || iterations < 1_000 || iterations > 100_000) return false;
+    const actual = await derivePortalPassword(password, salt, iterations);
     return constantTimeEqual(actual, expected);
   }
   // Legacy SHA-256 hashes are accepted once so existing portals remain usable;
@@ -40,6 +45,15 @@ export async function verifyPortalPassword(password: string, encoded: string): P
   if (!salt || !expected) return false;
   const digest = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(`${salt}:${password}`));
   return constantTimeEqual(bytesToHex(new Uint8Array(digest)), expected);
+}
+
+export function shouldUpgradePortalPassword(encoded: string): boolean {
+  return !encoded.startsWith(`hmac${PORTAL_PASSWORD_ITERATIONS}$`);
+}
+
+export async function upgradePortalPassword(portalId: number, password: string): Promise<void> {
+  await ensureTable();
+  await db().prepare('UPDATE portals SET password_hash = ? WHERE id = ?').bind(await hashPortalPassword(password), portalId).run();
 }
 
 function constantTimeEqual(left: string, right: string): boolean {
@@ -79,7 +93,16 @@ export async function listPortals(search = ''): Promise<PortalSummary[]> {
 }
 
 async function safeDelete(sql: string, ...values: unknown[]): Promise<void> {
-  try { await db().prepare(sql).bind(...values).run(); } catch { /* The related table may not exist on an older database. */ }
+  try {
+    await db().prepare(sql).bind(...values).run();
+  } catch (error) {
+    // A very old deployment may not have optional tables yet.  Ignore only
+    // that known compatibility case; every other failure must reach the API
+    // so callers never receive a false "deleted" success.
+    const message = error instanceof Error ? error.message.toLowerCase() : String(error).toLowerCase();
+    if (message.includes('no such table') || message.includes('does not exist')) return;
+    throw error;
+  }
 }
 
 /** Delete one portal and every record that is explicitly scoped to it. */

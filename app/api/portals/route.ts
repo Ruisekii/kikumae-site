@@ -1,7 +1,9 @@
 import { createPortal } from '../../../db/portals';
+import { allowBurst } from '../../../db/request-guard';
 
 export const runtime = 'edge';
 const RESERVED_PORTAL_SLUGS = new Set(['admin', 'api', 'callback', 'open', 'owner', 'questions', 'signin-with-chatgpt', 'signout-with-chatgpt', 'staff']);
+const MAX_REQUEST_BYTES = 8_192;
 
 function sameOrigin(request: Request): boolean {
   const origin = request.headers.get('origin');
@@ -10,8 +12,13 @@ function sameOrigin(request: Request): boolean {
 
 export async function POST(request: Request): Promise<Response> {
   if (!sameOrigin(request)) return Response.json({ message: 'この送信元は許可されていません。' }, { status: 403 });
+  if (!allowBurst(request, 'portal-create', 10, 10 * 60 * 1000)) return Response.json({ message: '作成操作が多すぎます。少し時間をおいて再度お試しください。' }, { status: 429, headers: { 'Retry-After': '600', 'Cache-Control': 'no-store' } });
   try {
-    const body = await request.json() as { name?: string; slug?: string; description?: string; password?: string; passwordConfirmation?: string };
+    const length = Number(request.headers.get('content-length') ?? '0');
+    if (!Number.isFinite(length) || length > MAX_REQUEST_BYTES) return Response.json({ message: '入力が大きすぎます。' }, { status: 413 });
+    const raw = await request.text();
+    if (new TextEncoder().encode(raw).byteLength > MAX_REQUEST_BYTES) return Response.json({ message: '入力が大きすぎます。' }, { status: 413 });
+    const body = JSON.parse(raw) as { name?: string; slug?: string; description?: string; password?: string; passwordConfirmation?: string };
     const name = String(body.name ?? '').trim(); const slug = String(body.slug ?? '').trim().toLowerCase(); const description = String(body.description ?? '').trim(); const password = String(body.password ?? '');
     if (name.length < 2 || name.length > 80) return Response.json({ message: '窓口名は2〜80文字で入力してください。' }, { status: 400 });
     if (!/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(slug) || slug.length > 48) return Response.json({ message: 'URL用の名前は英数字とハイフンで入力してください。' }, { status: 400 });

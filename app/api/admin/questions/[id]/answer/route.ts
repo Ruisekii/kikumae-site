@@ -26,7 +26,7 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
     const usedAi = data.usedAi === true;
     const grounds = Array.isArray(data.grounds) ? data.grounds.filter((item): item is string => typeof item === 'string').slice(0, 10) : [];
     if (!body) return Response.json({ message: '回答本文を入力してください。' }, { status: 400 });
-    const candidate = await approveAnswer(id, body, usedAi, grounds);
+    const candidate = await approveAnswer(id, body, usedAi, grounds, null);
     return Response.json({ ok: true, candidate }, { headers: { 'Cache-Control': 'no-store' } });
   } catch (error) {
     return Response.json({ message: error instanceof Error ? error.message : '回答を保存できませんでした。' }, { status: 400 });

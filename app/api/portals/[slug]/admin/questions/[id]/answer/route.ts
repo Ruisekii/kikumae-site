@@ -19,8 +19,8 @@ export async function POST(request: Request, { params }: { params: Promise<{ slu
     const usedAi = data.usedAi === true;
     const grounds = Array.isArray(data.grounds) ? data.grounds.filter((item): item is string => typeof item === 'string').slice(0, 10) : [];
     if (!body) return Response.json({ message: '回答本文を入力してください。' }, { status: 400 });
-    const question = await (await import('../../../../../../../../db/repository')).getQuestionForAdministrator(id);
+    const question = await (await import('../../../../../../../../db/repository')).getQuestionForAdministrator(id, portal.id);
     if (!question || question.portalId !== portal.id) return Response.json({ message: 'この窓口の質問ではありません。' }, { status: 404 });
-    return Response.json({ ok: true, candidate: await approveAnswer(id, body, usedAi, grounds) }, { headers: { 'Cache-Control': 'no-store' } });
+    return Response.json({ ok: true, candidate: await approveAnswer(id, body, usedAi, grounds, portal.id) }, { headers: { 'Cache-Control': 'no-store' } });
   } catch (error) { return Response.json({ message: error instanceof Error ? error.message : '回答を保存できませんでした。' }, { status: 400 }); }
 }
