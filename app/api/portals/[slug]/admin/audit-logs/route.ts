@@ -1,5 +1,5 @@
 import { requirePortalSession, sameOrigin } from '../../../../../../db/portal-auth';
-import { listQuestionsForAdministratorPage } from '../../../../../../db/repository';
+import { listAuditLogsForAdministrator } from '../../../../../../db/repository';
 
 export const runtime = 'edge';
 
@@ -8,7 +8,5 @@ export async function GET(request: Request, { params }: { params: Promise<{ slug
   if (!sameOrigin(request)) return Response.json({ message: 'この送信元は許可されていません。' }, { status: 403 });
   const portal = await requirePortalSession(request, slug);
   if (!portal) return Response.json({ message: '管理者パスワードでログインしてください。' }, { status: 401 });
-  const page = Number(new URL(request.url).searchParams.get('page') ?? '1');
-  const result = await listQuestionsForAdministratorPage(portal.id, Number.isFinite(page) ? page : 1);
-  return Response.json({ ...result, page: Math.max(1, Math.trunc(page) || 1) }, { headers: { 'Cache-Control': 'no-store' } });
+  return Response.json({ logs: await listAuditLogsForAdministrator(portal.id) }, { headers: { 'Cache-Control': 'no-store' } });
 }

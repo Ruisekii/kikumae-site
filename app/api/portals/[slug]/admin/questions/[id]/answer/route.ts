@@ -21,7 +21,7 @@ export async function POST(request: Request, { params }: { params: Promise<{ slu
     if (!body) return Response.json({ message: '回答本文を入力してください。' }, { status: 400 });
     const question = await (await import('../../../../../../../../db/repository')).getQuestionForAdministrator(id, portal.id);
     if (!question || question.portalId !== portal.id) return Response.json({ message: 'この窓口の質問ではありません。' }, { status: 404 });
-    return Response.json({ ok: true, candidate: await approveAnswer(id, body, usedAi, grounds, portal.id) }, { headers: { 'Cache-Control': 'no-store' } });
+    return Response.json({ ok: true, candidate: await approveAnswer(id, body, usedAi, grounds, portal.id, `portal:${portal.id}`) }, { headers: { 'Cache-Control': 'no-store' } });
   } catch (error) {
     if (error instanceof Error && error.message === 'REQUEST_BODY_TOO_LARGE') return Response.json({ message: '回答が長すぎます。' }, { status: 413 });
     return Response.json({ message: '回答を保存できませんでした。' }, { status: 400 });

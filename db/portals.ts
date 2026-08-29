@@ -10,13 +10,38 @@ async function ensureTable(): Promise<void> {
   await db().prepare("CREATE TABLE IF NOT EXISTS portal_sessions (id INTEGER PRIMARY KEY AUTOINCREMENT, portal_id INTEGER NOT NULL, token_hash TEXT NOT NULL UNIQUE, expires_at INTEGER NOT NULL, created_at INTEGER NOT NULL)").run();
 }
 
+async function ensureDeleteSchema(): Promise<void> {
+  // Portal deletion can be the first administrative operation on a freshly
+  // created portal, so do not assume the repository initializer has already
+  // created every related table.
+  const database = db();
+  await database.batch([
+    database.prepare("CREATE TABLE IF NOT EXISTS faqs (id INTEGER PRIMARY KEY AUTOINCREMENT, question TEXT NOT NULL, answer TEXT NOT NULL, category TEXT NOT NULL, status TEXT NOT NULL DEFAULT 'published', updated_at INTEGER NOT NULL, portal_id INTEGER)"),
+    database.prepare("CREATE TABLE IF NOT EXISTS questions (id INTEGER PRIMARY KEY AUTOINCREMENT, body TEXT NOT NULL, category TEXT NOT NULL, status TEXT NOT NULL DEFAULT 'open', created_at INTEGER NOT NULL, portal_id INTEGER)"),
+    database.prepare("CREATE TABLE IF NOT EXISTS faq_candidates (id INTEGER PRIMARY KEY AUTOINCREMENT, question_id INTEGER NOT NULL, q_text TEXT NOT NULL, a_text TEXT NOT NULL, category TEXT NOT NULL, status TEXT NOT NULL DEFAULT 'pending', created_at INTEGER NOT NULL, portal_id INTEGER)"),
+    database.prepare("CREATE TABLE IF NOT EXISTS audit_logs (id INTEGER PRIMARY KEY AUTOINCREMENT, actor_user_id TEXT, action TEXT NOT NULL, question_id INTEGER, portal_id INTEGER, detail TEXT NOT NULL DEFAULT '', created_at INTEGER NOT NULL)"),
+  ]);
+  for (const statement of [
+    'ALTER TABLE faqs ADD COLUMN portal_id INTEGER',
+    'ALTER TABLE questions ADD COLUMN portal_id INTEGER',
+    'ALTER TABLE faq_candidates ADD COLUMN portal_id INTEGER',
+    'ALTER TABLE audit_logs ADD COLUMN portal_id INTEGER',
+  ]) {
+    try { await database.prepare(statement).run(); } catch (error) {
+      const message = error instanceof Error ? error.message.toLowerCase() : String(error).toLowerCase();
+      if (!message.includes('duplicate column') && !message.includes('already exists') && !message.includes('no such table')) throw error;
+    }
+  }
+}
+
 function bytesToHex(bytes: Uint8Array): string { return Array.from(bytes, (byte) => byte.toString(16).padStart(2, '0')).join(''); }
 
-// PBKDF2 is not available in the Workers Web Crypto runtime. HMAC-SHA-256
-// is supported, so use a salted, deliberately expensive derivation with a
-// random salt.  The iteration count is encoded in the stored value so older
-// hmac1000 hashes can be upgraded after the next successful login.
+// Prefer the standards-based PBKDF2 password KDF exposed by Web Crypto. Keep
+// the existing HMAC format as a compatibility fallback for older Workers
+// runtimes; the iteration count is always encoded in the stored value.
+const PBKDF2_ITERATIONS = 210_000;
 const PORTAL_PASSWORD_ITERATIONS = 20_000;
+let pbkdf2Supported: boolean | null = null;
 
 async function derivePortalPassword(password: string, salt: string, iterations = PORTAL_PASSWORD_ITERATIONS): Promise<string> {
   const key = await crypto.subtle.importKey('raw', new TextEncoder().encode(password), { name: 'HMAC', hash: 'SHA-256' }, false, ['sign']);
@@ -25,11 +50,54 @@ async function derivePortalPassword(password: string, salt: string, iterations =
   return bytesToHex(value);
 }
 
+function bytesToBase64Url(bytes: Uint8Array): string {
+  let binary = '';
+  bytes.forEach((byte) => { binary += String.fromCharCode(byte); });
+  return btoa(binary).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/g, '');
+}
+
+function base64UrlToBytes(value: string): Uint8Array {
+  const padded = value.replace(/-/g, '+').replace(/_/g, '/') + '='.repeat((4 - value.length % 4) % 4);
+  const binary = atob(padded);
+  return Uint8Array.from(binary, (character) => character.charCodeAt(0));
+}
+
+async function derivePbkdf2(password: string, salt: Uint8Array, iterations: number): Promise<string> {
+  const key = await crypto.subtle.importKey('raw', new TextEncoder().encode(password), 'PBKDF2', false, ['deriveBits']);
+  const bits = await crypto.subtle.deriveBits({ name: 'PBKDF2', hash: 'SHA-256', salt, iterations }, key, 256);
+  return bytesToHex(new Uint8Array(bits));
+}
+
 export async function hashPortalPassword(password: string, salt = crypto.randomUUID()): Promise<string> {
-  return `hmac${PORTAL_PASSWORD_ITERATIONS}$${salt}$${await derivePortalPassword(password, salt)}`;
+  try {
+    const saltBytes = new Uint8Array(16);
+    crypto.getRandomValues(saltBytes);
+    const encodedSalt = bytesToBase64Url(saltBytes);
+    const derived = await derivePbkdf2(password, saltBytes, PBKDF2_ITERATIONS);
+    pbkdf2Supported = true;
+    return `pbkdf2sha256$${PBKDF2_ITERATIONS}$${encodedSalt}$${derived}`;
+  } catch {
+    pbkdf2Supported = false;
+    return `hmac${PORTAL_PASSWORD_ITERATIONS}$${salt}$${await derivePortalPassword(password, salt)}`;
+  }
 }
 
 export async function verifyPortalPassword(password: string, encoded: string): Promise<boolean> {
+  const pbkdf2Match = encoded.match(/^pbkdf2sha256\$(\d+)\$([A-Za-z0-9_-]+)\$([0-9a-f]{64})$/i);
+  if (pbkdf2Match) {
+    const iterations = Number(pbkdf2Match[1]);
+    const salt = pbkdf2Match[2];
+    const expected = pbkdf2Match[3];
+    if (!Number.isSafeInteger(iterations) || iterations < 100_000 || iterations > 500_000) return false;
+    try {
+      const actual = await derivePbkdf2(password, base64UrlToBytes(salt), iterations);
+      pbkdf2Supported = true;
+      return constantTimeEqual(actual, expected);
+    } catch {
+      pbkdf2Supported = false;
+      return false;
+    }
+  }
   const hmacMatch = encoded.match(/^hmac(\d+)\$([^$]+)\$([0-9a-f]{64})$/i);
   if (hmacMatch) {
     const iterations = Number(hmacMatch[1]);
@@ -48,7 +116,9 @@ export async function verifyPortalPassword(password: string, encoded: string): P
 }
 
 export function shouldUpgradePortalPassword(encoded: string): boolean {
-  return !encoded.startsWith(`hmac${PORTAL_PASSWORD_ITERATIONS}$`);
+  if (encoded.startsWith(`pbkdf2sha256$${PBKDF2_ITERATIONS}$`)) return false;
+  if (pbkdf2Supported === false && encoded.startsWith(`hmac${PORTAL_PASSWORD_ITERATIONS}$`)) return false;
+  return true;
 }
 
 export async function upgradePortalPassword(portalId: number, password: string): Promise<void> {
@@ -83,23 +153,32 @@ export function isOperator(userId: string): boolean {
   return Boolean(configured && configured === userId.trim().toLowerCase());
 }
 
-export async function listPortals(search = ''): Promise<PortalSummary[]> {
+export async function listPortalsPage(search = '', page = 1, pageSize = 200): Promise<{ portals: PortalSummary[]; hasMore: boolean }> {
   await ensureTable();
   const term = search.trim().slice(0, 80);
+  const safePage = Math.max(1, Math.trunc(page) || 1);
+  const safePageSize = Math.min(Math.max(Math.trunc(pageSize) || 200, 1), 200);
+  const offset = (safePage - 1) * safePageSize;
   const result = term
-    ? await db().prepare("SELECT id, name, slug, created_at FROM portals WHERE name LIKE ? OR slug LIKE ? ORDER BY created_at DESC LIMIT 200").bind(`%${term}%`, `%${term}%`).all<Record<string, unknown>>()
-    : await db().prepare('SELECT id, name, slug, created_at FROM portals ORDER BY created_at DESC LIMIT 200').all<Record<string, unknown>>();
-  return (result.results ?? []).map((row) => ({ id: Number(row.id), name: String(row.name ?? ''), slug: String(row.slug ?? ''), createdAt: Number(row.created_at ?? 0) }));
+    ? await db().prepare("SELECT id, name, slug, created_at FROM portals WHERE name LIKE ? OR slug LIKE ? ORDER BY created_at DESC LIMIT ? OFFSET ?").bind(`%${term}%`, `%${term}%`, safePageSize + 1, offset).all<Record<string, unknown>>()
+    : await db().prepare('SELECT id, name, slug, created_at FROM portals ORDER BY created_at DESC LIMIT ? OFFSET ?').bind(safePageSize + 1, offset).all<Record<string, unknown>>();
+  const rows = result.results ?? [];
+  return { portals: rows.slice(0, safePageSize).map((row) => ({ id: Number(row.id), name: String(row.name ?? ''), slug: String(row.slug ?? ''), createdAt: Number(row.created_at ?? 0) })), hasMore: rows.length > safePageSize };
+}
+
+export async function listPortals(search = ''): Promise<PortalSummary[]> {
+  return (await listPortalsPage(search, 1, 200)).portals;
 }
 
 /** Delete one portal and every record that is explicitly scoped to it. */
 export async function deletePortal(portalId: number): Promise<void> {
   await ensureTable();
+  await ensureDeleteSchema();
   // D1 batches execute as one atomic transaction: a failed child statement
   // rolls back the entire portal deletion instead of leaving partial data.
   await db().batch([
     db().prepare('DELETE FROM faq_candidates WHERE portal_id = ? OR question_id IN (SELECT id FROM questions WHERE portal_id = ?)').bind(portalId, portalId),
-    db().prepare('DELETE FROM audit_logs WHERE question_id IN (SELECT id FROM questions WHERE portal_id = ?)').bind(portalId),
+    db().prepare('DELETE FROM audit_logs WHERE portal_id = ? OR question_id IN (SELECT id FROM questions WHERE portal_id = ?)').bind(portalId, portalId),
     db().prepare('DELETE FROM questions WHERE portal_id = ?').bind(portalId),
     db().prepare('DELETE FROM faqs WHERE portal_id = ?').bind(portalId),
     db().prepare('DELETE FROM portal_sessions WHERE portal_id = ?').bind(portalId),

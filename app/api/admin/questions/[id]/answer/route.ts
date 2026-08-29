@@ -24,7 +24,7 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
     const usedAi = data.usedAi === true;
     const grounds = Array.isArray(data.grounds) ? data.grounds.filter((item): item is string => typeof item === 'string').slice(0, 10) : [];
     if (!body) return Response.json({ message: '回答本文を入力してください。' }, { status: 400 });
-    const candidate = await approveAnswer(id, body, usedAi, grounds, null);
+    const candidate = await approveAnswer(id, body, usedAi, grounds, null, user.userId);
     return Response.json({ ok: true, candidate }, { headers: { 'Cache-Control': 'no-store' } });
   } catch (error) {
     if (error instanceof Error && error.message === 'REQUEST_BODY_TOO_LARGE') return Response.json({ message: '回答が長すぎます。' }, { status: 413 });

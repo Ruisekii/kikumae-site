@@ -1,5 +1,5 @@
 import { createPortalSession, getPortal, shouldUpgradePortalPassword, upgradePortalPassword, verifyPortalPassword } from '../../../../../db/portals';
-import { allowBurst, readRequestText } from '../../../../../db/request-guard';
+import { allowBurstShared, readRequestText } from '../../../../../db/request-guard';
 
 export const runtime = 'edge';
 const MAX_REQUEST_BYTES = 4_096;
@@ -7,7 +7,7 @@ const MAX_REQUEST_BYTES = 4_096;
 export async function POST(request: Request, { params }: { params: Promise<{ slug: string }> }): Promise<Response> {
   const origin = request.headers.get('origin'); if (origin && origin !== new URL(request.url).origin) return Response.json({ message: 'この送信元は許可されていません。' }, { status: 403 });
   const { slug } = await params;
-  if (!allowBurst(request, `portal-login:${slug}`, 10, 5 * 60 * 1000)) return Response.json({ message: 'ログイン試行が多すぎます。5分ほど待ってから再度お試しください。' }, { status: 429, headers: { 'Retry-After': '300', 'Cache-Control': 'no-store' } });
+  if (!await allowBurstShared(request, `portal-login:${slug}`, 10, 5 * 60 * 1000)) return Response.json({ message: 'ログイン試行が多すぎます。5分ほど待ってから再度お試しください。' }, { status: 429, headers: { 'Retry-After': '300', 'Cache-Control': 'no-store' } });
   const portal = await getPortal(slug); if (!portal) return Response.json({ message: '窓口が見つかりません。' }, { status: 404 });
   let body: { password?: string };
   try {

@@ -15,6 +15,7 @@ export type Faq = {
   answer: string;
   category: string;
   status: string;
+  createdAt: number;
   updatedAt: number;
 };
 
@@ -50,8 +51,10 @@ export type SubmittedQuestion = {
   checkToken?: string;
 };
 
+export type AuditLog = { action: string; actorUserId: string | null; createdAt: number };
 
-const SEED_FAQS: Omit<Faq, 'id' | 'status' | 'updatedAt'>[] = [
+
+const SEED_FAQS: Omit<Faq, 'id' | 'status' | 'createdAt' | 'updatedAt'>[] = [
   { question: '見学は予約なしでも可能ですか？', answer: '予約なしでも見学できます。事前に連絡していただけると、案内がよりスムーズです。', category: '見学・参加方法' },
   { question: '初心者でも参加できますか？', answer: 'はい。初心者・未経験者も歓迎です。最初は無理のない作業から始められます。', category: '初心者向け' },
   { question: '活動日はいつですか？', answer: '通常活動は火曜日と木曜日の放課後です。大会前は活動日が増える場合があります。', category: '活動内容' },
@@ -89,11 +92,11 @@ async function initialise(): Promise<D1Database> {
   const db = database();
   const now = Date.now();
   await db.batch([
-    db.prepare("CREATE TABLE IF NOT EXISTS faqs (id INTEGER PRIMARY KEY AUTOINCREMENT, question TEXT NOT NULL UNIQUE, answer TEXT NOT NULL, category TEXT NOT NULL, status TEXT NOT NULL DEFAULT 'published', updated_at INTEGER NOT NULL)"),
+    db.prepare("CREATE TABLE IF NOT EXISTS faqs (id INTEGER PRIMARY KEY AUTOINCREMENT, question TEXT NOT NULL UNIQUE, answer TEXT NOT NULL, category TEXT NOT NULL, status TEXT NOT NULL DEFAULT 'published', created_at INTEGER NOT NULL DEFAULT 0, updated_at INTEGER NOT NULL)"),
     db.prepare("CREATE TABLE IF NOT EXISTS questions (id INTEGER PRIMARY KEY AUTOINCREMENT, body TEXT NOT NULL, category TEXT NOT NULL, status TEXT NOT NULL DEFAULT 'open', created_at INTEGER NOT NULL)"),
     db.prepare('CREATE TABLE IF NOT EXISTS admin_state (singleton INTEGER PRIMARY KEY CHECK (singleton = 1), user_id TEXT NOT NULL, created_at INTEGER NOT NULL)'),
     db.prepare("CREATE TABLE IF NOT EXISTS faq_candidates (id INTEGER PRIMARY KEY AUTOINCREMENT, question_id INTEGER NOT NULL, q_text TEXT NOT NULL, a_text TEXT NOT NULL, category TEXT NOT NULL, status TEXT NOT NULL DEFAULT 'pending', created_at INTEGER NOT NULL)"),
-    db.prepare("CREATE TABLE IF NOT EXISTS audit_logs (id INTEGER PRIMARY KEY AUTOINCREMENT, actor_user_id TEXT, action TEXT NOT NULL, question_id INTEGER, detail TEXT NOT NULL DEFAULT '', created_at INTEGER NOT NULL)"),
+    db.prepare("CREATE TABLE IF NOT EXISTS audit_logs (id INTEGER PRIMARY KEY AUTOINCREMENT, actor_user_id TEXT, action TEXT NOT NULL, question_id INTEGER, portal_id INTEGER, detail TEXT NOT NULL DEFAULT '', created_at INTEGER NOT NULL)"),
     db.prepare("CREATE TABLE IF NOT EXISTS schema_meta (key TEXT PRIMARY KEY, value TEXT NOT NULL)"),
     db.prepare('CREATE INDEX IF NOT EXISTS questions_created_at_idx ON questions (created_at DESC)'),
     db.prepare('CREATE INDEX IF NOT EXISTS faq_candidates_status_idx ON faq_candidates (status, created_at DESC)'),
@@ -102,6 +105,7 @@ async function initialise(): Promise<D1Database> {
   // Additive migration for the first anonymous-question schema.
   for (const migration of [
     "ALTER TABLE faqs ADD COLUMN status TEXT NOT NULL DEFAULT 'published'",
+    'ALTER TABLE faqs ADD COLUMN created_at INTEGER NOT NULL DEFAULT 0',
     'ALTER TABLE questions ADD COLUMN body_original TEXT',
     "ALTER TABLE questions ADD COLUMN ai_summary TEXT NOT NULL DEFAULT ''",
     'ALTER TABLE questions ADD COLUMN summary_edited INTEGER NOT NULL DEFAULT 0',
@@ -119,9 +123,12 @@ async function initialise(): Promise<D1Database> {
     'ALTER TABLE questions ADD COLUMN portal_id INTEGER',
     'ALTER TABLE faq_candidates ADD COLUMN portal_id INTEGER',
   ]) await safeRun(db, migration);
+  await safeRun(db, 'ALTER TABLE audit_logs ADD COLUMN portal_id INTEGER');
+  await safeRun(db, 'CREATE INDEX IF NOT EXISTS audit_logs_portal_created_idx ON audit_logs (portal_id, created_at DESC)');
   await ensureFaqIsolationSchema(db);
+  await safeRun(db, 'UPDATE faqs SET created_at = updated_at WHERE created_at = 0');
   await safeRun(db, 'UPDATE questions SET body_original = body WHERE body_original IS NULL');
-  await db.batch(SEED_FAQS.map((faq) => db.prepare("INSERT OR IGNORE INTO faqs (question, answer, category, status, updated_at) VALUES (?, ?, ?, 'published', ?)").bind(faq.question, faq.answer, faq.category, now)));
+  await db.batch(SEED_FAQS.map((faq) => db.prepare("INSERT OR IGNORE INTO faqs (question, answer, category, status, created_at, updated_at) VALUES (?, ?, ?, 'published', ?, ?)").bind(faq.question, faq.answer, faq.category, now, now)));
   await safeRun(db, 'CREATE UNIQUE INDEX IF NOT EXISTS questions_submission_key_unique ON questions (submission_key_hash) WHERE submission_key_hash IS NOT NULL');
   return db;
 }
@@ -136,8 +143,8 @@ async function ensureFaqIsolationSchema(db: D1Database): Promise<void> {
   if (marker?.value === 'ready') return;
   try {
     await db.batch([
-      db.prepare('CREATE TABLE IF NOT EXISTS faqs_scope_rebuild (id INTEGER PRIMARY KEY AUTOINCREMENT, question TEXT NOT NULL, answer TEXT NOT NULL, category TEXT NOT NULL, status TEXT NOT NULL DEFAULT \'published\', updated_at INTEGER NOT NULL, portal_id INTEGER)'),
-      db.prepare('INSERT OR IGNORE INTO faqs_scope_rebuild (id, question, answer, category, status, updated_at, portal_id) SELECT id, question, answer, category, status, updated_at, portal_id FROM faqs'),
+      db.prepare('CREATE TABLE IF NOT EXISTS faqs_scope_rebuild (id INTEGER PRIMARY KEY AUTOINCREMENT, question TEXT NOT NULL, answer TEXT NOT NULL, category TEXT NOT NULL, status TEXT NOT NULL DEFAULT \'published\', created_at INTEGER NOT NULL DEFAULT 0, updated_at INTEGER NOT NULL, portal_id INTEGER)'),
+      db.prepare('INSERT OR IGNORE INTO faqs_scope_rebuild (id, question, answer, category, status, created_at, updated_at, portal_id) SELECT id, question, answer, category, status, COALESCE(created_at, updated_at), updated_at, portal_id FROM faqs'),
       db.prepare('DROP TABLE faqs'),
       db.prepare('ALTER TABLE faqs_scope_rebuild RENAME TO faqs'),
       db.prepare('CREATE UNIQUE INDEX IF NOT EXISTS faqs_question_root_unique ON faqs (question) WHERE portal_id IS NULL'),
@@ -179,6 +186,7 @@ function mapFaq(row: Record<string, unknown>): Faq {
     answer: String(row.answer ?? ''),
     category: String(row.category ?? 'その他'),
     status: String(row.status ?? 'published'),
+    createdAt: Number(row.created_at ?? row.createdAt ?? row.updated_at ?? 0),
     updatedAt: Number(row.updated_at ?? row.updatedAt ?? 0),
   };
 }
@@ -186,9 +194,102 @@ function mapFaq(row: Record<string, unknown>): Faq {
 export async function listPublishedFaqs(portalId: number | null = null): Promise<Faq[]> {
   const db = await initialise();
   const result = portalId == null
-    ? await db.prepare("SELECT id, question, answer, category, status, updated_at FROM faqs WHERE status = 'published' AND portal_id IS NULL ORDER BY updated_at DESC").all<Record<string, unknown>>()
-    : await db.prepare("SELECT id, question, answer, category, status, updated_at FROM faqs WHERE status = 'published' AND portal_id = ? ORDER BY updated_at DESC").bind(portalId).all<Record<string, unknown>>();
+    ? await db.prepare("SELECT id, question, answer, category, status, created_at, updated_at FROM faqs WHERE status = 'published' AND portal_id IS NULL ORDER BY updated_at DESC").all<Record<string, unknown>>()
+    : await db.prepare("SELECT id, question, answer, category, status, created_at, updated_at FROM faqs WHERE status = 'published' AND portal_id = ? ORDER BY updated_at DESC").bind(portalId).all<Record<string, unknown>>();
   return (result.results ?? []).map(mapFaq);
+}
+
+function faqScope(portalId: number | null): { clause: string; values: number[] } {
+  return portalId == null ? { clause: 'portal_id IS NULL', values: [] } : { clause: 'portal_id = ?', values: [portalId] };
+}
+
+function validateFaqInput(question: string, answer: string, category: string): { question: string; answer: string; category: string } {
+  const safeQuestion = question.trim().slice(0, 300);
+  const safeAnswer = answer.trim().slice(0, 2000);
+  const safeCategory = category.trim().slice(0, 64) || 'その他';
+  if (safeQuestion.length < 2 || safeAnswer.length < 1) throw new Error('FAQ_INVALID');
+  if (containsPii(safeQuestion) || containsPii(safeAnswer)) throw new Error('FAQ_PII');
+  return { question: safeQuestion, answer: safeAnswer, category: safeCategory };
+}
+
+export async function listFaqsForAdministrator(portalId: number | null = null): Promise<Faq[]> {
+  const db = await initialise();
+  const scope = faqScope(portalId);
+  const statement = db.prepare(`SELECT id, question, answer, category, status, created_at, updated_at FROM faqs WHERE ${scope.clause} ORDER BY updated_at DESC LIMIT 500`);
+  const result = scope.values.length ? await statement.bind(...scope.values).all<Record<string, unknown>>() : await statement.all<Record<string, unknown>>();
+  return (result.results ?? []).map(mapFaq);
+}
+
+export async function createFaq(question: string, answer: string, category: string, portalId: number | null = null, actorUserId: string | null = null): Promise<Faq> {
+  const db = await initialise();
+  const input = validateFaqInput(question, answer, category);
+  const createdAt = Date.now();
+  try {
+    const result = await db.prepare('INSERT INTO faqs (question, answer, category, portal_id, status, created_at, updated_at) VALUES (?, ?, ?, ?, \'published\', ?, ?)').bind(input.question, input.answer, input.category, portalId, createdAt, createdAt).run();
+    const faq = { id: Number(result.meta.last_row_id), ...input, status: 'published', createdAt, updatedAt: createdAt };
+    try { await writeAuditLog('faq_created', actorUserId, null, portalId, `faq:${faq.id}`); } catch { /* do not fail a saved FAQ when logging is unavailable */ }
+    return faq;
+  } catch (error) {
+    if (error instanceof Error && /unique/i.test(error.message)) throw new Error('FAQ_DUPLICATE');
+    throw error;
+  }
+}
+
+async function getFaqForScope(faqId: number, portalId: number | null): Promise<Faq | null> {
+  const db = await initialise();
+  const scope = faqScope(portalId);
+  const statement = db.prepare(`SELECT id, question, answer, category, status, created_at, updated_at FROM faqs WHERE id = ? AND ${scope.clause} LIMIT 1`);
+  const row = scope.values.length ? await statement.bind(faqId, ...scope.values).first<Record<string, unknown>>() : await statement.bind(faqId).first<Record<string, unknown>>();
+  return row ? mapFaq(row) : null;
+}
+
+export async function updateFaq(faqId: number, question: string, answer: string, category: string, portalId: number | null = null, actorUserId: string | null = null): Promise<Faq> {
+  const db = await initialise();
+  const existing = await getFaqForScope(faqId, portalId);
+  if (!existing) throw new Error('FAQ_NOT_FOUND');
+  const input = validateFaqInput(question, answer, category);
+  const updatedAt = Date.now();
+  try {
+    await db.prepare(`UPDATE faqs SET question = ?, answer = ?, category = ?, status = 'published', updated_at = ? WHERE id = ?`).bind(input.question, input.answer, input.category, updatedAt, faqId).run();
+    const faq = { id: faqId, ...input, status: 'published', createdAt: existing.createdAt, updatedAt };
+    try { await writeAuditLog('faq_updated', actorUserId, null, portalId, `faq:${faqId}`); } catch { /* best effort */ }
+    return faq;
+  } catch (error) {
+    if (error instanceof Error && /unique/i.test(error.message)) throw new Error('FAQ_DUPLICATE');
+    throw error;
+  }
+}
+
+export async function deleteFaq(faqId: number, portalId: number | null = null, actorUserId: string | null = null): Promise<void> {
+  const db = await initialise();
+  const existing = await getFaqForScope(faqId, portalId);
+  if (!existing) throw new Error('FAQ_NOT_FOUND');
+  const scope = faqScope(portalId);
+  const statement = db.prepare(`DELETE FROM faqs WHERE id = ? AND ${scope.clause}`);
+  const result = scope.values.length ? await statement.bind(faqId, ...scope.values).run() : await statement.bind(faqId).run();
+  if (Number(result.meta.changes ?? 0) !== 1) throw new Error('FAQ_NOT_FOUND');
+  try { await writeAuditLog('faq_deleted', actorUserId, null, portalId, `faq:${faqId}`); } catch { /* best effort */ }
+}
+
+async function auditActorId(actorUserId: string | null): Promise<string | null> {
+  if (!actorUserId) return null;
+  if (/^portal:\d+$/.test(actorUserId)) return actorUserId;
+  const digest = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(actorUserId.trim().toLowerCase()));
+  return `user:${Array.from(new Uint8Array(digest), (byte) => byte.toString(16).padStart(2, '0')).join('').slice(0, 32)}`;
+}
+
+export async function writeAuditLog(action: string, actorUserId: string | null, questionId: number | null, portalId: number | null, detail = ''): Promise<void> {
+  const db = await initialise();
+  await db.prepare('INSERT INTO audit_logs (actor_user_id, action, question_id, portal_id, detail, created_at) VALUES (?, ?, ?, ?, ?, ?)').bind(await auditActorId(actorUserId), action.slice(0, 64), questionId, portalId, detail.slice(0, 300), Date.now()).run();
+}
+
+export async function listAuditLogsForAdministrator(portalId: number | null = null, limit = 50): Promise<AuditLog[]> {
+  const db = await initialise();
+  const scope = faqScope(portalId);
+  const safeLimit = Math.min(Math.max(Math.trunc(limit), 1), 100);
+  const statement = db.prepare(`SELECT action, actor_user_id, created_at FROM audit_logs WHERE ${scope.clause} ORDER BY created_at DESC LIMIT ?`);
+  const result = scope.values.length ? await statement.bind(...scope.values, safeLimit).all<Record<string, unknown>>() : await statement.bind(safeLimit).all<Record<string, unknown>>();
+  return (result.results ?? []).map((row) => ({ action: String(row.action ?? ''), actorUserId: row.actor_user_id == null ? null : String(row.actor_user_id), createdAt: Number(row.created_at ?? 0) }));
 }
 
 export async function listRelatedFaqs(query: string, limit = 3, portalId: number | null = null): Promise<RelatedFaq[]> {
@@ -275,14 +376,23 @@ const QUESTION_SELECT = `SELECT q.id, q.body, q.body_original, q.ai_summary, q.s
   c.id AS candidate_id, c.question_id, c.q_text, c.a_text, c.category AS candidate_category, c.status AS candidate_status, c.created_at AS candidate_created_at
   FROM questions q LEFT JOIN faq_candidates c ON c.question_id = q.id AND c.status = 'pending'`;
 
-export async function listQuestionsForAdministrator(portalId: number | null = null): Promise<SubmittedQuestion[]> {
+export async function listQuestionsForAdministratorPage(portalId: number | null = null, page = 1, pageSize = 100): Promise<{ questions: SubmittedQuestion[]; hasMore: boolean }> {
   const db = await initialise();
+  const safePage = Math.max(1, Math.trunc(page) || 1);
+  const safePageSize = Math.min(Math.max(Math.trunc(pageSize) || 100, 1), 100);
+  const offset = (safePage - 1) * safePageSize;
   const result = portalId == null
-    ? await db.prepare(`${QUESTION_SELECT} WHERE q.portal_id IS NULL ORDER BY q.created_at DESC LIMIT 100`).all<Record<string, unknown>>()
-    : await db.prepare(`${QUESTION_SELECT} WHERE q.portal_id = ? ORDER BY q.created_at DESC LIMIT 100`).bind(portalId).all<Record<string, unknown>>();
-  return (result.results ?? []).map(mapQuestion).map((question) => question.answerAlternatives.length || question.status !== 'open'
+    ? await db.prepare(`${QUESTION_SELECT} WHERE q.portal_id IS NULL ORDER BY q.created_at DESC LIMIT ? OFFSET ?`).bind(safePageSize + 1, offset).all<Record<string, unknown>>()
+    : await db.prepare(`${QUESTION_SELECT} WHERE q.portal_id = ? ORDER BY q.created_at DESC LIMIT ? OFFSET ?`).bind(portalId, safePageSize + 1, offset).all<Record<string, unknown>>();
+  const rows = result.results ?? [];
+  const hasMore = rows.length > safePageSize;
+  return { questions: rows.slice(0, safePageSize).map(mapQuestion).map((question) => question.answerAlternatives.length || question.status !== 'open'
     ? question
-    : { ...question, answerAlternatives: generateAlternativeDrafts(question.aiSummary, question.bodyOriginal, []) });
+    : { ...question, answerAlternatives: generateAlternativeDrafts(question.aiSummary, question.bodyOriginal, []) }), hasMore };
+}
+
+export async function listQuestionsForAdministrator(portalId: number | null = null): Promise<SubmittedQuestion[]> {
+  return (await listQuestionsForAdministratorPage(portalId, 1, 100)).questions;
 }
 
 /**
@@ -315,7 +425,7 @@ export async function generateAnswerDraft(questionId: number, portalId?: number 
   return { draft: generateLocalDraft(question.aiSummary || question.bodyOriginal, question.bodyOriginal, related), alternatives: generateAlternativeDrafts(question.aiSummary || question.bodyOriginal, question.bodyOriginal, related), grounds: related.map((faq) => faq.question), mode: 'local-rules' };
 }
 
-export async function approveAnswer(questionId: number, body: string, usedAi: boolean, grounds: string[], portalId?: number | null): Promise<FaqCandidate | null> {
+export async function approveAnswer(questionId: number, body: string, usedAi: boolean, grounds: string[], portalId?: number | null, actorUserId: string | null = null): Promise<FaqCandidate | null> {
   const db = await initialise();
   const question = await getQuestionForAdministrator(questionId, portalId);
   if (!question) throw new Error('質問が見つかりません。');
@@ -334,18 +444,25 @@ export async function approveAnswer(questionId: number, body: string, usedAi: bo
     : await update.bind(answer, usedAi ? 1 : 0, JSON.stringify(verifiedGrounds.slice(0, 10)), answeredAt, questionId, portalId).run();
   if (Number(updateResult.meta.changes ?? 0) !== 1) throw new Error('この質問はすでに回答済みです。');
   const candidate = containsPii(question.bodyOriginal) || containsPii(answer) ? null : generateFaqCandidate(question.bodyOriginal, answer, question.category);
-  if (!candidate) return null;
+  if (!candidate) {
+    try { await writeAuditLog('answer_saved', actorUserId, questionId, question.portalId, 'faq_candidate:none'); } catch { /* do not fail a saved answer when logging is unavailable */ }
+    return null;
+  }
   const pending = await db.prepare("SELECT id, question_id, q_text, a_text, category, status, created_at FROM faq_candidates WHERE question_id = ? AND status = 'pending' LIMIT 1").bind(questionId).first<Record<string, unknown>>();
-  if (pending) return {
+  if (pending) {
+    try { await writeAuditLog('answer_saved', actorUserId, questionId, question.portalId, `faq_candidate:${pending.id}`); } catch { /* best effort */ }
+    return {
     id: Number(pending.id), questionId: Number(pending.question_id), qText: String(pending.q_text ?? ''),
     aText: String(pending.a_text ?? ''), category: String(pending.category ?? 'その他'),
     status: String(pending.status ?? 'pending'), createdAt: Number(pending.created_at ?? answeredAt),
-  };
+    };
+  }
   const result = await db.prepare("INSERT INTO faq_candidates (question_id, q_text, a_text, category, portal_id, status, created_at) VALUES (?, ?, ?, ?, ?, 'pending', ?)").bind(questionId, candidate.q, candidate.a, candidate.category, question.portalId, answeredAt).run();
+  try { await writeAuditLog('answer_saved', actorUserId, questionId, question.portalId, `faq_candidate:${result.meta.last_row_id}`); } catch { /* best effort */ }
   return { id: Number(result.meta.last_row_id), questionId, qText: candidate.q, aText: candidate.a, category: candidate.category, status: 'pending', createdAt: answeredAt };
 }
 
-export async function deleteQuestion(questionId: number, portalId?: number | null): Promise<void> {
+export async function deleteQuestion(questionId: number, portalId?: number | null, actorUserId: string | null = null): Promise<void> {
   const db = await initialise();
   const question = await getQuestionForAdministrator(questionId, portalId);
   if (!question) throw new Error('質問が見つかりません。');
@@ -354,11 +471,12 @@ export async function deleteQuestion(questionId: number, portalId?: number | nul
   const statement = db.prepare(`DELETE FROM questions WHERE id = ?${scope}`);
   if (portalId === undefined || portalId === null) await statement.bind(questionId).run();
   else await statement.bind(questionId, portalId).run();
+  try { await writeAuditLog('question_deleted', actorUserId, questionId, question.portalId, 'question_deleted'); } catch { /* best effort */ }
 }
 
-export async function actOnCandidate(candidateId: number, action: string, qText: string, aText: string, category: string, portalId?: number | null): Promise<void> {
+export async function actOnCandidate(candidateId: number, action: string, qText: string, aText: string, category: string, portalId?: number | null, actorUserId: string | null = null): Promise<void> {
   const db = await initialise();
-  const candidate = await db.prepare("SELECT id, q_text, a_text, category, portal_id FROM faq_candidates WHERE id = ? AND status = 'pending'").bind(candidateId).first<{ id: number; q_text: string; a_text: string; category: string; portal_id: number | null }>();
+  const candidate = await db.prepare("SELECT id, question_id, q_text, a_text, category, portal_id FROM faq_candidates WHERE id = ? AND status = 'pending'").bind(candidateId).first<{ id: number; question_id: number; q_text: string; a_text: string; category: string; portal_id: number | null }>();
   if (!candidate) throw new Error('承認待ちのFAQ候補が見つかりません。');
   if (portalId !== undefined && candidate.portal_id !== portalId) throw new Error('この窓口のFAQ候補ではありません。');
   const safeQuestion = (qText.trim() || candidate.q_text).slice(0, 300);
@@ -372,7 +490,8 @@ export async function actOnCandidate(candidateId: number, action: string, qText:
     if (existing) {
       await db.prepare("UPDATE faqs SET answer = ?, category = ?, status = 'published', portal_id = ?, updated_at = ? WHERE id = ?").bind(safeAnswer, safeCategory, candidate.portal_id, Date.now(), existing.id).run();
     } else {
-      await db.prepare("INSERT INTO faqs (question, answer, category, portal_id, status, updated_at) VALUES (?, ?, ?, ?, 'published', ?)").bind(safeQuestion, safeAnswer, safeCategory, candidate.portal_id, Date.now()).run();
+      const publishedAt = Date.now();
+      await db.prepare("INSERT INTO faqs (question, answer, category, portal_id, status, created_at, updated_at) VALUES (?, ?, ?, ?, 'published', ?, ?)").bind(safeQuestion, safeAnswer, safeCategory, candidate.portal_id, publishedAt, publishedAt).run();
     }
     await db.prepare("UPDATE faq_candidates SET status = 'published', q_text = ?, a_text = ?, category = ? WHERE id = ?").bind(safeQuestion, safeAnswer, safeCategory, candidateId).run();
   } else if (action === 'individual' || action === 'reject') {
@@ -380,4 +499,5 @@ export async function actOnCandidate(candidateId: number, action: string, qText:
   } else {
     throw new Error('操作が正しくありません。');
   }
+  try { await writeAuditLog(action === 'publish' || action === 'publish_edited' ? 'faq_published' : `faq_candidate_${action}`, actorUserId, candidate.question_id, candidate.portal_id, `candidate:${candidateId}`); } catch { /* best effort */ }
 }

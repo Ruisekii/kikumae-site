@@ -1,6 +1,6 @@
 import { createQuestion } from '../../../db/repository';
 import { containsPii } from '../../../db/local-ai';
-import { allowBurst, readRequestText } from '../../../db/request-guard';
+import { allowBurstShared, readRequestText } from '../../../db/request-guard';
 
 export const runtime = 'edge';
 
@@ -18,7 +18,7 @@ function json(message: string, status: number): Response {
 
 export async function POST(request: Request): Promise<Response> {
   if (!sameOrigin(request)) return json('この送信元は許可されていません。', 403);
-  if (!allowBurst(request, 'question-create:root', 30, 10 * 60 * 1000)) return json('送信が多すぎます。少し時間をおいて再度お試しください。', 429);
+  if (!await allowBurstShared(request, 'question-create:root', 30, 10 * 60 * 1000)) return Response.json({ message: '送信が多すぎます。少し時間をおいて再度お試しください。' }, { status: 429, headers: { 'Retry-After': '600', 'Cache-Control': 'no-store' } });
   let payload: unknown;
   try {
     payload = JSON.parse(await readRequestText(request, MAX_REQUEST_BYTES));

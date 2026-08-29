@@ -36,3 +36,10 @@ next-env.d.ts
 /.wrangler/
 /outputs/
 /work/
+
+# database exports and operational backups (never commit user questions/answers)
+*.sqlite
+*.sqlite3
+*.dump
+*.sql.gz
+/backups/

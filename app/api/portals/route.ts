@@ -1,5 +1,5 @@
 import { createPortal } from '../../../db/portals';
-import { allowBurst, readRequestText } from '../../../db/request-guard';
+import { allowBurstShared, readRequestText } from '../../../db/request-guard';
 
 export const runtime = 'edge';
 const RESERVED_PORTAL_SLUGS = new Set(['admin', 'api', 'callback', 'open', 'owner', 'questions', 'signin-with-chatgpt', 'signout-with-chatgpt', 'staff']);
@@ -12,7 +12,7 @@ function sameOrigin(request: Request): boolean {
 
 export async function POST(request: Request): Promise<Response> {
   if (!sameOrigin(request)) return Response.json({ message: 'この送信元は許可されていません。' }, { status: 403 });
-  if (!allowBurst(request, 'portal-create', 10, 10 * 60 * 1000)) return Response.json({ message: '作成操作が多すぎます。少し時間をおいて再度お試しください。' }, { status: 429, headers: { 'Retry-After': '600', 'Cache-Control': 'no-store' } });
+  if (!await allowBurstShared(request, 'portal-create', 10, 10 * 60 * 1000)) return Response.json({ message: '作成操作が多すぎます。少し時間をおいて再度お試しください。' }, { status: 429, headers: { 'Retry-After': '600', 'Cache-Control': 'no-store' } });
   try {
     const raw = await readRequestText(request, MAX_REQUEST_BYTES);
     const body = JSON.parse(raw) as { name?: string; slug?: string; description?: string; password?: string; passwordConfirmation?: string };

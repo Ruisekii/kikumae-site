@@ -1,6 +1,6 @@
 import { listRelatedFaqs } from '../../../../db/repository';
 import { categorizeQuestion, containsPii, generateLocalSummary } from '../../../../db/local-ai';
-import { allowBurst, readRequestText } from '../../../../db/request-guard';
+import { allowBurstShared, readRequestText } from '../../../../db/request-guard';
 
 export const runtime = 'edge';
 
@@ -18,7 +18,7 @@ function json(payload: Record<string, unknown>, status = 200): Response {
 
 export async function POST(request: Request): Promise<Response> {
   if (!sameOrigin(request)) return json({ message: 'この送信元は許可されていません。' }, 403);
-  if (!allowBurst(request, 'question-preview:root', 60, 10 * 60 * 1000)) return json({ message: 'プレビュー操作が多すぎます。少し時間をおいて再度お試しください。' }, 429);
+  if (!await allowBurstShared(request, 'question-preview:root', 60, 10 * 60 * 1000)) return json({ message: 'プレビュー操作が多すぎます。少し時間をおいて再度お試しください。' }, 429);
   try {
     const payload = JSON.parse(await readRequestText(request, MAX_REQUEST_BYTES)) as Record<string, unknown>;
     const body = typeof payload.body === 'string' ? payload.body.trim() : '';

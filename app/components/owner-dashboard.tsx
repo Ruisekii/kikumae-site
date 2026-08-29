@@ -20,12 +20,14 @@ export function OwnerDashboard({ signOutHref }: { signOutHref?: string }) {
   const [busy, setBusy] = useState(false);
   const requestSerial = useRef(0);
 
-  const loadPortals = useCallback(async (search: string) => {
+  const loadPortals = useCallback(async (search: string, page = 1) => {
     const serial = ++requestSerial.current;
     setBusy(true);
     try {
-      const response = await fetch(`/api/owner/portals${search ? `?q=${encodeURIComponent(search)}` : ''}`, { cache: 'no-store' });
-      const body = await response.json() as { portals?: PortalSummary[]; message?: string };
+      const params = new URLSearchParams({ page: String(page) });
+      if (search) params.set('q', search);
+      const response = await fetch(`/api/owner/portals?${params.toString()}`, { cache: 'no-store' });
+      const body = await response.json() as { portals?: PortalSummary[]; hasMore?: boolean; page?: number; message?: string };
       // A fast search can finish before the initial load.  Do not let the
       // older response overwrite the user's latest result.
       if (serial !== requestSerial.current) return;
@@ -50,7 +52,7 @@ export function OwnerDashboard({ signOutHref }: { signOutHref?: string }) {
     event.preventDefault();
     const next = query.trim().slice(0, 80);
     setActiveQuery(next);
-    await loadPortals(next);
+    await loadPortals(next, 1);
   }
 
   function openDelete(target: PortalSummary) {

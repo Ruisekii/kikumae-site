@@ -15,6 +15,6 @@ export async function DELETE(request: Request, { params }: { params: Promise<{ i
   if (!(await isAdministrator(user.userId))) return Response.json({ message: 'このアカウントには管理権限がありません。' }, { status: 403 });
   const id = Number((await params).id);
   if (!Number.isInteger(id) || id <= 0) return Response.json({ message: '質問IDが正しくありません。' }, { status: 400 });
-  await deleteQuestion(id, null);
+  await deleteQuestion(id, null, user.userId);
   return Response.json({ ok: true }, { headers: { 'Cache-Control': 'no-store' } });
 }

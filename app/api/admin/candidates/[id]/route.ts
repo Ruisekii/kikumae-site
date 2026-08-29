@@ -26,7 +26,7 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
     const qText = typeof data.qText === 'string' ? data.qText : '';
     const aText = typeof data.aText === 'string' ? data.aText : '';
     const category = typeof data.category === 'string' ? data.category : '';
-    await actOnCandidate(id, action, qText, aText, category, null);
+    await actOnCandidate(id, action, qText, aText, category, null, user.userId);
     return Response.json({ ok: true }, { headers: { 'Cache-Control': 'no-store' } });
   } catch (error) {
     if (error instanceof Error && error.message === 'REQUEST_BODY_TOO_LARGE') return Response.json({ message: '入力が長すぎます。' }, { status: 413 });

@@ -1,13 +1,36 @@
-/** Best-effort per-isolate abuse guard for public mutation endpoints.
+import { env } from 'cloudflare:workers';
+
+/** Abuse guard for public mutation endpoints.
  *
- * Durable authorization and data ownership remain in D1.  This small guard
- * only limits burst traffic before expensive parsing/AI work; entries are
- * pruned so a long-lived Worker isolate cannot grow without bound.
+ * D1 is the shared counter so a burst cannot simply move to another Worker
+ * isolate. A small in-memory fallback keeps the endpoint usable during a
+ * transient binding failure; it is never used for authorization.
  */
 type Counter = { startedAt: number; count: number };
 
 const counters = new Map<string, Counter>();
 const MAX_COUNTERS = 5_000;
+let rateTableReady: Promise<void> | null = null;
+
+async function ensureRateTable(): Promise<void> {
+  if (!env.DB) throw new Error('DB_UNAVAILABLE');
+  if (!rateTableReady) {
+    rateTableReady = env.DB.prepare(`CREATE TABLE IF NOT EXISTS rate_limits (
+      scope TEXT NOT NULL,
+      client_key TEXT NOT NULL,
+      window_started_at INTEGER NOT NULL,
+      count INTEGER NOT NULL,
+      updated_at INTEGER NOT NULL,
+      PRIMARY KEY (scope, client_key)
+    )`).run().then(() => env.DB!.prepare('CREATE INDEX IF NOT EXISTS rate_limits_updated_at_idx ON rate_limits (updated_at)').run()).then(() => undefined);
+  }
+  try {
+    await rateTableReady;
+  } catch (error) {
+    rateTableReady = null;
+    throw error;
+  }
+}
 
 /** Read a body incrementally so chunked requests cannot bypass the size cap. */
 export async function readRequestText(request: Request, maxBytes: number): Promise<string> {
@@ -39,9 +62,10 @@ export async function readRequestText(request: Request, maxBytes: number): Promi
 }
 
 function clientHint(request: Request): string {
-  const value = request.headers.get('cf-connecting-ip')
-    ?? request.headers.get('x-real-ip')
-    ?? request.headers.get('x-forwarded-for')?.split(',')[0]?.trim();
+  // Only trust the address asserted by Cloudflare. Forwarded headers are
+  // client-controlled on direct/local requests and would let an attacker
+  // rotate the limiter key on every request.
+  const value = request.headers.get('cf-connecting-ip');
   return (value || 'anonymous').slice(0, 96);
 }
 
@@ -60,4 +84,30 @@ export function allowBurst(request: Request, scope: string, limit: number, windo
   if (previous.count >= limit) return false;
   previous.count += 1;
   return true;
+}
+
+/** Shared, atomic D1-backed burst limiter. */
+export async function allowBurstShared(request: Request, scope: string, limit: number, windowMs: number): Promise<boolean> {
+  const now = Date.now();
+  const key = clientHint(request);
+  const safeScope = scope.slice(0, 96);
+  try {
+    await ensureRateTable();
+    const cutoff = now - windowMs;
+    const result = await env.DB!.prepare(`
+      INSERT INTO rate_limits (scope, client_key, window_started_at, count, updated_at)
+      VALUES (?, ?, ?, 1, ?)
+      ON CONFLICT(scope, client_key) DO UPDATE SET
+        count = CASE WHEN rate_limits.window_started_at <= ? THEN 1 ELSE rate_limits.count + 1 END,
+        window_started_at = CASE WHEN rate_limits.window_started_at <= ? THEN excluded.window_started_at ELSE rate_limits.window_started_at END,
+        updated_at = excluded.updated_at
+      RETURNING count
+    `).bind(safeScope, key, now, now, cutoff, cutoff).first<{ count: number }>();
+    if (Math.random() < 0.02) {
+      await env.DB!.prepare('DELETE FROM rate_limits WHERE updated_at < ?').bind(now - 24 * 60 * 60 * 1000).run();
+    }
+    return Number(result?.count ?? limit + 1) <= limit;
+  } catch {
+    return allowBurst(request, scope, limit, windowMs);
+  }
 }

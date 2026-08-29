@@ -1,7 +1,7 @@
 import { getPortal } from '../../../../../../db/portals';
 import { listRelatedFaqs } from '../../../../../../db/repository';
 import { categorizeQuestion, containsPii, generateLocalSummary } from '../../../../../../db/local-ai';
-import { allowBurst, readRequestText } from '../../../../../../db/request-guard';
+import { allowBurstShared, readRequestText } from '../../../../../../db/request-guard';
 
 export const runtime = 'edge';
 const MAX_BYTES = 4096;
@@ -15,7 +15,7 @@ function sameOrigin(request: Request): boolean {
 export async function POST(request: Request, { params }: { params: Promise<{ slug: string }> }): Promise<Response> {
   if (!sameOrigin(request)) return Response.json({ message: 'この送信元は許可されていません。' }, { status: 403 });
   const { slug } = await params;
-  if (!allowBurst(request, `question-preview:${slug}`, 60, 10 * 60 * 1000)) return Response.json({ message: 'プレビュー操作が多すぎます。少し時間をおいて再度お試しください。' }, { status: 429, headers: { 'Retry-After': '600', 'Cache-Control': 'no-store' } });
+  if (!await allowBurstShared(request, `question-preview:${slug}`, 60, 10 * 60 * 1000)) return Response.json({ message: 'プレビュー操作が多すぎます。少し時間をおいて再度お試しください。' }, { status: 429, headers: { 'Retry-After': '600', 'Cache-Control': 'no-store' } });
   const portal = await getPortal(slug);
   if (!portal) return Response.json({ message: '窓口が見つかりません。' }, { status: 404 });
   try {

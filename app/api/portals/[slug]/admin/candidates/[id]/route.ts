@@ -14,7 +14,7 @@ export async function POST(request: Request, { params }: { params: Promise<{ slu
   if (!Number.isInteger(id) || id <= 0) return Response.json({ message: '候補IDが正しくありません。' }, { status: 400 });
   try {
     const data = JSON.parse(await readRequestText(request, MAX_BYTES)) as Record<string, unknown>;
-    await actOnCandidate(id, typeof data.action === 'string' ? data.action : '', typeof data.qText === 'string' ? data.qText : '', typeof data.aText === 'string' ? data.aText : '', typeof data.category === 'string' ? data.category : '', portal.id);
+    await actOnCandidate(id, typeof data.action === 'string' ? data.action : '', typeof data.qText === 'string' ? data.qText : '', typeof data.aText === 'string' ? data.aText : '', typeof data.category === 'string' ? data.category : '', portal.id, `portal:${portal.id}`);
     return Response.json({ ok: true }, { headers: { 'Cache-Control': 'no-store' } });
   } catch (error) {
     if (error instanceof Error && error.message === 'REQUEST_BODY_TOO_LARGE') return Response.json({ message: '入力が長すぎます。' }, { status: 413 });
