@@ -75,7 +75,6 @@ export function KikumaeClient({ faqs }: Props) {
         <nav aria-label="主要メニュー"><a href="#faq">FAQを探す</a><a href="#ask">質問する</a><Link href="/admin">管理者用</Link></nav>
       </header>
       <section className="hero" id="top">
-        <p className="eyebrow">聞きにくいを、聞きやすく。</p>
         <h1><span className="hero-line">聞きにくいを、聞きやすく。</span><span className="hero-line">答える手間も、もっと軽く。</span></h1>
         <p>きくまえは、AIが似たFAQを探し、質問を分かりやすく整理し、管理者には回答案を用意するサービスです。人が確認した答えはFAQとして育ち、次の人が質問する前に解決できるようになります。</p>
         <div className="hero-actions"><a className="button primary" href="#faq">FAQを探す</a><a className="button accent" href="#ask">匿名で質問する</a></div>
