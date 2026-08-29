@@ -4,18 +4,18 @@ import Link from 'next/link';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import type { FaqCandidate, SubmittedQuestion } from '../../db/repository';
 
-type Props = { displayName: string };
+type Props = { displayName: string; authorized?: boolean };
 type Draft = { draft: string; grounds: string[]; mode: string };
 
 const dateLabel = (value: number | null) => value ? new Intl.DateTimeFormat('ja-JP', { dateStyle: 'medium', timeStyle: 'short' }).format(new Date(value)) : '';
 
-export function StaffDashboard({ displayName }: Props) {
+export function StaffDashboard({ displayName, authorized = false }: Props) {
   const [questions, setQuestions] = useState<SubmittedQuestion[]>([]);
   const [selectedId, setSelectedId] = useState<number | null>(null);
   const [drafts, setDrafts] = useState<Record<number, Draft>>({});
   const [answerText, setAnswerText] = useState('');
   const [answerUsesAi, setAnswerUsesAi] = useState(false);
-  const [message, setMessage] = useState('管理権限を確認しています…');
+  const [message, setMessage] = useState(authorized ? '質問を読み込んでいます…' : '管理権限を確認しています…');
   const [busy, setBusy] = useState(false);
 
   const loadQuestions = useCallback(async () => {
@@ -28,12 +28,14 @@ export function StaffDashboard({ displayName }: Props) {
 
   useEffect(() => {
     async function load() {
-      const claim = await fetch('/api/admin/claim', { method: 'POST' });
-      if (!claim.ok) { const body = await claim.json() as { message?: string }; setMessage(body.message ?? 'このアカウントには管理権限がありません。'); return; }
+      if (!authorized) {
+        const claim = await fetch('/api/admin/claim', { method: 'POST' });
+        if (!claim.ok) { const body = await claim.json() as { message?: string }; setMessage(body.message ?? 'このアカウントには管理権限がありません。'); return; }
+      }
       await loadQuestions();
     }
     void load();
-  }, [loadQuestions]);
+  }, [authorized, loadQuestions]);
 
   // Keep transient success/status notices from hiding the dashboard itself.
   useEffect(() => {
