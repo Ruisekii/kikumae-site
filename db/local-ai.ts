@@ -151,7 +151,12 @@ export function generateAlternativeDrafts(summary: string, original: string, rel
 }
 
 export function generateFaqCandidate(question: string, answer: string, category: string): { q: string; a: string; category: string } {
-  const base = generateLocalSummary(question).replace(/知りたい。$/, '').replace(/^「|」$/g, '').slice(0, 50);
+  const base = generateLocalSummary(question)
+    .replace(/知りたい。$/, '')
+    .replace(/[「」]/g, '')
+    .replace(/について$/, '')
+    .trim()
+    .slice(0, 50);
   const q = /[か?？]$/.test(base) ? `${base}${base.endsWith('か') ? '？' : ''}` : `${base}について教えてください。`;
   return { q, a: answer.trim().slice(0, 1000), category: categorizeQuestion(question, category) };
 }

@@ -1,5 +1,5 @@
 import { createPortal } from '../../../db/portals';
-import { allowBurst } from '../../../db/request-guard';
+import { allowBurst, readRequestText } from '../../../db/request-guard';
 
 export const runtime = 'edge';
 const RESERVED_PORTAL_SLUGS = new Set(['admin', 'api', 'callback', 'open', 'owner', 'questions', 'signin-with-chatgpt', 'signout-with-chatgpt', 'staff']);
@@ -14,10 +14,7 @@ export async function POST(request: Request): Promise<Response> {
   if (!sameOrigin(request)) return Response.json({ message: 'この送信元は許可されていません。' }, { status: 403 });
   if (!allowBurst(request, 'portal-create', 10, 10 * 60 * 1000)) return Response.json({ message: '作成操作が多すぎます。少し時間をおいて再度お試しください。' }, { status: 429, headers: { 'Retry-After': '600', 'Cache-Control': 'no-store' } });
   try {
-    const length = Number(request.headers.get('content-length') ?? '0');
-    if (!Number.isFinite(length) || length > MAX_REQUEST_BYTES) return Response.json({ message: '入力が大きすぎます。' }, { status: 413 });
-    const raw = await request.text();
-    if (new TextEncoder().encode(raw).byteLength > MAX_REQUEST_BYTES) return Response.json({ message: '入力が大きすぎます。' }, { status: 413 });
+    const raw = await readRequestText(request, MAX_REQUEST_BYTES);
     const body = JSON.parse(raw) as { name?: string; slug?: string; description?: string; password?: string; passwordConfirmation?: string };
     const name = String(body.name ?? '').trim(); const slug = String(body.slug ?? '').trim().toLowerCase(); const description = String(body.description ?? '').trim(); const password = String(body.password ?? '');
     if (name.length < 2 || name.length > 80) return Response.json({ message: '窓口名は2〜80文字で入力してください。' }, { status: 400 });
@@ -29,6 +26,7 @@ export async function POST(request: Request): Promise<Response> {
     const portal = await createPortal(name, slug, description, password);
     return Response.json({ portal: { name: portal.name, slug: portal.slug, description: portal.description } }, { status: 201, headers: { 'Cache-Control': 'no-store' } });
   } catch (error) {
+    if (error instanceof Error && error.message === 'REQUEST_BODY_TOO_LARGE') return Response.json({ message: '入力が大きすぎます。' }, { status: 413 });
     console.error('portal creation failed', error instanceof Error ? error.name : 'unknown');
     const message = error instanceof Error && /unique/i.test(error.message) ? 'そのURL用の名前はすでに使われています。' : '窓口を作成できませんでした。';
     return Response.json({ message }, { status: 400 });

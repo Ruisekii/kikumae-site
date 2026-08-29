@@ -1,7 +1,9 @@
 import { requirePortalSession, sameOrigin } from '../../../../../../../db/portal-auth';
 import { actOnCandidate } from '../../../../../../../db/repository';
+import { readRequestText } from '../../../../../../../db/request-guard';
 
 export const runtime = 'edge';
+const MAX_BYTES = 8_000;
 
 export async function POST(request: Request, { params }: { params: Promise<{ slug: string; id: string }> }): Promise<Response> {
   const { slug, id: rawId } = await params;
@@ -11,8 +13,11 @@ export async function POST(request: Request, { params }: { params: Promise<{ slu
   const id = Number(rawId);
   if (!Number.isInteger(id) || id <= 0) return Response.json({ message: '候補IDが正しくありません。' }, { status: 400 });
   try {
-    const data = await request.json() as Record<string, unknown>;
+    const data = JSON.parse(await readRequestText(request, MAX_BYTES)) as Record<string, unknown>;
     await actOnCandidate(id, typeof data.action === 'string' ? data.action : '', typeof data.qText === 'string' ? data.qText : '', typeof data.aText === 'string' ? data.aText : '', typeof data.category === 'string' ? data.category : '', portal.id);
     return Response.json({ ok: true }, { headers: { 'Cache-Control': 'no-store' } });
-  } catch (error) { return Response.json({ message: error instanceof Error ? error.message : 'FAQ候補を更新できませんでした。' }, { status: 400 }); }
+  } catch (error) {
+    if (error instanceof Error && error.message === 'REQUEST_BODY_TOO_LARGE') return Response.json({ message: '入力が長すぎます。' }, { status: 413 });
+    return Response.json({ message: 'FAQ候補を更新できませんでした。' }, { status: 400 });
+  }
 }

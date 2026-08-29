@@ -1,5 +1,6 @@
 import { getChatGPTUser } from '../../../../chatgpt-auth';
 import { actOnCandidate, isAdministrator } from '../../../../../db/repository';
+import { readRequestText } from '../../../../../db/request-guard';
 
 export const runtime = 'edge';
 const MAX_BYTES = 8_000;
@@ -19,8 +20,7 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
   if (!Number.isInteger(id) || id <= 0) return Response.json({ message: '候補IDが正しくありません。' }, { status: 400 });
   if (!Number.isFinite(contentLength) || contentLength > MAX_BYTES) return Response.json({ message: '入力が長すぎます。' }, { status: 413 });
   try {
-    const raw = await request.text();
-    if (new TextEncoder().encode(raw).byteLength > MAX_BYTES) return Response.json({ message: '入力が長すぎます。' }, { status: 413 });
+    const raw = await readRequestText(request, MAX_BYTES);
     const data = JSON.parse(raw) as Record<string, unknown>;
     const action = typeof data.action === 'string' ? data.action : '';
     const qText = typeof data.qText === 'string' ? data.qText : '';
@@ -29,6 +29,7 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
     await actOnCandidate(id, action, qText, aText, category, null);
     return Response.json({ ok: true }, { headers: { 'Cache-Control': 'no-store' } });
   } catch (error) {
-    return Response.json({ message: error instanceof Error ? error.message : 'FAQ候補を更新できませんでした。' }, { status: 400 });
+    if (error instanceof Error && error.message === 'REQUEST_BODY_TOO_LARGE') return Response.json({ message: '入力が長すぎます。' }, { status: 413 });
+    return Response.json({ message: 'FAQ候補を更新できませんでした。' }, { status: 400 });
   }
 }

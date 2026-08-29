@@ -72,8 +72,12 @@ function configuredOwnerUserId(): string | null {
 async function safeRun(db: D1Database, sql: string): Promise<void> {
   try {
     await db.prepare(sql).run();
-  } catch {
-    // Existing deployments may already have the column. Migration is idempotent.
+  } catch (error) {
+    // Existing deployments may already have the column/index. Do not hide
+    // unrelated permission, corruption, or availability failures.
+    const message = error instanceof Error ? error.message.toLowerCase() : String(error).toLowerCase();
+    if (message.includes('duplicate column') || message.includes('already exists') || message.includes('no such table')) return;
+    throw error;
   }
 }
 
@@ -110,6 +114,7 @@ async function initialise(): Promise<D1Database> {
     'ALTER TABLE questions ADD COLUMN answered_at INTEGER',
     'ALTER TABLE questions ADD COLUMN check_token_hash TEXT',
     'ALTER TABLE questions ADD COLUMN check_token_expires_at INTEGER',
+    'ALTER TABLE questions ADD COLUMN submission_key_hash TEXT',
     'ALTER TABLE faqs ADD COLUMN portal_id INTEGER',
     'ALTER TABLE questions ADD COLUMN portal_id INTEGER',
     'ALTER TABLE faq_candidates ADD COLUMN portal_id INTEGER',
@@ -117,6 +122,7 @@ async function initialise(): Promise<D1Database> {
   await ensureFaqIsolationSchema(db);
   await safeRun(db, 'UPDATE questions SET body_original = body WHERE body_original IS NULL');
   await db.batch(SEED_FAQS.map((faq) => db.prepare("INSERT OR IGNORE INTO faqs (question, answer, category, status, updated_at) VALUES (?, ?, ?, 'published', ?)").bind(faq.question, faq.answer, faq.category, now)));
+  await safeRun(db, 'CREATE UNIQUE INDEX IF NOT EXISTS questions_submission_key_unique ON questions (submission_key_hash) WHERE submission_key_hash IS NOT NULL');
   return db;
 }
 
@@ -138,9 +144,11 @@ async function ensureFaqIsolationSchema(db: D1Database): Promise<void> {
       db.prepare('CREATE UNIQUE INDEX IF NOT EXISTS faqs_question_portal_unique ON faqs (question, portal_id) WHERE portal_id IS NOT NULL'),
       db.prepare("INSERT OR REPLACE INTO schema_meta (key, value) VALUES ('faqs_scope_v1', 'ready')"),
     ]);
-  } catch {
-    // Keep the existing table usable if a legacy database is being migrated by
-    // another request at the same time. The next request retries the marker.
+  } catch (error) {
+    const message = error instanceof Error ? error.message.toLowerCase() : String(error).toLowerCase();
+    // A concurrent legacy migration can race on the temporary table. Retry on
+    // the next request, but surface unrelated DB failures to the caller.
+    if (!(message.includes('already exists') || message.includes('no such table') || message.includes('database is locked'))) throw error;
   }
 }
 
@@ -187,9 +195,14 @@ export async function listRelatedFaqs(query: string, limit = 3, portalId: number
   return searchFaqs(query, await listPublishedFaqs(portalId), limit);
 }
 
-export async function createQuestion(body: string, requestedSummary = '', requestedCategory = '', portalId: number | null = null): Promise<SubmittedQuestion> {
+export async function createQuestion(body: string, requestedSummary = '', requestedCategory = '', portalId: number | null = null, submissionKey = ''): Promise<SubmittedQuestion> {
   const db = await initialise();
   const createdAt = Date.now();
+  const submissionKeyHash = submissionKey ? await hashCheckToken(submissionKey) : null;
+  if (submissionKeyHash) {
+    const duplicate = await db.prepare('SELECT id FROM questions WHERE submission_key_hash = ? LIMIT 1').bind(submissionKeyHash).first<{ id: number }>();
+    if (duplicate) throw new Error('QUESTION_DUPLICATE');
+  }
   const canonicalSummary = generateLocalSummary(body);
   const aiSummary = requestedSummary.trim().slice(0, 300) || canonicalSummary;
   const category = categorizeQuestion(body, requestedCategory);
@@ -201,7 +214,7 @@ export async function createQuestion(body: string, requestedSummary = '', reques
   // check a private question to 30 days.  Legacy rows without an expiry remain
   // readable so existing users are not broken during migration.
   const checkTokenExpiresAt = createdAt + 30 * 24 * 60 * 60 * 1000;
-  const result = await db.prepare("INSERT INTO questions (body, body_original, ai_summary, summary_edited, category, status, contact_type, answer_draft, answer_alternatives, answer_grounds, portal_id, check_token_hash, check_token_expires_at, created_at) VALUES (?, ?, ?, ?, ?, 'open', 'anonymous', ?, ?, ?, ?, ?, ?, ?)").bind(body, body, aiSummary, aiSummary !== canonicalSummary ? 1 : 0, category, draft, JSON.stringify(alternatives), JSON.stringify(related.map((faq) => faq.question)), portalId, await hashCheckToken(checkToken), checkTokenExpiresAt, createdAt).run();
+  const result = await db.prepare("INSERT INTO questions (body, body_original, ai_summary, summary_edited, category, status, contact_type, answer_draft, answer_alternatives, answer_grounds, portal_id, check_token_hash, check_token_expires_at, submission_key_hash, created_at) VALUES (?, ?, ?, ?, ?, 'open', 'anonymous', ?, ?, ?, ?, ?, ?, ?, ?)").bind(body, body, aiSummary, aiSummary !== canonicalSummary ? 1 : 0, category, draft, JSON.stringify(alternatives), JSON.stringify(related.map((faq) => faq.question)), portalId, await hashCheckToken(checkToken), checkTokenExpiresAt, submissionKeyHash, createdAt).run();
   const id = Number(result.meta.last_row_id);
   return {
     id, body, bodyOriginal: body, aiSummary, summaryEdited: aiSummary !== canonicalSummary,
@@ -306,15 +319,28 @@ export async function approveAnswer(questionId: number, body: string, usedAi: bo
   const db = await initialise();
   const question = await getQuestionForAdministrator(questionId, portalId);
   if (!question) throw new Error('質問が見つかりません。');
+  if (question.status !== 'open') throw new Error('この質問はすでに回答済みです。');
   const answer = body.trim().slice(0, 4000);
   if (!answer) throw new Error('回答本文を入力してください。');
   const answeredAt = Date.now();
+  // Recompute grounds from the server-side FAQ set. Client supplied grounds
+  // are display hints only and must not become provenance records.
+  const related = await listRelatedFaqs(question.aiSummary || question.bodyOriginal, 3, question.portalId);
+  const verifiedGrounds = related.map((faq) => faq.question);
   const scope = portalId === null ? ' AND portal_id IS NULL' : portalId === undefined ? '' : ' AND portal_id = ?';
-  const update = db.prepare(`UPDATE questions SET answer_body = ?, answer_used_ai = ?, answer_grounds = ?, status = 'answered', answered_at = ? WHERE id = ?${scope}`);
-  if (portalId === undefined || portalId === null) await update.bind(answer, usedAi ? 1 : 0, JSON.stringify(grounds.filter(Boolean).slice(0, 10)), answeredAt, questionId).run();
-  else await update.bind(answer, usedAi ? 1 : 0, JSON.stringify(grounds.filter(Boolean).slice(0, 10)), answeredAt, questionId, portalId).run();
+  const update = db.prepare(`UPDATE questions SET answer_body = ?, answer_used_ai = ?, answer_grounds = ?, status = 'answered', answered_at = ? WHERE id = ? AND status = 'open'${scope}`);
+  const updateResult = portalId === undefined || portalId === null
+    ? await update.bind(answer, usedAi ? 1 : 0, JSON.stringify(verifiedGrounds.slice(0, 10)), answeredAt, questionId).run()
+    : await update.bind(answer, usedAi ? 1 : 0, JSON.stringify(verifiedGrounds.slice(0, 10)), answeredAt, questionId, portalId).run();
+  if (Number(updateResult.meta.changes ?? 0) !== 1) throw new Error('この質問はすでに回答済みです。');
   const candidate = containsPii(question.bodyOriginal) || containsPii(answer) ? null : generateFaqCandidate(question.bodyOriginal, answer, question.category);
   if (!candidate) return null;
+  const pending = await db.prepare("SELECT id, question_id, q_text, a_text, category, status, created_at FROM faq_candidates WHERE question_id = ? AND status = 'pending' LIMIT 1").bind(questionId).first<Record<string, unknown>>();
+  if (pending) return {
+    id: Number(pending.id), questionId: Number(pending.question_id), qText: String(pending.q_text ?? ''),
+    aText: String(pending.a_text ?? ''), category: String(pending.category ?? 'その他'),
+    status: String(pending.status ?? 'pending'), createdAt: Number(pending.created_at ?? answeredAt),
+  };
   const result = await db.prepare("INSERT INTO faq_candidates (question_id, q_text, a_text, category, portal_id, status, created_at) VALUES (?, ?, ?, ?, ?, 'pending', ?)").bind(questionId, candidate.q, candidate.a, candidate.category, question.portalId, answeredAt).run();
   return { id: Number(result.meta.last_row_id), questionId, qText: candidate.q, aText: candidate.a, category: candidate.category, status: 'pending', createdAt: answeredAt };
 }

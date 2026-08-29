@@ -1,6 +1,6 @@
 import { listRelatedFaqs } from '../../../../db/repository';
 import { categorizeQuestion, containsPii, generateLocalSummary } from '../../../../db/local-ai';
-import { allowBurst } from '../../../../db/request-guard';
+import { allowBurst, readRequestText } from '../../../../db/request-guard';
 
 export const runtime = 'edge';
 
@@ -19,18 +19,15 @@ function json(payload: Record<string, unknown>, status = 200): Response {
 export async function POST(request: Request): Promise<Response> {
   if (!sameOrigin(request)) return json({ message: 'この送信元は許可されていません。' }, 403);
   if (!allowBurst(request, 'question-preview:root', 60, 10 * 60 * 1000)) return json({ message: 'プレビュー操作が多すぎます。少し時間をおいて再度お試しください。' }, 429);
-  const contentLength = Number(request.headers.get('content-length') ?? '0');
-  if (!Number.isFinite(contentLength) || contentLength > MAX_REQUEST_BYTES) return json({ message: '質問は500文字以内で入力してください。' }, 413);
   try {
-    const raw = await request.text();
-    if (new TextEncoder().encode(raw).byteLength > MAX_REQUEST_BYTES) return json({ message: '質問は500文字以内で入力してください。' }, 413);
-    const payload = JSON.parse(raw) as Record<string, unknown>;
+    const payload = JSON.parse(await readRequestText(request, MAX_REQUEST_BYTES)) as Record<string, unknown>;
     const body = typeof payload.body === 'string' ? payload.body.trim() : '';
     if (!body || body.length > MAX_QUESTION_CHARS) return json({ message: '質問は1〜500文字で入力してください。' }, 400);
     if (containsPii(body)) return json({ message: '個人情報やURLは入力できません。該当箇所を削除してください。' }, 400);
     const related = await listRelatedFaqs(body, 3);
     return json({ body, summary: generateLocalSummary(body), category: categorizeQuestion(body), related, aiMode: 'local-rules' });
-  } catch {
+  } catch (error) {
+    if (error instanceof Error && error.message === 'REQUEST_BODY_TOO_LARGE') return json({ message: '質問は500文字以内で入力してください。' }, 413);
     return json({ message: '入力形式が正しくありません。' }, 400);
   }
 }

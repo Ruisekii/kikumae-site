@@ -1,5 +1,6 @@
 import { getChatGPTUser } from '../../../../../chatgpt-auth';
 import { approveAnswer, isAdministrator } from '../../../../../../db/repository';
+import { readRequestText } from '../../../../../../db/request-guard';
 
 export const runtime = 'edge';
 const MAX_BYTES = 12_000;
@@ -16,11 +17,8 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
   if (!(await isAdministrator(user.userId))) return Response.json({ message: 'このアカウントには管理権限がありません。' }, { status: 403 });
   const id = Number((await params).id);
   if (!Number.isInteger(id) || id <= 0) return Response.json({ message: '質問IDが正しくありません。' }, { status: 400 });
-  const contentLength = Number(request.headers.get('content-length') ?? '0');
-  if (!Number.isFinite(contentLength) || contentLength > MAX_BYTES) return Response.json({ message: '回答が長すぎます。' }, { status: 413 });
   try {
-    const raw = await request.text();
-    if (new TextEncoder().encode(raw).byteLength > MAX_BYTES) return Response.json({ message: '回答が長すぎます。' }, { status: 413 });
+    const raw = await readRequestText(request, MAX_BYTES);
     const data = JSON.parse(raw) as Record<string, unknown>;
     const body = typeof data.body === 'string' ? data.body.trim() : '';
     const usedAi = data.usedAi === true;
@@ -29,6 +27,7 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
     const candidate = await approveAnswer(id, body, usedAi, grounds, null);
     return Response.json({ ok: true, candidate }, { headers: { 'Cache-Control': 'no-store' } });
   } catch (error) {
-    return Response.json({ message: error instanceof Error ? error.message : '回答を保存できませんでした。' }, { status: 400 });
+    if (error instanceof Error && error.message === 'REQUEST_BODY_TOO_LARGE') return Response.json({ message: '回答が長すぎます。' }, { status: 413 });
+    return Response.json({ message: '回答を保存できませんでした。' }, { status: 400 });
   }
 }

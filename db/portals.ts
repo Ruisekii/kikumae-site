@@ -92,28 +92,19 @@ export async function listPortals(search = ''): Promise<PortalSummary[]> {
   return (result.results ?? []).map((row) => ({ id: Number(row.id), name: String(row.name ?? ''), slug: String(row.slug ?? ''), createdAt: Number(row.created_at ?? 0) }));
 }
 
-async function safeDelete(sql: string, ...values: unknown[]): Promise<void> {
-  try {
-    await db().prepare(sql).bind(...values).run();
-  } catch (error) {
-    // A very old deployment may not have optional tables yet.  Ignore only
-    // that known compatibility case; every other failure must reach the API
-    // so callers never receive a false "deleted" success.
-    const message = error instanceof Error ? error.message.toLowerCase() : String(error).toLowerCase();
-    if (message.includes('no such table') || message.includes('does not exist')) return;
-    throw error;
-  }
-}
-
 /** Delete one portal and every record that is explicitly scoped to it. */
 export async function deletePortal(portalId: number): Promise<void> {
   await ensureTable();
-  await safeDelete('DELETE FROM faq_candidates WHERE portal_id = ? OR question_id IN (SELECT id FROM questions WHERE portal_id = ?)', portalId, portalId);
-  await safeDelete('DELETE FROM audit_logs WHERE question_id IN (SELECT id FROM questions WHERE portal_id = ?)', portalId);
-  await safeDelete('DELETE FROM questions WHERE portal_id = ?', portalId);
-  await safeDelete('DELETE FROM faqs WHERE portal_id = ?', portalId);
-  await safeDelete('DELETE FROM portal_sessions WHERE portal_id = ?', portalId);
-  await db().prepare('DELETE FROM portals WHERE id = ?').bind(portalId).run();
+  // D1 batches execute as one atomic transaction: a failed child statement
+  // rolls back the entire portal deletion instead of leaving partial data.
+  await db().batch([
+    db().prepare('DELETE FROM faq_candidates WHERE portal_id = ? OR question_id IN (SELECT id FROM questions WHERE portal_id = ?)').bind(portalId, portalId),
+    db().prepare('DELETE FROM audit_logs WHERE question_id IN (SELECT id FROM questions WHERE portal_id = ?)').bind(portalId),
+    db().prepare('DELETE FROM questions WHERE portal_id = ?').bind(portalId),
+    db().prepare('DELETE FROM faqs WHERE portal_id = ?').bind(portalId),
+    db().prepare('DELETE FROM portal_sessions WHERE portal_id = ?').bind(portalId),
+    db().prepare('DELETE FROM portals WHERE id = ?').bind(portalId),
+  ]);
 }
 
 async function tokenHash(token: string): Promise<string> { const digest = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(token)); return bytesToHex(new Uint8Array(digest)); }
@@ -127,4 +118,10 @@ export async function createPortalSession(portal: Portal): Promise<string> {
 export async function getPortalBySession(token: string): Promise<Portal | null> {
   await ensureTable(); const row = await db().prepare('SELECT p.id, p.name, p.slug, p.description, p.password_hash, p.created_at FROM portal_sessions s JOIN portals p ON p.id = s.portal_id WHERE s.token_hash = ? AND s.expires_at > ? LIMIT 1').bind(await tokenHash(token), Date.now()).first<Record<string, unknown>>();
   return row ? { id: Number(row.id), name: String(row.name), slug: String(row.slug), description: String(row.description ?? ''), passwordHash: String(row.password_hash), createdAt: Number(row.created_at) } : null;
+}
+
+export async function revokePortalSession(token: string): Promise<void> {
+  if (!token) return;
+  await ensureTable();
+  await db().prepare('DELETE FROM portal_sessions WHERE token_hash = ?').bind(await tokenHash(token)).run();
 }

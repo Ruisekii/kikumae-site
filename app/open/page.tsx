@@ -13,6 +13,16 @@ export default function OpenPortalPage() {
   const [copied, setCopied] = useState(false);
   const [slug, setSlug] = useState('');
 
+  async function copyPublicUrl(url: string) {
+    try {
+      if (!navigator.clipboard) throw new Error('clipboard-unavailable');
+      await navigator.clipboard.writeText(url);
+      setCopied(true);
+    } catch {
+      setMessage('コピーできませんでした。URLを選択してコピーしてください。');
+    }
+  }
+
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setBusy(true);
@@ -31,7 +41,7 @@ export default function OpenPortalPage() {
   if (created) {
     const publicUrl = typeof window !== 'undefined' ? `${window.location.origin}/${created.slug}` : `/${created.slug}`;
     const adminUrl = typeof window !== 'undefined' ? `${window.location.origin}/${created.slug}/admin` : `/${created.slug}/admin`;
-    return <main className="portal-create-page"><div className="portal-complete"><p className="eyebrow">窓口ができました！</p><h1>あなたのきくまえ窓口です</h1><p>{created.name}の質問を、聞きやすく受け付けられます。</p><dl><dt>公開ページ</dt><dd><code>{publicUrl}</code></dd><dt>管理ページ</dt><dd><code>{adminUrl}</code></dd></dl><div className="portal-qr"><p><b>公開ページのQRコード</b></p><img src={`https://quickchart.io/qr?size=180&margin=1&text=${encodeURIComponent(publicUrl)}`} alt={`${created.name} 公開ページのQRコード`} width="180" height="180" loading="eager" /><p className="input-hint">QRコードには公開ページのURLだけが入ります。</p></div><div className="form-actions"><Link className="button accent" href={`/${created.slug}`}>公開ページを見る</Link><Link className="button secondary" href={`/${created.slug}/admin`}>管理画面を開く</Link><button className="button secondary" type="button" onClick={() => { void navigator.clipboard?.writeText(publicUrl).then(() => setCopied(true)); }}>{copied ? 'コピーしました' : '公開URLをコピー'}</button></div><div className="next-steps"><b>次にすること</b><ol><li>管理画面で最初のFAQを確認・追加</li><li>公開URLをメンバーに共有</li><li>届いた質問に回答し、FAQ候補を承認</li></ol></div></div></main>;
+    return <main className="portal-create-page"><div className="portal-complete"><p className="eyebrow">窓口ができました！</p><h1>あなたのきくまえ窓口です</h1><p>{created.name}の質問を、聞きやすく受け付けられます。</p><dl><dt>公開ページ</dt><dd><code>{publicUrl}</code></dd><dt>管理ページ</dt><dd><code>{adminUrl}</code></dd></dl><div className="portal-qr"><p><b>公開ページのQRコード</b></p><img src={`https://quickchart.io/qr?size=180&margin=1&text=${encodeURIComponent(publicUrl)}`} alt={`${created.name} 公開ページのQRコード`} width="180" height="180" loading="eager" /><p className="input-hint">QRコードには公開ページのURLだけが入ります。</p></div><div className="form-actions"><Link className="button accent" href={`/${created.slug}`}>公開ページを見る</Link><Link className="button secondary" href={`/${created.slug}/admin`}>管理画面を開く</Link><button className="button secondary" type="button" onClick={() => { void copyPublicUrl(publicUrl); }}>{copied ? 'コピーしました' : '公開URLをコピー'}</button></div><div className="next-steps"><b>次にすること</b><ol><li>管理画面で最初のFAQを確認・追加</li><li>公開URLをメンバーに共有</li><li>届いた質問に回答し、FAQ候補を承認</li></ol></div></div></main>;
   }
 
   const safeSlug = slug.match(/^[a-z0-9]+(?:-[a-z0-9]+)*$/)?.[0] ?? '';

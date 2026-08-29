@@ -4,7 +4,7 @@ import { FormEvent, useMemo, useState } from 'react';
 import Link from 'next/link';
 import type { Faq, RelatedFaq } from '../../db/repository';
 
-type Preview = { body: string; summary: string; category: string; related: RelatedFaq[] };
+type Preview = { body: string; summary: string; category: string; related: RelatedFaq[]; submissionKey: string };
 type Props = { slug: string; name: string; description: string; faqs: Faq[] };
 const normalize = (value: string) => value.toLocaleLowerCase('ja-JP').replace(/\s/g, '');
 const categories = ['利用方法', '申請・手続き', '日程・場所', '料金・費用', 'ルール・制度', '困りごと・トラブル', 'その他'];
@@ -28,14 +28,14 @@ export function PortalClient({ slug, name, description, faqs }: Props) {
       const response = await fetch(`/api/portals/${slug}/questions/preview`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ body: question }) });
       const payload = await response.json() as Preview & { message?: string };
       if (!response.ok) { setStatus(payload.message ?? '確認できませんでした。'); return; }
-      setPreview(payload); setQuestion(payload.body);
+      setPreview({ ...payload, submissionKey: crypto.randomUUID() }); setQuestion(payload.body);
     } catch { setStatus('通信に失敗しました。時間をおいて再度お試しください。'); }
     finally { setBusy(false); }
   }
   async function submitQuestion(event: FormEvent<HTMLFormElement>) {
     event.preventDefault(); if (!preview) return; setBusy(true); setStatus('');
     try {
-      const response = await fetch(`/api/portals/${slug}/questions`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ body: preview.body, summary: preview.summary, category: preview.category }) });
+      const response = await fetch(`/api/portals/${slug}/questions`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ body: preview.body, summary: preview.summary, category: preview.category, submissionKey: preview.submissionKey }) });
       const payload = await response.json() as { message?: string; checkUrl?: string };
       if (!response.ok) { setStatus(payload.message ?? '送信できませんでした。'); return; }
       setQuestion(''); setPreview(null); setCheckUrl(payload.checkUrl ?? ''); setStatus('質問を受け付けました。管理者が確認し、FAQ改善のため継続保存されます。');

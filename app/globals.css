@@ -79,3 +79,8 @@ footer { padding: 28px 24px; background: var(--navy); color: #fff; text-align: c
  @media (max-width: 900px) { .company-grid { grid-template-columns: repeat(2, 1fr); } }
  @media (max-width: 720px) { .feature-grid, .places-grid, .company-grid { grid-template-columns: 1fr; } .cycle-list { display: grid; } .cycle-list i { text-align: center; } .hero h1 { font-size: clamp(2rem, 10vw, 3.4rem); } .hero-line { white-space: normal; } }
  .hero-line { display: block; white-space: nowrap; }
+
+/* Keep every AI answer candidate in the same Kikumae yellow treatment. */
+.draft-options .draft-option-1,
+.draft-options .draft-option-2,
+.draft-options .draft-option-3 { border-color: #f0c44c; background: #fff8d8; }

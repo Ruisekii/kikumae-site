@@ -11,5 +11,5 @@ export async function POST(request: Request, { params }: { params: Promise<{ slu
   const id = Number(rawId);
   if (!Number.isInteger(id) || id <= 0) return Response.json({ message: '質問IDが正しくありません。' }, { status: 400 });
   try { return Response.json(await generateAnswerDraft(id, portal.id), { headers: { 'Cache-Control': 'no-store' } }); }
-  catch (error) { return Response.json({ message: error instanceof Error ? error.message : '回答案を生成できませんでした。' }, { status: 400 }); }
+  catch { return Response.json({ message: '回答案を生成できませんでした。' }, { status: 400 }); }
 }

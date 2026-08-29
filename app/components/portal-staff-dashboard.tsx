@@ -21,10 +21,13 @@ export function PortalStaffDashboard({ params }: Props) {
   const [showDelete, setShowDelete] = useState(false);
   const [confirmName, setConfirmName] = useState('');
   const selected = useMemo(() => questions.find((question) => question.id === selectedId) ?? null, [questions, selectedId]);
+  function clearSession(message: string) {
+    setLoggedIn(false); setQuestions([]); setSelectedId(null); setDraft(null); setAnswerText(''); setMessage(message);
+  }
   async function loadQuestions() {
     const response = await fetch(`/api/portals/${slug}/admin/questions`, { cache: 'no-store' });
     const body = await response.json() as { questions?: SubmittedQuestion[]; message?: string };
-    if (!response.ok) { setMessage(body.message ?? '質問一覧を読み込めませんでした。'); return; }
+    if (!response.ok) { if (response.status === 401) clearSession('セッションの有効期限が切れました。もう一度ログインしてください。'); else setMessage(body.message ?? '質問一覧を読み込めませんでした。'); return; }
     setQuestions(body.questions ?? []); setSelectedId((current) => current && body.questions?.some((q) => q.id === current) ? current : null);
   }
   async function login() {
@@ -42,17 +45,17 @@ export function PortalStaffDashboard({ params }: Props) {
   }
   async function generateDraft() {
     if (!selected) return; setBusy(true); setMessage('回答案を用意しています…');
-    try { const response = await fetch(`/api/portals/${slug}/admin/questions/${selected.id}/draft`, { method: 'POST' }); const body = await response.json() as { draft?: string; alternatives?: string[]; grounds?: string[]; message?: string }; if (!response.ok) { setMessage(body.message ?? '回答案を生成できませんでした。'); return; } setDraft({ draft: body.draft ?? '', alternatives: body.alternatives ?? [], grounds: body.grounds ?? [] }); setAnswerText(body.draft ?? ''); setMessage(''); }
+    try { const response = await fetch(`/api/portals/${slug}/admin/questions/${selected.id}/draft`, { method: 'POST' }); const body = await response.json() as { draft?: string; alternatives?: string[]; grounds?: string[]; message?: string }; if (!response.ok) { if (response.status === 401) clearSession('セッションの有効期限が切れました。もう一度ログインしてください。'); else setMessage(body.message ?? '回答案を生成できませんでした。'); return; } setDraft({ draft: body.draft ?? '', alternatives: body.alternatives ?? [], grounds: body.grounds ?? [] }); setAnswerText(body.draft ?? ''); setMessage(''); }
     catch { setMessage('回答案の生成に失敗しました。'); } finally { setBusy(false); }
   }
   async function approveAnswer() {
     if (!selected || !answerText.trim()) return; setBusy(true); setMessage('回答を保存しています…');
-    try { const response = await fetch(`/api/portals/${slug}/admin/questions/${selected.id}/answer`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ body: answerText, usedAi: Boolean(draft), grounds: draft?.grounds ?? [] }) }); const body = await response.json() as { message?: string }; if (!response.ok) { setMessage(body.message ?? '回答を保存できませんでした。'); return; } await loadQuestions(); setMessage('人が確認した回答を保存しました。FAQ候補も確認できます。'); }
+    try { const response = await fetch(`/api/portals/${slug}/admin/questions/${selected.id}/answer`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ body: answerText, usedAi: Boolean(draft), grounds: draft?.grounds ?? [] }) }); const body = await response.json() as { message?: string }; if (!response.ok) { if (response.status === 401) clearSession('セッションの有効期限が切れました。もう一度ログインしてください。'); else setMessage(body.message ?? '回答を保存できませんでした。'); return; } await loadQuestions(); setMessage('人が確認した回答を保存しました。FAQ候補も確認できます。'); }
     catch { setMessage('回答の保存に失敗しました。'); } finally { setBusy(false); }
   }
   async function candidateAction(candidate: FaqCandidate, action: string) {
     setBusy(true); setMessage('FAQ候補を更新しています…');
-    try { const response = await fetch(`/api/portals/${slug}/admin/candidates/${candidate.id}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action, qText: candidate.qText, aText: candidate.aText, category: candidate.category }) }); const body = await response.json() as { message?: string }; if (!response.ok) { setMessage(body.message ?? 'FAQ候補を更新できませんでした。'); return; } await loadQuestions(); setMessage(action === 'publish_edited' ? 'FAQを公開しました。' : '候補を更新しました。'); }
+    try { const response = await fetch(`/api/portals/${slug}/admin/candidates/${candidate.id}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action, qText: candidate.qText, aText: candidate.aText, category: candidate.category }) }); const body = await response.json() as { message?: string }; if (!response.ok) { if (response.status === 401) clearSession('セッションの有効期限が切れました。もう一度ログインしてください。'); else setMessage(body.message ?? 'FAQ候補を更新できませんでした。'); return; } await loadQuestions(); setMessage(action === 'publish_edited' ? 'FAQを公開しました。' : '候補を更新しました。'); }
     catch { setMessage('FAQ候補の更新に失敗しました。'); } finally { setBusy(false); }
   }
   async function logout() {
