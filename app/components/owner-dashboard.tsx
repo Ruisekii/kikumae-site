@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { FormEvent, useCallback, useEffect, useMemo, useState } from 'react';
+import { FormEvent, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 type PortalSummary = { id: number; name: string; slug: string; createdAt: number };
 
@@ -18,17 +18,23 @@ export function OwnerDashboard() {
   const [message, setMessage] = useState('窓口一覧を読み込んでいます…');
   const [loaded, setLoaded] = useState(false);
   const [busy, setBusy] = useState(false);
+  const requestSerial = useRef(0);
 
   const loadPortals = useCallback(async (search: string) => {
+    const serial = ++requestSerial.current;
     setBusy(true);
     try {
       const response = await fetch(`/api/owner/portals${search ? `?q=${encodeURIComponent(search)}` : ''}`, { cache: 'no-store' });
       const body = await response.json() as { portals?: PortalSummary[]; message?: string };
+      // A fast search can finish before the initial load.  Do not let the
+      // older response overwrite the user's latest result.
+      if (serial !== requestSerial.current) return;
       if (!response.ok) { setMessage(body.message ?? '窓口一覧を読み込めませんでした。'); return; }
       setPortals(body.portals ?? []);
       setMessage('');
       setLoaded(true);
     } catch {
+      if (serial !== requestSerial.current) return;
       setMessage('窓口一覧の取得に失敗しました。');
     } finally {
       setBusy(false);
