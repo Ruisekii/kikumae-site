@@ -308,6 +308,30 @@ async function initialiseDatabase(): Promise<D1Database> {
     await safeRun(db, 'UPDATE questions SET body_original = body WHERE body_original IS NULL');
     await db.prepare("INSERT OR REPLACE INTO schema_meta (key, value) VALUES ('schema_v2', 'ready')").run();
   }
+  // schema_v2 was already marked complete on existing deployments before the
+  // Report -> Issue fields were introduced. Keep those databases additive and
+  // migrate the new columns once without rewriting the legacy rows.
+  const issueSchemaMarker = await db.prepare("SELECT value FROM schema_meta WHERE key = 'schema_v3' LIMIT 1").first<{ value: string }>();
+  if (issueSchemaMarker?.value !== 'ready') {
+    for (const migration of [
+      "ALTER TABLE questions ADD COLUMN request_text TEXT NOT NULL DEFAULT ''",
+      "ALTER TABLE questions ADD COLUMN affected_people TEXT NOT NULL DEFAULT ''",
+      "ALTER TABLE questions ADD COLUMN vulnerable_people TEXT NOT NULL DEFAULT '[]'",
+      "ALTER TABLE questions ADD COLUMN emotional_intensity TEXT NOT NULL DEFAULT 'low'",
+      "ALTER TABLE questions ADD COLUMN contains_abusive_language INTEGER NOT NULL DEFAULT 0",
+      "ALTER TABLE questions ADD COLUMN urgency_confidence REAL NOT NULL DEFAULT 0.5",
+      "ALTER TABLE questions ADD COLUMN grouping_confidence REAL NOT NULL DEFAULT 1",
+      "ALTER TABLE questions ADD COLUMN display_body TEXT NOT NULL DEFAULT ''",
+      'ALTER TABLE questions ADD COLUMN issue_id INTEGER',
+      "ALTER TABLE questions ADD COLUMN issue_link_confidence REAL NOT NULL DEFAULT 1",
+      "ALTER TABLE issues ADD COLUMN internal_note TEXT NOT NULL DEFAULT ''",
+      "ALTER TABLE faqs ADD COLUMN source TEXT NOT NULL DEFAULT '避難所スタッフ'",
+      'ALTER TABLE faqs ADD COLUMN expires_at INTEGER',
+      'ALTER TABLE faqs ADD COLUMN verified INTEGER NOT NULL DEFAULT 1',
+    ]) await safeRun(db, migration);
+    await safeRun(db, 'CREATE INDEX IF NOT EXISTS questions_issue_idx ON questions (issue_id, created_at DESC)');
+    await db.prepare("INSERT OR REPLACE INTO schema_meta (key, value) VALUES ('schema_v3', 'ready')").run();
+  }
   await ensureFaqIsolationSchema(db);
   await ensureIssueMigration(db);
   const seedMarker = await db.prepare("SELECT value FROM schema_meta WHERE key = 'shelter_faq_seed_v1' LIMIT 1").first<{ value: string }>();
