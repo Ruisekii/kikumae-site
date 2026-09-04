@@ -78,7 +78,7 @@ async function verifyAdminApiToken(token: string): Promise<boolean> {
   const signature = fromBase64Url(parts[3]);
   if (!Number.isSafeInteger(expiresAt) || expiresAt <= Date.now() || !signature) return false;
   const key = await importHmacKey(secret, ['verify']);
-  return crypto.subtle.verify('HMAC', key, signature, encoder.encode(payload));
+  return crypto.subtle.verify('HMAC', key, signature as BufferSource, encoder.encode(payload));
 }
 
 export function clearAdminSessionCookie(): string {
@@ -96,7 +96,7 @@ export async function getAdminSession(): Promise<AdminSession | null> {
   const signature = fromBase64Url(parts[3]);
   if (!Number.isSafeInteger(expiresAt) || expiresAt <= Date.now() || !signature) return null;
   const key = await importHmacKey(secret, ['verify']);
-  const valid = await crypto.subtle.verify('HMAC', key, signature, encoder.encode(payload));
+  const valid = await crypto.subtle.verify('HMAC', key, signature as BufferSource, encoder.encode(payload));
   return valid ? { userId: 'admin-password', displayName: '避難所管理者', expiresAt } : null;
 }
 

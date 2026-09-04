@@ -1,5 +1,5 @@
 import { listRelatedFaqs } from '../../../../db/repository';
-import { categorizeShelterQuestion, containsPii, generateShelterAnalysis, shelterFollowUp, type ShelterIntake } from '../../../../db/local-ai';
+import { categorizeShelterQuestion, generateShelterAnalysis, shelterFollowUp, type ShelterIntake } from '../../../../db/local-ai';
 import { allowBurstShared, readRequestText } from '../../../../db/request-guard';
 
 export const runtime = 'edge';
@@ -24,7 +24,6 @@ export async function POST(request: Request): Promise<Response> {
     const body = typeof payload.body === 'string' ? payload.body.trim() : '';
     const intake = (payload.intake && typeof payload.intake === 'object') ? payload.intake as ShelterIntake : {};
     if (!body || body.length > MAX_QUESTION_CHARS) return json({ message: '質問は1〜500文字で入力してください。' }, 400);
-    if (containsPii(body)) return json({ message: '個人情報やURLは入力できません。該当箇所を削除してください。' }, 400);
     const analysis = generateShelterAnalysis(body, intake);
     const related = await listRelatedFaqs(body, 3);
     const followUpKey = analysis.missingInformation[0] ?? '';

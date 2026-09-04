@@ -1,5 +1,4 @@
 import { createQuestion } from '../../../db/repository';
-import { containsPii } from '../../../db/local-ai';
 import type { ShelterIntake } from '../../../db/local-ai';
 import { allowBurstShared, readRequestText } from '../../../db/request-guard';
 
@@ -41,9 +40,7 @@ export async function POST(request: Request): Promise<Response> {
     lastReceivedAt: typeof rawIntake.lastReceivedAt === 'string' ? rawIntake.lastReceivedAt : '',
   };
   if (!body || body.length > MAX_QUESTION_CHARS) return json('質問は1〜500文字で入力してください。', 400);
-  if (containsPii(body)) return json('個人情報やURLは保存できません。内容を取り除いてから送信してください。', 400);
   if (summary.length > 300) return json('要約は300文字以内で入力してください。', 400);
-  if (summary && containsPii(summary)) return json('要約にも個人情報やURLは含められません。', 400);
 
   try {
     const question = await createQuestion(body, summary, category, null, submissionKey, intake);

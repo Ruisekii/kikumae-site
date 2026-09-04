@@ -14,6 +14,9 @@ export type AiRelatedFaq = RelatedFaq;
 
 export const SHELTER_CATEGORIES = ['水・飲料', '食料・物資', '医療・薬', 'トイレ・衛生', '設備・充電', 'ペット', '安全・その他', 'その他'] as const;
 export type ShelterCategory = typeof SHELTER_CATEGORIES[number];
+export const ISSUE_CATEGORIES = ['水', '食料', '医療', '衛生', 'トイレ', '睡眠', '安全', 'ペット', 'バリアフリー', '充電・通信', '人間関係', 'その他'] as const;
+export type IssueCategory = typeof ISSUE_CATEGORIES[number];
+export type UrgencyLevel = 'critical' | 'high' | 'normal' | 'low';
 
 export type ShelterIntake = {
   location?: string;
@@ -25,14 +28,22 @@ export type ShelterIntake = {
 export type ShelterAnalysis = {
   title: string;
   overview: string;
+  request: string;
   facts: string[];
   emotion: string;
+  emotionalIntensity: 'low' | 'medium' | 'high';
+  containsAbusiveLanguage: boolean;
   missingInformation: string[];
   urgencyCandidate: '高' | '中' | '低';
+  urgencyLevel: UrgencyLevel;
+  urgencyConfidence: number;
   urgentReview: boolean;
   category: ShelterCategory;
+  issueCategory: IssueCategory;
   location: string;
   peopleCount: string;
+  affectedPeople: string;
+  vulnerablePeople: string[];
   resourceRemaining: string;
   lastReceivedAt: string;
 };
@@ -84,6 +95,83 @@ function emotionLabel(value: string): string {
   return '不安や困りごとがある';
 }
 
+function emotionalIntensity(value: string): 'low' | 'medium' | 'high' {
+  if (/(死ね|消えろ|ふざけんな|ふざけるな|何回言|いい加減|最悪|怒鳴|許さ|どうなってる)/.test(value)) return 'high';
+  if (/(怒|焦|不安|心配|怖|恐|困る|助けて|苦しい|つらい|泣)/.test(value)) return 'medium';
+  return 'low';
+}
+
+function containsAbusiveLanguage(value: string): boolean {
+  return /(死ね|消えろ|ふざけんな|ふざけるな|馬鹿|バカ|クソ|何回言わせ|いい加減にしろ)/i.test(value);
+}
+
+function extractLocation(value: string, intakeLocation: string): string {
+  if (intakeLocation.trim()) return intakeLocation.trim().slice(0, 120);
+  const match = value.match(/(体育館(?:北側|南側)?|北トイレ|南トイレ|受付(?:付近)?|救護スペース|駐車場|屋外)/);
+  return match?.[1] ?? '';
+}
+
+function extractAffectedPeople(value: string, intakePeople: string): string {
+  if (intakePeople.trim()) return intakePeople.trim().slice(0, 80);
+  const match = value.match(/(\d{1,3})\s*(?:人|名)/);
+  return match?.[1] ? `${match[1]}人` : '';
+}
+
+function vulnerablePeople(value: string): string[] {
+  const found: string[] = [];
+  if (/(子ども|こども|乳児|赤ちゃん)/.test(value)) found.push('子ども');
+  if (/(高齢|お年寄り)/.test(value)) found.push('高齢者');
+  if (/(障害|車いす| wheelchair)/i.test(value)) found.push('障害者');
+  if (/(妊婦|妊娠)/.test(value)) found.push('妊婦');
+  if (/(持病|糖尿病|透析|喘息|ぜんそく)/.test(value)) found.push('持病あり');
+  return found.length ? found : ['不明'];
+}
+
+function requestLabel(category: ShelterCategory, value: string): string {
+  if (/(追加|配布|持ってき|届け|補充|足り|不足|ない|切れ)/.test(value)) {
+    if (category === '水・飲料') return '飲料水の追加配布・補充';
+    if (category === '食料・物資') return '食料・物資の追加配布・補充';
+    if (category === '医療・薬') return '必要な医療・薬の支援';
+    if (category === 'トイレ・衛生') return '清掃や衛生状態の改善';
+  }
+  if (category === '水・飲料') return '飲料水の配布場所・状況の確認';
+  if (category === '食料・物資') return '食料・物資の配布状況の確認';
+  if (category === '医療・薬') return '体調・薬についての支援';
+  if (category === 'トイレ・衛生') return 'トイレ・衛生についての案内や対応';
+  if (category === '設備・充電') return '利用できる設備や充電場所の案内';
+  if (category === 'ペット') return 'ペットの受け入れ場所・ルールの案内';
+  if (category === '安全・その他') return '安全状況の確認と必要な対応';
+  return '相談内容の確認と必要な支援';
+}
+
+export function canonicalIssueCategory(category: ShelterCategory, value: string): IssueCategory {
+  if (category === '水・飲料') return '水';
+  if (category === '食料・物資') return '食料';
+  if (category === '医療・薬') return '医療';
+  if (category === 'トイレ・衛生') return value.includes('トイレ') ? 'トイレ' : '衛生';
+  if (category === '設備・充電') return '充電・通信';
+  if (category === 'ペット') return 'ペット';
+  if (category === '安全・その他') return '安全';
+  if (/(眠|寝|毛布|寒い|暑い)/.test(value)) return '睡眠';
+  if (/(車いす|段差|バリアフリー|障害)/i.test(value)) return 'バリアフリー';
+  if (/(家族|近所|人間関係|けんか|騒|話し合い)/.test(value)) return '人間関係';
+  return 'その他';
+}
+
+export function urgencyLevel(urgentReview: boolean, candidate: '高' | '中' | '低'): UrgencyLevel {
+  return urgentReview ? 'critical' : candidate === '高' ? 'high' : candidate === '中' ? 'normal' : 'low';
+}
+
+export function redactSensitiveInformation(value: string): string {
+  return value
+    .replace(/[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/gi, '[連絡先を非表示]')
+    .replace(/https?:\/\/\S+|www\.\S+/gi, '[URLを非表示]')
+    .replace(/(?:0\d{1,4}[-ー－ ]?\d{1,4}[-ー－ ]?\d{3,4})/g, '[電話番号を非表示]')
+    .replace(/〒\s?\d{3}[-ー－]?\d{4}/g, '[郵便番号を非表示]')
+    .replace(/(?:氏名|名前|住所|電話(?:番号)?|メール(?:アドレス)?|連絡先)\s*[:：]\s*[^、。\n]+/g, (match) => `${match.split(/[:：]/)[0]}：[個人情報を非表示]`)
+    .slice(0, 500);
+}
+
 function shelterTitle(category: ShelterCategory, location: string, value: string): string {
   const place = location ? `${location}の` : '';
   const topic = category === '水・飲料' ? '飲料水不足' : category === '医療・薬' ? '医療・薬の相談' : category === '食料・物資' ? '物資不足' : category === 'トイレ・衛生' ? 'トイレ・衛生の相談' : category === '設備・充電' ? '設備・充電の相談' : category === 'ペット' ? 'ペットの相談' : '避難所での困りごと';
@@ -93,11 +181,12 @@ function shelterTitle(category: ShelterCategory, location: string, value: string
 
 export function generateShelterAnalysis(value: string, intake: ShelterIntake = {}): ShelterAnalysis {
   const text = value.trim().replace(/\r?\n/g, ' ');
-  const location = intake.location?.trim().slice(0, 120) ?? '';
-  const peopleCount = intake.peopleCount?.trim().slice(0, 80) ?? '';
+  const location = extractLocation(text, intake.location ?? '');
+  const peopleCount = extractAffectedPeople(text, intake.peopleCount ?? '');
   const resourceRemaining = intake.resourceRemaining?.trim().slice(0, 120) ?? '';
   const lastReceivedAt = intake.lastReceivedAt?.trim().slice(0, 120) ?? '';
   const category = categorizeShelterQuestion(text);
+  const issueCategory = canonicalIssueCategory(category, text);
   const facts: string[] = [];
   if (location) facts.push(`場所：${location}`);
   if (peopleCount) facts.push(`人数：${peopleCount}`);
@@ -114,8 +203,18 @@ export function generateShelterAnalysis(value: string, intake: ShelterIntake = {
   if (!lastReceivedAt && /(水|食料|物資|薬|届|来ない|配布)/.test(text)) missingInformation.push('最後に受け取った時刻');
   const urgentReview = URGENT_PATTERNS.test(text);
   const urgencyCandidate: '高' | '中' | '低' = urgentReview ? '高' : HIGH_URGENCY_PATTERNS.test(text) ? '中' : '低';
-  const overview = `${shelterTitle(category, location, text)}。${emotionLabel(text)}状況として受け止め、対応に必要な情報を確認します。`;
-  return { title: shelterTitle(category, location, text), overview, facts, emotion: emotionLabel(text), missingInformation, urgencyCandidate, urgentReview, category, location, peopleCount, resourceRemaining, lastReceivedAt };
+  const emotion = emotionLabel(text);
+  const title = shelterTitle(category, location, text);
+  const request = requestLabel(category, text);
+  const overview = `${title}。${request}が必要な状況です。`;
+  const confidence = urgentReview ? 0.78 : HIGH_URGENCY_PATTERNS.test(text) ? 0.66 : 0.54;
+  return {
+    title, overview, request, facts, emotion, emotionalIntensity: emotionalIntensity(text),
+    containsAbusiveLanguage: containsAbusiveLanguage(text), missingInformation, urgencyCandidate,
+    urgencyLevel: urgencyLevel(urgentReview, urgencyCandidate), urgencyConfidence: confidence,
+    urgentReview, category, issueCategory, location, peopleCount, affectedPeople: peopleCount,
+    vulnerablePeople: vulnerablePeople(text), resourceRemaining, lastReceivedAt,
+  };
 }
 
 export function shelterFollowUp(key: string, category: ShelterCategory): { question: string; options: string[] } {
