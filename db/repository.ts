@@ -694,11 +694,17 @@ export async function deleteQuestion(questionId: number, portalId?: number | nul
   const db = await initialise();
   const question = await getQuestionForAdministrator(questionId, portalId);
   if (!question) throw new Error('質問が見つかりません。');
-  await db.prepare('DELETE FROM faq_candidates WHERE question_id = ?').bind(questionId).run();
   const scope = portalId === null ? ' AND portal_id IS NULL' : portalId === undefined ? '' : ' AND portal_id = ?';
-  const statement = db.prepare(`DELETE FROM questions WHERE id = ?${scope}`);
-  if (portalId === undefined || portalId === null) await statement.bind(questionId).run();
-  else await statement.bind(questionId, portalId).run();
+  const questionsStatement = db.prepare(`DELETE FROM questions WHERE id = ?${scope}`);
+  // 対応メモ（case_updates）と原文閲覧履歴（question_events）も、複数選択削除
+  // （deleteQuestions）と同じくバッチで一緒に削除する。片方だけ削除すると、
+  // 「削除したはず」の相談本文や対応メモが孤立レコードとしてD1に残り続ける。
+  await db.batch([
+    db.prepare('DELETE FROM faq_candidates WHERE question_id = ?').bind(questionId),
+    db.prepare('DELETE FROM case_updates WHERE question_id = ?').bind(questionId),
+    db.prepare('DELETE FROM question_events WHERE question_id = ?').bind(questionId),
+    portalId === undefined || portalId === null ? questionsStatement.bind(questionId) : questionsStatement.bind(questionId, portalId),
+  ]);
   try { await writeAuditLog('question_deleted', actorUserId, questionId, question.portalId, 'question_deleted'); } catch { /* best effort */ }
 }
 

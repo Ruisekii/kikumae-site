@@ -86,6 +86,37 @@ export function allowBurst(request: Request, scope: string, limit: number, windo
   return true;
 }
 
+/** Raw D1-backed sliding-window counter shared by the per-client and
+ * scope-wide (aggregate) checks below. Returns true while `count <= limit`. */
+async function incrementAndCheck(scope: string, key: string, limit: number, windowMs: number, now: number): Promise<boolean> {
+  const cutoff = now - windowMs;
+  const result = await env.DB!.prepare(`
+    INSERT INTO rate_limits (scope, client_key, window_started_at, count, updated_at)
+    VALUES (?, ?, ?, 1, ?)
+    ON CONFLICT(scope, client_key) DO UPDATE SET
+      count = CASE WHEN rate_limits.window_started_at <= ? THEN 1 ELSE rate_limits.count + 1 END,
+      window_started_at = CASE WHEN rate_limits.window_started_at <= ? THEN excluded.window_started_at ELSE rate_limits.window_started_at END,
+      updated_at = excluded.updated_at
+    RETURNING count
+  `).bind(scope, key, now, now, cutoff, cutoff).first<{ count: number }>();
+  return Number(result?.count ?? limit + 1) <= limit;
+}
+
+// ログイン系エンドポイントは呼び出し側がスコープに窓口スラッグ／管理者の
+// 固定文字列を渡している（'admin-login' / 'portal-login:<slug>'）。それを
+// 目印に、IP単位の制限とは別に「窓口・管理者ログイン単位」で合算する制限を
+// ここだけで完結させる（ログインAPI側のファイルは変更しない）。同一窓口へ
+// 複数IPから分散して試行された場合でも、各IPの枠が独立して残り続けて実質
+// 無制限になる問題への対策。正規の職員が複数端末・複数拠点から同時にログイン
+// する状況を締め出さないよう、閾値はIP単位より大きく緩めに設定している。
+const AGGREGATE_CLIENT_KEY = '__scope_aggregate__';
+
+function loginAggregateLimit(scope: string): { limit: number; windowMs: number } | null {
+  if (scope === 'admin-login') return { limit: 30, windowMs: 15 * 60 * 1000 };
+  if (scope.startsWith('portal-login:')) return { limit: 50, windowMs: 5 * 60 * 1000 };
+  return null;
+}
+
 /** Shared, atomic D1-backed burst limiter. */
 export async function allowBurstShared(request: Request, scope: string, limit: number, windowMs: number): Promise<boolean> {
   const now = Date.now();
@@ -93,20 +124,22 @@ export async function allowBurstShared(request: Request, scope: string, limit: n
   const safeScope = scope.slice(0, 96);
   try {
     await ensureRateTable();
-    const cutoff = now - windowMs;
-    const result = await env.DB!.prepare(`
-      INSERT INTO rate_limits (scope, client_key, window_started_at, count, updated_at)
-      VALUES (?, ?, ?, 1, ?)
-      ON CONFLICT(scope, client_key) DO UPDATE SET
-        count = CASE WHEN rate_limits.window_started_at <= ? THEN 1 ELSE rate_limits.count + 1 END,
-        window_started_at = CASE WHEN rate_limits.window_started_at <= ? THEN excluded.window_started_at ELSE rate_limits.window_started_at END,
-        updated_at = excluded.updated_at
-      RETURNING count
-    `).bind(safeScope, key, now, now, cutoff, cutoff).first<{ count: number }>();
+    const perClientOk = await incrementAndCheck(safeScope, key, limit, windowMs, now);
+    if (!perClientOk) return false;
+    const aggregate = loginAggregateLimit(safeScope);
+    if (aggregate) {
+      const aggregateOk = await incrementAndCheck(safeScope, AGGREGATE_CLIENT_KEY, aggregate.limit, aggregate.windowMs, now);
+      if (!aggregateOk) {
+        // IPやパスワードなど機微な値は出さず、どの窓口/管理者ログインが
+        // 分散攻撃を受けているかだけを運用側が気づけるように記録する。
+        console.warn(`rate-limit: scope-wide login aggregate exceeded for scope=${safeScope}`);
+        return false;
+      }
+    }
     if (Math.random() < 0.02) {
       await env.DB!.prepare('DELETE FROM rate_limits WHERE updated_at < ?').bind(now - 24 * 60 * 60 * 1000).run();
     }
-    return Number(result?.count ?? limit + 1) <= limit;
+    return true;
   } catch {
     return allowBurst(request, scope, limit, windowMs);
   }

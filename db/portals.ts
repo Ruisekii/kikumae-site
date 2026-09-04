@@ -20,6 +20,11 @@ async function ensureDeleteSchema(): Promise<void> {
     database.prepare("CREATE TABLE IF NOT EXISTS questions (id INTEGER PRIMARY KEY AUTOINCREMENT, body TEXT NOT NULL, category TEXT NOT NULL, status TEXT NOT NULL DEFAULT 'open', created_at INTEGER NOT NULL, portal_id INTEGER)"),
     database.prepare("CREATE TABLE IF NOT EXISTS faq_candidates (id INTEGER PRIMARY KEY AUTOINCREMENT, question_id INTEGER NOT NULL, q_text TEXT NOT NULL, a_text TEXT NOT NULL, category TEXT NOT NULL, status TEXT NOT NULL DEFAULT 'pending', created_at INTEGER NOT NULL, portal_id INTEGER)"),
     database.prepare("CREATE TABLE IF NOT EXISTS audit_logs (id INTEGER PRIMARY KEY AUTOINCREMENT, actor_user_id TEXT, action TEXT NOT NULL, question_id INTEGER, portal_id INTEGER, detail TEXT NOT NULL DEFAULT '', created_at INTEGER NOT NULL)"),
+    // case_updates と question_events は portal_id 列を持たず question_id 経由でしか
+    // 窓口と紐付かない。deletePortal はリポジトリ初期化前に呼ばれ得るため、他の
+    // テーブルと同様にここでも存在を保証してから削除対象に含める。
+    database.prepare("CREATE TABLE IF NOT EXISTS case_updates (id INTEGER PRIMARY KEY AUTOINCREMENT, question_id INTEGER NOT NULL, status TEXT NOT NULL, message TEXT NOT NULL DEFAULT '', is_public INTEGER NOT NULL DEFAULT 1, actor_user_id TEXT, created_at INTEGER NOT NULL)"),
+    database.prepare("CREATE TABLE IF NOT EXISTS question_events (id INTEGER PRIMARY KEY AUTOINCREMENT, question_id INTEGER, event_type TEXT NOT NULL, actor_user_id TEXT, detail TEXT NOT NULL DEFAULT '', created_at INTEGER NOT NULL)"),
   ]);
   for (const statement of [
     'ALTER TABLE faqs ADD COLUMN portal_id INTEGER',
@@ -179,6 +184,10 @@ export async function deletePortal(portalId: number): Promise<void> {
   await db().batch([
     db().prepare('DELETE FROM faq_candidates WHERE portal_id = ? OR question_id IN (SELECT id FROM questions WHERE portal_id = ?)').bind(portalId, portalId),
     db().prepare('DELETE FROM audit_logs WHERE portal_id = ? OR question_id IN (SELECT id FROM questions WHERE portal_id = ?)').bind(portalId, portalId),
+    // case_updates（対応メッセージ本文）と question_events（原文閲覧履歴）は
+    // portal_id 列を持たないため、この窓口の質問IDを経由して削除する。
+    db().prepare('DELETE FROM case_updates WHERE question_id IN (SELECT id FROM questions WHERE portal_id = ?)').bind(portalId),
+    db().prepare('DELETE FROM question_events WHERE question_id IN (SELECT id FROM questions WHERE portal_id = ?)').bind(portalId),
     db().prepare('DELETE FROM questions WHERE portal_id = ?').bind(portalId),
     db().prepare('DELETE FROM faqs WHERE portal_id = ?').bind(portalId),
     db().prepare('DELETE FROM portal_sessions WHERE portal_id = ?').bind(portalId),
