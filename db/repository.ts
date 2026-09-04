@@ -9,6 +9,7 @@ import {
   searchFaqs,
   combinedSimilarity,
   generateShelterAnalysis,
+  SHELTER_CATEGORIES,
   type ShelterIntake,
 } from './local-ai';
 
@@ -274,7 +275,7 @@ function mapFaq(row: Record<string, unknown>): Faq {
 export async function listPublishedFaqs(portalId: number | null = null): Promise<Faq[]> {
   const db = await initialise();
   const result = portalId == null
-    ? await db.prepare("SELECT id, question, answer, category, status, created_at, updated_at FROM faqs WHERE status = 'published' AND portal_id IS NULL ORDER BY updated_at DESC").all<Record<string, unknown>>()
+    ? await db.prepare(`SELECT id, question, answer, category, status, created_at, updated_at FROM faqs WHERE status = 'published' AND portal_id IS NULL AND category IN (${SHELTER_CATEGORIES.map(() => '?').join(',')}) ORDER BY updated_at DESC`).bind(...SHELTER_CATEGORIES).all<Record<string, unknown>>()
     : await db.prepare("SELECT id, question, answer, category, status, created_at, updated_at FROM faqs WHERE status = 'published' AND portal_id = ? ORDER BY updated_at DESC").bind(portalId).all<Record<string, unknown>>();
   return (result.results ?? []).map(mapFaq);
 }
