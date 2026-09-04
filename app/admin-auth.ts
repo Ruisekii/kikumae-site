@@ -42,7 +42,7 @@ async function sign(payload: string, secret: string): Promise<string> {
 
 export async function verifyAdminPassword(password: string): Promise<boolean> {
   const secret = configuredPassword();
-  if (!secret || secret.length < 12 || !password || password.length > 128) return false;
+  if (!secret || secret.length < 8 || !password || password.length > 128) return false;
   const key = await importHmacKey('kikumae-admin-password-check', ['sign']);
   const expected = new Uint8Array(await crypto.subtle.sign('HMAC', key, encoder.encode(secret)));
   const actual = new Uint8Array(await crypto.subtle.sign('HMAC', key, encoder.encode(password)));
@@ -54,7 +54,7 @@ export async function verifyAdminPassword(password: string): Promise<boolean> {
 
 export async function createAdminSessionCookie(): Promise<string> {
   const secret = configuredPassword();
-  if (!secret || secret.length < 12) throw new Error('ADMIN_PASSWORD_NOT_CONFIGURED');
+  if (!secret || secret.length < 8) throw new Error('ADMIN_PASSWORD_NOT_CONFIGURED');
   const expiresAt = Date.now() + SESSION_SECONDS * 1000;
   const payload = `v1.${expiresAt}.${crypto.randomUUID()}`;
   const signature = await sign(payload, secret);
@@ -63,7 +63,7 @@ export async function createAdminSessionCookie(): Promise<string> {
 
 export async function createAdminApiToken(): Promise<string> {
   const secret = configuredPassword();
-  if (!secret || secret.length < 12) throw new Error('ADMIN_PASSWORD_NOT_CONFIGURED');
+  if (!secret || secret.length < 8) throw new Error('ADMIN_PASSWORD_NOT_CONFIGURED');
   const expiresAt = Date.now() + API_TOKEN_SECONDS * 1000;
   const payload = `v1.${expiresAt}.${crypto.randomUUID()}`;
   return `${payload}.${await sign(payload, secret)}`;
@@ -87,7 +87,7 @@ export function clearAdminSessionCookie(): string {
 
 export async function getAdminSession(): Promise<AdminSession | null> {
   const secret = configuredPassword();
-  if (!secret || secret.length < 12) return null;
+  if (!secret || secret.length < 8) return null;
   const stored = (await cookies()).get(ADMIN_COOKIE)?.value ?? '';
   const parts = stored.split('.');
   if (parts.length !== 4 || parts[0] !== 'v1') return null;
