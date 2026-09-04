@@ -74,7 +74,7 @@ export function KikumaeClient({ faqs }: Props) {
       const nextPreview = { body: payload.body ?? body, summary: payload.summary ?? '', category: payload.category ?? 'その他', related: payload.related ?? [], analysis: payload.analysis, followUp: payload.followUp ?? null, submissionKey: preview?.submissionKey ?? crypto.randomUUID() };
       setPreview(nextPreview); setIntake(nextIntake); setActiveKey(nextPreview.analysis.missingInformation[0] ?? '');
       if (!isFollowUp && nextPreview.related.length) addMessage({ from: 'ai', text: 'お話しくださってありがとうございます。近い案内が見つかりました。まずはこちらを確認してみてください。' });
-      else if (nextPreview.followUp) addMessage({ from: 'ai', text: `${nextPreview.analysis.emotion}状況なのですね。対応のために、ひとつだけ確認させてください。` });
+      else if (nextPreview.followUp) addMessage({ from: 'ai', text: `${nextPreview.analysis.emotion}状況なのですね。対応のために、ひとつだけ確認させてください。\n\n${nextPreview.followUp.question}` });
       else { addMessage({ from: 'ai', text: '伝えてくださった内容を整理しました。この内容を避難所スタッフへ届けてもよいですか？' }); setReadyToSubmit(true); }
     } catch { setStatus('通信に失敗しました。時間をおいてもう一度お試しください。'); }
     finally { setBusy(false); }
