@@ -165,18 +165,20 @@ export function StaffDashboard({ displayName, authorized = false, adminApiToken,
     }
   }
 
-  async function updateIssue(status: string, messageText: string, isPublic: boolean, assignedTeam: string, assignedUser: string, urgencyConfirmed: string, internalNote: string) {
-    if (!selected) return;
+  async function updateIssue(status: string, messageText: string, isPublic: boolean, assignedTeam: string, assignedUser: string, urgencyConfirmed: string, internalNote: string): Promise<boolean> {
+    if (!selected) return false;
     setBusy(true);
     setMessage('課題の対応状況を更新しています…');
     try {
       const response = await fetch(`/api/admin/issues/${selected.id}/status`, { method: 'POST', credentials: 'same-origin', headers: adminHeaders(adminApiToken, { 'Content-Type': 'application/json', Accept: 'application/json' }), body: JSON.stringify({ status, message: messageText, isPublic, assignedTeam, assignedUser, urgencyConfirmed, internalNote, expectedVersion: selected.version }) });
       const body = await response.json() as { message?: string };
-      if (!response.ok) { if (response.status === 401) { window.location.assign('/admin'); return; } setMessage(body.message ?? '課題を更新できませんでした。'); await loadIssues({ silent: true }); return; }
+      if (!response.ok) { if (response.status === 401) { window.location.assign('/admin'); return false; } setMessage(body.message ?? '課題を更新できませんでした。'); await loadIssues({ silent: true }); return false; }
       await loadIssues();
       setMessage('課題の対応状況を更新しました。');
+      return true;
     } catch {
       setMessage('課題の更新に失敗しました。');
+      return false;
     } finally {
       setBusy(false);
     }
@@ -236,7 +238,7 @@ export function StaffDashboard({ displayName, authorized = false, adminApiToken,
 
 function Metric({ label, value, tone }: { label: string; value: number; tone: string }) { return <div className={`metric-card metric-${tone}`}><span>{label}</span><strong>{value}</strong><small>件</small></div>; }
 
-function IssueDetail({ issue, draft, answerText, setAnswerText, answerUsesAi, setAnswerUsesAi, displayName, busy, onGenerateDraft, onApprove, onStatus, onOriginalViewed, onMerge }: { issue: Issue; draft?: Draft; answerText: string; setAnswerText: (value: string) => void; answerUsesAi: boolean; setAnswerUsesAi: (value: boolean) => void; displayName: string; busy: boolean; onGenerateDraft: () => void; onApprove: () => void; onStatus: (status: string, message: string, isPublic: boolean, assignedTeam: string, assignedUser: string, urgencyConfirmed: string, internalNote: string) => Promise<void>; onOriginalViewed: () => void; onMerge: (candidateId: number, action: MergeAction) => Promise<void> }) {
+function IssueDetail({ issue, draft, answerText, setAnswerText, answerUsesAi, setAnswerUsesAi, displayName, busy, onGenerateDraft, onApprove, onStatus, onOriginalViewed, onMerge }: { issue: Issue; draft?: Draft; answerText: string; setAnswerText: (value: string) => void; answerUsesAi: boolean; setAnswerUsesAi: (value: boolean) => void; displayName: string; busy: boolean; onGenerateDraft: () => void; onApprove: () => void; onStatus: (status: string, message: string, isPublic: boolean, assignedTeam: string, assignedUser: string, urgencyConfirmed: string, internalNote: string) => Promise<boolean>; onOriginalViewed: () => void; onMerge: (candidateId: number, action: MergeAction) => Promise<void> }) {
   const [tab, setTab] = useState<'summary' | 'original' | 'reports'>('summary');
   const [publicMessage, setPublicMessage] = useState('');
   const [isPublic, setIsPublic] = useState(true);
@@ -272,7 +274,8 @@ function IssueDetail({ issue, draft, answerText, setAnswerText, answerUsesAi, se
   /* eslint-enable react-hooks/set-state-in-effect, react-hooks/exhaustive-deps */
 
   async function save(status: string) {
-    await onStatus(status, publicMessage, isPublic, team, assignee, urgency, internalNote);
+    const saved = await onStatus(status, publicMessage, isPublic, team, assignee, urgency, internalNote);
+    if (!saved) return;
     setPublicMessage('');
     setDirty(false);
     setLastServerVersion(issue.version + 1);
