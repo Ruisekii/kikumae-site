@@ -62,7 +62,8 @@ export function KikumaeClient({ faqs }: Props) {
   function addMessage(message: ChatMessage) { setMessages((current) => [...current, message]); }
 
   function beginChat(withVoice = false) {
-    setChatOpen(true); setMessages([{ from: 'ai', text: '来てくださってありがとうございます。まず、いちばん困っていることを教えてください。短い言葉でも大丈夫です。' }]); setPreview(null); setFaqDecision(false); setReadyToSubmit(false); setStatus('');
+    setChatOpen(true); setMessages([{ from: 'ai', text: '来てくださってありがとうございます。まず、いちばん困っていることを教えてください。短い言葉でも大丈夫です。' }]); setPreview(null); setFaqDecision(false); setReadyToSubmit(false); setStatus(''); setOriginalBody(''); setContextBody(''); setIntake(emptyIntake);
+    try { localStorage.removeItem('kikumae-shelter-draft'); } catch { /* local draft is best effort */ }
     window.setTimeout(() => { inputRef.current?.focus(); if (withVoice) startVoice(); }, 50);
   }
 
