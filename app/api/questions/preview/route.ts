@@ -25,7 +25,7 @@ export async function POST(request: Request): Promise<Response> {
     const intake = (payload.intake && typeof payload.intake === 'object') ? payload.intake as ShelterIntake : {};
     if (!body || body.length > MAX_QUESTION_CHARS) return json({ message: '質問は1〜500文字で入力してください。' }, 400);
     const analysis = generateShelterAnalysis(body, intake);
-    const related = await listRelatedFaqs(body, 3);
+    const related = await listRelatedFaqs(body, 3, null, analysis.category);
     const followUpKey = analysis.missingInformation[0] ?? '';
     return json({ body, summary: analysis.overview, category: categorizeShelterQuestion(body), analysis, related, followUp: followUpKey ? shelterFollowUp(followUpKey, analysis.category) : null, aiMode: 'local-rules' });
   } catch (error) {

@@ -553,8 +553,15 @@ export async function listAuditLogsForAdministrator(portalId: number | null = nu
   return (result.results ?? []).map((row) => ({ action: String(row.action ?? ''), actorUserId: row.actor_user_id == null ? null : String(row.actor_user_id), createdAt: Number(row.created_at ?? 0) }));
 }
 
-export async function listRelatedFaqs(query: string, limit = 3, portalId: number | null = null): Promise<RelatedFaq[]> {
-  return searchFaqs(query, await listPublishedFaqs(portalId), limit);
+export async function listRelatedFaqs(query: string, limit = 3, portalId: number | null = null, shelterCategory = ''): Promise<RelatedFaq[]> {
+  const faqs = await listPublishedFaqs(portalId);
+  const ranked = searchFaqs(query, faqs, Math.max(limit, 6));
+  if (!shelterCategory || shelterCategory === 'その他') return ranked.slice(0, limit);
+  const categoryFaqs = faqs.filter((faq) => faq.category === shelterCategory).map((faq) => {
+    const existing = ranked.find((item) => item.id === faq.id);
+    return existing ?? { ...faq, score: 0.65 };
+  });
+  return [...categoryFaqs, ...ranked.filter((faq) => faq.category !== shelterCategory)].slice(0, limit);
 }
 
 export async function createQuestion(body: string, requestedSummary = '', requestedCategory = '', portalId: number | null = null, submissionKey = '', intake: ShelterIntake = {}): Promise<SubmittedQuestion> {
@@ -569,7 +576,8 @@ export async function createQuestion(body: string, requestedSummary = '', reques
   const canonicalSummary = shelterAnalysis?.overview ?? generateLocalSummary(body);
   const aiSummary = requestedSummary.trim().slice(0, 300) || canonicalSummary;
   const category = categorizeQuestion(body, requestedCategory);
-  const related = await listRelatedFaqs(aiSummary || body, 3, portalId);
+  const analysis = shelterAnalysis ?? generateShelterAnalysis(body, intake);
+  const related = await listRelatedFaqs(aiSummary || body, 3, portalId, analysis.category);
   const draft = generateLocalDraft(aiSummary, body, related);
   const alternatives = generateAlternativeDrafts(aiSummary, body, related);
   const checkToken = crypto.randomUUID() + crypto.randomUUID();
@@ -577,7 +585,6 @@ export async function createQuestion(body: string, requestedSummary = '', reques
   // check a private question to 30 days.  Legacy rows without an expiry remain
   // readable so existing users are not broken during migration.
   const checkTokenExpiresAt = createdAt + 30 * 24 * 60 * 60 * 1000;
-  const analysis = shelterAnalysis ?? generateShelterAnalysis(body, intake);
   const displayBody = redactSensitiveInformation(body);
   const result = await db.prepare("INSERT INTO questions (body, body_original, ai_summary, summary_edited, category, status, workflow_status, title, location, people_count, resource_remaining, last_received_at, fact_summary, emotion_summary, missing_information, urgency_candidate, urgent_review, request_text, affected_people, vulnerable_people, emotional_intensity, contains_abusive_language, urgency_confidence, grouping_confidence, display_body, contact_type, answer_draft, answer_alternatives, answer_grounds, portal_id, check_token_hash, check_token_expires_at, submission_key_hash, created_at) VALUES (?, ?, ?, ?, ?, 'open', 'received', ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'anonymous', ?, ?, ?, ?, ?, ?, ?, ?, ?)").bind(body, body, aiSummary, aiSummary !== canonicalSummary ? 1 : 0, category, analysis.title, analysis.location, analysis.peopleCount, analysis.resourceRemaining, analysis.lastReceivedAt, JSON.stringify(analysis.facts), analysis.emotion, JSON.stringify(analysis.missingInformation), analysis.urgencyCandidate, analysis.urgentReview ? 1 : 0, analysis.request, analysis.affectedPeople, JSON.stringify(analysis.vulnerablePeople), analysis.emotionalIntensity, analysis.containsAbusiveLanguage ? 1 : 0, analysis.urgencyConfidence, 1, displayBody, draft, JSON.stringify(alternatives), JSON.stringify(related.map((faq) => faq.question)), portalId, await hashCheckToken(checkToken), checkTokenExpiresAt, submissionKeyHash, createdAt).run();
   const id = Number(result.meta.last_row_id);
