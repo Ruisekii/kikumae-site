@@ -3,6 +3,7 @@ import { env } from 'cloudflare:workers';
 
 const ADMIN_COOKIE = 'kikumae_admin_session';
 const SESSION_SECONDS = 8 * 60 * 60;
+const API_TOKEN_SECONDS = 60 * 60;
 const encoder = new TextEncoder();
 
 export type AdminSession = {
@@ -60,6 +61,26 @@ export async function createAdminSessionCookie(): Promise<string> {
   return `${ADMIN_COOKIE}=${payload}.${signature}; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=${SESSION_SECONDS}`;
 }
 
+export async function createAdminApiToken(): Promise<string> {
+  const secret = configuredPassword();
+  if (!secret || secret.length < 12) throw new Error('ADMIN_PASSWORD_NOT_CONFIGURED');
+  const expiresAt = Date.now() + API_TOKEN_SECONDS * 1000;
+  const payload = `v1.${expiresAt}.${crypto.randomUUID()}`;
+  return `${payload}.${await sign(payload, secret)}`;
+}
+
+async function verifyAdminApiToken(token: string): Promise<boolean> {
+  const secret = configuredPassword();
+  const parts = token.split('.');
+  if (!secret || parts.length !== 4 || parts[0] !== 'v1') return false;
+  const payload = parts.slice(0, 3).join('.');
+  const expiresAt = Number(parts[1]);
+  const signature = fromBase64Url(parts[3]);
+  if (!Number.isSafeInteger(expiresAt) || expiresAt <= Date.now() || !signature) return false;
+  const key = await importHmacKey(secret, ['verify']);
+  return crypto.subtle.verify('HMAC', key, signature, encoder.encode(payload));
+}
+
 export function clearAdminSessionCookie(): string {
   return `${ADMIN_COOKIE}=; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=0`;
 }
@@ -79,7 +100,9 @@ export async function getAdminSession(): Promise<AdminSession | null> {
   return valid ? { userId: 'admin-password', displayName: '避難所管理者', expiresAt } : null;
 }
 
-export async function getAdminUser(): Promise<{ userId: string; displayName: string } | null> {
+export async function getAdminUser(request?: Request): Promise<{ userId: string; displayName: string } | null> {
+  const apiToken = request?.headers.get('x-kikumae-admin-token')?.trim() ?? '';
+  if (apiToken && await verifyAdminApiToken(apiToken)) return { userId: 'admin-password', displayName: '避難所管理者' };
   const session = await getAdminSession();
   return session ? { userId: session.userId, displayName: session.displayName } : null;
 }

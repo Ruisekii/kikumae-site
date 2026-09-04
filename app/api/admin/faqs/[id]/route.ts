@@ -10,15 +10,15 @@ function sameOrigin(request: Request): boolean {
   return !origin || origin === new URL(request.url).origin;
 }
 
-async function authorized(): Promise<{ userId: string } | null> {
-  const user = await getAdminUser();
+async function authorized(request: Request): Promise<{ userId: string } | null> {
+  const user = await getAdminUser(request);
   if (!user) return null;
   return { userId: user.userId };
 }
 
 export async function PATCH(request: Request, { params }: { params: Promise<{ id: string }> }): Promise<Response> {
   if (!sameOrigin(request)) return Response.json({ message: 'この送信元は許可されていません。' }, { status: 403 });
-  const auth = await authorized();
+  const auth = await authorized(request);
   if (!auth) return Response.json({ message: '管理者権限が必要です。' }, { status: 403 });
   const id = Number((await params).id);
   if (!Number.isInteger(id) || id <= 0) return Response.json({ message: 'FAQ IDが正しくありません。' }, { status: 400 });
@@ -37,7 +37,7 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
 
 export async function DELETE(request: Request, { params }: { params: Promise<{ id: string }> }): Promise<Response> {
   if (!sameOrigin(request)) return Response.json({ message: 'この送信元は許可されていません。' }, { status: 403 });
-  const auth = await authorized();
+  const auth = await authorized(request);
   if (!auth) return Response.json({ message: '管理者権限が必要です。' }, { status: 403 });
   const id = Number((await params).id);
   if (!Number.isInteger(id) || id <= 0) return Response.json({ message: 'FAQ IDが正しくありません。' }, { status: 400 });

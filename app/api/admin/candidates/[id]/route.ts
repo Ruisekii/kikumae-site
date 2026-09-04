@@ -12,7 +12,7 @@ function sameOrigin(request: Request): boolean {
 
 export async function POST(request: Request, { params }: { params: Promise<{ id: string }> }): Promise<Response> {
   if (!sameOrigin(request)) return Response.json({ message: 'この送信元は許可されていません。' }, { status: 403 });
-  const user = await getAdminUser();
+  const user = await getAdminUser(request);
   if (!user) return Response.json({ message: '管理者用パスワードでログインしてください。' }, { status: 401 });
   const id = Number((await params).id);
   const contentLength = Number(request.headers.get('content-length') ?? '0');

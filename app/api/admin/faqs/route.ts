@@ -10,14 +10,14 @@ function sameOrigin(request: Request): boolean {
   return !origin || origin === new URL(request.url).origin;
 }
 
-export async function GET(): Promise<Response> {
-  if (!await getAdminUser()) return Response.json({ message: '管理者用パスワードでログインしてください。' }, { status: 401 });
+export async function GET(request: Request): Promise<Response> {
+  if (!await getAdminUser(request)) return Response.json({ message: '管理者用パスワードでログインしてください。' }, { status: 401 });
   return Response.json({ faqs: await listFaqsForAdministrator(null) }, { headers: { 'Cache-Control': 'no-store' } });
 }
 
 export async function POST(request: Request): Promise<Response> {
   if (!sameOrigin(request)) return Response.json({ message: 'この送信元は許可されていません。' }, { status: 403 });
-  const user = await getAdminUser();
+  const user = await getAdminUser(request);
   if (!user) return Response.json({ message: '管理者用パスワードでログインしてください。' }, { status: 401 });
   try {
     const data = JSON.parse(await readRequestText(request, MAX_BYTES)) as Record<string, unknown>;

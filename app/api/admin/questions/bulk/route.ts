@@ -11,7 +11,7 @@ function sameOrigin(request: Request): boolean {
 
 export async function DELETE(request: Request): Promise<Response> {
   if (!sameOrigin(request)) return Response.json({ message: 'この送信元は許可されていません。' }, { status: 403 });
-  const user = await getAdminUser();
+  const user = await getAdminUser(request);
   if (!user) return Response.json({ message: '管理者用パスワードでログインしてください。' }, { status: 401 });
   try {
     const raw = await readRequestText(request, 16 * 1024);

@@ -10,7 +10,7 @@ function sameOrigin(request: Request): boolean {
 
 export async function DELETE(request: Request, { params }: { params: Promise<{ id: string }> }): Promise<Response> {
   if (!sameOrigin(request)) return Response.json({ message: 'この送信元は許可されていません。' }, { status: 403 });
-  const user = await getAdminUser();
+  const user = await getAdminUser(request);
   if (!user) return Response.json({ message: '管理者用パスワードでログインしてください。' }, { status: 401 });
   const id = Number((await params).id);
   if (!Number.isInteger(id) || id <= 0) return Response.json({ message: '質問IDが正しくありません。' }, { status: 400 });
