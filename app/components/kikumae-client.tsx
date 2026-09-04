@@ -66,11 +66,12 @@ export function KikumaeClient({ faqs }: Props) {
   }
 
   async function inspect(body: string, nextIntake: Intake, isFollowUp = false) {
-    setBusy(true); setStatus('');
+    setBusy(true); setStatus('内容を確認しています…');
     try {
       const response = await fetch('/api/questions/preview', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ body, intake: nextIntake }) });
       const payload = await response.json() as { message?: string; body?: string; summary?: string; category?: string; related?: RelatedFaq[]; analysis?: Analysis; followUp?: FollowUp };
       if (!response.ok || !payload.analysis) { setStatus(payload.message ?? '内容を確認できませんでした。'); return; }
+      setStatus('');
       const nextPreview = { body: payload.body ?? body, summary: payload.summary ?? '', category: payload.category ?? 'その他', related: payload.related ?? [], analysis: payload.analysis, followUp: payload.followUp ?? null, submissionKey: preview?.submissionKey ?? crypto.randomUUID() };
       setPreview(nextPreview); setIntake(nextIntake); setActiveKey(nextPreview.analysis.missingInformation[0] ?? '');
       if (!isFollowUp && nextPreview.related.length) addMessage({ from: 'ai', text: 'お話しくださってありがとうございます。近い案内が見つかりました。まずはこちらを確認してみてください。' });
