@@ -1121,11 +1121,14 @@ export async function deleteQuestion(questionId: number, portalId?: number | nul
   const db = await initialise();
   const question = await getQuestionForAdministrator(questionId, portalId);
   if (!question) throw new Error('質問が見つかりません。');
-  await db.prepare('DELETE FROM faq_candidates WHERE question_id = ?').bind(questionId).run();
   const scope = portalId === null ? ' AND portal_id IS NULL' : portalId === undefined ? '' : ' AND portal_id = ?';
   const statement = db.prepare(`DELETE FROM questions WHERE id = ?${scope}`);
-  if (portalId === undefined || portalId === null) await statement.bind(questionId).run();
-  else await statement.bind(questionId, portalId).run();
+  await db.batch([
+    db.prepare('DELETE FROM faq_candidates WHERE question_id = ?').bind(questionId),
+    db.prepare('DELETE FROM case_updates WHERE question_id = ?').bind(questionId),
+    db.prepare('DELETE FROM question_events WHERE question_id = ?').bind(questionId),
+    portalId === undefined || portalId === null ? statement.bind(questionId) : statement.bind(questionId, portalId),
+  ]);
   try { await writeAuditLog('question_deleted', actorUserId, questionId, question.portalId, 'question_deleted'); } catch { /* best effort */ }
 }
 

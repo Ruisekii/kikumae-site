@@ -86,6 +86,28 @@ export function allowBurst(request: Request, scope: string, limit: number, windo
   return true;
 }
 
+async function incrementAndCheck(scope: string, key: string, limit: number, windowMs: number, now: number): Promise<boolean> {
+  const cutoff = now - windowMs;
+  const result = await env.DB!.prepare(`
+    INSERT INTO rate_limits (scope, client_key, window_started_at, count, updated_at)
+    VALUES (?, ?, ?, 1, ?)
+    ON CONFLICT(scope, client_key) DO UPDATE SET
+      count = CASE WHEN rate_limits.window_started_at <= ? THEN 1 ELSE rate_limits.count + 1 END,
+      window_started_at = CASE WHEN rate_limits.window_started_at <= ? THEN excluded.window_started_at ELSE rate_limits.window_started_at END,
+      updated_at = excluded.updated_at
+    RETURNING count
+  `).bind(scope, key, now, now, cutoff, cutoff).first<{ count: number }>();
+  return Number(result?.count ?? limit + 1) <= limit;
+}
+
+const AGGREGATE_CLIENT_KEY = '__scope_aggregate__';
+
+function loginAggregateLimit(scope: string): { limit: number; windowMs: number } | null {
+  if (scope === 'admin-login') return { limit: 30, windowMs: 15 * 60 * 1000 };
+  if (scope.startsWith('portal-login:')) return { limit: 50, windowMs: 5 * 60 * 1000 };
+  return null;
+}
+
 /** Shared, atomic D1-backed burst limiter. */
 export async function allowBurstShared(request: Request, scope: string, limit: number, windowMs: number): Promise<boolean> {
   const now = Date.now();
@@ -93,20 +115,13 @@ export async function allowBurstShared(request: Request, scope: string, limit: n
   const safeScope = scope.slice(0, 96);
   try {
     await ensureRateTable();
-    const cutoff = now - windowMs;
-    const result = await env.DB!.prepare(`
-      INSERT INTO rate_limits (scope, client_key, window_started_at, count, updated_at)
-      VALUES (?, ?, ?, 1, ?)
-      ON CONFLICT(scope, client_key) DO UPDATE SET
-        count = CASE WHEN rate_limits.window_started_at <= ? THEN 1 ELSE rate_limits.count + 1 END,
-        window_started_at = CASE WHEN rate_limits.window_started_at <= ? THEN excluded.window_started_at ELSE rate_limits.window_started_at END,
-        updated_at = excluded.updated_at
-      RETURNING count
-    `).bind(safeScope, key, now, now, cutoff, cutoff).first<{ count: number }>();
+    if (!await incrementAndCheck(safeScope, key, limit, windowMs, now)) return false;
+    const aggregate = loginAggregateLimit(safeScope);
+    if (aggregate && !await incrementAndCheck(safeScope, AGGREGATE_CLIENT_KEY, aggregate.limit, aggregate.windowMs, now)) return false;
     if (Math.random() < 0.02) {
       await env.DB!.prepare('DELETE FROM rate_limits WHERE updated_at < ?').bind(now - 24 * 60 * 60 * 1000).run();
     }
-    return Number(result?.count ?? limit + 1) <= limit;
+    return true;
   } catch {
     return allowBurst(request, scope, limit, windowMs);
   }

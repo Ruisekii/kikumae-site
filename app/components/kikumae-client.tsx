@@ -88,22 +88,23 @@ export function KikumaeClient({ faqs }: Props) {
   async function inspect(body: string, nextIntake: Intake, isFollowUp = false) {
     setBusy(true); setStatus('内容を確認しています…');
     try {
-      const response = await fetch('/api/questions/preview', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ body, intake: nextIntake }) });
+      const response = await fetch('/api/questions/preview', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ body, intake: nextIntake }), signal: AbortSignal.timeout(15000) });
       const payload = await response.json() as { message?: string; body?: string; summary?: string; category?: string; related?: RelatedFaq[]; analysis?: Analysis; followUp?: FollowUp };
-      if (!response.ok || !payload.analysis) { setStatus(payload.message ?? '内容を確認できませんでした。'); return; }
+      if (!response.ok || !payload.analysis) { setStatus(payload.message ?? '内容を確認できませんでした。'); return false; }
       setStatus('');
       const nextPreview = { body: payload.body ?? body, summary: payload.summary ?? '', category: payload.category ?? 'その他', related: payload.related ?? [], analysis: payload.analysis, followUp: payload.followUp ?? null, submissionKey: preview?.submissionKey ?? crypto.randomUUID() };
       setPreview(nextPreview); setIntake(nextIntake); setActiveKey(nextPreview.analysis.missingInformation[0] ?? '');
       if (!isFollowUp && nextPreview.related.length) addMessage({ from: 'ai', text: 'お話しくださってありがとうございます。近い案内が見つかりました。まずはこちらを確認してみてください。' });
       else if (nextPreview.followUp) addMessage({ from: 'ai', text: `${nextPreview.analysis.emotion}状況なのですね。対応のために、ひとつだけ確認させてください。\n\n${nextPreview.followUp.question}` });
       else { addMessage({ from: 'ai', text: '伝えてくださった内容を整理しました。この内容を避難所スタッフへ届けてもよいですか？' }); setReadyToSubmit(true); }
-    } catch { setStatus('通信に失敗しました。時間をおいてもう一度お試しください。'); }
+      return true;
+    } catch (error) { setStatus(error instanceof Error && error.name === 'TimeoutError' ? '通信が遅いようです。もう一度お試しください。' : '通信に失敗しました。時間をおいてもう一度お試しください。'); return false; }
     finally { setBusy(false); }
   }
 
   async function sendMessageValue(value: string) {
     const trimmed = value.trim(); if (!trimmed || busy) return; setInput(''); addMessage({ from: 'person', text: trimmed });
-    if (!originalBody) { setOriginalBody(trimmed); setContextBody(trimmed); await inspect(trimmed, intake); return; }
+    if (!originalBody) { setOriginalBody(trimmed); setContextBody(trimmed); const ok = await inspect(trimmed, intake); if (!ok) { setOriginalBody(''); setContextBody(''); } return; }
     if (activeKey) { const nextIntake = intakeForKey(trimmed, activeKey, intake); const nextContext = `${contextBody}\n${activeKey}：${trimmed}`; setContextBody(nextContext); await inspect(nextContext, nextIntake, true); }
   }
 
@@ -127,7 +128,7 @@ export function KikumaeClient({ faqs }: Props) {
   async function submitQuestion() {
     if (!preview || busy) return; setBusy(true); setStatus('相談を届けています…');
     try {
-      const response = await fetch('/api/questions', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ body: originalBody, summary: preview.summary, category: preview.category, submissionKey: preview.submissionKey, intake }) });
+      const response = await fetch('/api/questions', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ body: originalBody, summary: preview.summary, category: preview.category, submissionKey: preview.submissionKey, intake }), signal: AbortSignal.timeout(15000) });
       const payload = await response.json() as { message?: string; checkUrl?: string };
       if (!response.ok) { setStatus(payload.message ?? '相談を届けられませんでした。'); return; }
       setCheckUrl(payload.checkUrl ?? ''); setReadyToSubmit(false); setStatus('相談が届きました。確認ページを保存してください。'); addMessage({ from: 'ai', text: '相談を受け付けました。相談IDと対応状況を確認できます。' }); try { localStorage.removeItem('kikumae-shelter-draft'); } catch { /* local draft is best effort */ }
