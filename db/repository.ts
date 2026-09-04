@@ -131,6 +131,7 @@ export type Issue = {
   category: IssueCategory | string;
   location: string;
   urgency: UrgencyLevel;
+  urgencyConfidence: number;
   urgencyConfirmed: UrgencyLevel | null;
   status: 'new' | 'reviewing' | 'assigned' | 'in_progress' | 'waiting' | 'resolved' | 'cannot_resolve' | string;
   reportCount: number;
@@ -154,8 +155,11 @@ export type Issue = {
   missingInformation: string[];
   reports: IssueReport[];
   representativeReportId: number | null;
+  candidateId: number | null;
   candidateIssueId: number | null;
   candidateConfidence: number | null;
+  candidateIssueTitle: string;
+  candidateReason: string;
   updates: CaseUpdate[];
 };
 
@@ -883,19 +887,19 @@ function mapIssue(row: Record<string, unknown>): Issue {
   const vulnerable = parseStringList(row.vulnerable_people == null ? null : String(row.vulnerable_people));
   return {
     id: Number(row.id), title: String(row.title ?? '課題'), summary: String(row.summary ?? ''), request: String(row.request ?? ''),
-    category: String(row.category ?? 'その他'), location: String(row.location ?? ''), urgency: urgency as UrgencyLevel, urgencyConfirmed: confirmed,
+    category: String(row.category ?? 'その他'), location: String(row.location ?? ''), urgency: urgency as UrgencyLevel, urgencyConfidence: Number(row.urgency_confidence ?? 0), urgencyConfirmed: confirmed,
     status: String(row.status ?? 'new') as Issue['status'], reportCount: Number(row.report_count ?? 0), affectedPeople: String(row.affected_people ?? ''),
     vulnerablePeople: vulnerable.length ? vulnerable : ['不明'], firstReportedAt: Number(row.first_reported_at ?? row.created_at ?? 0),
     lastReportedAt: Number(row.last_reported_at ?? row.updated_at ?? 0), assignedTeam: String(row.assigned_team ?? ''), assignedUser: String(row.assigned_user ?? ''),
     responseMessage: String(row.response_message ?? ''), internalNote: String(row.internal_note ?? ''), estimatedResolutionTime: String(row.estimated_resolution_time ?? ''),
     resolvedAt: row.resolved_at == null ? null : Number(row.resolved_at), createdAt: Number(row.created_at ?? 0), updatedAt: Number(row.updated_at ?? 0),
     version: Number(row.version ?? 1), groupingConfidence: Number(row.grouping_confidence ?? 1), groupingMode: String(row.grouping_mode ?? 'single'),
-    facts: [], emotions: [], missingInformation: [], reports: [], representativeReportId: null, candidateIssueId: null, candidateConfidence: null, updates: [],
+    facts: [], emotions: [], missingInformation: [], reports: [], representativeReportId: null, candidateId: null, candidateIssueId: null, candidateConfidence: null, candidateIssueTitle: '', candidateReason: '', updates: [],
   };
 }
 
 async function hydrateIssue(db: D1Database, issue: Issue, includeReports = true): Promise<Issue> {
-  const reportRows = includeReports ? await db.prepare(`SELECT q.id, q.title, q.created_at, q.workflow_status, q.location, q.urgency_candidate, q.display_body, q.body_original,
+  const reportRows = includeReports ? await db.prepare(`SELECT q.id, q.title, q.created_at, q.workflow_status, q.location, q.urgency_candidate, q.urgency_confidence, q.display_body, q.body_original,
       q.fact_summary, q.emotion_summary, q.missing_information FROM issue_reports ir JOIN questions q ON q.id = ir.question_id
       WHERE ir.issue_id = ? ORDER BY q.created_at ASC, q.id ASC LIMIT 200`).bind(issue.id).all<Record<string, unknown>>() : { results: [] };
   const reports = (reportRows.results ?? []).map((row) => ({
@@ -903,19 +907,25 @@ async function hydrateIssue(db: D1Database, issue: Issue, includeReports = true)
     location: String(row.location ?? ''), urgency: String(row.urgency_candidate ?? 'normal') as UrgencyLevel, displayBody: String(row.display_body ?? ''), originalBody: String(row.body_original ?? row.display_body ?? ''),
   }));
   const facts: string[] = []; const emotions: string[] = []; const missing: string[] = [];
+  const urgencyConfidence = Math.max(issue.urgencyConfidence, ...(reportRows.results ?? []).map((row) => Number(row.urgency_confidence ?? 0)));
   for (const row of reportRows.results ?? []) {
     facts.push(...parseStringList(row.fact_summary == null ? null : String(row.fact_summary)));
     if (row.emotion_summary) emotions.push(String(row.emotion_summary));
     missing.push(...parseStringList(row.missing_information == null ? null : String(row.missing_information)));
   }
   const updates = await db.prepare('SELECT id, message, is_public, created_at, \'issue\' AS status FROM issue_responses WHERE issue_id = ? ORDER BY created_at ASC, id ASC LIMIT 100').bind(issue.id).all<Record<string, unknown>>();
-  const candidate = await db.prepare('SELECT candidate_issue_id, confidence FROM issue_merge_candidates WHERE issue_id = ? AND status = \'pending\' ORDER BY confidence DESC LIMIT 1').bind(issue.id).first<Record<string, unknown>>();
+  const candidate = await db.prepare(`SELECT c.id, c.candidate_issue_id, c.confidence, c.reason, target.title AS candidate_issue_title
+    FROM issue_merge_candidates c JOIN issues target ON target.id = c.candidate_issue_id
+    WHERE c.issue_id = ? AND c.status = 'pending' ORDER BY c.confidence DESC LIMIT 1`).bind(issue.id).first<Record<string, unknown>>();
   return {
-    ...issue, reports, reportCount: Math.max(issue.reportCount, reports.length), facts: Array.from(new Set(facts)).slice(0, 16),
+    ...issue, urgencyConfidence, reports, reportCount: Math.max(issue.reportCount, reports.length), facts: Array.from(new Set(facts)).slice(0, 16),
     emotions: Array.from(new Set(emotions)).slice(0, 8), missingInformation: Array.from(new Set(missing)).slice(0, 12),
     representativeReportId: reports[0]?.id ?? null,
+    candidateId: candidate?.id == null ? null : Number(candidate.id),
     candidateIssueId: candidate?.candidate_issue_id == null ? null : Number(candidate.candidate_issue_id),
     candidateConfidence: candidate?.confidence == null ? null : Number(candidate.confidence),
+    candidateIssueTitle: String(candidate?.candidate_issue_title ?? ''),
+    candidateReason: String(candidate?.reason ?? ''),
     updates: (updates.results ?? []).map((row) => ({ id: Number(row.id), status: String(row.status ?? 'issue'), message: String(row.message ?? ''), isPublic: Boolean(Number(row.is_public ?? 0)), createdAt: Number(row.created_at ?? 0) })),
   };
 }
@@ -929,6 +939,47 @@ export async function listIssuesForAdministratorPage(portalId: number | null = n
   const result = portalId === null ? await statement.bind(safePageSize + 1, offset).all<Record<string, unknown>>() : await statement.bind(portalId, safePageSize + 1, offset).all<Record<string, unknown>>();
   const rows = result.results ?? []; const hasMore = rows.length > safePageSize;
   return { issues: await Promise.all(rows.slice(0, safePageSize).map((row) => hydrateIssue(db, mapIssue(row)))), hasMore };
+}
+
+export async function reviewIssueMergeCandidate(candidateId: number, action: 'accept' | 'reject', actorUserId: string, actorDisplayName = '避難所管理者'): Promise<{ action: 'accepted' | 'rejected'; issueId: number; targetIssueId: number | null }> {
+  if (!Number.isInteger(candidateId) || candidateId <= 0) throw new Error('MERGE_CANDIDATE_INVALID');
+  const db = await initialise();
+  const candidate = await db.prepare(`SELECT c.id, c.issue_id, c.candidate_issue_id, source.status AS source_status, target.status AS target_status,
+      source.report_count AS source_report_count, target.report_count AS target_report_count, source.last_reported_at AS source_last_reported_at,
+      target.last_reported_at AS target_last_reported_at, source.urgency_candidate AS source_urgency, target.urgency_candidate AS target_urgency
+    FROM issue_merge_candidates c JOIN issues source ON source.id = c.issue_id JOIN issues target ON target.id = c.candidate_issue_id
+    WHERE c.id = ? AND c.status = 'pending' AND source.portal_id IS NULL AND target.portal_id IS NULL`).bind(candidateId).first<Record<string, unknown>>();
+  if (!candidate) throw new Error('MERGE_CANDIDATE_NOT_FOUND');
+  const issueId = Number(candidate.issue_id);
+  const targetIssueId = Number(candidate.candidate_issue_id);
+  await ensureStaffUser(actorUserId, actorDisplayName);
+  const actor = await auditActorId(actorUserId);
+
+  if (action === 'reject') {
+    const result = await db.prepare("UPDATE issue_merge_candidates SET status = 'rejected' WHERE id = ? AND status = 'pending'").bind(candidateId).run();
+    if (Number(result.meta.changes ?? 0) !== 1) throw new Error('MERGE_CONFLICT');
+    await db.prepare('INSERT INTO issue_operation_history (issue_id, report_id, operation, actor_user_id, detail, created_at) VALUES (?, NULL, ?, ?, ?, ?)').bind(issueId, 'merge_candidate_rejected', actor, `candidate:${targetIssueId}`, Date.now()).run();
+    await writeAuditLog('issue_merge_candidate_rejected', actorUserId, null, null, `issue:${issueId} candidate:${targetIssueId}`);
+    return { action: 'rejected', issueId, targetIssueId: null };
+  }
+
+  if (candidate.source_status === 'resolved' || candidate.source_status === 'cannot_resolve' || candidate.target_status === 'resolved' || candidate.target_status === 'cannot_resolve') throw new Error('MERGE_NOT_ALLOWED');
+  const now = Date.now();
+  const sourceLastReportedAt = Number(candidate.source_last_reported_at ?? 0);
+  const targetLastReportedAt = Number(candidate.target_last_reported_at ?? 0);
+  const urgency = urgencyRank(String(candidate.source_urgency ?? 'normal')) > urgencyRank(String(candidate.target_urgency ?? 'normal')) ? String(candidate.source_urgency ?? 'normal') : String(candidate.target_urgency ?? 'normal');
+  await db.batch([
+    db.prepare("UPDATE issue_reports SET issue_id = ?, link_type = 'manual', confidence = 1, updated_at = ? WHERE issue_id = ?").bind(targetIssueId, now, issueId),
+    db.prepare('UPDATE questions SET issue_id = ?, issue_link_confidence = 1 WHERE issue_id = ?').bind(targetIssueId, issueId),
+    db.prepare('UPDATE issue_responses SET issue_id = ? WHERE issue_id = ?').bind(targetIssueId, issueId),
+    db.prepare('UPDATE issue_operation_history SET issue_id = ? WHERE issue_id = ?').bind(targetIssueId, issueId),
+    db.prepare(`UPDATE issues SET report_count = (SELECT COUNT(*) FROM issue_reports WHERE issue_id = ?), last_reported_at = ?, urgency_candidate = ?, grouping_confidence = 1, grouping_mode = 'manual', updated_at = ?, version = version + 1 WHERE id = ? AND portal_id IS NULL`).bind(targetIssueId, Math.max(sourceLastReportedAt, targetLastReportedAt), urgency, now, targetIssueId),
+    db.prepare('INSERT INTO issue_operation_history (issue_id, report_id, operation, actor_user_id, detail, created_at) VALUES (?, NULL, ?, ?, ?, ?)').bind(targetIssueId, 'merge_candidate_accepted', actor, `merged_issue:${issueId}`, now),
+    db.prepare('DELETE FROM issue_merge_candidates WHERE issue_id = ? OR candidate_issue_id = ?').bind(issueId, issueId),
+    db.prepare('DELETE FROM issues WHERE id = ? AND portal_id IS NULL').bind(issueId),
+  ]);
+  await writeAuditLog('issue_merge_candidate_accepted', actorUserId, null, null, `issue:${issueId} target:${targetIssueId}`);
+  return { action: 'accepted', issueId, targetIssueId };
 }
 
 export async function getIssueForAdministrator(issueId: number, portalId: number | null = null): Promise<Issue | null> {

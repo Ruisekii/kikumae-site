@@ -180,7 +180,10 @@ function shelterTitle(category: ShelterCategory, location: string, value: string
 }
 
 export function generateShelterAnalysis(value: string, intake: ShelterIntake = {}): ShelterAnalysis {
-  const text = value.trim().replace(/\r?\n/g, ' ');
+  const rawText = value.trim().replace(/\r?\n/g, ' ');
+  // Keep the original report separately, but never copy common contact data
+  // into derived titles, facts, locations, or reply context.
+  const text = redactSensitiveInformation(rawText);
   const location = extractLocation(text, intake.location ?? '');
   const peopleCount = extractAffectedPeople(text, intake.peopleCount ?? '');
   const resourceRemaining = intake.resourceRemaining?.trim().slice(0, 120) ?? '';

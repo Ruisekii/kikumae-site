@@ -9,8 +9,9 @@ type Analysis = { title: string; overview: string; facts: string[]; emotion: str
 type FollowUp = { question: string; options: string[] } | null;
 type Preview = { body: string; summary: string; category: string; related: RelatedFaq[]; analysis: Analysis; followUp: FollowUp; submissionKey: string };
 type ChatMessage = { from: 'ai' | 'person'; text: string };
-type SpeechRecognitionLike = { lang: string; interimResults: boolean; onresult: ((event: { results: ArrayLike<ArrayLike<{ transcript: string }>> }) => void) | null; onerror: (() => void) | null; start: () => void; stop: () => void };
+type SpeechRecognitionLike = { lang: string; interimResults: boolean; onresult: ((event: { results: ArrayLike<ArrayLike<{ transcript: string }>> }) => void) | null; onerror: (() => void) | null; onend: (() => void) | null; start: () => void; stop: () => void };
 type SpeechWindow = Window & { SpeechRecognition?: new () => SpeechRecognitionLike; webkitSpeechRecognition?: new () => SpeechRecognitionLike };
+type SavedDraft = { savedAt?: number; input?: string; originalBody?: string; contextBody?: string; intake?: Intake; chatOpen?: boolean; messages?: ChatMessage[]; activeKey?: string; preview?: Preview | null; faqDecision?: boolean; readyToSubmit?: boolean };
 
 type Props = { faqs: Faq[] };
 const emptyIntake: Intake = { location: '', peopleCount: '', resourceRemaining: '', lastReceivedAt: '' };
@@ -34,6 +35,7 @@ export function KikumaeClient({ faqs }: Props) {
   const [busy, setBusy] = useState(false);
   const [listening, setListening] = useState(false);
   const [offline, setOffline] = useState(false);
+  const submitLockRef = useRef(false);
   const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -42,16 +44,17 @@ export function KikumaeClient({ faqs }: Props) {
     const restoreTimer = window.setTimeout(() => {
       try {
         const saved = localStorage.getItem('kikumae-shelter-draft');
-        if (saved) { const draft = JSON.parse(saved) as Partial<{ input: string; originalBody: string; contextBody: string; intake: Intake }>; if (draft.input) setInput(draft.input); if (draft.originalBody) setOriginalBody(draft.originalBody); if (draft.contextBody) setContextBody(draft.contextBody); if (draft.intake) setIntake({ ...emptyIntake, ...draft.intake }); }
+        if (saved) { const draft = JSON.parse(saved) as SavedDraft; const fresh = !draft.savedAt || Date.now() - draft.savedAt < 24 * 60 * 60 * 1000; if (fresh) { if (draft.input) setInput(draft.input); if (draft.originalBody) setOriginalBody(draft.originalBody); if (draft.contextBody) setContextBody(draft.contextBody); if (draft.intake) setIntake({ ...emptyIntake, ...draft.intake }); if (draft.chatOpen) setChatOpen(true); if (draft.messages?.length) setMessages(draft.messages); if (draft.activeKey) setActiveKey(draft.activeKey); if (draft.preview) setPreview(draft.preview); if (draft.faqDecision) setFaqDecision(true); if (draft.readyToSubmit) setReadyToSubmit(true); } }
       } catch { /* local draft is best effort */ }
     }, 0);
     return () => { window.clearTimeout(restoreTimer); window.removeEventListener('online', updateConnection); window.removeEventListener('offline', updateConnection); };
   }, []);
 
   useEffect(() => {
-    if (!input && !originalBody) return;
-    try { localStorage.setItem('kikumae-shelter-draft', JSON.stringify({ input, originalBody, contextBody, intake })); } catch { /* local draft is best effort */ }
-  }, [input, originalBody, contextBody, intake]);
+    if (checkUrl) { try { localStorage.removeItem('kikumae-shelter-draft'); } catch { /* local draft is best effort */ } return; }
+    if (!input && !originalBody && !messages.length) return;
+    try { localStorage.setItem('kikumae-shelter-draft', JSON.stringify({ savedAt: Date.now(), input, originalBody, contextBody, intake, chatOpen, messages, activeKey, preview, faqDecision, readyToSubmit } satisfies SavedDraft)); } catch { /* local draft is best effort */ }
+  }, [input, originalBody, contextBody, intake, chatOpen, messages, activeKey, preview, faqDecision, readyToSubmit, checkUrl]);
 
   const matches = useMemo(() => {
     const term = normalize(query);
@@ -74,6 +77,7 @@ export function KikumaeClient({ faqs }: Props) {
     const recognition = new SpeechRecognition(); recognition.lang = 'ja-JP'; recognition.interimResults = false; setListening(true);
     recognition.onresult = (event) => { const transcript = Array.from(event.results).map((result) => result[0]?.transcript ?? '').join(''); setInput(transcript); setListening(false); };
     recognition.onerror = () => { setListening(false); setStatus('音声を聞き取れませんでした。文字でも入力できます。'); };
+    recognition.onend = () => setListening(false);
     recognition.start();
   }
 
@@ -126,14 +130,14 @@ export function KikumaeClient({ faqs }: Props) {
   }
 
   async function submitQuestion() {
-    if (!preview || busy) return; setBusy(true); setStatus('相談を届けています…');
+    if (!preview || busy || submitLockRef.current) return; submitLockRef.current = true; setBusy(true); setStatus('相談を届けています…');
     try {
       const response = await fetch('/api/questions', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ body: originalBody, summary: preview.summary, category: preview.category, submissionKey: preview.submissionKey, intake }), signal: AbortSignal.timeout(15000) });
       const payload = await response.json() as { message?: string; checkUrl?: string };
       if (!response.ok) { setStatus(payload.message ?? '相談を届けられませんでした。'); return; }
       setCheckUrl(payload.checkUrl ?? ''); setReadyToSubmit(false); setStatus('相談が届きました。確認ページを保存してください。'); addMessage({ from: 'ai', text: '相談を受け付けました。相談IDと対応状況を確認できます。' }); try { localStorage.removeItem('kikumae-shelter-draft'); } catch { /* local draft is best effort */ }
     } catch { setStatus('通信に失敗しました。時間をおいてもう一度お試しください。'); }
-    finally { setBusy(false); }
+    finally { submitLockRef.current = false; setBusy(false); }
   }
 
   function closeChat() { setChatOpen(false); setStatus(''); }

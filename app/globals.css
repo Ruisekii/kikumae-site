@@ -240,6 +240,13 @@ button, input, textarea, select { font-size: 1rem; }
 .check-link-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 9px; margin-top: 12px; }
 .check-link-actions span { color: var(--muted); font-size: .82rem; }
 .group-notice { margin: 14px 0 0; padding: 10px 12px; border-radius: 10px; background: #edf8fb; color: #326b80; font-weight: 800; }
+.status-live-note { margin: 12px 0 0; color: #4b8798; font-size: .85rem; font-weight: 800; }
+.merge-candidate { margin-top: 18px; padding: 15px; border: 1px solid #c8dff0; border-left: 5px solid #5d9bc2; border-radius: 12px; background: #f2f8fc; }
+.merge-candidate h3 { margin: 0; color: var(--navy); }
+.merge-candidate p { margin: 6px 0 0; color: var(--muted); line-height: 1.6; }
+.merge-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+.pagination-controls { display: flex; align-items: center; justify-content: center; gap: 14px; margin-top: 16px; color: var(--muted); font-weight: 800; }
+.bulk-answer-confirm { padding: 9px 11px; border-radius: 9px; background: #fff6df; color: #7a622b; font-weight: 800; }
 
 @media (max-width: 680px) {
   .command-summary { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
@@ -247,4 +254,7 @@ button, input, textarea, select { font-size: 1rem; }
   .command-summary span:nth-last-child(-n+2) { border-bottom: 0; padding-bottom: 0; }
   .self-assign { width: 100%; margin: 0; }
   .report-original summary { display: grid; }
+  .merge-actions { display: grid; }
+  .merge-actions .button { width: 100%; }
+  .pagination-controls { flex-wrap: wrap; }
 }
