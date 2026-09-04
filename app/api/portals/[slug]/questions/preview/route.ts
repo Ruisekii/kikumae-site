@@ -1,6 +1,6 @@
 import { getPortal } from '../../../../../../db/portals';
 import { listRelatedFaqs } from '../../../../../../db/repository';
-import { categorizeQuestion, containsPii, generateLocalSummary } from '../../../../../../db/local-ai';
+import { categorizeQuestion, detectPiiTypes, maskPii, generateLocalSummary } from '../../../../../../db/local-ai';
 import { allowBurstShared, readRequestText } from '../../../../../../db/request-guard';
 
 export const runtime = 'edge';
@@ -23,8 +23,12 @@ export async function POST(request: Request, { params }: { params: Promise<{ slu
     const payload = JSON.parse(raw) as Record<string, unknown>;
     const body = typeof payload.body === 'string' ? payload.body.trim() : '';
     if (!body || body.length > MAX_CHARS) return Response.json({ message: '質問は1〜500文字で入力してください。' }, { status: 400 });
-    if (containsPii(body)) return Response.json({ message: '個人情報やURLは入力できません。該当箇所を削除してください。' }, { status: 400 });
-    return Response.json({ body, summary: generateLocalSummary(body), category: categorizeQuestion(body), related: await listRelatedFaqs(body, 3, portal.id), aiMode: 'local-rules' }, { headers: { 'Cache-Control': 'no-store' } });
+    // 個人情報やURLを検出してもプレビューは拒否しない。要約・分類などの
+    // 派生テキストは伏字化したテキストから生成する。
+    const piiTypes = detectPiiTypes(body);
+    const piiDetected = piiTypes.length > 0;
+    const maskedBody = piiDetected ? maskPii(body) : body;
+    return Response.json({ body, bodyMasked: maskedBody, piiDetected, piiTypes, summary: generateLocalSummary(maskedBody), category: categorizeQuestion(maskedBody), related: await listRelatedFaqs(maskedBody, 3, portal.id), aiMode: 'local-rules' }, { headers: { 'Cache-Control': 'no-store' } });
   } catch (error) {
     if (error instanceof Error && error.message === 'REQUEST_BODY_TOO_LARGE') return Response.json({ message: '質問は500文字以内で入力してください。' }, { status: 413 });
     return Response.json({ message: '入力形式が正しくありません。' }, { status: 400 });

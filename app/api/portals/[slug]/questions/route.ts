@@ -1,6 +1,5 @@
 import { getPortal } from '../../../../../db/portals';
 import { createQuestion } from '../../../../../db/repository';
-import { containsPii } from '../../../../../db/local-ai';
 import { allowBurstShared, readRequestText } from '../../../../../db/request-guard';
 
 export const runtime = 'edge';
@@ -26,11 +25,20 @@ export async function POST(request: Request, { params }: { params: Promise<{ slu
     const category = typeof data.category === 'string' ? data.category.trim() : '';
     const submissionKey = typeof data.submissionKey === 'string' ? data.submissionKey.trim().slice(0, 128) : '';
     if (!body || body.length > MAX_CHARS) return Response.json({ message: '質問は1〜500文字で入力してください。' }, { status: 400 });
-    if (containsPii(body) || (summary && containsPii(summary))) return Response.json({ message: '個人情報やURLは保存できません。内容を取り除いてから送信してください。' }, { status: 400 });
     if (summary.length > 300) return Response.json({ message: '要約は300文字以内で入力してください。' }, { status: 400 });
+    // 個人情報やURLを含んでいても受付は拒否しない。原文はそのまま保存し、
+    // 職員向けの表示は createQuestion 内で伏字化される。
     try {
       const question = await createQuestion(body, summary, category, portal.id, submissionKey);
-      return Response.json({ id: question.id, checkUrl: `${new URL(request.url).origin}/questions/${question.checkToken}`, message: '質問を受け付けました。管理者が確認します。' }, { status: 201, headers: { 'Cache-Control': 'no-store' } });
+      return Response.json({
+        id: question.id,
+        checkUrl: `${new URL(request.url).origin}/questions/${question.checkToken}`,
+        message: question.piiDetected
+          ? '質問を受け付けました。個人情報を含む可能性がある内容が見つかったため、職員の画面では該当箇所を伏字にして表示します。'
+          : '質問を受け付けました。管理者が確認します。',
+        piiDetected: question.piiDetected,
+        piiTypes: question.piiTypes,
+      }, { status: 201, headers: { 'Cache-Control': 'no-store' } });
     } catch (error) {
       if (error instanceof Error && error.message === 'QUESTION_DUPLICATE') return Response.json({ message: 'この質問はすでに受け付けています。回答の確認URLをご確認ください。' }, { status: 409 });
       return Response.json({ message: '質問を保存できませんでした。' }, { status: 400 });

@@ -39,7 +39,28 @@ export type ShelterAnalysis = {
 
 const PUNCTUATION = /[\s、。・!！?？「」『』()（）\[\]【】,.:;〜~ー\-]/g;
 const KEYWORD_RE = /[一-龥]{2,}|[ァ-ヴー]{2,}|[a-zA-Z]{3,}/g;
-const PERSONAL_DATA_PATTERN = /(?:[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}|https?:\/\/|www\.|(?:0\d{1,4}[-ー－ ]?\d{1,4}[-ー－ ]?\d{3,4})|〒\s?\d{3}[-ー－]?\d{4}|(?:東京都|北海道|(?:京都|大阪)府|.{2,3}県).{0,24}(?:市|区|町|村|丁目|番地|号)|(?:学籍|生徒|社員)番号|(?:氏名|名前|住所|電話(?:番号)?|メール(?:アドレス)?|連絡先|郵便番号|口座|マイナンバー)\s*[:：])/i;
+
+/**
+ * 個人情報として扱う種別ごとの検出パターン。
+ * containsPii() はこの一覧のいずれかに一致するかどうかを判定し（旧
+ * PERSONAL_DATA_PATTERN と一致条件は同じ）、maskPii()/detectPiiTypes() は
+ * 種別ごとの伏字化・フラグ付けに使う。ラベル系（「氏名:」など）とURLは、
+ * マスク時に値の部分まで伏字化できるよう一致範囲を値側へ広げているが、
+ * これは containsPii() の真偽判定には影響しない（一致自体はラベル部分で
+ * 成立するため）。
+ */
+const PII_CATEGORIES: { type: string; label: string; source: string }[] = [
+  { type: 'email', label: 'メールアドレス', source: '[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,}' },
+  { type: 'url', label: 'URL', source: '(?:https?:\\/\\/|www\\.)\\S*' },
+  { type: 'phone', label: '電話番号', source: '0\\d{1,4}[-ー－ ]?\\d{1,4}[-ー－ ]?\\d{3,4}' },
+  { type: 'postal_code', label: '郵便番号', source: '〒\\s?\\d{3}[-ー－]?\\d{4}' },
+  { type: 'address', label: '住所', source: '(?:東京都|北海道|(?:京都|大阪)府|.{2,3}県).{0,24}(?:市|区|町|村|丁目|番地|号)' },
+  { type: 'id_number', label: '学籍・社員番号', source: '(?:学籍|生徒|社員)番号' },
+  { type: 'labeled_field', label: '個人情報の記載', source: '(?:氏名|名前|住所|電話(?:番号)?|メール(?:アドレス)?|連絡先|郵便番号|口座|マイナンバー)\\s*[:：]\\s*\\S*' },
+];
+
+/** UI表示用のラベル辞書（値そのものは含まない、種別コード→日本語ラベルのみ）。 */
+export const PII_TYPE_LABELS: Record<string, string> = Object.fromEntries(PII_CATEGORIES.map(({ type, label }) => [type, label]));
 const CATEGORY_KEYWORDS: Record<string, string[]> = {
   '利用方法': ['使い', '利用', '方法', 'どこから', 'どうやって', '申し込み', '申込み', '見学', '参加', '予約', '訪問'],
   '申請・手続き': ['申請', '手続き', '提出', '精算', '登録', '変更', '申込', '申し込み'],
@@ -185,7 +206,22 @@ export function searchFaqs(query: string, faqs: AiFaq[], limit = 5): AiRelatedFa
     .map((faq) => ({ ...faq, score: Math.round(faq.score * 1000) / 1000 }));
 }
 
-export function containsPii(value: string): boolean { return PERSONAL_DATA_PATTERN.test(value); }
+export function containsPii(value: string): boolean {
+  return PII_CATEGORIES.some(({ source }) => new RegExp(source, 'i').test(value));
+}
+
+/** 検出した個人情報の種別コードだけを返す（値そのものは含まない）。 */
+export function detectPiiTypes(value: string): string[] {
+  return PII_CATEGORIES.filter(({ source }) => new RegExp(source, 'i').test(value)).map(({ type }) => type);
+}
+
+/**
+ * 個人情報らしき箇所を種別ラベル付きの伏字（例:「[伏字:電話番号]」）へ
+ * 置き換える。原文は書き換えず、常に呼び出し側が別テキストとして扱う。
+ */
+export function maskPii(value: string): string {
+  return PII_CATEGORIES.reduce((text, { source, label }) => text.replace(new RegExp(source, 'gi'), `[伏字:${label}]`), value);
+}
 
 export function categorizeQuestion(value: string, requested = ''): string {
   if (Object.prototype.hasOwnProperty.call(CATEGORY_KEYWORDS, requested) || (SHELTER_CATEGORIES as readonly string[]).includes(requested)) return requested;

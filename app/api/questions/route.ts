@@ -1,5 +1,4 @@
 import { createQuestion } from '../../../db/repository';
-import { containsPii } from '../../../db/local-ai';
 import type { ShelterIntake } from '../../../db/local-ai';
 import { allowBurstShared, readRequestText } from '../../../db/request-guard';
 
@@ -41,13 +40,22 @@ export async function POST(request: Request): Promise<Response> {
     lastReceivedAt: typeof rawIntake.lastReceivedAt === 'string' ? rawIntake.lastReceivedAt : '',
   };
   if (!body || body.length > MAX_QUESTION_CHARS) return json('質問は1〜500文字で入力してください。', 400);
-  if (containsPii(body)) return json('個人情報やURLは保存できません。内容を取り除いてから送信してください。', 400);
   if (summary.length > 300) return json('要約は300文字以内で入力してください。', 400);
-  if (summary && containsPii(summary)) return json('要約にも個人情報やURLは含められません。', 400);
+  // 個人情報やURLを含んでいても受付は拒否しない。原文はそのまま保存し、
+  // 職員向けの要約・分析などの表示は createQuestion 内で伏字化される。
+  // どの種別を検出したかは応答の piiDetected / piiTypes で伝える。
 
   try {
     const question = await createQuestion(body, summary, category, null, submissionKey, intake);
-    return Response.json({ id: question.id, checkUrl: `${new URL(request.url).origin}/questions/${question.checkToken}`, message: '質問を受け付けました。管理者が確認します。' }, { status: 201, headers: { 'Cache-Control': 'no-store' } });
+    return Response.json({
+      id: question.id,
+      checkUrl: `${new URL(request.url).origin}/questions/${question.checkToken}`,
+      message: question.piiDetected
+        ? '質問を受け付けました。個人情報を含む可能性がある内容が見つかったため、職員の画面では該当箇所を伏字にして表示します。'
+        : '質問を受け付けました。管理者が確認します。',
+      piiDetected: question.piiDetected,
+      piiTypes: question.piiTypes,
+    }, { status: 201, headers: { 'Cache-Control': 'no-store' } });
   } catch (error) {
     if (error instanceof Error && error.message === 'QUESTION_DUPLICATE') return json('この質問はすでに受け付けています。回答の確認URLをご確認ください。', 409);
     return json('質問を保存できませんでした。', 400);

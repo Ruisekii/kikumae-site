@@ -2,6 +2,8 @@ import { env } from 'cloudflare:workers';
 import {
   categorizeQuestion,
   containsPii,
+  detectPiiTypes,
+  maskPii,
   generateFaqCandidate,
   generateLocalSummary,
   generateLocalDraft,
@@ -60,6 +62,9 @@ export type SubmittedQuestion = {
   id: number;
   body: string;
   bodyOriginal: string;
+  bodyMasked: string;
+  piiDetected: boolean;
+  piiTypes: string[];
   aiSummary: string;
   summaryEdited: boolean;
   category: string;
@@ -211,6 +216,22 @@ async function initialise(): Promise<D1Database> {
     await safeRun(db, 'UPDATE faqs SET created_at = updated_at WHERE created_at = 0');
     await safeRun(db, 'UPDATE questions SET body_original = body WHERE body_original IS NULL');
     await db.prepare("INSERT OR REPLACE INTO schema_meta (key, value) VALUES ('schema_v2', 'ready')").run();
+  }
+
+  // 個人情報の伏字化用カラムは schema_v2 とは別マーカーで加算する。schema_v2
+  // が既に 'ready' の既存デプロイでも、このブロックは独立して一度だけ実行される。
+  const piiMigrationMarker = await db.prepare("SELECT value FROM schema_meta WHERE key = 'schema_pii_mask_v1' LIMIT 1").first<{ value: string }>();
+  if (piiMigrationMarker?.value !== 'ready') {
+    for (const migration of [
+      'ALTER TABLE questions ADD COLUMN body_masked TEXT',
+      'ALTER TABLE questions ADD COLUMN pii_detected INTEGER NOT NULL DEFAULT 0',
+      "ALTER TABLE questions ADD COLUMN pii_types TEXT NOT NULL DEFAULT '[]'",
+    ]) await safeRun(db, migration);
+    // 既存行は「個人情報を検出したら受付自体を拒否する」旧仕様で保存された
+    // ものなので、本文に個人情報は含まれていない。原文をそのままマスク済み
+    // 欄へコピーしてよい（新規に伏字化し直す必要はない）。
+    await safeRun(db, 'UPDATE questions SET body_masked = body_original WHERE body_masked IS NULL');
+    await db.prepare("INSERT OR REPLACE INTO schema_meta (key, value) VALUES ('schema_pii_mask_v1', 'ready')").run();
   }
   await ensureFaqIsolationSchema(db);
   const seedMarker = await db.prepare("SELECT value FROM schema_meta WHERE key = 'shelter_faq_seed_v1' LIMIT 1").first<{ value: string }>();
@@ -400,26 +421,42 @@ export async function createQuestion(body: string, requestedSummary = '', reques
     const duplicate = await db.prepare('SELECT id FROM questions WHERE submission_key_hash = ? LIMIT 1').bind(submissionKeyHash).first<{ id: number }>();
     if (duplicate) throw new Error('QUESTION_DUPLICATE');
   }
-  const shelterAnalysis = portalId === null ? generateShelterAnalysis(body, intake) : null;
-  const canonicalSummary = shelterAnalysis?.overview ?? generateLocalSummary(body);
-  const aiSummary = requestedSummary.trim().slice(0, 300) || canonicalSummary;
-  const category = categorizeQuestion(body, requestedCategory);
-  const related = await listRelatedFaqs(aiSummary || body, 3, portalId);
-  const draft = generateLocalDraft(aiSummary, body, related);
-  const alternatives = generateAlternativeDrafts(aiSummary, body, related);
+  // 原文（body/body_original）は必ずそのまま保存する。個人情報を検出した
+  // 場合でも受付自体は拒否せず、要約・分析・回答案・FAQ候補など原文以外の
+  // 派生テキストの生成には伏字化した maskedBody を使う。原文は職員が
+  // 「原文を開く」操作をしたときだけ参照する（recordOriginalViewed）。
+  const piiTypes = detectPiiTypes(body);
+  const piiDetected = piiTypes.length > 0;
+  const maskedBody = piiDetected ? maskPii(body) : body;
+  const shelterAnalysis = portalId === null ? generateShelterAnalysis(maskedBody, intake) : null;
+  const canonicalSummary = shelterAnalysis?.overview ?? generateLocalSummary(maskedBody);
+  const requestedSummaryTrimmed = requestedSummary.trim().slice(0, 300);
+  const maskedRequestedSummary = requestedSummaryTrimmed && containsPii(requestedSummaryTrimmed) ? maskPii(requestedSummaryTrimmed) : requestedSummaryTrimmed;
+  const aiSummary = maskedRequestedSummary || canonicalSummary;
+  const category = categorizeQuestion(maskedBody, requestedCategory);
+  const related = await listRelatedFaqs(aiSummary || maskedBody, 3, portalId);
+  const draft = generateLocalDraft(aiSummary, maskedBody, related);
+  const alternatives = generateAlternativeDrafts(aiSummary, maskedBody, related);
   const checkToken = crypto.randomUUID() + crypto.randomUUID();
   // Keep the question/FAQ data indefinitely, but limit the bearer URL used to
   // check a private question to 30 days.  Legacy rows without an expiry remain
   // readable so existing users are not broken during migration.
   const checkTokenExpiresAt = createdAt + 30 * 24 * 60 * 60 * 1000;
-  const analysis = shelterAnalysis ?? generateShelterAnalysis(body, intake);
-  const result = await db.prepare("INSERT INTO questions (body, body_original, ai_summary, summary_edited, category, status, workflow_status, title, location, people_count, resource_remaining, last_received_at, fact_summary, emotion_summary, missing_information, urgency_candidate, urgent_review, contact_type, answer_draft, answer_alternatives, answer_grounds, portal_id, check_token_hash, check_token_expires_at, submission_key_hash, created_at) VALUES (?, ?, ?, ?, ?, 'open', 'received', ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'anonymous', ?, ?, ?, ?, ?, ?, ?, ?)").bind(body, body, aiSummary, aiSummary !== canonicalSummary ? 1 : 0, category, analysis.title, analysis.location, analysis.peopleCount, analysis.resourceRemaining, analysis.lastReceivedAt, JSON.stringify(analysis.facts), analysis.emotion, JSON.stringify(analysis.missingInformation), analysis.urgencyCandidate, analysis.urgentReview ? 1 : 0, draft, JSON.stringify(alternatives), JSON.stringify(related.map((faq) => faq.question)), portalId, await hashCheckToken(checkToken), checkTokenExpiresAt, submissionKeyHash, createdAt).run();
+  const analysis = shelterAnalysis ?? generateShelterAnalysis(maskedBody, intake);
+  const result = await db.prepare("INSERT INTO questions (body, body_original, body_masked, pii_detected, pii_types, ai_summary, summary_edited, category, status, workflow_status, title, location, people_count, resource_remaining, last_received_at, fact_summary, emotion_summary, missing_information, urgency_candidate, urgent_review, contact_type, answer_draft, answer_alternatives, answer_grounds, portal_id, check_token_hash, check_token_expires_at, submission_key_hash, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'open', 'received', ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'anonymous', ?, ?, ?, ?, ?, ?, ?, ?)").bind(
+    body, body, maskedBody, piiDetected ? 1 : 0, JSON.stringify(piiTypes),
+    aiSummary, aiSummary !== canonicalSummary ? 1 : 0, category,
+    analysis.title, analysis.location, analysis.peopleCount, analysis.resourceRemaining, analysis.lastReceivedAt,
+    JSON.stringify(analysis.facts), analysis.emotion, JSON.stringify(analysis.missingInformation), analysis.urgencyCandidate, analysis.urgentReview ? 1 : 0,
+    draft, JSON.stringify(alternatives), JSON.stringify(related.map((faq) => faq.question)),
+    portalId, await hashCheckToken(checkToken), checkTokenExpiresAt, submissionKeyHash, createdAt,
+  ).run();
   const id = Number(result.meta.last_row_id);
   await db.prepare("INSERT INTO case_updates (question_id, status, message, is_public, actor_user_id, created_at) VALUES (?, 'received', ?, 1, NULL, ?)").bind(id, '相談を受け付けました。避難所スタッフが内容を確認します。', createdAt).run();
   await recordQuestionEvent(id, 'question_received', null, '相談受付');
   if (portalId === null) await assignSimilarGroup(db, id, analysis, createdAt);
   return {
-    id, body, bodyOriginal: body, aiSummary, summaryEdited: aiSummary !== canonicalSummary,
+    id, body: maskedBody, bodyOriginal: body, bodyMasked: maskedBody, piiDetected, piiTypes, aiSummary, summaryEdited: aiSummary !== canonicalSummary,
     category, status: 'open', createdAt, answerBody: null, answerDraft: draft, answerAlternatives: alternatives, answerUsedAi: false,
     answerGrounds: related.map((faq) => faq.question), answeredAt: null, portalId, workflowStatus: 'received', title: analysis.title,
     location: analysis.location, peopleCount: analysis.peopleCount, resourceRemaining: analysis.resourceRemaining, lastReceivedAt: analysis.lastReceivedAt,
@@ -530,8 +567,15 @@ function mapCandidate(row: Record<string, unknown> | null): FaqCandidate | null 
 
 function mapQuestion(row: Record<string, unknown>): SubmittedQuestion {
   return {
-    id: Number(row.id), body: String(row.body_original ?? row.body ?? ''),
-    bodyOriginal: String(row.body_original ?? row.body ?? ''), aiSummary: String(row.ai_summary ?? ''),
+    // body は既定表示用（個人情報を検出していればマスク済み）。原文が
+    // 必要な場合は bodyOriginal を使う（職員が「原文を開く」操作をした
+    // ときだけ参照し、question_events に original_opened として記録する）。
+    id: Number(row.id), body: String(row.body_masked ?? row.body_original ?? row.body ?? ''),
+    bodyOriginal: String(row.body_original ?? row.body ?? ''),
+    bodyMasked: String(row.body_masked ?? row.body_original ?? row.body ?? ''),
+    piiDetected: Boolean(Number(row.pii_detected ?? 0)),
+    piiTypes: parseStringList(row.pii_types == null ? null : String(row.pii_types)),
+    aiSummary: String(row.ai_summary ?? ''),
     summaryEdited: Boolean(Number(row.summary_edited ?? 0)), category: String(row.category ?? 'その他'),
     status: String(row.status ?? 'open'), createdAt: Number(row.created_at ?? 0),
     answerBody: row.answer_body == null ? null : String(row.answer_body),
@@ -554,7 +598,7 @@ function mapQuestion(row: Record<string, unknown>): SubmittedQuestion {
   };
 }
 
-const QUESTION_SELECT = `SELECT q.id, q.body, q.body_original, q.ai_summary, q.summary_edited, q.category, q.status, q.created_at, q.answer_body, q.answer_draft, q.answer_alternatives, q.answer_used_ai, q.answer_grounds, q.answered_at, q.portal_id,
+const QUESTION_SELECT = `SELECT q.id, q.body, q.body_original, q.body_masked, q.pii_detected, q.pii_types, q.ai_summary, q.summary_edited, q.category, q.status, q.created_at, q.answer_body, q.answer_draft, q.answer_alternatives, q.answer_used_ai, q.answer_grounds, q.answered_at, q.portal_id,
   q.workflow_status, q.title, q.location, q.people_count, q.resource_remaining, q.last_received_at, q.fact_summary, q.emotion_summary, q.missing_information, q.urgency_candidate, q.urgency_confirmed, q.urgent_review, q.faq_resolved, q.faq_id, q.similar_group_id, q.assignee_name, q.internal_note, q.first_confirmed_at, q.resolved_at,
   sg.title AS similar_group_title, (SELECT COUNT(*) FROM questions sq WHERE sq.similar_group_id = q.similar_group_id) AS similar_count,
   c.id AS candidate_id, c.question_id, c.q_text, c.a_text, c.category AS candidate_category, c.status AS candidate_status, c.created_at AS candidate_created_at
@@ -589,7 +633,7 @@ export async function listQuestionsForAdministratorPage(portalId: number | null 
   const hasMore = rows.length > safePageSize;
   const mapped = rows.slice(0, safePageSize).map(mapQuestion).map((question) => question.answerAlternatives.length || question.status !== 'open'
     ? question
-    : { ...question, answerAlternatives: generateAlternativeDrafts(question.aiSummary, question.bodyOriginal, []) });
+    : { ...question, answerAlternatives: generateAlternativeDrafts(question.aiSummary, question.bodyMasked, []) });
   return { questions: await Promise.all(mapped.map((question) => hydrateQuestion(db, question))), hasMore };
 }
 
@@ -623,7 +667,7 @@ export async function generateAnswerDraft(questionId: number, portalId?: number 
   const question = await getQuestionForAdministrator(questionId, portalId);
   if (!question) throw new Error('質問が見つかりません。');
   if (portalId !== undefined && question.portalId !== portalId) throw new Error('この窓口の質問ではありません。');
-  const query = [question.title, question.aiSummary, question.bodyOriginal, question.category].filter(Boolean).join(' ');
+  const query = [question.title, question.aiSummary, question.bodyMasked, question.category].filter(Boolean).join(' ');
   const related = await listRelatedFaqs(query, 5, question.portalId);
   const shelterCategory = SHELTER_CATEGORIES.includes(question.category as ShelterCategory)
     && (question.category !== 'その他' || isShelterQuestion(question.bodyOriginal))
@@ -642,13 +686,13 @@ export async function generateAnswerDraft(questionId: number, portalId?: number 
       urgentReview: question.urgentReview,
     };
     return {
-      draft: generateShelterReplyDraft(context, question.bodyOriginal, shelterRelated),
-      alternatives: generateShelterAlternativeDrafts(context, question.bodyOriginal, shelterRelated),
+      draft: generateShelterReplyDraft(context, question.bodyMasked, shelterRelated),
+      alternatives: generateShelterAlternativeDrafts(context, question.bodyMasked, shelterRelated),
       grounds: shelterRelated.map((faq) => faq.question),
       mode: 'local-rules',
     };
   }
-  return { draft: generateLocalDraft(question.aiSummary || question.bodyOriginal, question.bodyOriginal, related), alternatives: generateAlternativeDrafts(question.aiSummary || question.bodyOriginal, question.bodyOriginal, related), grounds: related.map((faq) => faq.question), mode: 'local-rules' };
+  return { draft: generateLocalDraft(question.aiSummary || question.bodyMasked, question.bodyMasked, related), alternatives: generateAlternativeDrafts(question.aiSummary || question.bodyMasked, question.bodyMasked, related), grounds: related.map((faq) => faq.question), mode: 'local-rules' };
 }
 
 export async function approveAnswer(questionId: number, body: string, usedAi: boolean, grounds: string[], portalId?: number | null, actorUserId: string | null = null): Promise<FaqCandidate | null> {
@@ -661,7 +705,7 @@ export async function approveAnswer(questionId: number, body: string, usedAi: bo
   const answeredAt = Date.now();
   // Recompute grounds from the server-side FAQ set. Client supplied grounds
   // are display hints only and must not become provenance records.
-  const related = await listRelatedFaqs(question.aiSummary || question.bodyOriginal, 3, question.portalId);
+  const related = await listRelatedFaqs(question.aiSummary || question.bodyMasked, 3, question.portalId);
   const verifiedGrounds = related.map((faq) => faq.question);
   const scope = portalId === null ? ' AND portal_id IS NULL' : portalId === undefined ? '' : ' AND portal_id = ?';
   const update = db.prepare(`UPDATE questions SET answer_body = ?, answer_used_ai = ?, answer_grounds = ?, status = 'answered', workflow_status = 'resolved', answered_at = ?, resolved_at = COALESCE(resolved_at, ?) WHERE id = ? AND status = 'open'${scope}`);
@@ -671,7 +715,10 @@ export async function approveAnswer(questionId: number, body: string, usedAi: bo
   if (Number(updateResult.meta.changes ?? 0) !== 1) throw new Error('この質問はすでに回答済みです。');
   await db.prepare("INSERT INTO case_updates (question_id, status, message, is_public, actor_user_id, created_at) VALUES (?, 'resolved', ?, 1, ?, ?)").bind(questionId, '確認済みの回答をお届けしました。', await auditActorId(actorUserId), answeredAt).run();
   await recordQuestionEvent(questionId, 'answer_approved', actorUserId, usedAi ? 'ai_draft_reviewed' : 'human_written');
-  const candidate = containsPii(question.bodyOriginal) || containsPii(answer) ? null : generateFaqCandidate(question.bodyOriginal, answer, question.category);
+  // FAQ候補は原文ではなく伏字化済みテキストから作る。相談本文に個人情報が
+  // あっても、伏字化されている以上は候補生成を諦めない。回答本文（職員が
+  // 書いたもの）に個人情報が残っている場合のみ候補生成を見送る。
+  const candidate = containsPii(answer) ? null : generateFaqCandidate(question.bodyMasked, answer, question.category);
   if (!candidate) {
     try { await writeAuditLog('answer_saved', actorUserId, questionId, question.portalId, 'faq_candidate:none'); } catch { /* do not fail a saved answer when logging is unavailable */ }
     return null;

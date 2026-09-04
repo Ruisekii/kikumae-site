@@ -43,3 +43,6 @@ next-env.d.ts
 *.dump
 *.sql.gz
 /backups/
+
+# typescript incremental build output
+tsconfig.tsbuildinfo
