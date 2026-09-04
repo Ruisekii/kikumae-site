@@ -206,6 +206,15 @@ async function ensureAdminState(db: D1Database): Promise<void> {
 }
 
 async function initialise(): Promise<D1Database> {
+  try {
+    return await initialiseDatabase();
+  } catch (error) {
+    console.error('KIKUMAE_INITIALISE_FAILED', error instanceof Error ? error.message : String(error));
+    throw error;
+  }
+}
+
+async function initialiseDatabase(): Promise<D1Database> {
   const db = database();
   const now = Date.now();
   await db.batch([
