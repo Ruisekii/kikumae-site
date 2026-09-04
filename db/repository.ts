@@ -158,53 +158,64 @@ async function initialise(): Promise<D1Database> {
     db.prepare('CREATE INDEX IF NOT EXISTS question_events_type_created_idx ON question_events (event_type, created_at DESC)'),
   ]);
 
-  // Additive migration for the first anonymous-question schema.
-  for (const migration of [
-    "ALTER TABLE faqs ADD COLUMN status TEXT NOT NULL DEFAULT 'published'",
-    'ALTER TABLE faqs ADD COLUMN created_at INTEGER NOT NULL DEFAULT 0',
-    'ALTER TABLE questions ADD COLUMN body_original TEXT',
-    "ALTER TABLE questions ADD COLUMN ai_summary TEXT NOT NULL DEFAULT ''",
-    'ALTER TABLE questions ADD COLUMN summary_edited INTEGER NOT NULL DEFAULT 0',
-    "ALTER TABLE questions ADD COLUMN contact_type TEXT NOT NULL DEFAULT 'anonymous'",
-    'ALTER TABLE questions ADD COLUMN answer_body TEXT',
-    "ALTER TABLE questions ADD COLUMN answer_draft TEXT NOT NULL DEFAULT ''",
-    "ALTER TABLE questions ADD COLUMN answer_alternatives TEXT NOT NULL DEFAULT '[]'",
-    'ALTER TABLE questions ADD COLUMN answer_used_ai INTEGER NOT NULL DEFAULT 0',
-    "ALTER TABLE questions ADD COLUMN answer_grounds TEXT NOT NULL DEFAULT '[]'",
-    'ALTER TABLE questions ADD COLUMN answered_at INTEGER',
-    'ALTER TABLE questions ADD COLUMN check_token_hash TEXT',
-    'ALTER TABLE questions ADD COLUMN check_token_expires_at INTEGER',
-    'ALTER TABLE questions ADD COLUMN submission_key_hash TEXT',
-    'ALTER TABLE faqs ADD COLUMN portal_id INTEGER',
-    'ALTER TABLE questions ADD COLUMN portal_id INTEGER',
-    'ALTER TABLE faq_candidates ADD COLUMN portal_id INTEGER',
-    "ALTER TABLE questions ADD COLUMN workflow_status TEXT NOT NULL DEFAULT 'received'",
-    "ALTER TABLE questions ADD COLUMN title TEXT NOT NULL DEFAULT ''",
-    "ALTER TABLE questions ADD COLUMN location TEXT NOT NULL DEFAULT ''",
-    "ALTER TABLE questions ADD COLUMN people_count TEXT NOT NULL DEFAULT ''",
-    "ALTER TABLE questions ADD COLUMN resource_remaining TEXT NOT NULL DEFAULT ''",
-    "ALTER TABLE questions ADD COLUMN last_received_at TEXT NOT NULL DEFAULT ''",
-    "ALTER TABLE questions ADD COLUMN fact_summary TEXT NOT NULL DEFAULT '[]'",
-    "ALTER TABLE questions ADD COLUMN emotion_summary TEXT NOT NULL DEFAULT ''",
-    "ALTER TABLE questions ADD COLUMN missing_information TEXT NOT NULL DEFAULT '[]'",
-    "ALTER TABLE questions ADD COLUMN urgency_candidate TEXT NOT NULL DEFAULT '低'",
-    "ALTER TABLE questions ADD COLUMN urgency_confirmed TEXT",
-    "ALTER TABLE questions ADD COLUMN urgent_review INTEGER NOT NULL DEFAULT 0",
-    "ALTER TABLE questions ADD COLUMN faq_resolved INTEGER",
-    "ALTER TABLE questions ADD COLUMN faq_id INTEGER",
-    "ALTER TABLE questions ADD COLUMN similar_group_id INTEGER",
-    "ALTER TABLE questions ADD COLUMN assignee_name TEXT NOT NULL DEFAULT ''",
-    "ALTER TABLE questions ADD COLUMN internal_note TEXT NOT NULL DEFAULT ''",
-    "ALTER TABLE questions ADD COLUMN first_confirmed_at INTEGER",
-    "ALTER TABLE questions ADD COLUMN resolved_at INTEGER",
-  ]) await safeRun(db, migration);
-  await safeRun(db, 'ALTER TABLE audit_logs ADD COLUMN portal_id INTEGER');
-  await safeRun(db, 'CREATE INDEX IF NOT EXISTS audit_logs_portal_created_idx ON audit_logs (portal_id, created_at DESC)');
-  await safeRun(db, 'CREATE INDEX IF NOT EXISTS questions_workflow_status_idx ON questions (workflow_status, created_at DESC)');
+  // Additive migrations are guarded by a marker so every public request does
+  // not repeatedly attempt dozens of ALTER TABLE statements against D1.
+  const migrationMarker = await db.prepare("SELECT value FROM schema_meta WHERE key = 'schema_v2' LIMIT 1").first<{ value: string }>();
+  if (migrationMarker?.value !== 'ready') {
+    for (const migration of [
+      "ALTER TABLE faqs ADD COLUMN status TEXT NOT NULL DEFAULT 'published'",
+      'ALTER TABLE faqs ADD COLUMN created_at INTEGER NOT NULL DEFAULT 0',
+      'ALTER TABLE questions ADD COLUMN body_original TEXT',
+      "ALTER TABLE questions ADD COLUMN ai_summary TEXT NOT NULL DEFAULT ''",
+      'ALTER TABLE questions ADD COLUMN summary_edited INTEGER NOT NULL DEFAULT 0',
+      "ALTER TABLE questions ADD COLUMN contact_type TEXT NOT NULL DEFAULT 'anonymous'",
+      'ALTER TABLE questions ADD COLUMN answer_body TEXT',
+      "ALTER TABLE questions ADD COLUMN answer_draft TEXT NOT NULL DEFAULT ''",
+      "ALTER TABLE questions ADD COLUMN answer_alternatives TEXT NOT NULL DEFAULT '[]'",
+      'ALTER TABLE questions ADD COLUMN answer_used_ai INTEGER NOT NULL DEFAULT 0',
+      "ALTER TABLE questions ADD COLUMN answer_grounds TEXT NOT NULL DEFAULT '[]'",
+      'ALTER TABLE questions ADD COLUMN answered_at INTEGER',
+      'ALTER TABLE questions ADD COLUMN check_token_hash TEXT',
+      'ALTER TABLE questions ADD COLUMN check_token_expires_at INTEGER',
+      'ALTER TABLE questions ADD COLUMN submission_key_hash TEXT',
+      'ALTER TABLE faqs ADD COLUMN portal_id INTEGER',
+      'ALTER TABLE questions ADD COLUMN portal_id INTEGER',
+      'ALTER TABLE faq_candidates ADD COLUMN portal_id INTEGER',
+      "ALTER TABLE questions ADD COLUMN workflow_status TEXT NOT NULL DEFAULT 'received'",
+      "ALTER TABLE questions ADD COLUMN title TEXT NOT NULL DEFAULT ''",
+      "ALTER TABLE questions ADD COLUMN location TEXT NOT NULL DEFAULT ''",
+      "ALTER TABLE questions ADD COLUMN people_count TEXT NOT NULL DEFAULT ''",
+      "ALTER TABLE questions ADD COLUMN resource_remaining TEXT NOT NULL DEFAULT ''",
+      "ALTER TABLE questions ADD COLUMN last_received_at TEXT NOT NULL DEFAULT ''",
+      "ALTER TABLE questions ADD COLUMN fact_summary TEXT NOT NULL DEFAULT '[]'",
+      "ALTER TABLE questions ADD COLUMN emotion_summary TEXT NOT NULL DEFAULT ''",
+      "ALTER TABLE questions ADD COLUMN missing_information TEXT NOT NULL DEFAULT '[]'",
+      "ALTER TABLE questions ADD COLUMN urgency_candidate TEXT NOT NULL DEFAULT '低'",
+      "ALTER TABLE questions ADD COLUMN urgency_confirmed TEXT",
+      "ALTER TABLE questions ADD COLUMN urgent_review INTEGER NOT NULL DEFAULT 0",
+      "ALTER TABLE questions ADD COLUMN faq_resolved INTEGER",
+      "ALTER TABLE questions ADD COLUMN faq_id INTEGER",
+      "ALTER TABLE questions ADD COLUMN similar_group_id INTEGER",
+      "ALTER TABLE questions ADD COLUMN assignee_name TEXT NOT NULL DEFAULT ''",
+      "ALTER TABLE questions ADD COLUMN internal_note TEXT NOT NULL DEFAULT ''",
+      "ALTER TABLE questions ADD COLUMN first_confirmed_at INTEGER",
+      "ALTER TABLE questions ADD COLUMN resolved_at INTEGER",
+    ]) await safeRun(db, migration);
+    await safeRun(db, 'ALTER TABLE audit_logs ADD COLUMN portal_id INTEGER');
+    await safeRun(db, 'CREATE INDEX IF NOT EXISTS audit_logs_portal_created_idx ON audit_logs (portal_id, created_at DESC)');
+    await safeRun(db, 'CREATE INDEX IF NOT EXISTS questions_workflow_status_idx ON questions (workflow_status, created_at DESC)');
+    await safeRun(db, 'UPDATE faqs SET created_at = updated_at WHERE created_at = 0');
+    await safeRun(db, 'UPDATE questions SET body_original = body WHERE body_original IS NULL');
+    await db.prepare("INSERT OR REPLACE INTO schema_meta (key, value) VALUES ('schema_v2', 'ready')").run();
+  }
   await ensureFaqIsolationSchema(db);
-  await safeRun(db, 'UPDATE faqs SET created_at = updated_at WHERE created_at = 0');
-  await safeRun(db, 'UPDATE questions SET body_original = body WHERE body_original IS NULL');
-  await db.batch(SEED_FAQS.map((faq) => db.prepare("INSERT OR IGNORE INTO faqs (question, answer, category, status, created_at, updated_at) VALUES (?, ?, ?, 'published', ?, ?)").bind(faq.question, faq.answer, faq.category, now, now)));
+  const seedMarker = await db.prepare("SELECT value FROM schema_meta WHERE key = 'shelter_faq_seed_v1' LIMIT 1").first<{ value: string }>();
+  if (seedMarker?.value !== 'ready') {
+    await db.batch([
+      ...SEED_FAQS.map((faq) => db.prepare("INSERT OR IGNORE INTO faqs (question, answer, category, status, created_at, updated_at) VALUES (?, ?, ?, 'published', ?, ?)").bind(faq.question, faq.answer, faq.category, now, now)),
+      db.prepare("INSERT OR REPLACE INTO schema_meta (key, value) VALUES ('shelter_faq_seed_v1', 'ready')"),
+    ]);
+  }
   await safeRun(db, 'CREATE UNIQUE INDEX IF NOT EXISTS questions_submission_key_unique ON questions (submission_key_hash) WHERE submission_key_hash IS NOT NULL');
   return db;
 }
