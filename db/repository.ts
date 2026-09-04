@@ -6,11 +6,15 @@ import {
   generateLocalSummary,
   generateLocalDraft,
   generateAlternativeDrafts,
+  generateShelterReplyDraft,
+  generateShelterAlternativeDrafts,
   searchFaqs,
   combinedSimilarity,
   generateShelterAnalysis,
   SHELTER_CATEGORIES,
+  isShelterQuestion,
   type ShelterIntake,
+  type ShelterCategory,
 } from './local-ai';
 
 export type Faq = {
@@ -619,7 +623,31 @@ export async function generateAnswerDraft(questionId: number, portalId?: number 
   const question = await getQuestionForAdministrator(questionId, portalId);
   if (!question) throw new Error('質問が見つかりません。');
   if (portalId !== undefined && question.portalId !== portalId) throw new Error('この窓口の質問ではありません。');
-  const related = await listRelatedFaqs(question.aiSummary || question.bodyOriginal, 3, question.portalId);
+  const query = [question.title, question.aiSummary, question.bodyOriginal, question.category].filter(Boolean).join(' ');
+  const related = await listRelatedFaqs(query, 5, question.portalId);
+  const shelterCategory = SHELTER_CATEGORIES.includes(question.category as ShelterCategory)
+    && (question.category !== 'その他' || isShelterQuestion(question.bodyOriginal))
+    ? question.category as ShelterCategory
+    : null;
+  if (shelterCategory) {
+    const shelterRelated = related.filter((faq) => faq.category === shelterCategory);
+    const context = {
+      category: shelterCategory,
+      location: question.location,
+      peopleCount: question.peopleCount,
+      resourceRemaining: question.resourceRemaining,
+      lastReceivedAt: question.lastReceivedAt,
+      emotion: question.emotionSummary,
+      missingInformation: question.missingInformation,
+      urgentReview: question.urgentReview,
+    };
+    return {
+      draft: generateShelterReplyDraft(context, question.bodyOriginal, shelterRelated),
+      alternatives: generateShelterAlternativeDrafts(context, question.bodyOriginal, shelterRelated),
+      grounds: shelterRelated.map((faq) => faq.question),
+      mode: 'local-rules',
+    };
+  }
   return { draft: generateLocalDraft(question.aiSummary || question.bodyOriginal, question.bodyOriginal, related), alternatives: generateAlternativeDrafts(question.aiSummary || question.bodyOriginal, question.bodyOriginal, related), grounds: related.map((faq) => faq.question), mode: 'local-rules' };
 }
 

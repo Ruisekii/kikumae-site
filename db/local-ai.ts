@@ -221,6 +221,82 @@ export function generateLocalDraft(summary: string, original: string, related: A
   return answers;
 }
 
+export type ShelterReplyContext = {
+  category: ShelterCategory;
+  location?: string;
+  peopleCount?: string;
+  resourceRemaining?: string;
+  lastReceivedAt?: string;
+  emotion?: string;
+  missingInformation?: string[];
+  urgentReview?: boolean;
+};
+
+function shelterReplyOpening(category: ShelterCategory, original: string): string {
+  const family = /(子ども|こども|乳児|赤ちゃん)/.test(original) ? 'お子さんもいる中で、' : '';
+  const emotion = /(怒|何回|いい加減|困る|最悪|いつまで)/.test(original)
+    ? '不安や焦りを感じる状況なのですね。'
+    : /(怖|恐|不安|心配|どうしよう|泣|助けて|苦しい|痛い|つらい)/.test(original)
+      ? 'とても心配な状況なのですね。'
+      : 'お困りの状況なのですね。';
+  const topic = category === '水・飲料' ? '飲料水が足りず'
+    : category === '食料・物資' ? '食料や必要な物資が足りず'
+      : category === '医療・薬' ? '体調や薬について心配があり'
+        : category === 'トイレ・衛生' ? 'トイレや衛生面で困っていて'
+          : category === '設備・充電' ? '設備や充電について困っていて'
+            : category === 'ペット' ? 'ペットのことで心配があり'
+              : category === '安全・その他' ? '安全について心配があり'
+                : '避難所で困っていることがあり';
+  return `${topic}、${family}${emotion}`;
+}
+
+function shelterReplyAction(category: ShelterCategory): string {
+  if (category === '水・飲料') return '避難所スタッフが飲料水の配布状況と在庫を確認します。';
+  if (category === '食料・物資') return '避難所スタッフが配布状況と必要な物資を確認します。';
+  if (category === '医療・薬') return '避難所スタッフが体調と必要な支援を確認します。';
+  if (category === 'トイレ・衛生') return '避難所スタッフが利用できる場所と衛生面の状況を確認します。';
+  if (category === '設備・充電') return '避難所スタッフが利用できる設備と案内を確認します。';
+  if (category === 'ペット') return '避難所スタッフが受け入れ場所とルールを確認します。';
+  if (category === '安全・その他') return '避難所スタッフが安全の状況を確認します。';
+  return '避難所スタッフが状況を確認します。';
+}
+
+/**
+ * 避難所相談用の返信案。FAQの回答をそのまま返すだけではなく、
+ * 相談本文の感情を受け止め、分析済みの事実と不足情報をつなげます。
+ * 重要な判断や送信は必ず職員が確認します。
+ */
+export function generateShelterReplyDraft(context: ShelterReplyContext, original: string, related: AiRelatedFaq[]): string {
+  const category = context.category;
+  const lines = [
+    shelterReplyOpening(category, original),
+    'ご相談を受け付けました。',
+    shelterReplyAction(category),
+  ];
+  if (context.location) lines.push(`場所は「${context.location}」として確認します。`);
+  const faq = related.find((item) => item.category === category)?.answer.trim();
+  if (faq) lines.push(faq);
+  const missing = Array.from(new Set(context.missingInformation ?? [])).slice(0, 3);
+  if (missing.length) lines.push(`差し支えなければ、${missing.join('、')}を分かる範囲で教えてください。`);
+  if (context.urgentReview || category === '医療・薬' || category === '安全・その他') {
+    lines.push('体調の急な悪化、けが、火災、暴力など緊急の場合は、返信を待たず近くのスタッフまたは受付へ知らせてください。');
+  } else {
+    lines.push('確認できた内容は、対応状況を更新してお知らせします。');
+  }
+  return lines.join('\n\n');
+}
+
+export function generateShelterAlternativeDrafts(context: ShelterReplyContext, original: string, related: AiRelatedFaq[]): string[] {
+  const base = generateShelterReplyDraft(context, original, related);
+  const short = [
+    shelterReplyOpening(context.category, original),
+    shelterReplyAction(context.category),
+    context.missingInformation?.length ? `確認のため、${context.missingInformation.slice(0, 2).join('、')}を教えてください。` : '確認できた内容は対応状況でお知らせします。',
+    '緊急の場合は、近くのスタッフまたは受付へ直接知らせてください。',
+  ].join('\n\n');
+  return [base, short, '職員が内容を確認してから、対応状況と案内をお知らせします。'];
+}
+
 export function generateAlternativeDrafts(summary: string, original: string, related: AiRelatedFaq[]): string[] {
   const text = original.trim();
   const topic = summary || generateLocalSummary(text);

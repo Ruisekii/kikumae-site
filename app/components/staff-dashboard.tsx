@@ -25,24 +25,43 @@ export function StaffDashboard({ displayName, authorized = false, signOutHref }:
   const [message, setMessage] = useState(authorized ? '相談を読み込んでいます…' : '管理権限を確認しています…');
   const [busy, setBusy] = useState(false);
 
-  const loadQuestions = useCallback(async () => {
-    const response = await fetch('/api/admin/questions?page=1', { cache: 'no-store' });
+  const loadQuestions = useCallback(async ({ silent = false }: { silent?: boolean } = {}) => {
+    const response = await fetch('/api/admin/questions?page=1', {
+      cache: 'no-store',
+      credentials: 'same-origin',
+      headers: { Accept: 'application/json' },
+    });
     const body = await response.json() as { questions?: SubmittedQuestion[]; stats?: ShelterDashboardStats; message?: string };
-    if (!response.ok) { setMessage(body.message ?? '相談一覧を読み込めませんでした。'); return; }
-    setQuestions(body.questions ?? []); setStats(body.stats ?? null); setMessage('');
+    if (!response.ok) {
+      if (response.status === 401) { window.location.assign('/admin'); return; }
+      if (!silent) setMessage(body.message ?? '相談一覧を読み込めませんでした。');
+      return;
+    }
+    setQuestions(body.questions ?? []); setStats(body.stats ?? null);
+    if (!silent) setMessage('相談一覧を更新しました。');
     setSelectedId((current) => current && !(body.questions ?? []).some((question) => question.id === current) ? null : current);
   }, []);
 
   useEffect(() => {
     async function load() {
       if (!authorized) {
-        const claim = await fetch('/api/admin/claim', { method: 'POST' });
+        const claim = await fetch('/api/admin/claim', { method: 'POST', credentials: 'same-origin' });
         if (!claim.ok) { const body = await claim.json() as { message?: string }; setMessage(body.message ?? 'このアカウントには管理権限がありません。'); return; }
       }
       await loadQuestions();
     }
     void load();
   }, [authorized, loadQuestions]);
+
+  useEffect(() => {
+    const refresh = () => {
+      if (document.visibilityState !== 'visible' || busy || selectedId !== null) return;
+      void loadQuestions({ silent: true });
+    };
+    const timer = window.setInterval(refresh, 10000);
+    document.addEventListener('visibilitychange', refresh);
+    return () => { window.clearInterval(timer); document.removeEventListener('visibilitychange', refresh); };
+  }, [busy, loadQuestions, selectedId]);
 
   useEffect(() => {
     if (!message || message.includes('権限') || message.includes('確認しています')) return;
@@ -54,7 +73,7 @@ export function StaffDashboard({ displayName, authorized = false, signOutHref }:
   const visibleQuestions = useMemo(() => caseFilter === 'all' ? questions : questions.filter((question) => question.workflowStatus === caseFilter), [caseFilter, questions]);
 
   function selectQuestion(question: SubmittedQuestion) {
-    setSelectedId(question.id); setAnswerText(question.answerBody ?? question.answerDraft ?? ''); setAnswerUsesAi(!question.answerBody && Boolean(question.answerDraft)); setDrafts((current) => question.answerDraft ? { ...current, [question.id]: current[question.id] ?? { draft: question.answerDraft, grounds: question.answerGrounds, mode: 'local-rules' } } : current); setMessage('');
+    setSelectedId(question.id); setAnswerText(question.answerBody ?? ''); setAnswerUsesAi(false); setDrafts((current) => { const next = { ...current }; delete next[question.id]; return next; }); setMessage('');
   }
 
   function toggleSelection(id: number) {
@@ -72,7 +91,7 @@ export function StaffDashboard({ displayName, authorized = false, signOutHref }:
     if (!window.confirm(`${selectedIds.length}件の相談を削除します。削除した相談は避難者の確認画面からも見られなくなります。よろしいですか？`)) return;
     setBusy(true); setMessage(`${selectedIds.length}件の相談を削除しています…`);
     try {
-      const response = await fetch('/api/admin/questions/bulk', { method: 'DELETE', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ ids: selectedIds }) });
+      const response = await fetch('/api/admin/questions/bulk', { method: 'DELETE', credentials: 'same-origin', headers: { 'Content-Type': 'application/json', Accept: 'application/json' }, body: JSON.stringify({ ids: selectedIds }) });
       const body = await response.json() as { deleted?: number; message?: string };
       if (!response.ok) { setMessage(body.message ?? '相談を削除できませんでした。'); return; }
       if (selectedId && selectedIds.includes(selectedId)) setSelectedId(null);
@@ -82,30 +101,30 @@ export function StaffDashboard({ displayName, authorized = false, signOutHref }:
 
   async function generateDraft() {
     if (!selected) return; setBusy(true); setMessage('承認済みFAQを根拠に回答案を作っています…');
-    try { const response = await fetch(`/api/admin/questions/${selected.id}/draft`, { method: 'POST' }); const body = await response.json() as Draft & { message?: string }; if (!response.ok) { setMessage(body.message ?? '回答案を生成できませんでした。'); return; } setDrafts((current) => ({ ...current, [selected.id]: body })); setAnswerText(body.draft); setAnswerUsesAi(true); setMessage(''); }
+    try { const response = await fetch(`/api/admin/questions/${selected.id}/draft`, { method: 'POST', credentials: 'same-origin', headers: { Accept: 'application/json' } }); const body = await response.json() as Draft & { message?: string }; if (!response.ok) { if (response.status === 401) { window.location.assign('/admin'); return; } setMessage(body.message ?? '回答案を生成できませんでした。'); return; } setDrafts((current) => ({ ...current, [selected.id]: body })); setAnswerText(body.draft); setAnswerUsesAi(true); setMessage('相談内容に合わせた返信案を作成しました。'); }
     catch { setMessage('回答案の生成に失敗しました。'); } finally { setBusy(false); }
   }
 
   async function approveAnswer() {
     if (!selected || !answerText.trim()) return; setBusy(true); setMessage('確認済みの返信を保存しています…');
-    try { const response = await fetch(`/api/admin/questions/${selected.id}/answer`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ body: answerText, usedAi: answerUsesAi, grounds: drafts[selected.id]?.grounds ?? [] }) }); const body = await response.json() as { message?: string }; if (!response.ok) { setMessage(body.message ?? '返信を保存できませんでした。'); return; } await loadQuestions(); setMessage('返信を保存し、解決済みにしました。'); }
+    try { const response = await fetch(`/api/admin/questions/${selected.id}/answer`, { method: 'POST', credentials: 'same-origin', headers: { 'Content-Type': 'application/json', Accept: 'application/json' }, body: JSON.stringify({ body: answerText, usedAi: answerUsesAi, grounds: drafts[selected.id]?.grounds ?? [] }) }); const body = await response.json() as { message?: string }; if (!response.ok) { if (response.status === 401) { window.location.assign('/admin'); return; } setMessage(body.message ?? '返信を保存できませんでした。'); return; } await loadQuestions(); setMessage('返信を保存し、解決済みにしました。'); }
     catch { setMessage('返信の保存に失敗しました。'); } finally { setBusy(false); }
   }
 
   async function updateWorkflow(status: string, messageText: string, isPublic: boolean, assigneeName: string, urgencyConfirmed: string, internalNote: string) {
     if (!selected) return; setBusy(true); setMessage('相談の状態を更新しています…');
-    try { const response = await fetch(`/api/admin/questions/${selected.id}/status`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ status, message: messageText, isPublic, assigneeName, urgencyConfirmed, internalNote }) }); const body = await response.json() as { message?: string }; if (!response.ok) { setMessage(body.message ?? '状態を更新できませんでした。'); return; } await loadQuestions(); setMessage('相談の対応状況を更新しました。'); }
+    try { const response = await fetch(`/api/admin/questions/${selected.id}/status`, { method: 'POST', credentials: 'same-origin', headers: { 'Content-Type': 'application/json', Accept: 'application/json' }, body: JSON.stringify({ status, message: messageText, isPublic, assigneeName, urgencyConfirmed, internalNote }) }); const body = await response.json() as { message?: string }; if (!response.ok) { if (response.status === 401) { window.location.assign('/admin'); return; } setMessage(body.message ?? '状態を更新できませんでした。'); return; } await loadQuestions(); setMessage('相談の対応状況を更新しました。'); }
     catch { setMessage('状態の更新に失敗しました。'); } finally { setBusy(false); }
   }
 
   async function recordOriginalViewed() {
     if (!selected) return;
-    void fetch(`/api/admin/questions/${selected.id}/events`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ event: 'original_opened' }) });
+    void fetch(`/api/admin/questions/${selected.id}/events`, { method: 'POST', credentials: 'same-origin', headers: { 'Content-Type': 'application/json', Accept: 'application/json' }, body: JSON.stringify({ event: 'original_opened' }) });
   }
 
   async function candidateAction(candidate: FaqCandidate, action: string, qText: string, aText: string, category: string) {
     if (!selected) return; setBusy(true); setMessage('FAQ候補を更新しています…');
-    try { const response = await fetch(`/api/admin/candidates/${candidate.id}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action, qText, aText, category }) }); const body = await response.json() as { message?: string }; if (!response.ok) { setMessage(body.message ?? 'FAQ候補を更新できませんでした。'); return; } await loadQuestions(); setMessage(action === 'publish_edited' ? 'FAQ候補を承認し、公開FAQに追加しました。' : 'FAQ候補を更新しました。'); }
+    try { const response = await fetch(`/api/admin/candidates/${candidate.id}`, { method: 'POST', credentials: 'same-origin', headers: { 'Content-Type': 'application/json', Accept: 'application/json' }, body: JSON.stringify({ action, qText, aText, category }) }); const body = await response.json() as { message?: string }; if (!response.ok) { if (response.status === 401) { window.location.assign('/admin'); return; } setMessage(body.message ?? 'FAQ候補を更新できませんでした。'); return; } await loadQuestions(); setMessage(action === 'publish_edited' ? 'FAQ候補を承認し、公開FAQに追加しました。' : 'FAQ候補を更新しました。'); }
     catch { setMessage('FAQ候補の更新に失敗しました。'); } finally { setBusy(false); }
   }
 
