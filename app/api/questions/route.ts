@@ -47,6 +47,7 @@ export async function POST(request: Request): Promise<Response> {
     return Response.json({ id: question.id, checkUrl: `${new URL(request.url).origin}/questions/${question.checkToken}`, message: '質問を受け付けました。管理者が確認します。' }, { status: 201, headers: { 'Cache-Control': 'no-store' } });
   } catch (error) {
     if (error instanceof Error && error.message === 'QUESTION_DUPLICATE') return json('この質問はすでに受け付けています。回答の確認URLをご確認ください。', 409);
+    console.error('KIKUMAE_QUESTION_CREATE_FAILED', error instanceof Error ? error.message : String(error));
     return json('質問を保存できませんでした。', 400);
   }
 }
