@@ -1,5 +1,5 @@
-import { getChatGPTUser } from '../../../../../chatgpt-auth';
-import { generateAnswerDraft, isAdministrator } from '../../../../../../db/repository';
+import { getAdminUser } from '../../../../../admin-auth';
+import { generateAnswerDraft } from '../../../../../../db/repository';
 
 export const runtime = 'edge';
 
@@ -10,9 +10,7 @@ function sameOrigin(request: Request): boolean {
 
 export async function POST(request: Request, { params }: { params: Promise<{ id: string }> }): Promise<Response> {
   if (!sameOrigin(request)) return Response.json({ message: 'この送信元は許可されていません。' }, { status: 403 });
-  const user = await getChatGPTUser();
-  if (!user) return Response.json({ message: '管理画面はChatGPTアカウントで認証してください。' }, { status: 401 });
-  if (!(await isAdministrator(user.userId))) return Response.json({ message: 'このアカウントには管理権限がありません。' }, { status: 403 });
+  if (!await getAdminUser()) return Response.json({ message: '管理者用パスワードでログインしてください。' }, { status: 401 });
   const id = Number((await params).id);
   if (!Number.isInteger(id) || id <= 0) return Response.json({ message: '質問IDが正しくありません。' }, { status: 400 });
   try {

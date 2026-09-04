@@ -1,5 +1,5 @@
-import { getChatGPTUser } from '../../../../chatgpt-auth';
-import { deleteFaq, isAdministrator, updateFaq } from '../../../../../db/repository';
+import { getAdminUser } from '../../../../admin-auth';
+import { deleteFaq, updateFaq } from '../../../../../db/repository';
 import { readRequestText } from '../../../../../db/request-guard';
 
 export const runtime = 'edge';
@@ -11,8 +11,8 @@ function sameOrigin(request: Request): boolean {
 }
 
 async function authorized(): Promise<{ userId: string } | null> {
-  const user = await getChatGPTUser();
-  if (!user || !(await isAdministrator(user.userId))) return null;
+  const user = await getAdminUser();
+  if (!user) return null;
   return { userId: user.userId };
 }
 
