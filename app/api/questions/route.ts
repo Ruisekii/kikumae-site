@@ -1,5 +1,6 @@
 import { createQuestion } from '../../../db/repository';
 import { containsPii } from '../../../db/local-ai';
+import type { ShelterIntake } from '../../../db/local-ai';
 import { allowBurstShared, readRequestText } from '../../../db/request-guard';
 
 export const runtime = 'edge';
@@ -32,13 +33,20 @@ export async function POST(request: Request): Promise<Response> {
   const summary = typeof data.summary === 'string' ? data.summary.trim() : '';
   const category = typeof data.category === 'string' ? data.category.trim() : '';
   const submissionKey = typeof data.submissionKey === 'string' ? data.submissionKey.trim().slice(0, 128) : '';
+  const rawIntake = (data.intake && typeof data.intake === 'object') ? data.intake as Record<string, unknown> : {};
+  const intake: ShelterIntake = {
+    location: typeof rawIntake.location === 'string' ? rawIntake.location : '',
+    peopleCount: typeof rawIntake.peopleCount === 'string' ? rawIntake.peopleCount : '',
+    resourceRemaining: typeof rawIntake.resourceRemaining === 'string' ? rawIntake.resourceRemaining : '',
+    lastReceivedAt: typeof rawIntake.lastReceivedAt === 'string' ? rawIntake.lastReceivedAt : '',
+  };
   if (!body || body.length > MAX_QUESTION_CHARS) return json('質問は1〜500文字で入力してください。', 400);
   if (containsPii(body)) return json('個人情報やURLは保存できません。内容を取り除いてから送信してください。', 400);
   if (summary.length > 300) return json('要約は300文字以内で入力してください。', 400);
   if (summary && containsPii(summary)) return json('要約にも個人情報やURLは含められません。', 400);
 
   try {
-    const question = await createQuestion(body, summary, category, null, submissionKey);
+    const question = await createQuestion(body, summary, category, null, submissionKey, intake);
     return Response.json({ id: question.id, checkUrl: `${new URL(request.url).origin}/questions/${question.checkToken}`, message: '質問を受け付けました。管理者が確認します。' }, { status: 201, headers: { 'Cache-Control': 'no-store' } });
   } catch (error) {
     if (error instanceof Error && error.message === 'QUESTION_DUPLICATE') return json('この質問はすでに受け付けています。回答の確認URLをご確認ください。', 409);

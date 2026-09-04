@@ -1,5 +1,5 @@
 import { listRelatedFaqs } from '../../../../db/repository';
-import { categorizeQuestion, containsPii, generateLocalSummary } from '../../../../db/local-ai';
+import { categorizeShelterQuestion, containsPii, generateShelterAnalysis, shelterFollowUp, type ShelterIntake } from '../../../../db/local-ai';
 import { allowBurstShared, readRequestText } from '../../../../db/request-guard';
 
 export const runtime = 'edge';
@@ -22,10 +22,13 @@ export async function POST(request: Request): Promise<Response> {
   try {
     const payload = JSON.parse(await readRequestText(request, MAX_REQUEST_BYTES)) as Record<string, unknown>;
     const body = typeof payload.body === 'string' ? payload.body.trim() : '';
+    const intake = (payload.intake && typeof payload.intake === 'object') ? payload.intake as ShelterIntake : {};
     if (!body || body.length > MAX_QUESTION_CHARS) return json({ message: '質問は1〜500文字で入力してください。' }, 400);
     if (containsPii(body)) return json({ message: '個人情報やURLは入力できません。該当箇所を削除してください。' }, 400);
+    const analysis = generateShelterAnalysis(body, intake);
     const related = await listRelatedFaqs(body, 3);
-    return json({ body, summary: generateLocalSummary(body), category: categorizeQuestion(body), related, aiMode: 'local-rules' });
+    const followUpKey = analysis.missingInformation[0] ?? '';
+    return json({ body, summary: analysis.overview, category: categorizeShelterQuestion(body), analysis, related, followUp: followUpKey ? shelterFollowUp(followUpKey, analysis.category) : null, aiMode: 'local-rules' });
   } catch (error) {
     if (error instanceof Error && error.message === 'REQUEST_BODY_TOO_LARGE') return json({ message: '質問は500文字以内で入力してください。' }, 413);
     return json({ message: '入力形式が正しくありません。' }, 400);

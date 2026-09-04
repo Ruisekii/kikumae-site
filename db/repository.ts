@@ -7,6 +7,9 @@ import {
   generateLocalDraft,
   generateAlternativeDrafts,
   searchFaqs,
+  combinedSimilarity,
+  generateShelterAnalysis,
+  type ShelterIntake,
 } from './local-ai';
 
 export type Faq = {
@@ -20,6 +23,23 @@ export type Faq = {
 };
 
 export type RelatedFaq = Faq & { score: number };
+
+export type CaseUpdate = {
+  id: number;
+  status: string;
+  message: string;
+  isPublic: boolean;
+  createdAt: number;
+};
+
+export type SimilarQuestion = {
+  id: number;
+  title: string;
+  category: string;
+  location: string;
+  workflowStatus: string;
+  createdAt: number;
+};
 
 export type FaqCandidate = {
   id: number;
@@ -47,19 +67,49 @@ export type SubmittedQuestion = {
   answerGrounds: string[];
   answeredAt: number | null;
   portalId: number | null;
+  workflowStatus: string;
+  title: string;
+  location: string;
+  peopleCount: string;
+  resourceRemaining: string;
+  lastReceivedAt: string;
+  factSummary: string[];
+  emotionSummary: string;
+  missingInformation: string[];
+  urgencyCandidate: string;
+  urgencyConfirmed: string | null;
+  urgentReview: boolean;
+  faqResolved: boolean | null;
+  similarGroupId: number | null;
+  similarGroupTitle: string;
+  similarCount: number;
+  assigneeName: string;
+  internalNote: string;
+  firstConfirmedAt: number | null;
+  resolvedAt: number | null;
+  updates: CaseUpdate[];
+  similarQuestions: SimilarQuestion[];
   candidate: FaqCandidate | null;
   checkToken?: string;
+};
+
+export type ShelterDashboardStats = {
+  counts: Record<string, number>;
+  categoryCounts: { category: string; count: number }[];
+  urgent: SubmittedQuestion[];
+  surge: { category: string; count: number } | null;
 };
 
 export type AuditLog = { action: string; actorUserId: string | null; createdAt: number };
 
 
 const SEED_FAQS: Omit<Faq, 'id' | 'status' | 'createdAt' | 'updatedAt'>[] = [
-  { question: '見学は予約なしでも可能ですか？', answer: '予約なしでも見学できます。事前に連絡していただけると、案内がよりスムーズです。', category: '見学・参加方法' },
-  { question: '初心者でも参加できますか？', answer: 'はい。初心者・未経験者も歓迎です。最初は無理のない作業から始められます。', category: '初心者向け' },
-  { question: '活動日はいつですか？', answer: '通常活動は火曜日と木曜日の放課後です。大会前は活動日が増える場合があります。', category: '活動内容' },
-  { question: '部費はいくらですか？', answer: '部費は月額500円です。大会遠征時には別途交通費がかかる場合があります。', category: '部費・持ち物' },
-  { question: '一人で見学に行っても大丈夫ですか？', answer: 'もちろん大丈夫です。一人で来る方も多いので、気軽にお越しください。', category: '見学・参加方法' },
+  { question: '飲料水はどこで受け取れますか？', answer: '避難所の受付または物資配布場所で案内しています。配布場所や時間が分からない場合は、近くのスタッフへ声をかけてください。', category: '水・飲料' },
+  { question: '食料や物資の配布はいつですか？', answer: '配布の時間と場所は、避難所内の掲示とスタッフから案内します。数が足りない場合は、世帯の人数をスタッフへ伝えてください。', category: '食料・物資' },
+  { question: '薬が必要なときはどうすればいいですか？', answer: '受付または近くのスタッフへ、必要な薬と体調を伝えてください。緊急の場合は、すぐにスタッフへ知らせてください。', category: '医療・薬' },
+  { question: 'トイレや手洗いの場所を教えてください', answer: '避難所内の案内表示を確認してください。見つからない場合は、受付で場所を案内します。', category: 'トイレ・衛生' },
+  { question: 'スマートフォンを充電できる場所はありますか？', answer: '充電場所の有無と利用方法は、受付または掲示で案内しています。順番や時間のルールがある場合は、現地の案内に従ってください。', category: '設備・充電' },
+  { question: 'ペットと一緒に避難できますか？', answer: 'ペットの受け入れ場所やルールは避難所ごとに異なります。受付で確認し、案内された場所で過ごしてください。', category: 'ペット' },
 ];
 
 function database(): D1Database {
@@ -97,9 +147,14 @@ async function initialise(): Promise<D1Database> {
     db.prepare('CREATE TABLE IF NOT EXISTS admin_state (singleton INTEGER PRIMARY KEY CHECK (singleton = 1), user_id TEXT NOT NULL, created_at INTEGER NOT NULL)'),
     db.prepare("CREATE TABLE IF NOT EXISTS faq_candidates (id INTEGER PRIMARY KEY AUTOINCREMENT, question_id INTEGER NOT NULL, q_text TEXT NOT NULL, a_text TEXT NOT NULL, category TEXT NOT NULL, status TEXT NOT NULL DEFAULT 'pending', created_at INTEGER NOT NULL)"),
     db.prepare("CREATE TABLE IF NOT EXISTS audit_logs (id INTEGER PRIMARY KEY AUTOINCREMENT, actor_user_id TEXT, action TEXT NOT NULL, question_id INTEGER, portal_id INTEGER, detail TEXT NOT NULL DEFAULT '', created_at INTEGER NOT NULL)"),
+    db.prepare("CREATE TABLE IF NOT EXISTS case_updates (id INTEGER PRIMARY KEY AUTOINCREMENT, question_id INTEGER NOT NULL, status TEXT NOT NULL, message TEXT NOT NULL DEFAULT '', is_public INTEGER NOT NULL DEFAULT 1, actor_user_id TEXT, created_at INTEGER NOT NULL)"),
+    db.prepare("CREATE TABLE IF NOT EXISTS similar_groups (id INTEGER PRIMARY KEY AUTOINCREMENT, title TEXT NOT NULL, category TEXT NOT NULL, location TEXT NOT NULL DEFAULT '', created_at INTEGER NOT NULL, updated_at INTEGER NOT NULL)"),
+    db.prepare("CREATE TABLE IF NOT EXISTS question_events (id INTEGER PRIMARY KEY AUTOINCREMENT, question_id INTEGER, event_type TEXT NOT NULL, actor_user_id TEXT, detail TEXT NOT NULL DEFAULT '', created_at INTEGER NOT NULL)"),
     db.prepare("CREATE TABLE IF NOT EXISTS schema_meta (key TEXT PRIMARY KEY, value TEXT NOT NULL)"),
     db.prepare('CREATE INDEX IF NOT EXISTS questions_created_at_idx ON questions (created_at DESC)'),
     db.prepare('CREATE INDEX IF NOT EXISTS faq_candidates_status_idx ON faq_candidates (status, created_at DESC)'),
+    db.prepare('CREATE INDEX IF NOT EXISTS case_updates_question_created_idx ON case_updates (question_id, created_at ASC)'),
+    db.prepare('CREATE INDEX IF NOT EXISTS question_events_type_created_idx ON question_events (event_type, created_at DESC)'),
   ]);
 
   // Additive migration for the first anonymous-question schema.
@@ -122,9 +177,29 @@ async function initialise(): Promise<D1Database> {
     'ALTER TABLE faqs ADD COLUMN portal_id INTEGER',
     'ALTER TABLE questions ADD COLUMN portal_id INTEGER',
     'ALTER TABLE faq_candidates ADD COLUMN portal_id INTEGER',
+    "ALTER TABLE questions ADD COLUMN workflow_status TEXT NOT NULL DEFAULT 'received'",
+    "ALTER TABLE questions ADD COLUMN title TEXT NOT NULL DEFAULT ''",
+    "ALTER TABLE questions ADD COLUMN location TEXT NOT NULL DEFAULT ''",
+    "ALTER TABLE questions ADD COLUMN people_count TEXT NOT NULL DEFAULT ''",
+    "ALTER TABLE questions ADD COLUMN resource_remaining TEXT NOT NULL DEFAULT ''",
+    "ALTER TABLE questions ADD COLUMN last_received_at TEXT NOT NULL DEFAULT ''",
+    "ALTER TABLE questions ADD COLUMN fact_summary TEXT NOT NULL DEFAULT '[]'",
+    "ALTER TABLE questions ADD COLUMN emotion_summary TEXT NOT NULL DEFAULT ''",
+    "ALTER TABLE questions ADD COLUMN missing_information TEXT NOT NULL DEFAULT '[]'",
+    "ALTER TABLE questions ADD COLUMN urgency_candidate TEXT NOT NULL DEFAULT '低'",
+    "ALTER TABLE questions ADD COLUMN urgency_confirmed TEXT",
+    "ALTER TABLE questions ADD COLUMN urgent_review INTEGER NOT NULL DEFAULT 0",
+    "ALTER TABLE questions ADD COLUMN faq_resolved INTEGER",
+    "ALTER TABLE questions ADD COLUMN faq_id INTEGER",
+    "ALTER TABLE questions ADD COLUMN similar_group_id INTEGER",
+    "ALTER TABLE questions ADD COLUMN assignee_name TEXT NOT NULL DEFAULT ''",
+    "ALTER TABLE questions ADD COLUMN internal_note TEXT NOT NULL DEFAULT ''",
+    "ALTER TABLE questions ADD COLUMN first_confirmed_at INTEGER",
+    "ALTER TABLE questions ADD COLUMN resolved_at INTEGER",
   ]) await safeRun(db, migration);
   await safeRun(db, 'ALTER TABLE audit_logs ADD COLUMN portal_id INTEGER');
   await safeRun(db, 'CREATE INDEX IF NOT EXISTS audit_logs_portal_created_idx ON audit_logs (portal_id, created_at DESC)');
+  await safeRun(db, 'CREATE INDEX IF NOT EXISTS questions_workflow_status_idx ON questions (workflow_status, created_at DESC)');
   await ensureFaqIsolationSchema(db);
   await safeRun(db, 'UPDATE faqs SET created_at = updated_at WHERE created_at = 0');
   await safeRun(db, 'UPDATE questions SET body_original = body WHERE body_original IS NULL');
@@ -172,6 +247,11 @@ function parseGrounds(value: string | null): string[] {
 function parseAlternatives(value: string | null): string[] {
   if (!value) return [];
   try { const parsed = JSON.parse(value) as unknown; return Array.isArray(parsed) ? parsed.filter((item): item is string => typeof item === 'string').slice(0, 3) : []; } catch { return []; }
+}
+
+function parseStringList(value: string | null): string[] {
+  if (!value) return [];
+  try { const parsed = JSON.parse(value) as unknown; return Array.isArray(parsed) ? parsed.filter((item): item is string => typeof item === 'string').slice(0, 12) : []; } catch { return []; }
 }
 
 async function hashCheckToken(token: string): Promise<string> {
@@ -296,7 +376,7 @@ export async function listRelatedFaqs(query: string, limit = 3, portalId: number
   return searchFaqs(query, await listPublishedFaqs(portalId), limit);
 }
 
-export async function createQuestion(body: string, requestedSummary = '', requestedCategory = '', portalId: number | null = null, submissionKey = ''): Promise<SubmittedQuestion> {
+export async function createQuestion(body: string, requestedSummary = '', requestedCategory = '', portalId: number | null = null, submissionKey = '', intake: ShelterIntake = {}): Promise<SubmittedQuestion> {
   const db = await initialise();
   const createdAt = Date.now();
   const submissionKeyHash = submissionKey ? await hashCheckToken(submissionKey) : null;
@@ -304,7 +384,8 @@ export async function createQuestion(body: string, requestedSummary = '', reques
     const duplicate = await db.prepare('SELECT id FROM questions WHERE submission_key_hash = ? LIMIT 1').bind(submissionKeyHash).first<{ id: number }>();
     if (duplicate) throw new Error('QUESTION_DUPLICATE');
   }
-  const canonicalSummary = generateLocalSummary(body);
+  const shelterAnalysis = portalId === null ? generateShelterAnalysis(body, intake) : null;
+  const canonicalSummary = shelterAnalysis?.overview ?? generateLocalSummary(body);
   const aiSummary = requestedSummary.trim().slice(0, 300) || canonicalSummary;
   const category = categorizeQuestion(body, requestedCategory);
   const related = await listRelatedFaqs(aiSummary || body, 3, portalId);
@@ -315,13 +396,87 @@ export async function createQuestion(body: string, requestedSummary = '', reques
   // check a private question to 30 days.  Legacy rows without an expiry remain
   // readable so existing users are not broken during migration.
   const checkTokenExpiresAt = createdAt + 30 * 24 * 60 * 60 * 1000;
-  const result = await db.prepare("INSERT INTO questions (body, body_original, ai_summary, summary_edited, category, status, contact_type, answer_draft, answer_alternatives, answer_grounds, portal_id, check_token_hash, check_token_expires_at, submission_key_hash, created_at) VALUES (?, ?, ?, ?, ?, 'open', 'anonymous', ?, ?, ?, ?, ?, ?, ?, ?)").bind(body, body, aiSummary, aiSummary !== canonicalSummary ? 1 : 0, category, draft, JSON.stringify(alternatives), JSON.stringify(related.map((faq) => faq.question)), portalId, await hashCheckToken(checkToken), checkTokenExpiresAt, submissionKeyHash, createdAt).run();
+  const analysis = shelterAnalysis ?? generateShelterAnalysis(body, intake);
+  const result = await db.prepare("INSERT INTO questions (body, body_original, ai_summary, summary_edited, category, status, workflow_status, title, location, people_count, resource_remaining, last_received_at, fact_summary, emotion_summary, missing_information, urgency_candidate, urgent_review, contact_type, answer_draft, answer_alternatives, answer_grounds, portal_id, check_token_hash, check_token_expires_at, submission_key_hash, created_at) VALUES (?, ?, ?, ?, ?, 'open', 'received', ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'anonymous', ?, ?, ?, ?, ?, ?, ?, ?)").bind(body, body, aiSummary, aiSummary !== canonicalSummary ? 1 : 0, category, analysis.title, analysis.location, analysis.peopleCount, analysis.resourceRemaining, analysis.lastReceivedAt, JSON.stringify(analysis.facts), analysis.emotion, JSON.stringify(analysis.missingInformation), analysis.urgencyCandidate, analysis.urgentReview ? 1 : 0, draft, JSON.stringify(alternatives), JSON.stringify(related.map((faq) => faq.question)), portalId, await hashCheckToken(checkToken), checkTokenExpiresAt, submissionKeyHash, createdAt).run();
   const id = Number(result.meta.last_row_id);
+  await db.prepare("INSERT INTO case_updates (question_id, status, message, is_public, actor_user_id, created_at) VALUES (?, 'received', ?, 1, NULL, ?)").bind(id, '相談を受け付けました。避難所スタッフが内容を確認します。', createdAt).run();
+  await recordQuestionEvent(id, 'question_received', null, '相談受付');
+  if (portalId === null) await assignSimilarGroup(db, id, analysis, createdAt);
   return {
     id, body, bodyOriginal: body, aiSummary, summaryEdited: aiSummary !== canonicalSummary,
     category, status: 'open', createdAt, answerBody: null, answerDraft: draft, answerAlternatives: alternatives, answerUsedAi: false,
-    answerGrounds: related.map((faq) => faq.question), answeredAt: null, portalId, candidate: null, checkToken,
+    answerGrounds: related.map((faq) => faq.question), answeredAt: null, portalId, workflowStatus: 'received', title: analysis.title,
+    location: analysis.location, peopleCount: analysis.peopleCount, resourceRemaining: analysis.resourceRemaining, lastReceivedAt: analysis.lastReceivedAt,
+    factSummary: analysis.facts, emotionSummary: analysis.emotion, missingInformation: analysis.missingInformation, urgencyCandidate: analysis.urgencyCandidate,
+    urgencyConfirmed: null, urgentReview: analysis.urgentReview, faqResolved: null, similarGroupId: null, similarGroupTitle: '', similarCount: 0,
+    assigneeName: '', internalNote: '', firstConfirmedAt: null, resolvedAt: null, updates: [{ id: 0, status: 'received', message: '相談を受け付けました。避難所スタッフが内容を確認します。', isPublic: true, createdAt }], similarQuestions: [], candidate: null, checkToken,
   };
+}
+
+async function assignSimilarGroup(db: D1Database, questionId: number, analysis: ReturnType<typeof generateShelterAnalysis>, now: number): Promise<number | null> {
+  const result = await db.prepare("SELECT id, body, ai_summary, category, location, similar_group_id FROM questions WHERE portal_id IS NULL AND id != ? AND created_at > ? ORDER BY created_at DESC LIMIT 80").bind(questionId, now - 7 * 24 * 60 * 60 * 1000).all<Record<string, unknown>>();
+  const candidate = (result.results ?? []).find((row) => {
+    const samePlace = analysis.location && String(row.location ?? '') && analysis.location === String(row.location ?? '');
+    const sameCategory = analysis.category !== 'その他' && analysis.category === String(row.category ?? '');
+    const score = combinedSimilarity(analysis.overview, String(row.ai_summary ?? row.body ?? ''));
+    return Boolean((samePlace && sameCategory) || score >= 0.52 || (sameCategory && score >= 0.35));
+  });
+  if (!candidate) return null;
+  let groupId = candidate.similar_group_id == null ? null : Number(candidate.similar_group_id);
+  if (!groupId) {
+    const group = await db.prepare('INSERT INTO similar_groups (title, category, location, created_at, updated_at) VALUES (?, ?, ?, ?, ?)').bind(analysis.title, analysis.category, analysis.location, now, now).run();
+    groupId = Number(group.meta.last_row_id);
+    await db.prepare('UPDATE questions SET similar_group_id = ? WHERE id = ?').bind(groupId, Number(candidate.id)).run();
+  }
+  await db.prepare('UPDATE questions SET similar_group_id = ? WHERE id = ?').bind(groupId, questionId).run();
+  await db.prepare('UPDATE similar_groups SET updated_at = ? WHERE id = ?').bind(now, groupId).run();
+  return groupId;
+}
+
+export async function recordQuestionEvent(questionId: number | null, eventType: string, actorUserId: string | null = null, detail = ''): Promise<void> {
+  const db = await initialise();
+  await db.prepare('INSERT INTO question_events (question_id, event_type, actor_user_id, detail, created_at) VALUES (?, ?, ?, ?, ?)').bind(questionId, eventType.slice(0, 64), await auditActorId(actorUserId), detail.slice(0, 500), Date.now()).run();
+}
+
+export async function recordFaqSelfResolved(faqId: number | null, query: string): Promise<void> {
+  await writeAuditLog('faq_self_resolved', null, null, null, `faq:${faqId ?? 'none'} query:${query.trim().slice(0, 80)}`);
+  await recordQuestionEvent(null, 'faq_self_resolved', null, `faq:${faqId ?? 'none'}`);
+}
+
+export async function updateQuestionWorkflow(questionId: number, workflowStatus: string, message: string, isPublic: boolean, assigneeName: string, urgencyConfirmed: string, internalNote: string, actorUserId: string): Promise<SubmittedQuestion> {
+  const allowed = new Set(['received', 'reviewing', 'in_progress', 'awaiting_info', 'resolved']);
+  if (!allowed.has(workflowStatus)) throw new Error('STATUS_INVALID');
+  const db = await initialise();
+  const question = await getQuestionForAdministrator(questionId, null);
+  if (!question) throw new Error('質問が見つかりません。');
+  const now = Date.now();
+  const firstConfirmedAt = question.firstConfirmedAt ?? (workflowStatus !== 'received' ? now : null);
+  const resolvedAt = workflowStatus === 'resolved' ? (question.resolvedAt ?? now) : null;
+  const scope = ' AND portal_id IS NULL';
+  const update = await db.prepare(`UPDATE questions SET workflow_status = ?, assignee_name = ?, urgency_confirmed = ?, internal_note = ?, first_confirmed_at = COALESCE(first_confirmed_at, ?), resolved_at = ? WHERE id = ?${scope}`).bind(workflowStatus, assigneeName.trim().slice(0, 120), urgencyConfirmed.trim().slice(0, 8) || null, internalNote.trim().slice(0, 2000), firstConfirmedAt, resolvedAt, questionId).run();
+  if (Number(update.meta.changes ?? 0) !== 1) throw new Error('質問を更新できませんでした。');
+  const publicMessage = message.trim().slice(0, 500);
+  if (publicMessage || isPublic) await db.prepare('INSERT INTO case_updates (question_id, status, message, is_public, actor_user_id, created_at) VALUES (?, ?, ?, ?, ?, ?)').bind(questionId, workflowStatus, publicMessage, isPublic ? 1 : 0, await auditActorId(actorUserId), now).run();
+  await recordQuestionEvent(questionId, 'status_changed', actorUserId, `${workflowStatus}:${isPublic ? 'public' : 'internal'}`);
+  await writeAuditLog('workflow_updated', actorUserId, questionId, null, workflowStatus);
+  return (await getQuestionForAdministrator(questionId, null))!;
+}
+
+export async function recordOriginalViewed(questionId: number, actorUserId: string): Promise<void> {
+  await recordQuestionEvent(questionId, 'original_opened', actorUserId);
+  await writeAuditLog('original_opened', actorUserId, questionId, null, '原文タブを表示');
+}
+
+export async function getShelterDashboardStats(): Promise<ShelterDashboardStats> {
+  const db = await initialise();
+  const countsResult = await db.prepare("SELECT workflow_status, COUNT(*) AS count FROM questions WHERE portal_id IS NULL GROUP BY workflow_status").all<Record<string, unknown>>();
+  const categoryResult = await db.prepare("SELECT category, COUNT(*) AS count FROM questions WHERE portal_id IS NULL GROUP BY category ORDER BY count DESC").all<Record<string, unknown>>();
+  const urgentResult = await db.prepare(`${QUESTION_SELECT} WHERE q.portal_id IS NULL AND (q.urgent_review = 1 OR q.urgency_confirmed = '高') AND q.workflow_status != 'resolved' ORDER BY q.created_at DESC LIMIT 8`).all<Record<string, unknown>>();
+  const surgeResult = await db.prepare("SELECT category, COUNT(*) AS count FROM questions WHERE portal_id IS NULL AND created_at > ? GROUP BY category ORDER BY count DESC LIMIT 1").bind(Date.now() - 30 * 60 * 1000).first<Record<string, unknown>>();
+  const urgent = await Promise.all((urgentResult.results ?? []).map((row) => hydrateQuestion(db, mapQuestion(row))));
+  const counts: Record<string, number> = { received: 0, reviewing: 0, in_progress: 0, awaiting_info: 0, resolved: 0 };
+  (countsResult.results ?? []).forEach((row) => { counts[String(row.workflow_status ?? 'received')] = Number(row.count ?? 0); });
+  return { counts, categoryCounts: (categoryResult.results ?? []).map((row) => ({ category: String(row.category ?? 'その他'), count: Number(row.count ?? 0) })), urgent, surge: surgeResult ? { category: String(surgeResult.category ?? 'その他'), count: Number(surgeResult.count ?? 0) } : null };
 }
 
 export async function claimAdministrator(userId: string): Promise<boolean> {
@@ -368,13 +523,43 @@ function mapQuestion(row: Record<string, unknown>): SubmittedQuestion {
     answerAlternatives: parseAlternatives(row.answer_alternatives == null ? null : String(row.answer_alternatives)),
     answerUsedAi: Boolean(Number(row.answer_used_ai ?? 0)),
     answerGrounds: parseGrounds(row.answer_grounds == null ? null : String(row.answer_grounds)),
-    answeredAt: row.answered_at == null ? null : Number(row.answered_at), portalId: row.portal_id == null ? null : Number(row.portal_id), candidate: mapCandidate(row),
+    answeredAt: row.answered_at == null ? null : Number(row.answered_at), portalId: row.portal_id == null ? null : Number(row.portal_id),
+    workflowStatus: String(row.workflow_status ?? (row.status === 'answered' ? 'resolved' : 'received')),
+    title: String(row.title ?? row.ai_summary ?? ''), location: String(row.location ?? ''), peopleCount: String(row.people_count ?? ''),
+    resourceRemaining: String(row.resource_remaining ?? ''), lastReceivedAt: String(row.last_received_at ?? ''),
+    factSummary: parseStringList(row.fact_summary == null ? null : String(row.fact_summary)), emotionSummary: String(row.emotion_summary ?? ''),
+    missingInformation: parseStringList(row.missing_information == null ? null : String(row.missing_information)),
+    urgencyCandidate: String(row.urgency_candidate ?? '低'), urgencyConfirmed: row.urgency_confirmed == null ? null : String(row.urgency_confirmed),
+    urgentReview: Boolean(Number(row.urgent_review ?? 0)), faqResolved: row.faq_resolved == null ? null : Boolean(Number(row.faq_resolved)),
+    similarGroupId: row.similar_group_id == null ? null : Number(row.similar_group_id), similarGroupTitle: String(row.similar_group_title ?? ''),
+    similarCount: Number(row.similar_count ?? 0), assigneeName: String(row.assignee_name ?? ''), internalNote: String(row.internal_note ?? ''),
+    firstConfirmedAt: row.first_confirmed_at == null ? null : Number(row.first_confirmed_at), resolvedAt: row.resolved_at == null ? null : Number(row.resolved_at),
+    updates: [], similarQuestions: [], candidate: mapCandidate(row),
   };
 }
 
 const QUESTION_SELECT = `SELECT q.id, q.body, q.body_original, q.ai_summary, q.summary_edited, q.category, q.status, q.created_at, q.answer_body, q.answer_draft, q.answer_alternatives, q.answer_used_ai, q.answer_grounds, q.answered_at, q.portal_id,
+  q.workflow_status, q.title, q.location, q.people_count, q.resource_remaining, q.last_received_at, q.fact_summary, q.emotion_summary, q.missing_information, q.urgency_candidate, q.urgency_confirmed, q.urgent_review, q.faq_resolved, q.faq_id, q.similar_group_id, q.assignee_name, q.internal_note, q.first_confirmed_at, q.resolved_at,
+  sg.title AS similar_group_title, (SELECT COUNT(*) FROM questions sq WHERE sq.similar_group_id = q.similar_group_id) AS similar_count,
   c.id AS candidate_id, c.question_id, c.q_text, c.a_text, c.category AS candidate_category, c.status AS candidate_status, c.created_at AS candidate_created_at
-  FROM questions q LEFT JOIN faq_candidates c ON c.question_id = q.id AND c.status = 'pending'`;
+  FROM questions q LEFT JOIN similar_groups sg ON sg.id = q.similar_group_id LEFT JOIN faq_candidates c ON c.question_id = q.id AND c.status = 'pending'`;
+
+async function hydrateQuestion(db: D1Database, question: SubmittedQuestion): Promise<SubmittedQuestion> {
+  const result = await db.prepare('SELECT id, status, message, is_public, created_at FROM case_updates WHERE question_id = ? ORDER BY created_at ASC, id ASC LIMIT 80').bind(question.id).all<Record<string, unknown>>();
+  const updates = (result.results ?? []).map((row) => ({
+    id: Number(row.id), status: String(row.status ?? 'received'), message: String(row.message ?? ''),
+    isPublic: Boolean(Number(row.is_public ?? 0)), createdAt: Number(row.created_at ?? 0),
+  }));
+  let similarQuestions: SimilarQuestion[] = [];
+  if (question.similarGroupId) {
+    const related = await db.prepare(`${QUESTION_SELECT} WHERE q.similar_group_id = ? AND q.id != ? ORDER BY q.created_at DESC LIMIT 30`).bind(question.similarGroupId, question.id).all<Record<string, unknown>>();
+    similarQuestions = (related.results ?? []).map((row) => ({
+      id: Number(row.id), title: String(row.title ?? row.ai_summary ?? '相談'), category: String(row.category ?? 'その他'),
+      location: String(row.location ?? ''), workflowStatus: String(row.workflow_status ?? 'received'), createdAt: Number(row.created_at ?? 0),
+    }));
+  }
+  return { ...question, updates, similarCount: question.similarGroupId ? Math.max(question.similarCount - 1, similarQuestions.length) : 0, similarQuestions };
+}
 
 export async function listQuestionsForAdministratorPage(portalId: number | null = null, page = 1, pageSize = 100): Promise<{ questions: SubmittedQuestion[]; hasMore: boolean }> {
   const db = await initialise();
@@ -386,9 +571,10 @@ export async function listQuestionsForAdministratorPage(portalId: number | null 
     : await db.prepare(`${QUESTION_SELECT} WHERE q.portal_id = ? ORDER BY q.created_at DESC LIMIT ? OFFSET ?`).bind(portalId, safePageSize + 1, offset).all<Record<string, unknown>>();
   const rows = result.results ?? [];
   const hasMore = rows.length > safePageSize;
-  return { questions: rows.slice(0, safePageSize).map(mapQuestion).map((question) => question.answerAlternatives.length || question.status !== 'open'
+  const mapped = rows.slice(0, safePageSize).map(mapQuestion).map((question) => question.answerAlternatives.length || question.status !== 'open'
     ? question
-    : { ...question, answerAlternatives: generateAlternativeDrafts(question.aiSummary, question.bodyOriginal, []) }), hasMore };
+    : { ...question, answerAlternatives: generateAlternativeDrafts(question.aiSummary, question.bodyOriginal, []) });
+  return { questions: await Promise.all(mapped.map((question) => hydrateQuestion(db, question))), hasMore };
 }
 
 export async function listQuestionsForAdministrator(portalId: number | null = null): Promise<SubmittedQuestion[]> {
@@ -407,14 +593,14 @@ export async function getQuestionForAdministrator(questionId: number, portalId?:
   const result = portalId === undefined || portalId === null
     ? await statement.bind(questionId).first<Record<string, unknown>>()
     : await statement.bind(questionId, portalId).first<Record<string, unknown>>();
-  return result ? mapQuestion(result) : null;
+  return result ? hydrateQuestion(db, mapQuestion(result)) : null;
 }
 
 export async function getQuestionByCheckToken(token: string): Promise<SubmittedQuestion | null> {
   const db = await initialise();
   if (!/^[0-9a-f-]{32,80}$/i.test(token)) return null;
   const result = await db.prepare(`${QUESTION_SELECT} WHERE q.check_token_hash = ? AND (q.check_token_expires_at IS NULL OR q.check_token_expires_at > ?) LIMIT 1`).bind(await hashCheckToken(token), Date.now()).first<Record<string, unknown>>();
-  return result ? mapQuestion(result) : null;
+  return result ? hydrateQuestion(db, mapQuestion(result)) : null;
 }
 
 export async function generateAnswerDraft(questionId: number, portalId?: number | null): Promise<{ draft: string; alternatives: string[]; grounds: string[]; mode: 'local-rules' }> {
@@ -438,11 +624,13 @@ export async function approveAnswer(questionId: number, body: string, usedAi: bo
   const related = await listRelatedFaqs(question.aiSummary || question.bodyOriginal, 3, question.portalId);
   const verifiedGrounds = related.map((faq) => faq.question);
   const scope = portalId === null ? ' AND portal_id IS NULL' : portalId === undefined ? '' : ' AND portal_id = ?';
-  const update = db.prepare(`UPDATE questions SET answer_body = ?, answer_used_ai = ?, answer_grounds = ?, status = 'answered', answered_at = ? WHERE id = ? AND status = 'open'${scope}`);
+  const update = db.prepare(`UPDATE questions SET answer_body = ?, answer_used_ai = ?, answer_grounds = ?, status = 'answered', workflow_status = 'resolved', answered_at = ?, resolved_at = COALESCE(resolved_at, ?) WHERE id = ? AND status = 'open'${scope}`);
   const updateResult = portalId === undefined || portalId === null
-    ? await update.bind(answer, usedAi ? 1 : 0, JSON.stringify(verifiedGrounds.slice(0, 10)), answeredAt, questionId).run()
-    : await update.bind(answer, usedAi ? 1 : 0, JSON.stringify(verifiedGrounds.slice(0, 10)), answeredAt, questionId, portalId).run();
+    ? await update.bind(answer, usedAi ? 1 : 0, JSON.stringify(verifiedGrounds.slice(0, 10)), answeredAt, answeredAt, questionId).run()
+    : await update.bind(answer, usedAi ? 1 : 0, JSON.stringify(verifiedGrounds.slice(0, 10)), answeredAt, answeredAt, questionId, portalId).run();
   if (Number(updateResult.meta.changes ?? 0) !== 1) throw new Error('この質問はすでに回答済みです。');
+  await db.prepare("INSERT INTO case_updates (question_id, status, message, is_public, actor_user_id, created_at) VALUES (?, 'resolved', ?, 1, ?, ?)").bind(questionId, '確認済みの回答をお届けしました。', await auditActorId(actorUserId), answeredAt).run();
+  await recordQuestionEvent(questionId, 'answer_approved', actorUserId, usedAi ? 'ai_draft_reviewed' : 'human_written');
   const candidate = containsPii(question.bodyOriginal) || containsPii(answer) ? null : generateFaqCandidate(question.bodyOriginal, answer, question.category);
   if (!candidate) {
     try { await writeAuditLog('answer_saved', actorUserId, questionId, question.portalId, 'faq_candidate:none'); } catch { /* do not fail a saved answer when logging is unavailable */ }

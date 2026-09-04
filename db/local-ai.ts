@@ -12,6 +12,31 @@ import type { Faq, RelatedFaq } from './repository';
 export type AiFaq = Faq;
 export type AiRelatedFaq = RelatedFaq;
 
+export const SHELTER_CATEGORIES = ['水・飲料', '食料・物資', '医療・薬', 'トイレ・衛生', '設備・充電', 'ペット', '安全・その他', 'その他'] as const;
+export type ShelterCategory = typeof SHELTER_CATEGORIES[number];
+
+export type ShelterIntake = {
+  location?: string;
+  peopleCount?: string;
+  resourceRemaining?: string;
+  lastReceivedAt?: string;
+};
+
+export type ShelterAnalysis = {
+  title: string;
+  overview: string;
+  facts: string[];
+  emotion: string;
+  missingInformation: string[];
+  urgencyCandidate: '高' | '中' | '低';
+  urgentReview: boolean;
+  category: ShelterCategory;
+  location: string;
+  peopleCount: string;
+  resourceRemaining: string;
+  lastReceivedAt: string;
+};
+
 const PUNCTUATION = /[\s、。・!！?？「」『』()（）\[\]【】,.:;〜~ー\-]/g;
 const KEYWORD_RE = /[一-龥]{2,}|[ァ-ヴー]{2,}|[a-zA-Z]{3,}/g;
 const PERSONAL_DATA_PATTERN = /(?:[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}|https?:\/\/|www\.|(?:0\d{1,4}[-ー－ ]?\d{1,4}[-ー－ ]?\d{3,4})|〒\s?\d{3}[-ー－]?\d{4}|(?:東京都|北海道|(?:京都|大阪)府|.{2,3}県).{0,24}(?:市|区|町|村|丁目|番地|号)|(?:学籍|生徒|社員)番号|(?:氏名|名前|住所|電話(?:番号)?|メール(?:アドレス)?|連絡先|郵便番号|口座|マイナンバー)\s*[:：])/i;
@@ -23,6 +48,82 @@ const CATEGORY_KEYWORDS: Record<string, string[]> = {
   'ルール・制度': ['ルール', '規則', '制度', '有給', '在宅', '服装', '条件', '対象', '初心者', '未経験', '初めて', 'はじめて'],
   '困りごと・トラブル': ['できない', 'つながらない', '忘れ', '不具合', '困っ', 'エラー', 'パスワード', '不安'],
 };
+
+const SHELTER_CATEGORY_KEYWORDS: Record<ShelterCategory, string[]> = {
+  '水・飲料': ['水', '飲料', '給水', '脱水'],
+  '食料・物資': ['食料', 'ごはん', '食事', '物資', 'おむつ', 'ミルク', '毛布', '衣類'],
+  '医療・薬': ['医療', '病院', 'けが', '怪我', '薬', '持病', '体調', '熱', '痛い', '看護'],
+  'トイレ・衛生': ['トイレ', '衛生', '手洗い', '入浴', '生理', '汚れ'],
+  '設備・充電': ['充電', '電源', 'コンセント', '照明', '空調', '寒い', '暑い', '設備'],
+  'ペット': ['ペット', '犬', '猫', '動物'],
+  '安全・その他': ['火事', '火災', '暴力', '危険', '逃げ', '避難', '不審', '安全'],
+  その他: [],
+};
+
+const URGENT_PATTERNS = /(意識|呼吸|出血|けが|怪我|救急|持病|薬がない|薬切れ|火事|火災|煙|暴力|殴|襲|閉じ込め|倒れ|命|生命|危険|虐待)/i;
+const HIGH_URGENCY_PATTERNS = /(足りない|ない|切れ|動けない|痛い|苦しい|子ども|高齢|乳児|妊娠|一人で|困って)/i;
+
+export function isShelterQuestion(value: string): boolean {
+  return /(避難所|避難|給水|飲料|物資|トイレ|充電|薬|医療|ペット|毛布|食料|水が|水の|困っている|困って)/.test(value);
+}
+
+export function categorizeShelterQuestion(value: string, requested = ''): ShelterCategory {
+  if ((SHELTER_CATEGORIES as readonly string[]).includes(requested)) return requested as ShelterCategory;
+  let best: ShelterCategory = 'その他'; let hits = 0;
+  (Object.entries(SHELTER_CATEGORY_KEYWORDS) as [ShelterCategory, string[]][]).forEach(([category, words]) => {
+    const count = words.filter((word) => value.includes(word)).length;
+    if (count > hits) { best = category; hits = count; }
+  });
+  return best;
+}
+
+function emotionLabel(value: string): string {
+  if (/(怒|何回|いい加減|ふざけ|困る|最悪|いつまで)/.test(value)) return '強い不満・焦り';
+  if (/(怖|恐|不安|心配|どうしよう|泣)/.test(value)) return '不安・心配';
+  if (/(助けて|苦しい|痛い|つらい)/.test(value)) return '切迫感・つらさ';
+  return '不安や困りごとがある';
+}
+
+function shelterTitle(category: ShelterCategory, location: string, value: string): string {
+  const place = location ? `${location}の` : '';
+  const topic = category === '水・飲料' ? '飲料水不足' : category === '医療・薬' ? '医療・薬の相談' : category === '食料・物資' ? '物資不足' : category === 'トイレ・衛生' ? 'トイレ・衛生の相談' : category === '設備・充電' ? '設備・充電の相談' : category === 'ペット' ? 'ペットの相談' : '避難所での困りごと';
+  if (!location && category === 'その他') return value.trim().replace(/\s+/g, ' ').slice(0, 34);
+  return `${place}${topic}`;
+}
+
+export function generateShelterAnalysis(value: string, intake: ShelterIntake = {}): ShelterAnalysis {
+  const text = value.trim().replace(/\r?\n/g, ' ');
+  const location = intake.location?.trim().slice(0, 120) ?? '';
+  const peopleCount = intake.peopleCount?.trim().slice(0, 80) ?? '';
+  const resourceRemaining = intake.resourceRemaining?.trim().slice(0, 120) ?? '';
+  const lastReceivedAt = intake.lastReceivedAt?.trim().slice(0, 120) ?? '';
+  const category = categorizeShelterQuestion(text);
+  const facts: string[] = [];
+  if (location) facts.push(`場所：${location}`);
+  if (peopleCount) facts.push(`人数：${peopleCount}`);
+  if (resourceRemaining) facts.push(`残量・不足状況：${resourceRemaining}`);
+  if (lastReceivedAt) facts.push(`最後に受け取った時刻：${lastReceivedAt}`);
+  if (category !== 'その他') facts.push(`相談分類：${category}`);
+  if (/(子ども|こども|乳児|赤ちゃん)/.test(text)) facts.push('子どもを含む可能性');
+  if (/(高齢|お年寄り)/.test(text)) facts.push('高齢者を含む可能性');
+  if (/(何回|何度|また|もう一度)/.test(text)) facts.push('以前にも申し出た可能性');
+  const missingInformation: string[] = [];
+  if (!location) missingInformation.push('場所');
+  if (!peopleCount && /(水|食料|物資|薬|トイレ|毛布|足り|不足|ない|切れ)/.test(text)) missingInformation.push('人数');
+  if (!resourceRemaining && /(水|食料|物資|薬|足り|不足|ない|切れ)/.test(text)) missingInformation.push('残量');
+  if (!lastReceivedAt && /(水|食料|物資|薬|届|来ない|配布)/.test(text)) missingInformation.push('最後に受け取った時刻');
+  const urgentReview = URGENT_PATTERNS.test(text);
+  const urgencyCandidate: '高' | '中' | '低' = urgentReview ? '高' : HIGH_URGENCY_PATTERNS.test(text) ? '中' : '低';
+  const overview = `${shelterTitle(category, location, text)}。${emotionLabel(text)}状況として受け止め、対応に必要な情報を確認します。`;
+  return { title: shelterTitle(category, location, text), overview, facts, emotion: emotionLabel(text), missingInformation, urgencyCandidate, urgentReview, category, location, peopleCount, resourceRemaining, lastReceivedAt };
+}
+
+export function shelterFollowUp(key: string, category: ShelterCategory): { question: string; options: string[] } {
+  if (key === '場所') return { question: '避難所のどのあたりにいますか？（例：1階、受付の近く）', options: [] };
+  if (key === '人数') return { question: '何人くらいで困っていますか？', options: ['1人', '2〜5人', '6人以上', 'わからない'] };
+  if (key === '残量') return { question: category === '水・飲料' ? '飲み水はあとどのくらいありますか？' : '必要なものはあとどのくらいありますか？', options: ['ほとんどない', '少しある', 'まだある', 'わからない'] };
+  return { question: '最後に受け取ったのはいつごろですか？', options: ['今日', '昨日', 'それより前', 'わからない'] };
+}
 const SYNONYM_GROUPS = [
   ['見学', '体験', '訪問'], ['予約', '急に', 'アポ', 'いきなり'],
   ['初心者', '未経験', '初めて', 'はじめて'], ['部費', '費用', 'お金', '料金'],
@@ -70,7 +171,7 @@ function keywordScore(a: string, b: string): number {
   return intersection ? (intersection / Math.min(ka.size, kb.size)) * (0.5 + 0.5 * Math.min(intersection, 2) / 2) : 0;
 }
 
-function combinedSimilarity(query: string, target: string): number {
+export function combinedSimilarity(query: string, target: string): number {
   return Math.max(cosineSimilarity(query, target), keywordScore(query, target) * 0.8);
 }
 
@@ -87,7 +188,8 @@ export function searchFaqs(query: string, faqs: AiFaq[], limit = 5): AiRelatedFa
 export function containsPii(value: string): boolean { return PERSONAL_DATA_PATTERN.test(value); }
 
 export function categorizeQuestion(value: string, requested = ''): string {
-  if (Object.prototype.hasOwnProperty.call(CATEGORY_KEYWORDS, requested)) return requested;
+  if (Object.prototype.hasOwnProperty.call(CATEGORY_KEYWORDS, requested) || (SHELTER_CATEGORIES as readonly string[]).includes(requested)) return requested;
+  if (isShelterQuestion(value)) return categorizeShelterQuestion(value);
   let best = 'その他'; let hits = 0;
   Object.entries(CATEGORY_KEYWORDS).forEach(([category, words]) => {
     const count = words.filter((word) => value.includes(word)).length;
