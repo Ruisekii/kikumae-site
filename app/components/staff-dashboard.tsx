@@ -25,22 +25,31 @@ export function StaffDashboard({ displayName, authorized = false, adminApiToken,
   const [selectedIds, setSelectedIds] = useState<number[]>([]);
   const [message, setMessage] = useState(authorized ? '相談を読み込んでいます…' : '管理権限を確認しています…');
   const [busy, setBusy] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
 
   const loadQuestions = useCallback(async ({ silent = false }: { silent?: boolean } = {}) => {
-    const response = await fetch('/api/admin/questions?page=1', {
-      cache: 'no-store',
-      credentials: 'same-origin',
-      headers: adminHeaders(adminApiToken, { Accept: 'application/json' }),
-    });
-    const body = await response.json() as { questions?: SubmittedQuestion[]; stats?: ShelterDashboardStats; message?: string };
-    if (!response.ok) {
-      if (response.status === 401) { window.location.assign('/admin'); return; }
-      if (!silent) setMessage(body.message ?? '相談一覧を読み込めませんでした。');
-      return;
+    setRefreshing(true);
+    if (!silent) setMessage('相談一覧を更新しています…');
+    try {
+      const response = await fetch('/api/admin/questions?page=1', {
+        cache: 'no-store',
+        credentials: 'same-origin',
+        headers: adminHeaders(adminApiToken, { Accept: 'application/json' }),
+      });
+      const body = await response.json() as { questions?: SubmittedQuestion[]; stats?: ShelterDashboardStats; message?: string };
+      if (!response.ok) {
+        if (response.status === 401) { window.location.assign('/admin'); return; }
+        if (!silent) setMessage(body.message ?? '相談一覧を読み込めませんでした。');
+        return;
+      }
+      setQuestions(body.questions ?? []); setStats(body.stats ?? null);
+      if (!silent) setMessage('相談一覧を更新しました。');
+      setSelectedId((current) => current && !(body.questions ?? []).some((question) => question.id === current) ? null : current);
+    } catch {
+      if (!silent) setMessage('相談一覧を読み込めませんでした。');
+    } finally {
+      setRefreshing(false);
     }
-    setQuestions(body.questions ?? []); setStats(body.stats ?? null);
-    if (!silent) setMessage('相談一覧を更新しました。');
-    setSelectedId((current) => current && !(body.questions ?? []).some((question) => question.id === current) ? null : current);
   }, [adminApiToken]);
 
   useEffect(() => {
@@ -56,13 +65,13 @@ export function StaffDashboard({ displayName, authorized = false, adminApiToken,
 
   useEffect(() => {
     const refresh = () => {
-      if (document.visibilityState !== 'visible' || busy || selectedId !== null) return;
+      if (document.visibilityState !== 'visible' || busy || refreshing) return;
       void loadQuestions({ silent: true });
     };
     const timer = window.setInterval(refresh, 10000);
     document.addEventListener('visibilitychange', refresh);
     return () => { window.clearInterval(timer); document.removeEventListener('visibilitychange', refresh); };
-  }, [busy, loadQuestions, selectedId]);
+  }, [busy, loadQuestions, refreshing]);
 
   useEffect(() => {
     if (!message || message.includes('権限') || message.includes('確認しています')) return;
@@ -146,7 +155,9 @@ function QuestionDetail({ question, draft, answerText, setAnswerText, answerUses
   const [candidateA, setCandidateA] = useState(question.candidate?.aText ?? '');
   const [candidateCategory, setCandidateCategory] = useState(question.candidate?.category ?? 'その他');
   const candidate = question.candidate;
-  useEffect(() => { setAssignee(question.assigneeName); setUrgency(question.urgencyConfirmed ?? ''); setInternalNote(question.internalNote); setCandidateQ(question.candidate?.qText ?? ''); setCandidateA(question.candidate?.aText ?? ''); setCandidateCategory(question.candidate?.category ?? 'その他'); setTab('summary'); }, [question]);
+  // Keep in-progress staff edits when the background refresh replaces the question object.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  useEffect(() => { setAssignee(question.assigneeName); setUrgency(question.urgencyConfirmed ?? ''); setInternalNote(question.internalNote); setCandidateQ(question.candidate?.qText ?? ''); setCandidateA(question.candidate?.aText ?? ''); setCandidateCategory(question.candidate?.category ?? 'その他'); setTab('summary'); }, [question.id]);
 
   async function saveStatus(status: string) { await onStatus(status, publicMessage, isPublic, assignee, urgency, internalNote); setPublicMessage(''); }
   return <article className="detail-card shelter-detail-card"><div className="detail-header"><div><span className="status-pill status-{question.workflowStatus}">{statusLabel[question.workflowStatus] ?? question.workflowStatus}</span><span className="tag">{question.category}</span><time>{dateLabel(question.createdAt)}</time></div>{question.urgentReview && <span className="urgent-badge">! 要緊急確認</span>}</div><h2 className="detail-title">{question.title || question.aiSummary || '相談の内容'}</h2><div className="detail-facts-row"><span>場所：{question.location || '未確認'}</span><span>同様の相談：{question.similarCount}件</span><span>担当：{question.assigneeName || '未設定'}</span></div><div className="detail-tabs" role="tablist"><button className={tab === 'summary' ? 'active' : ''} type="button" onClick={() => setTab('summary')}>AI要約</button><button className={tab === 'original' ? 'active' : ''} type="button" onClick={() => { setTab('original'); onOriginalViewed(); }}>原文</button><button className={tab === 'related' ? 'active' : ''} type="button" onClick={() => setTab('related')}>関連する相談 <b>{question.similarCount}</b></button></div>{tab === 'summary' && <section className="analysis-panel"><div className="analysis-section overview-section"><span className="analysis-label">概要</span><p>{question.aiSummary || 'AI要約がありません。原文を確認してください。'}</p></div><div className="analysis-split"><div><span className="analysis-label">事実</span>{question.factSummary.length ? <ul>{question.factSummary.map((fact) => <li key={fact}>{fact}</li>)}</ul> : <p className="muted-block">追加の事実はまだありません。</p>}</div><div className="emotion-box"><span className="analysis-label">感情</span><strong>{question.emotionSummary || '不安や困りごと'}</strong><p>感情を削除せず認識し、対応に必要な事実を先に確認します。</p></div></div><div className="analysis-section"><span className="analysis-label">確認が必要な情報</span>{question.missingInformation.length ? <div className="missing-chips">{question.missingInformation.map((item) => <span key={item}>{item}</span>)}</div> : <p className="muted-block">必要な情報はそろっています。</p>}</div><div className="analysis-section urgency-section"><div><span className="analysis-label">緊急度候補</span><strong className={`urgency-${question.urgencyCandidate}`}>{question.urgencyCandidate}</strong>{question.urgentReview && <p className="urgent-explain">重大なキーワードを検出しました。職員が優先して確認してください。</p>}</div><label>職員が確定<select value={urgency} onChange={(event) => setUrgency(event.target.value)}><option value="">未確定</option><option>高</option><option>中</option><option>低</option></select></label></div></section>}{tab === 'original' && <section className="original-panel"><div className="original-warning"><strong>原文</strong><span>AI整理前の内容をそのまま保存しています</span></div><p>{question.bodyOriginal}</p><p className="input-hint">原文を開いたことは記録されます。必要なときに確認し、まずAI要約と事実から対応できます。</p></section>}{tab === 'related' && <section className="related-panel"><div className="related-group-heading"><span className="analysis-label">共通案件候補</span><strong>{question.similarGroupTitle || question.title}</strong><p>個別の相談は消さず、同じ状況として関連付けています。</p></div>{question.similarQuestions.length ? <div className="related-list">{question.similarQuestions.map((item) => <div key={item.id}><span className="status-pill">{statusLabel[item.workflowStatus] ?? item.workflowStatus}</span><strong>{item.title}</strong><small>{item.location || '場所未確認'} · {dateLabel(item.createdAt)}</small></div>)}</div> : <p className="muted-block">まだ関連付けられた相談はありません。</p>}</section>}<section className="response-panel"><div className="response-panel-heading"><div><span className="analysis-label">対応操作</span><h3>状況を更新して、避難者へ返します</h3></div>{question.workflowStatus !== 'resolved' && <button className="button accent" type="button" disabled={busy} onClick={() => void saveStatus('in_progress')}>対応を開始</button>}</div><div className="response-grid"><label>担当者<input value={assignee} onChange={(event) => setAssignee(event.target.value)} placeholder="例：佐藤" /></label><label>公開する進捗コメント<textarea value={publicMessage} onChange={(event) => setPublicMessage(event.target.value)} placeholder="例：飲料水の補充を手配しています。" maxLength={500} /></label><label className="check-public"><input type="checkbox" checked={isPublic} onChange={(event) => setIsPublic(event.target.checked)} /> 避難者に表示する</label><label>内部メモ（職員のみ）<textarea value={internalNote} onChange={(event) => setInternalNote(event.target.value)} placeholder="職員間の引き継ぎメモ" maxLength={2000} /></label></div><div className="status-actions"><button type="button" disabled={busy} onClick={() => void saveStatus('reviewing')}>確認中にする</button><button type="button" disabled={busy} onClick={() => void saveStatus('awaiting_info')}>追加情報を確認中</button><button className="action-resolve" type="button" disabled={busy} onClick={() => void saveStatus('resolved')}>解決済みにする</button></div></section>{question.workflowStatus !== 'resolved' && <section className="answer-editor"><div className="response-panel-heading"><div><span className="analysis-label">AIによる返信案</span><h3>人が確認してから送信</h3></div><button className="button secondary" type="button" disabled={busy} onClick={onGenerateDraft}>返信案を作る</button></div>{draft && <div className="grounds"><b>根拠：承認済みFAQ</b>{draft.grounds.length ? <ul>{draft.grounds.map((ground) => <li key={ground}>{ground}</li>)}</ul> : <p>根拠なし。推測せず、職員が内容を作成してください。</p>}<p className="input-hint">外部サービスへ送信せず、FAQの内容だけを根拠にしています。</p></div>}<textarea value={answerText} onChange={(event) => setAnswerText(event.target.value)} maxLength={4000} placeholder="避難者への返信を入力してください" /><label className="check-label"><input type="checkbox" checked={answerUsesAi} onChange={(event) => setAnswerUsesAi(event.target.checked)} /> AIの返信案を参考にした</label><button className="button accent" type="button" disabled={busy || !answerText.trim()} onClick={onApprove}>確認して返信・解決にする</button></section>}{question.answerBody && <section className="answer-history"><span className="analysis-label">避難者へ送った返信</span><p>{question.answerBody}</p></section>}{candidate && <section className="candidate-review"><span className="analysis-label">対応ナレッジ候補</span><h3>今回の対応をFAQに残しますか？</h3><p className="input-hint">AI候補は自動公開されません。内容を確認してから選択してください。</p><label>質問<input value={candidateQ} onChange={(event) => setCandidateQ(event.target.value)} maxLength={300} /></label><label>回答<textarea value={candidateA} onChange={(event) => setCandidateA(event.target.value)} maxLength={2000} /></label><label>カテゴリ<select value={candidateCategory} onChange={(event) => setCandidateCategory(event.target.value)}>{['水・飲料', '食料・物資', '医療・薬', 'トイレ・衛生', '設備・充電', 'ペット', '安全・その他', 'その他'].map((value) => <option key={value}>{value}</option>)}</select></label><div className="form-actions"><button className="button accent" type="button" disabled={busy} onClick={() => void onCandidateAction(candidate, 'publish_edited', candidateQ, candidateA, candidateCategory)}>承認してFAQに追加</button><button className="button secondary" type="button" disabled={busy} onClick={() => void onCandidateAction(candidate, 'individual', candidateQ, candidateA, candidateCategory)}>今回だけにする</button><button className="button danger" type="button" disabled={busy} onClick={() => void onCandidateAction(candidate, 'reject', candidateQ, candidateA, candidateCategory)}>見送る</button></div></section>}<div className="update-history"><span className="analysis-label">公開できる対応履歴</span>{question.updates.filter((update) => update.isPublic && update.message).map((update) => <div key={update.id}><b>{statusLabel[update.status] ?? update.status}</b><p>{update.message}</p><time>{dateLabel(update.createdAt)}</time></div>)}</div></article>;
