@@ -166,3 +166,35 @@ button, input, textarea, select { font-size: 1rem; }
 .shelter-question-card { background: #fff; border-left: 3px solid transparent; }
 .shelter-question-card.selected { border-left-color: #2f9db8; background: #f7fcfe; }
 .shelter-detail-card { border-top: 4px solid #2f9db8; }
+
+/* The staff first viewport is a triage workspace: counts above, list and detail below. */
+.shelter-staff-content { display: flex; flex-direction: column; }
+.shelter-staff-content > .staff-heading { order: 0; }
+.shelter-staff-content > .form-status { order: 1; }
+.shelter-staff-content > .metric-grid { order: 2; margin-top: 16px; margin-bottom: 10px; }
+.shelter-staff-content > .cases-section { order: 3; margin-top: 8px; }
+.shelter-staff-content > .priority-grid { order: 4; margin-top: 12px; }
+.shelter-staff-content > .category-card { order: 5; }
+.shelter-staff-content > #faq-management { order: 6; }
+.shelter-staff-content > #settings { order: 7; }
+.shelter-staff-content > .audit-log-section { order: 8; }
+.metric-card { min-height: 92px; padding: 14px 18px; }
+.metric-card strong { margin-top: 5px; font-size: 2rem; }
+.cases-section { overflow: hidden; }
+.bulk-toolbar { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin: 2px 0 14px; padding: 10px 12px; border: 1px solid #cfe4eb; border-radius: 12px; background: #f7fcfe; }
+.bulk-toolbar-main { display: flex; align-items: center; flex-wrap: wrap; gap: 12px; }
+.bulk-select-all { display: inline-flex; align-items: center; gap: 7px; color: var(--navy); font-size: .88rem; font-weight: 800; cursor: pointer; }
+.bulk-select-all input { width: 18px; height: 18px; accent-color: #1f7390; }
+.bulk-selection-count { color: var(--muted); font-size: .86rem; font-weight: 800; }
+.bulk-delete-button { margin-left: auto; }
+.shelter-question-card { position: relative; }
+.bulk-check { display: inline-grid; width: 20px; height: 20px; place-items: center; flex: none; border: 2px solid #b8d6df; border-radius: 6px; background: #fff; }
+.shelter-question-card.bulk-selected { border-left-color: #1f7390; background: #eef9fc; }
+.shelter-question-card.bulk-selected .bulk-check { border-color: #1f7390; background: #1f7390; }
+.shelter-question-card.bulk-selected .bulk-check::after { content: '✓'; color: #fff; font-size: .82rem; font-weight: 900; }
+
+@media (max-width: 680px) {
+  .bulk-toolbar { align-items: stretch; flex-direction: column; }
+  .bulk-delete-button { width: 100%; margin-left: 0; }
+  .shelter-question-card > div { flex-direction: row; align-items: center; }
+}

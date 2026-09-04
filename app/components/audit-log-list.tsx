@@ -5,7 +5,7 @@ import type { AuditLog } from '../../db/repository';
 
 const labels: Record<string, string> = {
   answer_saved: '回答を保存', faq_created: 'FAQを追加', faq_updated: 'FAQを更新', faq_deleted: 'FAQを削除',
-  faq_published: 'FAQ候補を公開', faq_candidate_individual: '個別回答にする', faq_candidate_reject: 'FAQ候補を非公開', question_deleted: '質問を削除',
+  faq_published: 'FAQ候補を公開', faq_candidate_individual: '個別回答にする', faq_candidate_reject: 'FAQ候補を非公開', question_deleted: '質問を削除', questions_bulk_deleted: '相談を複数削除',
 };
 
 export function AuditLogList({ apiBase }: { apiBase: string }) {

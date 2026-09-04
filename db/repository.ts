@@ -674,6 +674,28 @@ export async function deleteQuestion(questionId: number, portalId?: number | nul
   try { await writeAuditLog('question_deleted', actorUserId, questionId, question.portalId, 'question_deleted'); } catch { /* best effort */ }
 }
 
+export async function deleteQuestions(questionIds: number[], portalId: number | null = null, actorUserId: string | null = null): Promise<number> {
+  const ids = [...new Set(questionIds.filter((id) => Number.isInteger(id) && id > 0))].slice(0, 100);
+  if (!ids.length) return 0;
+  const db = await initialise();
+  const placeholders = ids.map(() => '?').join(', ');
+  const scope = portalId === null ? 'portal_id IS NULL' : 'portal_id = ?';
+  const scopeValues = portalId === null ? [] : [portalId];
+  const found = await db.prepare(`SELECT id FROM questions WHERE id IN (${placeholders}) AND ${scope}`).bind(...ids, ...scopeValues).all<{ id: number }>();
+  const foundIds = (found.results ?? []).map((row) => Number(row.id)).filter((id) => ids.includes(id));
+  if (!foundIds.length) return 0;
+  const foundPlaceholders = foundIds.map(() => '?').join(', ');
+  await db.batch([
+    db.prepare(`DELETE FROM faq_candidates WHERE question_id IN (${foundPlaceholders})`).bind(...foundIds),
+    db.prepare(`DELETE FROM case_updates WHERE question_id IN (${foundPlaceholders})`).bind(...foundIds),
+    db.prepare(`DELETE FROM question_events WHERE question_id IN (${foundPlaceholders})`).bind(...foundIds),
+    db.prepare(`DELETE FROM questions WHERE id IN (${foundPlaceholders}) AND ${scope}`).bind(...foundIds, ...scopeValues),
+    db.prepare('DELETE FROM similar_groups WHERE id NOT IN (SELECT DISTINCT similar_group_id FROM questions WHERE similar_group_id IS NOT NULL)'),
+  ]);
+  try { await writeAuditLog('questions_bulk_deleted', actorUserId, null, portalId, `count:${foundIds.length} ids:${foundIds.join(',')}`); } catch { /* best effort */ }
+  return foundIds.length;
+}
+
 export async function actOnCandidate(candidateId: number, action: string, qText: string, aText: string, category: string, portalId?: number | null, actorUserId: string | null = null): Promise<void> {
   const db = await initialise();
   const candidate = await db.prepare("SELECT id, question_id, q_text, a_text, category, portal_id FROM faq_candidates WHERE id = ? AND status = 'pending'").bind(candidateId).first<{ id: number; question_id: number; q_text: string; a_text: string; category: string; portal_id: number | null }>();
