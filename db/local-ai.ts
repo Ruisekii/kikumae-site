@@ -196,11 +196,24 @@ export function combinedSimilarity(query: string, target: string): number {
   return Math.max(cosineSimilarity(query, target), keywordScore(query, target) * 0.8);
 }
 
+// 日本語のbigram cosineは「です」「ます」「ください」等の助詞・語尾だけでも
+// 0.2を超えてしまい、内容が無関係なFAQでも「近い案内」として通ってしまう。
+// そのため、まずキーワード（キーワード抽出はkeywords()を参照）が1語も
+// 一致しないFAQは、cosineがいくら高くても候補から除外する。
+// 閾値は実測（curlで/api/questions/previewを直接叩いた結果）に基づき、
+// 「トイレ」「充電」など実際に一致するFAQを殺さない最小値として0.3へ引き上げた
+// （0.2のままだと助詞だけの一致でも通ってしまうケースが残っていた）。
+const FAQ_MATCH_THRESHOLD = 0.3;
+
 export function searchFaqs(query: string, faqs: AiFaq[], limit = 5): AiRelatedFaq[] {
   if (!query.trim()) return [];
   return faqs
-    .map((faq) => ({ ...faq, score: Math.max(combinedSimilarity(query, faq.question), combinedSimilarity(query, faq.answer) * 0.9) }))
-    .filter((faq) => faq.score >= 0.2)
+    .map((faq) => {
+      const keywordHit = Math.max(keywordScore(query, faq.question), keywordScore(query, faq.answer));
+      const score = keywordHit > 0 ? Math.max(combinedSimilarity(query, faq.question), combinedSimilarity(query, faq.answer) * 0.9) : 0;
+      return { ...faq, score };
+    })
+    .filter((faq) => faq.score >= FAQ_MATCH_THRESHOLD)
     .sort((a, b) => b.score - a.score)
     .slice(0, limit)
     .map((faq) => ({ ...faq, score: Math.round(faq.score * 1000) / 1000 }));

@@ -46,3 +46,7 @@ next-env.d.ts
 
 # typescript incremental build output
 tsconfig.tsbuildinfo
+
+# wrangler local secrets (never commit)
+.dev.vars
+.dev.vars.*

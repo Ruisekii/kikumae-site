@@ -487,3 +487,23 @@ footer { padding: 28px 24px; background: var(--navy); color: #fff; text-align: c
   .question-card-main > div { flex-direction: row; align-items: center; }
   .bulk-row-checkbox { padding-top: 17px; }
 }
+
+/* 避難者向けフッター（職員用リンクは、常時露出のヘッダーから目立たない位置へ移動） */
+.evac-theme .evac-footer { max-width: 920px; margin: 0 auto 40px; padding: 0 24px; text-align: center; }
+.evac-theme .evac-footer a { color: var(--v-muted); font-size: .82rem; text-decoration: underline; text-underline-offset: 3px; }
+@media (max-width: 680px) { .evac-theme .evac-footer { margin-bottom: 76px; } }
+
+/* 受付完了カード：相談IDと確認URLを、控え忘れても後で見返せる形で残す */
+.evac-theme .consult-id { margin: 0; color: var(--v-ink); font-size: 1.3rem; font-weight: 900; }
+.evac-theme .check-url-box { display: flex; flex-wrap: wrap; gap: 8px; width: 100%; }
+.evac-theme .check-url-input { flex: 1 1 240px; min-width: 0; border: 1.5px solid var(--v-line); border-radius: 10px; background: var(--v-surface); padding: 10px 12px; color: var(--v-ink); font-size: .88rem; }
+.evac-theme .save-hint { margin: 0; color: var(--v-muted); font-size: .85rem; }
+
+/* 相談状況照会ページ：この端末から送った相談の一覧（相談本文は保持しないため一覧はID・件名・日時のみ） */
+.evac-theme .device-history { margin-top: 30px; padding-top: 22px; border-top: 1px solid var(--v-line); }
+.evac-theme .device-history h2 { margin: 0; color: var(--v-ink); font-size: 1.05rem; }
+.evac-theme .device-history-note { margin: 6px 0 0; color: var(--v-muted); font-size: .85rem; }
+.evac-theme .device-history-list { display: grid; gap: 8px; margin: 16px 0; padding: 0; list-style: none; }
+.evac-theme .device-history-list li { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 10px 12px; border: 1px solid var(--v-line); border-radius: 10px; background: var(--v-surface); }
+.evac-theme .device-history-list a { color: var(--v-coral-text); font-weight: 800; text-decoration: none; }
+.evac-theme .device-history-date { color: var(--v-muted); font-size: .78rem; white-space: nowrap; }
