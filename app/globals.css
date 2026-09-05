@@ -516,6 +516,12 @@ footer { padding: 28px 24px; background: var(--navy); color: #fff; text-align: c
 .evac-theme .check-url-input { flex: 1 1 240px; min-width: 0; border: 1.5px solid var(--v-line); border-radius: 10px; background: var(--v-surface); padding: 10px 12px; color: var(--v-ink); font-size: .88rem; }
 .evac-theme .save-hint { margin: 0; color: var(--v-muted); font-size: .85rem; }
 
+/* 窓口ページ（/[slug]）の受付完了カード：レイアウトのみの追加で新規の色は使わない。
+   カード自体は既存の .ask-form （border:2px solid var(--ink) 等、既存トークン）を流用する。 */
+.consult-receipt { display: grid; gap: 12px; }
+.consult-receipt h3 { margin: 0; color: var(--navy); }
+.consult-receipt .tag { justify-self: start; }
+
 /* 相談状況照会ページ：この端末から送った相談の一覧（相談本文は保持しないため一覧はID・件名・日時のみ） */
 .evac-theme .device-history { margin-top: 30px; padding-top: 22px; border-top: 1px solid var(--v-line); }
 .evac-theme .device-history h2 { margin: 0; color: var(--v-ink); font-size: 1.05rem; }
