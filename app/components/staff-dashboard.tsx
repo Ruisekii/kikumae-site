@@ -14,6 +14,7 @@ const statusLabel: Record<string, string> = { new: '未確認', reviewing: '確�
 const urgencyLabel: Record<string, string> = { critical: '要緊急確認', high: '高', normal: '通常', low: '低' };
 const dateLabel = (value: number | null) => value ? new Intl.DateTimeFormat('ja-JP', { dateStyle: 'medium', timeStyle: 'short' }).format(new Date(value)) : '';
 const relativeLabel = (value: number) => { const minutes = Math.max(0, Math.round((Date.now() - value) / 60000)); return minutes < 1 ? 'いま' : minutes < 60 ? `${minutes}分前` : `${Math.floor(minutes / 60)}時間前`; };
+const durationLabel = (seconds: number | null | undefined) => { if (seconds == null) return '—'; if (seconds < 60) return `${seconds}秒`; const minutes = Math.round(seconds / 60); return minutes < 60 ? `${minutes}分` : `${Math.floor(minutes / 60)}時間${minutes % 60 ? `${minutes % 60}分` : ''}`; };
 const adminHeaders = (token: string | undefined, headers: Record<string, string> = {}) => token ? { ...headers, 'x-kikumae-admin-token': token } : headers;
 
 export function StaffDashboard({ displayName, authorized = false, adminApiToken, signOutHref }: Props) {
@@ -28,15 +29,19 @@ export function StaffDashboard({ displayName, authorized = false, adminApiToken,
   const [selectedIds, setSelectedIds] = useState<number[]>([]);
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(false);
+  const [search, setSearch] = useState('');
+  const [searchInput, setSearchInput] = useState('');
   const [message, setMessage] = useState(authorized ? '課題を読み込んでいます…' : '管理権限を確認しています…');
   const [busy, setBusy] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
 
-  const loadIssues = useCallback(async ({ silent = false, pageNumber = page }: { silent?: boolean; pageNumber?: number } = {}) => {
+  const loadIssues = useCallback(async ({ silent = false, pageNumber = page, searchTerm = search }: { silent?: boolean; pageNumber?: number; searchTerm?: string } = {}) => {
     setRefreshing(true);
     if (!silent) setMessage('指令盤を更新しています…');
     try {
-      const response = await fetch(`/api/admin/issues?page=${Math.max(1, pageNumber)}`, { cache: 'no-store', credentials: 'same-origin', headers: adminHeaders(adminApiToken, { Accept: 'application/json' }) });
+      const query = new URLSearchParams({ page: String(Math.max(1, pageNumber)) });
+      if (searchTerm.trim()) query.set('search', searchTerm.trim());
+      const response = await fetch(`/api/admin/issues?${query.toString()}`, { cache: 'no-store', credentials: 'same-origin', headers: adminHeaders(adminApiToken, { Accept: 'application/json' }) });
       const body = await response.json() as { issues?: Issue[]; stats?: ShelterDashboardStats; hasMore?: boolean; message?: string };
       if (!response.ok) {
         if (response.status === 401) { window.location.assign('/admin'); return; }
@@ -54,7 +59,7 @@ export function StaffDashboard({ displayName, authorized = false, adminApiToken,
     } finally {
       setRefreshing(false);
     }
-  }, [adminApiToken, page]);
+  }, [adminApiToken, page, search]);
 
   /* The selected issue is a server-backed form; reset it when the selected record changes. */
   /* eslint-disable react-hooks/set-state-in-effect, react-hooks/exhaustive-deps */
@@ -106,6 +111,25 @@ export function StaffDashboard({ displayName, authorized = false, adminApiToken,
     setPage(nextPage);
     setSelectedId(null);
     setSelectedIds([]);
+  }
+
+  function submitSearch(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    const nextSearch = searchInput.trim().slice(0, 80);
+    setSearch(nextSearch);
+    setPage(1);
+    setSelectedId(null);
+    setSelectedIds([]);
+    void loadIssues({ pageNumber: 1, searchTerm: nextSearch });
+  }
+
+  function clearSearch() {
+    setSearchInput('');
+    setSearch('');
+    setPage(1);
+    setSelectedId(null);
+    setSelectedIds([]);
+    void loadIssues({ pageNumber: 1, searchTerm: '' });
   }
 
   async function deleteSelected() {
@@ -214,8 +238,9 @@ export function StaffDashboard({ displayName, authorized = false, adminApiToken,
       <section className="staff-content shelter-staff-content">
         <div className="staff-heading" id="overview"><div><p className="eyebrow">避難所の状況</p><h1>いま対応する課題</h1><p className="staff-note">原文を大量に読まなくても、必要な事実と要望を課題単位で確認できます。</p></div><button className="button secondary" type="button" onClick={() => void loadIssues()} disabled={busy || refreshing}>↻ {refreshing ? '更新中…' : '更新'}</button></div>
         {message && <p className="form-status" role="status">{message}</p>}
-        <div className="metric-grid"><Metric label="未確認" value={counts.new} tone="blue" /><Metric label="確認中" value={counts.reviewing + counts.assigned} tone="soft" /><Metric label="対応中" value={counts.in_progress + counts.waiting} tone="yellow" /><Metric label="本日解決" value={counts.resolved} tone="green" /></div>
+        <div className="metric-grid"><Metric label="未確認" value={counts.new} tone="blue" /><Metric label="確認中" value={counts.reviewing + counts.assigned} tone="soft" /><Metric label="対応中" value={counts.in_progress + counts.waiting} tone="yellow" /><Metric label="本日解決" value={stats?.metrics?.resolvedToday ?? 0} tone="green" /></div>
         <div className="command-summary"><span><b>{stats?.metrics?.reports ?? 0}</b>件の相談</span><span><b>{stats?.metrics?.issues ?? 0}</b>個の課題</span><span><b>{stats?.metrics?.autoGrouped ?? 0}</b>件を自動で関連付け</span><span><b>{stats?.metrics?.originalOpened ?? 0}</b>回 原文を確認</span></div>
+        <div className="kpi-detail-grid"><Kpi label="FAQだけで解決" value={stats?.metrics?.faqResolved ?? 0} suffix="件" /><Kpi label="職員が対応" value={stats?.metrics?.staffHandled ?? 0} suffix="件" /><Kpi label="原文を開かず対応" value={stats?.metrics?.originalNotOpened ?? 0} suffix="件" /><Kpi label="平均初回確認" value={durationLabel(stats?.metrics?.averageFirstConfirmationSeconds)} /><Kpi label="平均解決まで" value={durationLabel(stats?.metrics?.averageResolutionSeconds)} /></div>
         <div className="priority-grid">
           <section className="priority-card urgent-card"><div className="section-card-heading"><div><p className="eyebrow">要緊急確認</p><h2>命・安全に関わる可能性</h2></div><span className="priority-count">{stats?.urgent.length ?? 0}</span></div>{stats?.urgent.length ? <div className="priority-list">{stats.urgent.slice(0, 4).map((issue) => <button type="button" key={issue.id} onClick={() => { selectIssue(issue); window.location.hash = 'issues'; }}><span className="alert-dot">!</span><span><strong>{issue.title}</strong><small>{issue.location || '場所未確認'} · 報告 {issue.reportCount}件</small></span><b>›</b></button>)}</div> : <p className="muted-block">現在、要緊急確認の課題はありません。</p>}</section>
           <section className="priority-card surge-card"><div className="section-card-heading"><div><p className="eyebrow">最近届いた相談</p><h2>30分間の傾向</h2></div><span className="trend-mark">↗</span></div>{stats?.surge ? <><strong className="surge-value">{stats.surge.category}</strong><p>直近30分で <b>{stats.surge.count}件</b>届いています。前の時間帯との比較ではなく、受付件数の目安として確認してください。</p></> : <p className="muted-block">まだ十分な件数がありません。</p>}</section>
@@ -224,6 +249,7 @@ export function StaffDashboard({ displayName, authorized = false, adminApiToken,
         <section className="cases-section" id="issues">
           <div className="section-card-heading"><div><p className="eyebrow">課題指令盤</p><h2>現在対応すべき課題</h2></div><span className="muted-small">同じ状況の相談は1つにまとめて表示</span></div>
           <div className="case-filters">{[['all', 'すべて'], ['new', '未確認'], ['reviewing', '確認中'], ['assigned', '担当決定'], ['in_progress', '対応中'], ['waiting', '追加情報'], ['resolved', '解決済み']].map(([value, label]) => <button className={caseFilter === value ? 'selected' : ''} type="button" key={value} onClick={() => setCaseFilter(value)}>{label} <b>{value === 'all' ? stats?.metrics?.issues ?? issues.length : counts[value] ?? 0}</b></button>)}</div>
+          <form className="issue-search" onSubmit={submitSearch}><label htmlFor="issue-search-input">相談・課題を検索</label><div><input id="issue-search-input" value={searchInput} onChange={(event) => setSearchInput(event.target.value)} placeholder="水・体育館・医療など" /><button className="button secondary" type="submit" disabled={refreshing}>検索</button>{search && <button className="button ghost" type="button" onClick={clearSearch}>検索を解除</button>}</div>{search && <p>「{search}」で検索中。ページをまたいで課題を探しています。</p>}</form>
           <div className="bulk-toolbar"><div className="bulk-toolbar-main"><button className="button secondary" type="button" onClick={() => setSelectionMode((current) => !current)}>{selectionMode ? '選択を終了' : '複数選択'}</button>{selectionMode && <><label className="bulk-select-all"><input type="checkbox" checked={visibleIssues.length > 0 && visibleIssues.every((issue) => selectedIds.includes(issue.id))} onChange={toggleAllVisible} /> 表示中を全選択</label><span className="bulk-selection-count">{selectedIds.length}件選択中</span></>}</div>{selectionMode && <button className="button danger bulk-delete-button" type="button" disabled={!selectedIds.length || busy} onClick={() => void deleteSelected()}>選択した課題を削除</button>}</div>
           <div className="staff-layout shelter-staff-layout"><div className="question-list">{visibleIssues.map((issue) => <article className={`question-card shelter-question-card issue-card ${selectedId === issue.id ? 'selected ' : ''}${selectionMode && selectedIds.includes(issue.id) ? 'bulk-selected' : ''}`} key={issue.id}><label className="bulk-row-checkbox"><input className="bulk-row-checkbox-input" type="checkbox" checked={selectedIds.includes(issue.id)} disabled={!selectionMode} onChange={() => toggleSelection(issue.id)} onClick={(event) => event.stopPropagation()} aria-label={`${issue.title}を選択`} /></label><button className="question-card-main" type="button" onClick={() => selectionMode ? toggleSelection(issue.id) : selectIssue(issue)} aria-pressed={selectionMode ? selectedIds.includes(issue.id) : undefined}><div><span className={`status-pill status-${issue.status}`}>{statusLabel[issue.status] ?? issue.status}</span><span className={`urgency-chip urgency-chip-${issue.urgency}`}>{urgencyLabel[issue.urgency] ?? issue.urgency}</span><span className="tag">{issue.category}</span><time>{relativeLabel(issue.lastReportedAt)}</time></div><strong>{issue.title}</strong><p>{issue.location || '場所を確認中'} · 報告 {issue.reportCount}件{issue.affectedPeople ? ` · 影響 ${issue.affectedPeople}` : ''}</p><span className="question-assignee">{issue.assignedTeam || issue.assignedUser ? `担当：${issue.assignedTeam || issue.assignedUser}` : '担当未設定'}{issue.groupingMode === 'suggested' ? ' · 統合候補あり' : ''}</span></button></article>)}{!visibleIssues.length && <div className="detail-empty">この状態の課題はありません。</div>}</div><div className="staff-detail">{selected ? <IssueDetail issue={selected} draft={drafts[selected.id]} answerText={answerText} setAnswerText={setAnswerText} answerUsesAi={answerUsesAi} setAnswerUsesAi={setAnswerUsesAi} displayName={displayName} busy={busy} onGenerateDraft={() => void generateDraft()} onApprove={() => void approveAnswer()} onStatus={updateIssue} onOriginalViewed={() => void recordOriginalViewed()} onMerge={reviewMerge} /> : <div className="detail-empty detail-sticky-empty">一覧から課題を選ぶと、職員向けの整理画面が表示されます。</div>}</div></div>
           {(page > 1 || hasMore) && <div className="pagination-controls"><button className="button secondary" type="button" disabled={page <= 1 || busy} onClick={() => changePage(page - 1)}>前の100件</button><span>ページ {page}</span><button className="button secondary" type="button" disabled={!hasMore || busy} onClick={() => changePage(page + 1)}>次の100件</button></div>}
@@ -237,6 +263,7 @@ export function StaffDashboard({ displayName, authorized = false, adminApiToken,
 }
 
 function Metric({ label, value, tone }: { label: string; value: number; tone: string }) { return <div className={`metric-card metric-${tone}`}><span>{label}</span><strong>{value}</strong><small>件</small></div>; }
+function Kpi({ label, value, suffix }: { label: string; value: number | string; suffix?: string }) { return <div className="kpi-detail-card"><span>{label}</span><strong>{value}</strong>{suffix && <small>{suffix}</small>}</div>; }
 
 function IssueDetail({ issue, draft, answerText, setAnswerText, answerUsesAi, setAnswerUsesAi, displayName, busy, onGenerateDraft, onApprove, onStatus, onOriginalViewed, onMerge }: { issue: Issue; draft?: Draft; answerText: string; setAnswerText: (value: string) => void; answerUsesAi: boolean; setAnswerUsesAi: (value: boolean) => void; displayName: string; busy: boolean; onGenerateDraft: () => void; onApprove: () => void; onStatus: (status: string, message: string, isPublic: boolean, assignedTeam: string, assignedUser: string, urgencyConfirmed: string, internalNote: string) => Promise<boolean>; onOriginalViewed: () => void; onMerge: (candidateId: number, action: MergeAction) => Promise<void> }) {
   const [tab, setTab] = useState<'summary' | 'original' | 'reports'>('summary');

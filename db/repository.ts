@@ -168,7 +168,19 @@ export type ShelterDashboardStats = {
   categoryCounts: { category: string; count: number }[];
   urgent: Issue[];
   surge: { category: string; count: number } | null;
-  metrics?: { reports: number; issues: number; autoGrouped: number; originalOpened: number; issueResponses: number };
+  metrics?: {
+    reports: number;
+    issues: number;
+    autoGrouped: number;
+    originalOpened: number;
+    issueResponses: number;
+    faqResolved: number;
+    staffHandled: number;
+    originalNotOpened: number;
+    averageFirstConfirmationSeconds: number | null;
+    averageResolutionSeconds: number | null;
+    resolvedToday: number;
+  };
 };
 
 export type AuditLog = { action: string; actorUserId: string | null; createdAt: number };
@@ -732,12 +744,29 @@ export async function getShelterDashboardStats(): Promise<ShelterDashboardStats>
   const reportMetric = await db.prepare("SELECT COUNT(*) AS count FROM questions WHERE portal_id IS NULL").first<Record<string, unknown>>();
   const issueMetric = await db.prepare("SELECT COUNT(*) AS count FROM issues WHERE portal_id IS NULL").first<Record<string, unknown>>();
   const groupedMetric = await db.prepare("SELECT COUNT(*) AS count FROM issue_reports ir JOIN issues i ON i.id = ir.issue_id WHERE i.portal_id IS NULL AND ir.link_type = 'auto'").first<Record<string, unknown>>();
-  const originalMetric = await db.prepare("SELECT COUNT(*) AS count FROM question_events qe JOIN questions q ON q.id = qe.question_id WHERE q.portal_id IS NULL AND qe.event_type = 'original_opened'").first<Record<string, unknown>>();
+  const originalQuestionMetric = await db.prepare("SELECT COUNT(*) AS count FROM question_events qe JOIN questions q ON q.id = qe.question_id WHERE q.portal_id IS NULL AND qe.event_type = 'original_opened'").first<Record<string, unknown>>();
+  const originalIssueMetric = await db.prepare("SELECT COUNT(DISTINCT h.issue_id) AS count FROM issue_operation_history h JOIN issues i ON i.id = h.issue_id WHERE i.portal_id IS NULL AND h.operation = 'original_opened'").first<Record<string, unknown>>();
   const responseMetric = await db.prepare("SELECT COUNT(*) AS count FROM issue_responses ir JOIN issues i ON i.id = ir.issue_id WHERE i.portal_id IS NULL").first<Record<string, unknown>>();
+  const faqResolvedMetric = await db.prepare("SELECT COUNT(*) AS count FROM questions WHERE portal_id IS NULL AND faq_resolved = 1").first<Record<string, unknown>>();
+  const staffHandledMetric = await db.prepare("SELECT COUNT(*) AS count FROM issues WHERE portal_id IS NULL AND status != 'new'").first<Record<string, unknown>>();
+  const originalNotOpenedMetric = await db.prepare("SELECT COUNT(*) AS count FROM issues i WHERE i.portal_id IS NULL AND i.status != 'new' AND NOT EXISTS (SELECT 1 FROM issue_operation_history h WHERE h.issue_id = i.id AND h.operation = 'original_opened')").first<Record<string, unknown>>();
+  const timingMetric = await db.prepare("SELECT AVG(first_confirmed_at - created_at) AS first_confirmation_ms, AVG(resolved_at - created_at) AS resolution_ms FROM questions WHERE portal_id IS NULL AND (first_confirmed_at IS NOT NULL OR resolved_at IS NOT NULL)").first<Record<string, unknown>>();
+  const japanNow = new Date(Date.now() + 9 * 60 * 60 * 1000);
+  const startOfJapanDay = Date.UTC(japanNow.getUTCFullYear(), japanNow.getUTCMonth(), japanNow.getUTCDate()) - 9 * 60 * 60 * 1000;
+  const resolvedTodayMetric = await db.prepare("SELECT COUNT(*) AS count FROM issues WHERE portal_id IS NULL AND resolved_at >= ?").bind(startOfJapanDay).first<Record<string, unknown>>();
+  const averageSeconds = (value: unknown): number | null => value == null ? null : Math.max(0, Math.round(Number(value) / 1000));
   return {
     counts, categoryCounts: (categoryResult.results ?? []).map((row) => ({ category: String(row.category ?? 'その他'), count: Number(row.count ?? 0) })),
     urgent, surge: surgeResult ? { category: String(surgeResult.category ?? 'その他'), count: Number(surgeResult.count ?? 0) } : null,
-    metrics: { reports: Number(reportMetric?.count ?? 0), issues: Number(issueMetric?.count ?? 0), autoGrouped: Number(groupedMetric?.count ?? 0), originalOpened: Number(originalMetric?.count ?? 0), issueResponses: Number(responseMetric?.count ?? 0) },
+    metrics: {
+      reports: Number(reportMetric?.count ?? 0), issues: Number(issueMetric?.count ?? 0),
+      autoGrouped: Number(groupedMetric?.count ?? 0),
+      originalOpened: Number(originalQuestionMetric?.count ?? 0) + Number(originalIssueMetric?.count ?? 0),
+      issueResponses: Number(responseMetric?.count ?? 0), faqResolved: Number(faqResolvedMetric?.count ?? 0),
+      staffHandled: Number(staffHandledMetric?.count ?? 0), originalNotOpened: Number(originalNotOpenedMetric?.count ?? 0),
+      averageFirstConfirmationSeconds: averageSeconds(timingMetric?.first_confirmation_ms), averageResolutionSeconds: averageSeconds(timingMetric?.resolution_ms),
+      resolvedToday: Number(resolvedTodayMetric?.count ?? 0),
+    },
   };
 }
 
@@ -930,13 +959,17 @@ async function hydrateIssue(db: D1Database, issue: Issue, includeReports = true)
   };
 }
 
-export async function listIssuesForAdministratorPage(portalId: number | null = null, page = 1, pageSize = 100): Promise<{ issues: Issue[]; hasMore: boolean }> {
+export async function listIssuesForAdministratorPage(portalId: number | null = null, page = 1, pageSize = 100, search = ''): Promise<{ issues: Issue[]; hasMore: boolean }> {
   const db = await initialise();
   const safePage = Math.max(1, Math.trunc(page) || 1); const safePageSize = Math.min(Math.max(Math.trunc(pageSize) || 100, 1), 100); const offset = (safePage - 1) * safePageSize;
   const scope = portalId === null ? 'portal_id IS NULL' : 'portal_id = ?';
   const priority = "CASE urgency_candidate WHEN 'critical' THEN 4 WHEN 'high' THEN 3 WHEN 'normal' THEN 2 ELSE 1 END";
-  const statement = db.prepare(`${ISSUE_SELECT} WHERE ${scope} ORDER BY CASE WHEN status IN ('resolved','cannot_resolve') THEN 1 ELSE 0 END ASC, ${priority} DESC, report_count DESC, last_reported_at ASC LIMIT ? OFFSET ?`);
-  const result = portalId === null ? await statement.bind(safePageSize + 1, offset).all<Record<string, unknown>>() : await statement.bind(portalId, safePageSize + 1, offset).all<Record<string, unknown>>();
+  const term = search.trim().slice(0, 80);
+  const searchClause = term ? " AND (title LIKE ? OR summary LIKE ? OR request LIKE ? OR location LIKE ? OR category LIKE ? OR assigned_team LIKE ? OR assigned_user LIKE ?)" : '';
+  const searchValues = term ? Array.from({ length: 7 }, () => `%${term}%`) : [];
+  const statement = db.prepare(`${ISSUE_SELECT} WHERE ${scope}${searchClause} ORDER BY CASE WHEN status IN ('resolved','cannot_resolve') THEN 1 ELSE 0 END ASC, ${priority} DESC, report_count DESC, last_reported_at ASC LIMIT ? OFFSET ?`);
+  const values = portalId === null ? [...searchValues, safePageSize + 1, offset] : [portalId, ...searchValues, safePageSize + 1, offset];
+  const result = await statement.bind(...values).all<Record<string, unknown>>();
   const rows = result.results ?? []; const hasMore = rows.length > safePageSize;
   return { issues: await Promise.all(rows.slice(0, safePageSize).map((row) => hydrateIssue(db, mapIssue(row)))), hasMore };
 }
@@ -993,6 +1026,19 @@ function questionStatusForIssue(status: string): string {
   return status === 'resolved' || status === 'cannot_resolve' ? 'resolved' : status === 'in_progress' ? 'in_progress' : status === 'waiting' ? 'awaiting_info' : status === 'new' ? 'received' : 'reviewing';
 }
 
+function issueStatusPublicMessage(status: string): string {
+  const messages: Record<string, string> = {
+    new: '相談を受け付けました。避難所スタッフが内容を確認します。',
+    reviewing: '避難所スタッフが状況を確認しています。',
+    assigned: '担当スタッフを決めて、対応を進めます。',
+    in_progress: '避難所スタッフが対応を進めています。',
+    waiting: '対応に必要な情報を確認しています。',
+    resolved: '対応が完了しました。',
+    cannot_resolve: '現在の対応状況を記録しました。近くのスタッフにもご相談ください。',
+  };
+  return messages[status] ?? '相談の対応状況が更新されました。';
+}
+
 export async function ensureStaffUser(externalId: string, displayName: string, role = 'staff'): Promise<void> {
   const db = await initialise(); const id = externalId.trim().slice(0, 120) || 'admin-password'; const name = displayName.trim().slice(0, 120) || '避難所管理者';
   await db.prepare(`INSERT INTO staff_users (external_id, display_name, role, active, last_seen_at) VALUES (?, ?, ?, 1, ?)
@@ -1011,15 +1057,17 @@ export async function updateIssueWorkflow(issueId: number, status: string, messa
     ? await db.prepare(`UPDATE issues SET status = ?, assigned_team = ?, assigned_user = ?, urgency_confirmed = ?, internal_note = ?, resolved_at = ?, updated_at = ?, version = version + 1 WHERE id = ? AND portal_id IS NULL`).bind(...binds).run()
     : await db.prepare(`UPDATE issues SET status = ?, assigned_team = ?, assigned_user = ?, urgency_confirmed = ?, internal_note = ?, resolved_at = ?, updated_at = ?, version = version + 1 WHERE id = ? AND portal_id IS NULL AND version = ?`).bind(...binds, expectedVersion).run();
   if (Number(result.meta.changes ?? 0) !== 1) throw new Error(expectedVersion == null ? 'ISSUE_UPDATE_FAILED' : 'ISSUE_CONFLICT');
-  const publicMessage = message.trim().slice(0, 1000); const publicFlag = isPublic ? 1 : 0;
-  if (publicMessage) {
-    const actor = await auditActorId(actorUserId);
-    await db.prepare('INSERT INTO issue_responses (issue_id, message, is_public, actor_user_id, created_at) VALUES (?, ?, ?, ?, ?)').bind(issueId, publicMessage, publicFlag, actor, now).run();
-    const mappedStatus = questionStatusForIssue(status);
-    const reportIds = await db.prepare('SELECT question_id FROM issue_reports WHERE issue_id = ?').bind(issueId).all<{ question_id: number }>();
-    await db.batch((reportIds.results ?? []).map((row) => db.prepare('INSERT INTO case_updates (question_id, status, message, is_public, actor_user_id, created_at) VALUES (?, ?, ?, ?, ?, ?)').bind(Number(row.question_id), mappedStatus, publicMessage, publicFlag, actor, now)));
-  }
   const mappedStatus = questionStatusForIssue(status);
+  const publicMessage = message.trim().slice(0, 1000);
+  const publicFlag = isPublic ? 1 : 0;
+  const statusChanged = issue.status !== status;
+  if (publicMessage || statusChanged) {
+    const actor = await auditActorId(actorUserId);
+    const residentMessage = publicMessage || issueStatusPublicMessage(status);
+    if (publicMessage) await db.prepare('INSERT INTO issue_responses (issue_id, message, is_public, actor_user_id, created_at) VALUES (?, ?, ?, ?, ?)').bind(issueId, publicMessage, publicFlag, actor, now).run();
+    const reportIds = await db.prepare('SELECT question_id FROM issue_reports WHERE issue_id = ?').bind(issueId).all<{ question_id: number }>();
+    await db.batch((reportIds.results ?? []).map((row) => db.prepare('INSERT INTO case_updates (question_id, status, message, is_public, actor_user_id, created_at) VALUES (?, ?, ?, ?, ?, ?)').bind(Number(row.question_id), mappedStatus, residentMessage, publicMessage ? publicFlag : 1, actor, now)));
+  }
   await db.prepare('UPDATE questions SET workflow_status = ?, assignee_name = ?, urgency_confirmed = ?, internal_note = ?, first_confirmed_at = COALESCE(first_confirmed_at, ?) WHERE issue_id = ?').bind(mappedStatus, assignedUser.trim().slice(0, 120), urgencyConfirmed.trim().slice(0, 8) || null, internalNote.trim().slice(0, 2000), status === 'new' ? null : now, issueId).run();
   if (status === 'resolved' || status === 'cannot_resolve') await db.prepare('UPDATE questions SET resolved_at = COALESCE(resolved_at, ?) WHERE issue_id = ?').bind(now, issueId).run();
   await db.prepare('INSERT INTO issue_operation_history (issue_id, report_id, operation, actor_user_id, detail, created_at) VALUES (?, NULL, ?, ?, ?, ?)').bind(issueId, `issue_${status}`, await auditActorId(actorUserId), publicMessage ? `public:${publicFlag}` : 'status only', now).run();
