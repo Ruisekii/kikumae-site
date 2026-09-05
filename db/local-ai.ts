@@ -150,6 +150,8 @@ const SYNONYM_GROUPS = [
   ['初心者', '未経験', '初めて', 'はじめて'], ['部費', '費用', 'お金', '料金'],
   ['活動日', '曜日', '日時', '時間', 'いつ'], ['持ち物', '道具', '必要'],
   ['入部', '参加', '入り'], ['一人', '1人', 'ひとり'],
+  // 避難所の相談で頻出する1文字語の表記ゆれ（かな表記のみで漢字を含まない語も拾えるようにする）
+  ['水', '飲料水', 'お水'], ['薬', 'くすり'],
 ];
 
 function normalize(value: string): string {
@@ -176,10 +178,18 @@ function cosineSimilarity(a: string, b: string): number {
   return na && nb ? dot / (Math.sqrt(na) * Math.sqrt(nb)) : 0;
 }
 
+// KEYWORD_RE は漢字2文字以上／カタカナ2文字以上／英字3文字以上しか拾わないため、
+// 「水」「薬」のような1文字の重要語はここで個別にヒントとして拾う（第2ラウンドで追加）。
+// 避難所の相談で特に頻出し、かつ他の語と混同しにくいものだけを最小限で追加した
+// （実測: 「水がほしいです」「薬がなくて困っています」が"related":[]になる退行を確認して対応）。
+// 「傷」「寒」「暑」「便」等の追加は、単独では意味が広がりすぎる／実測で崩れるケースが
+// 未確認のため今回は見送った（詳細は報告参照）。
+const SHELTER_ONE_CHAR_HINTS = ['水', '薬', '熱', '火'];
+
 function keywords(value: string): Set<string> {
   const text = value.normalize('NFKC');
   const found = new Set(text.match(KEYWORD_RE) ?? []);
-  ['いつ', '急に', '一人', '1人', 'ひとり', 'はじめて', '初めて', 'お金'].forEach((hint) => { if (text.includes(hint)) found.add(hint); });
+  ['いつ', '急に', '一人', '1人', 'ひとり', 'はじめて', '初めて', 'お金', 'くすり', ...SHELTER_ONE_CHAR_HINTS].forEach((hint) => { if (text.includes(hint)) found.add(hint); });
   const expanded = new Set(found);
   found.forEach((word) => SYNONYM_GROUPS.forEach((group) => { if (group.includes(word)) group.forEach((synonym) => expanded.add(synonym)); }));
   return expanded;

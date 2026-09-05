@@ -544,3 +544,17 @@ footer { padding: 28px 24px; background: var(--navy); color: #fff; text-align: c
 /* 統計・分析セクションの内訳（既存の counts / surge をそのまま使う） */
 .stats-summary-row { display: flex; flex-wrap: wrap; gap: 8px 16px; margin-top: 4px; padding-bottom: 14px; border-bottom: 1px solid var(--line); color: var(--muted); font-size: .88rem; }
 .stats-summary-row strong { color: var(--navy); }
+
+/* ============================================================
+   第2ラウンド追記分（音声ボタンの領域確保／相談導線の整理）
+   既存セレクタ・パレット定義の値は書き換えず、新しいクラスを追記するのみ。
+   ============================================================ */
+
+/* 音声入力ボタン：対応可否の判定（マウント後のuseEffectで実行）が終わるまで領域だけ先に
+   確保しておき、判定が終わってボタンが現れてもレイアウトがずれないようにする。
+   非対応と分かった場合は visibility を戻さず、押せると誤解させない（第1ラウンドの意図を維持）。 */
+.evac-theme .voice-slot { visibility: hidden; pointer-events: none; }
+.evac-theme .voice-slot.is-voice-ready { visibility: visible; pointer-events: auto; }
+
+/* 「相談をはじめる」の重複ボタンを撤去したあと、上のヒーローへ戻るための控えめなリンク */
+.evac-theme .chat-invite-link { display: inline-block; margin-top: 14px; }

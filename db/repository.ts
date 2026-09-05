@@ -509,7 +509,13 @@ export async function updateQuestionWorkflow(questionId: number, workflowStatus:
   const update = await db.prepare(`UPDATE questions SET workflow_status = ?, assignee_name = ?, urgency_confirmed = ?, internal_note = ?, first_confirmed_at = COALESCE(first_confirmed_at, ?), resolved_at = ? WHERE id = ?${scope}`).bind(workflowStatus, assigneeName.trim().slice(0, 120), urgencyConfirmed.trim().slice(0, 8) || null, internalNote.trim().slice(0, 2000), firstConfirmedAt, resolvedAt, questionId).run();
   if (Number(update.meta.changes ?? 0) !== 1) throw new Error('質問を更新できませんでした。');
   const publicMessage = message.trim().slice(0, 500);
-  if (publicMessage || isPublic) await db.prepare('INSERT INTO case_updates (question_id, status, message, is_public, actor_user_id, created_at) VALUES (?, ?, ?, ?, ?, ?)').bind(questionId, workflowStatus, publicMessage, isPublic ? 1 : 0, await auditActorId(actorUserId), now).run();
+  // 「状態は変えずに保存する」導線（担当者・内部メモだけ保存）を押しても、公開コメントが空で
+  // 状態も変わっていないときはcase_updatesに空行を積まない（伝える内容があるとき、または
+  // 状態が実際に変わったときだけ履歴を残す）。isPublic自体は「挿入するかどうか」ではなく
+  // 「挿入する行を公開扱いにするかどうか」の値なので、挿入判定からは外す。
+  // 監査記録（recordQuestionEvent/writeAuditLog）はこの抑制と無関係に必ず残す。
+  const statusChanged = workflowStatus !== question.workflowStatus;
+  if (publicMessage || statusChanged) await db.prepare('INSERT INTO case_updates (question_id, status, message, is_public, actor_user_id, created_at) VALUES (?, ?, ?, ?, ?, ?)').bind(questionId, workflowStatus, publicMessage, isPublic ? 1 : 0, await auditActorId(actorUserId), now).run();
   await recordQuestionEvent(questionId, 'status_changed', actorUserId, `${workflowStatus}:${isPublic ? 'public' : 'internal'}`);
   await writeAuditLog('workflow_updated', actorUserId, questionId, null, workflowStatus);
   return (await getQuestionForAdministrator(questionId, null))!;
