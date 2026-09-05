@@ -507,3 +507,40 @@ footer { padding: 28px 24px; background: var(--navy); color: #fff; text-align: c
 .evac-theme .device-history-list li { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 10px 12px; border: 1px solid var(--v-line); border-radius: 10px; background: var(--v-surface); }
 .evac-theme .device-history-list a { color: var(--v-coral-text); font-weight: 800; text-decoration: none; }
 .evac-theme .device-history-date { color: var(--v-muted); font-size: .78rem; white-space: nowrap; }
+
+/* ============================================================
+   職員ダッシュボード・追記分（ワークフロー改善）
+   既存のパレット定義・避難者側セレクタは書き換えず、既存の --shelter- 接頭辞
+   トークンの組み合わせを新しいクラスで再利用するだけに留める。
+   ============================================================ */
+
+/* 通知メッセージ：色だけでなく記号・文言でも成功/失敗を区別し、失敗は職員が閉じるまで残す */
+.staff-message { display: flex; align-items: center; gap: 8px; margin: 16px 0 0; font-weight: 800; }
+.staff-message-info { color: var(--muted); }
+.staff-message-success { color: var(--shelter-sage-text); }
+.staff-message-error { padding: 10px 14px; border-radius: 12px; background: var(--shelter-coral-soft); color: var(--shelter-coral-text); border: 1.5px solid var(--shelter-coral-text); }
+.message-dismiss { margin-left: auto; border: 0; background: transparent; color: inherit; font-weight: 800; text-decoration: underline; cursor: pointer; padding: 2px 6px; }
+
+/* 新着（未確認・要緊急確認の増加）を音を鳴らさずに知らせるバナー */
+.arrival-notice { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin: 10px 0 0; padding: 10px 14px; border-radius: 12px; background: var(--shelter-sunflower-soft); color: var(--shelter-sunflower-text); font-weight: 800; }
+.arrival-notice button { margin-left: auto; border: 0; background: transparent; color: inherit; font-weight: 900; cursor: pointer; padding: 4px 8px; font-size: 1rem; }
+
+/* 状態を変えずに保存する導線と、未保存の変更があることを示すバッジ */
+.save-only-row { display: flex; align-items: center; gap: 10px; margin-top: 16px; flex-wrap: wrap; }
+.unsaved-badge { display: inline-block; padding: 3px 9px; border-radius: 999px; background: var(--shelter-plum-soft); color: var(--shelter-plum); font-size: .78rem; font-weight: 800; }
+
+/* 他の職員の更新と自分の未保存の編集がぶつかったときに知らせる（黙って上書きしない） */
+.conflict-notice { margin: 14px 0; padding: 12px 14px; border-radius: 12px; background: var(--shelter-coral-soft); border: 1.5px solid var(--shelter-coral-text); }
+.conflict-notice strong { display: block; color: var(--shelter-coral-text); font-size: .9rem; }
+.conflict-notice p { margin: 6px 0 10px; color: var(--ink); font-size: .85rem; }
+
+/* ボタンは無効化せず、押したとき・入力が足りないときに不足を示して誘導する注意書き */
+.inline-warning { margin-top: 8px; padding: 8px 10px; border-radius: 8px; background: var(--shelter-coral-soft); color: var(--shelter-coral-text); font-weight: 700; font-size: .85rem; }
+
+/* 担当未設定だけの絞り込みトグル */
+.assignee-filter-toggle { display: inline-flex; align-items: center; gap: 6px; margin: 0 0 18px; padding: 6px 10px; border: 1px solid var(--line); border-radius: 999px; color: var(--muted); font-size: .85rem; font-weight: 800; cursor: pointer; }
+.assignee-filter-toggle input { width: 16px; height: 16px; accent-color: var(--shelter-coral-strong); }
+
+/* 統計・分析セクションの内訳（既存の counts / surge をそのまま使う） */
+.stats-summary-row { display: flex; flex-wrap: wrap; gap: 8px 16px; margin-top: 4px; padding-bottom: 14px; border-bottom: 1px solid var(--line); color: var(--muted); font-size: .88rem; }
+.stats-summary-row strong { color: var(--navy); }

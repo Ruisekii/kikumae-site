@@ -2,8 +2,10 @@
 
 import { FormEvent, useEffect, useState } from 'react';
 import type { Faq } from '../../db/repository';
+// 避難所版のカテゴリ定義（db/local-ai.ts）をそのまま使う。旧「きくまえ」版のカテゴリと混在させない。
+import { SHELTER_CATEGORIES } from '../../db/local-ai';
 
-const categories = ['利用方法', '申請・手続き', '日程・場所', '料金・費用', 'ルール・制度', '困りごと・トラブル', 'その他'];
+const categories = SHELTER_CATEGORIES;
 type Props = { apiBase: string; title?: string };
 type FormState = { question: string; answer: string; category: string };
 const emptyForm: FormState = { question: '', answer: '', category: 'その他' };
