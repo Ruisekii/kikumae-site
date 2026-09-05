@@ -387,6 +387,23 @@ footer { padding: 28px 24px; background: var(--navy); color: #fff; text-align: c
   .evac-theme .timeline-item { min-height: 78px; }
 }
 
+/* 自主窓口（避難者向け・/[slug]）を避難所の世界観へ統一するための追記。
+   portal-client.tsx はきくまえ時代からの旧クラス名（.portal-hero / .ask-section / .faq-grid /
+   .faq-card / .step-card / .original-card / .related-card 等）をまだ使っており、これらは
+   var(--ink) / var(--navy) / var(--muted) / var(--line) / var(--paper) / var(--blue) / var(--yellow)
+   という旧トークン名を直接参照している。.staff-page が既存の :root トークン名を --shelter-* へ
+   別名で束ね直しているのと同じやり方で、.evac-theme 配下でも同じ旧トークン名を既存の
+   --v-*（実体は --shelter-*）へ束ね直す。--v-* 自体の値や :root の値は書き換えない。 */
+.evac-theme {
+  --ink: var(--v-ink);
+  --navy: var(--v-ink);
+  --muted: var(--v-muted);
+  --line: var(--v-line);
+  --paper: var(--v-surface);
+  --blue: var(--v-sunflower-soft);
+  --yellow: var(--v-sunflower);
+}
+
 /* 職員ダッシュボード */
 /* 共有パレット(--shelter-*)を、この画面内だけで使われてきた旧トークン名(--ink/--navy/--muted/--line/--blue/--red/--green)
    の別名として上書きする。他画面の:rootトークンには影響しない（.staff-page配下にのみ適用されるため）。

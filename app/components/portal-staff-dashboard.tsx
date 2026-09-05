@@ -3,6 +3,7 @@
 import { use, useMemo, useState } from 'react';
 import Link from 'next/link';
 import type { FaqCandidate, SubmittedQuestion } from '../../db/repository';
+import { PII_TYPE_LABELS } from '../../db/local-ai';
 import { FaqManagement } from './faq-management';
 import { AuditLogList } from './audit-log-list';
 
@@ -29,7 +30,7 @@ export function PortalStaffDashboard({ params }: Props) {
   async function loadQuestions() {
     const response = await fetch(`/api/portals/${slug}/admin/questions`, { cache: 'no-store' });
     const body = await response.json() as { questions?: SubmittedQuestion[]; message?: string };
-    if (!response.ok) { if (response.status === 401) clearSession('セッションの有効期限が切れました。もう一度ログインしてください。'); else setMessage(body.message ?? '質問一覧を読み込めませんでした。'); return; }
+    if (!response.ok) { if (response.status === 401) clearSession('セッションの有効期限が切れました。もう一度ログインしてください。'); else setMessage(body.message ?? '相談一覧を読み込めませんでした。'); return; }
     setQuestions(body.questions ?? []); setSelectedId((current) => current && body.questions?.some((q) => q.id === current) ? current : null);
   }
   async function login() {
@@ -61,14 +62,14 @@ export function PortalStaffDashboard({ params }: Props) {
     catch { setMessage('FAQ候補の更新に失敗しました。'); } finally { setBusy(false); }
   }
   async function deleteSelectedQuestion() {
-    if (!selected || !window.confirm('この質問と回答履歴を削除しますか？この操作は元に戻せません。')) return;
-    setBusy(true); setMessage('質問を削除しています…');
+    if (!selected || !window.confirm('この相談と回答履歴を削除しますか？この操作は元に戻せません。')) return;
+    setBusy(true); setMessage('相談を削除しています…');
     try {
       const response = await fetch(`/api/portals/${slug}/admin/questions/${selected.id}`, { method: 'DELETE' });
       const body = await response.json() as { message?: string };
-      if (!response.ok) { if (response.status === 401) clearSession('セッションの有効期限が切れました。もう一度ログインしてください。'); else setMessage(body.message ?? '質問を削除できませんでした。'); return; }
-      setSelectedId(null); setDraft(null); setAnswerText(''); await loadQuestions(); setMessage('質問を削除しました。');
-    } catch { setMessage('質問の削除に失敗しました。'); }
+      if (!response.ok) { if (response.status === 401) clearSession('セッションの有効期限が切れました。もう一度ログインしてください。'); else setMessage(body.message ?? '相談を削除できませんでした。'); return; }
+      setSelectedId(null); setDraft(null); setAnswerText(''); await loadQuestions(); setMessage('相談を削除しました。');
+    } catch { setMessage('相談の削除に失敗しました。'); }
     finally { setBusy(false); }
   }
   async function logout() {
@@ -86,18 +87,21 @@ export function PortalStaffDashboard({ params }: Props) {
     } catch { setMessage('窓口の削除に失敗しました。'); }
     finally { setBusy(false); }
   }
-  if (!loggedIn) return <main className="staff-page"><header className="site-header"><Link className="brand" href="/">🐣 きくまえ</Link><Link href={`/${slug}`}>公開ページへ</Link></header><section className="portal-admin-login"><p className="eyebrow">管理者用</p><h1>この窓口の管理画面</h1><p className="staff-note">窓口作成時に設定したパスワードで入ります。</p><form onSubmit={(event) => { event.preventDefault(); void login(); }}><label>管理者パスワード<input value={password} onChange={(event) => setPassword(event.target.value)} type="password" required autoComplete="current-password" /></label><button className="button accent" type="submit" disabled={busy}>{busy ? '確認中…' : '管理画面に入る'}</button>{message && <p className="form-status" role="status">{message}</p>}</form></section></main>;
+  if (!loggedIn) return <main className="staff-page"><header className="site-header"><Link className="brand" href={`/${slug}`}>◌ 避難所の相談窓口</Link><Link href={`/${slug}`}>公開ページへ</Link></header><section className="portal-admin-login"><p className="eyebrow">管理者用</p><h1>この窓口の管理画面</h1><p className="staff-note">窓口作成時に設定したパスワードで入ります。</p><form onSubmit={(event) => { event.preventDefault(); void login(); }}><label>管理者パスワード<input value={password} onChange={(event) => setPassword(event.target.value)} type="password" required autoComplete="current-password" /></label><button className="button accent" type="submit" disabled={busy}>{busy ? '確認中…' : '管理画面に入る'}</button>{message && <p className="form-status" role="status">{message}</p>}</form></section></main>;
   const openCount = questions.filter((q) => q.status === 'open').length;
   const pendingCount = questions.filter((q) => q.candidate).length;
-  return <main className="staff-page"><header className="site-header"><Link className="brand" href="/">🐣 きくまえ</Link><div className="header-actions"><Link href={`/${slug}`}>公開ページへ</Link><button className="button secondary" type="button" onClick={() => void logout()}>ログアウト</button></div></header><section className="staff-content"><p className="eyebrow">窓口管理</p><h1>{name}</h1><p className="staff-note">質問者は匿名です。原文は保存したまま、AIは下書きだけを支援します。</p>{message && <p className="form-status" role="status">{message}</p>}<div className="staff-stats"><span>未回答 <b>{openCount}</b></span><span>FAQ候補 <b>{pendingCount}</b></span><span>公開FAQは人が承認</span><button className="button secondary" type="button" onClick={() => void loadQuestions()} disabled={busy}>更新</button></div><div className="staff-layout"><div className="question-list">{questions.map((question) => <button className={`question-card question-select ${selectedId === question.id ? 'selected' : ''}`} key={question.id} type="button" onClick={() => selectQuestion(question)}><div><span className="tag">{question.category}</span><span className="status-pill">{question.status === 'open' ? '未回答' : '回答済み'}</span><time>{dateLabel(question.createdAt)}</time></div><strong>{question.aiSummary || '原文を確認してください'}</strong><p>{question.bodyOriginal}</p></button>)}{!questions.length && <p className="empty">まだ質問はありません。公開ページから匿名で質問できます。</p>}</div><div className="staff-detail">{selected ? <PortalQuestionDetail question={selected} draft={draft} answerText={answerText} setAnswerText={setAnswerText} busy={busy} onGenerateDraft={() => void generateDraft()} onApprove={() => void approveAnswer()} onCandidateAction={candidateAction} onDelete={() => void deleteSelectedQuestion()} /> : <div className="detail-empty">左の質問を選ぶと、原文・要約・回答案が表示されます。</div>}</div></div><FaqManagement apiBase={`/api/portals/${slug}/admin/faqs`} /><AuditLogList apiBase={`/api/portals/${slug}/admin/audit-logs`} /><section className="danger-zone" aria-labelledby="portal-delete-title"><h2 id="portal-delete-title">危険な操作</h2><p>この窓口を削除すると、公開FAQ・質問・回答・FAQ候補・確認用データなど、窓口に保存された関連データも削除されます。この操作は取り消せません。</p>{!showDelete ? <button className="button danger" type="button" onClick={() => { setShowDelete(true); setConfirmName(''); setMessage(''); }}>この窓口を削除</button> : <div className="delete-confirm"><h3>「{name}」を削除しますか？</h3><p>削除を続けるには、確認のため窓口名を入力してください。</p><label htmlFor="portal-delete-name">窓口名<input id="portal-delete-name" value={confirmName} onChange={(event) => setConfirmName(event.target.value)} autoComplete="off" placeholder={name} /></label><div className="form-actions"><button className="button danger" type="button" disabled={busy || confirmName !== name} onClick={() => void deletePortal()}>完全に削除する</button><button className="button secondary" type="button" disabled={busy} onClick={() => { setShowDelete(false); setConfirmName(''); }}>キャンセル</button></div></div>}</section></section></main>;
+  return <main className="staff-page"><header className="site-header"><Link className="brand" href={`/${slug}`}>◌ 避難所の相談窓口</Link><div className="header-actions"><Link href={`/${slug}`}>公開ページへ</Link><button className="button secondary" type="button" onClick={() => void logout()}>ログアウト</button></div></header><section className="staff-content"><p className="eyebrow">窓口管理</p><h1>{name}</h1><p className="staff-note">相談者は匿名です。原文は保存したまま、AIは下書きだけを支援します。</p>{message && <p className="form-status" role="status">{message}</p>}<div className="staff-stats"><span>未回答 <b>{openCount}</b></span><span>FAQ候補 <b>{pendingCount}</b></span><span>公開FAQは人が承認</span><button className="button secondary" type="button" onClick={() => void loadQuestions()} disabled={busy}>更新</button></div><div className="staff-layout"><div className="question-list">{questions.map((question) => <button className={`question-card question-select ${selectedId === question.id ? 'selected' : ''}`} key={question.id} type="button" onClick={() => selectQuestion(question)}><div><span className="tag">{question.category}</span><span className="status-pill">{question.status === 'open' ? '未回答' : '回答済み'}</span>{question.piiDetected && <span className="pii-chip">伏字あり</span>}<time>{dateLabel(question.createdAt)}</time></div><strong>{question.aiSummary || '要約を確認してください'}</strong>{/* 一覧では原文をそのまま並べない。個人情報を伏字にした本文（未検出のときは原文と同じ値）だけを見せる */}<p>{question.bodyMasked}</p></button>)}{!questions.length && <p className="empty">まだ相談はありません。公開ページから匿名で相談できます。</p>}</div><div className="staff-detail">{selected ? <PortalQuestionDetail question={selected} draft={draft} answerText={answerText} setAnswerText={setAnswerText} busy={busy} onGenerateDraft={() => void generateDraft()} onApprove={() => void approveAnswer()} onCandidateAction={candidateAction} onDelete={() => void deleteSelectedQuestion()} /> : <div className="detail-empty">左の相談を選ぶと、要約・原文・回答案が表示されます。</div>}</div></div><FaqManagement apiBase={`/api/portals/${slug}/admin/faqs`} /><AuditLogList apiBase={`/api/portals/${slug}/admin/audit-logs`} /><section className="danger-zone" aria-labelledby="portal-delete-title"><h2 id="portal-delete-title">危険な操作</h2><p>この窓口を削除すると、公開FAQ・相談・回答・FAQ候補・確認用データなど、窓口に保存された関連データも削除されます。この操作は取り消せません。</p>{!showDelete ? <button className="button danger" type="button" onClick={() => { setShowDelete(true); setConfirmName(''); setMessage(''); }}>この窓口を削除</button> : <div className="delete-confirm"><h3>「{name}」を削除しますか？</h3><p>削除を続けるには、確認のため窓口名を入力してください。</p><label htmlFor="portal-delete-name">窓口名<input id="portal-delete-name" value={confirmName} onChange={(event) => setConfirmName(event.target.value)} autoComplete="off" placeholder={name} /></label><div className="form-actions"><button className="button danger" type="button" disabled={busy || confirmName !== name} onClick={() => void deletePortal()}>完全に削除する</button><button className="button secondary" type="button" disabled={busy} onClick={() => { setShowDelete(false); setConfirmName(''); }}>キャンセル</button></div></div>}</section></section></main>;
 }
 
 function PortalQuestionDetail({ question, draft, answerText, setAnswerText, busy, onGenerateDraft, onApprove, onCandidateAction, onDelete }: { question: SubmittedQuestion; draft: { draft: string; alternatives: string[]; grounds: string[] } | null; answerText: string; setAnswerText: (value: string) => void; busy: boolean; onGenerateDraft: () => void; onApprove: () => void; onCandidateAction: (candidate: FaqCandidate, action: string) => Promise<void>; onDelete: () => void }) {
   const candidate = question.candidate;
   return <article className="detail-card">
     <div className="detail-header"><span className="tag">{question.category}</span><span className="status-pill">{question.status === 'open' ? '未回答' : '回答済み'}</span></div>
+    {question.piiDetected && <div className="pii-notice"><strong>個人情報を検出したため一部を伏字にしています</strong><div className="pii-chip-row">{question.piiTypes.map((type) => <span key={type} className="pii-chip">{PII_TYPE_LABELS[type] ?? type}</span>)}</div></div>}
     <section className="summary-block"><h2>AIによる要約</h2><p>{question.aiSummary || '要約なし'}</p></section>
-    <section className="original-block"><h2>質問の原文</h2><p>{question.bodyOriginal}</p></section>
+    {/* 原文はここでのみ表示する（一覧では並べない）。窓口側には原文閲覧の監査記録を残すAPIがないため、
+        メイン職員画面のような「開いたことは記録されます」という案内は書かない。 */}
+    <section className="original-block"><h2>相談の原文</h2><p>{question.bodyOriginal}</p></section>
     {question.status === 'open' && <section className="answer-editor"><h2>AI回答案（人の承認が必要）</h2>{!draft ? <><p className="input-hint">この窓口の承認済みFAQだけを根拠に、外部送信なしで下書きを作成します。</p><button className="button primary" type="button" disabled={busy} onClick={onGenerateDraft}>✨ 回答案を表示</button></> : <>
       <div className="grounds"><b>根拠（承認済みFAQ）</b>{draft.grounds.length ? <ul>{draft.grounds.map((ground) => <li key={ground}>{ground}</li>)}</ul> : <p>根拠なし</p>}</div>
       {draft.alternatives.length > 0 && <div className="draft-options"><b>回答案を選ぶ（選んだ文章が編集欄に入ります）</b>{draft.alternatives.map((option, index) => <button className="draft-option" type="button" key={`${question.id}-${index}`} onClick={() => setAnswerText(option)}><strong>🟡 回答案{index + 1}：{index === 0 ? '簡潔に答える' : index === 1 ? '少し丁寧に説明する' : '別の観点から案内する'}</strong><span>{option}</span></button>)}</div>}
@@ -105,6 +109,6 @@ function PortalQuestionDetail({ question, draft, answerText, setAnswerText, busy
     </>}</section>}
     {question.answerBody && <section className="answer-history"><h2>承認済み回答</h2><p>{question.answerBody}</p></section>}
     {candidate && <section className="candidate-review"><h2>AIが作ったFAQ候補</h2><p className="input-hint">公式FAQにするかは、人が確認して決めます。</p><div className="step-card"><b>Q. {candidate.qText}</b><p>{candidate.aText}</p><span className="tag">{candidate.category}</span></div><div className="form-actions"><button className="button accent" type="button" disabled={busy} onClick={() => void onCandidateAction(candidate, 'publish_edited')}>人が承認して公式FAQに公開</button><button className="button secondary" type="button" disabled={busy} onClick={() => void onCandidateAction(candidate, 'individual')}>個別回答だけにする</button><button className="button danger" type="button" disabled={busy} onClick={() => void onCandidateAction(candidate, 'reject')}>非公開にする</button></div></section>}
-    <button className="button danger delete-question" type="button" disabled={busy} onClick={onDelete}>この質問と回答履歴を削除</button>
+    <button className="button danger delete-question" type="button" disabled={busy} onClick={onDelete}>この相談と回答履歴を削除</button>
   </article>;
 }
