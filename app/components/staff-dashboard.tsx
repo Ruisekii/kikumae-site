@@ -116,20 +116,26 @@ export function StaffDashboard({ displayName, authorized = false, adminApiToken,
   function submitSearch(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const nextSearch = searchInput.trim().slice(0, 80);
+    if (search === nextSearch && page === 1) {
+      void loadIssues({ pageNumber: 1, searchTerm: nextSearch });
+      return;
+    }
     setSearch(nextSearch);
     setPage(1);
     setSelectedId(null);
     setSelectedIds([]);
-    void loadIssues({ pageNumber: 1, searchTerm: nextSearch });
   }
 
   function clearSearch() {
+    if (!search && page === 1) {
+      void loadIssues({ pageNumber: 1, searchTerm: '' });
+      return;
+    }
     setSearchInput('');
     setSearch('');
     setPage(1);
     setSelectedId(null);
     setSelectedIds([]);
-    void loadIssues({ pageNumber: 1, searchTerm: '' });
   }
 
   async function deleteSelected() {
