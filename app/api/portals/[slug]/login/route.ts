@@ -1,4 +1,4 @@
-import { createPortalSession, getPortal, shouldUpgradePortalPassword, upgradePortalPassword, verifyPortalPassword } from '../../../../../db/portals';
+import { createPortalSession, DUMMY_PASSWORD_HASH, getPortal, shouldUpgradePortalPassword, upgradePortalPassword, verifyPortalPassword } from '../../../../../db/portals';
 import { allowBurstShared, readRequestText } from '../../../../../db/request-guard';
 
 export const runtime = 'edge';
@@ -8,7 +8,10 @@ export async function POST(request: Request, { params }: { params: Promise<{ slu
   const origin = request.headers.get('origin'); if (origin && origin !== new URL(request.url).origin) return Response.json({ message: 'この送信元は許可されていません。' }, { status: 403 });
   const { slug } = await params;
   if (!await allowBurstShared(request, `portal-login:${slug}`, 10, 5 * 60 * 1000)) return Response.json({ message: 'ログイン試行が多すぎます。5分ほど待ってから再度お試しください。' }, { status: 429, headers: { 'Retry-After': '300', 'Cache-Control': 'no-store' } });
-  const portal = await getPortal(slug); if (!portal) return Response.json({ message: '窓口が見つかりません。' }, { status: 404 });
+  // 窓口の有無でレスポンスを分けると、総当たりでどのスラッグが実在するか
+  // 判別できてしまう。存在しない場合もダミーハッシュに対して同じコストの
+  // 照合を行い、以降は実在時とまったく同じメッセージ・ステータス・処理で応答する。
+  const portal = await getPortal(slug);
   let body: { password?: string };
   try {
     body = JSON.parse(await readRequestText(request, MAX_REQUEST_BYTES)) as { password?: string };
@@ -17,7 +20,8 @@ export async function POST(request: Request, { params }: { params: Promise<{ slu
     return Response.json({ message: '入力形式が正しくありません。' }, { status: 400 });
   }
   const password = String(body.password ?? '');
-  if (password.length > 128 || !await verifyPortalPassword(password, portal.passwordHash)) return Response.json({ message: 'パスワードが違います。' }, { status: 401 });
+  const passwordOk = password.length <= 128 && await verifyPortalPassword(password, portal?.passwordHash ?? DUMMY_PASSWORD_HASH);
+  if (!portal || !passwordOk) return Response.json({ message: 'パスワードが違います。' }, { status: 401 });
   if (shouldUpgradePortalPassword(portal.passwordHash)) {
     // Do not fail a valid login if a best-effort hash upgrade is unavailable;
     // the rate limit still protects this endpoint and the next login retries.

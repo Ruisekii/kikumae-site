@@ -5,6 +5,21 @@ export const runtime = 'edge';
 const RESERVED_PORTAL_SLUGS = new Set(['admin', 'api', 'callback', 'open', 'owner', 'questions', 'signin-with-chatgpt', 'signout-with-chatgpt', 'staff']);
 const MAX_REQUEST_BYTES = 8_192;
 
+// なりすまし対策: 避難所や公的機関を騙る窓口名・URL用の名前をブロックする。
+// ブロックリスト単独では類似字での回避を防ぎきれないため、窓口ページ側の
+// 出自表示（誰かが自分で開設した窓口であることの明示）と合わせて運用する。
+const IMPERSONATION_TERMS = ['避難所', '避難', '安否', '被災', '災害', '救援', '市役所', '区役所', '町役場', '役所', '自治体', '公式', 'police', 'shelter', 'official'];
+
+// 全角半角(NFKC)・大文字小文字・スペースの有無を正規化してから判定する。
+function normalizeForImpersonationCheck(value: string): string {
+  return value.normalize('NFKC').toLowerCase().replace(/\s+/g, '');
+}
+
+function containsImpersonationTerm(value: string): boolean {
+  const normalized = normalizeForImpersonationCheck(value);
+  return IMPERSONATION_TERMS.some((term) => normalized.includes(normalizeForImpersonationCheck(term)));
+}
+
 function sameOrigin(request: Request): boolean {
   const origin = request.headers.get('origin');
   return !origin || origin === new URL(request.url).origin;
@@ -20,6 +35,7 @@ export async function POST(request: Request): Promise<Response> {
     if (name.length < 2 || name.length > 80) return Response.json({ message: '窓口名は2〜80文字で入力してください。' }, { status: 400 });
     if (!/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(slug) || slug.length > 48) return Response.json({ message: 'URL用の名前は英数字とハイフンで入力してください。' }, { status: 400 });
     if (RESERVED_PORTAL_SLUGS.has(slug)) return Response.json({ message: 'そのURL用の名前はシステムで予約されています。別の名前を入力してください。' }, { status: 400 });
+    if (containsImpersonationTerm(name) || containsImpersonationTerm(slug)) return Response.json({ message: '避難所や市区町村などの公的な窓口を装う言葉は、窓口名やURL用の名前に使えません。別の言葉で入力してください。' }, { status: 400 });
     if (description.length > 300) return Response.json({ message: '説明は300文字以内で入力してください。' }, { status: 400 });
     if (password.length < 10 || password.length > 128) return Response.json({ message: '管理者パスワードは10文字以上で設定してください。' }, { status: 400 });
     if (password !== String(body.passwordConfirmation ?? '')) return Response.json({ message: 'パスワード確認が一致しません。' }, { status: 400 });

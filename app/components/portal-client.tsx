@@ -44,6 +44,11 @@ export function PortalClient({ slug, name, description, faqs }: Props) {
   }
   return <main>
     <header className="site-header"><Link className="brand" href="/">🐣 きくまえ</Link><nav><a href="#faq">FAQを探す</a><a href="#ask">質問する</a><Link href={`/${slug}/admin`}>管理画面</Link></nav></header>
+    {/* なりすまし対策: この窓口が避難所の公式窓口ではなく、誰かが自分で開設したものであることを
+        常時・目立つ形で明示する。折りたたみにせず、質問フォームより前に必ず目に入る位置に置く。 */}
+    <p className="portal-origin-notice" role="note" style={{ maxWidth: 1120, margin: '20px auto 0', padding: '14px 20px', border: '2px solid var(--ink)', borderRadius: 14, background: 'var(--blue)', boxShadow: '4px 4px 0 var(--ink)', fontWeight: 800, fontSize: '.92rem', lineHeight: 1.6 }}>
+      この窓口は「{name}」の利用者が自分で開設したものです。避難所の公式な相談窓口ではありません。避難所に関するご相談は<Link href="/" style={{ textDecoration: 'underline' }}>公式窓口（トップページ）</Link>をご利用ください。
+    </p>
     <section className="portal-hero"><p className="eyebrow">匿名の質問窓口</p><h1>🐣 {name}のきくまえ</h1><p>{description || '気になることは、思ったままの言葉で聞けます。'}</p><div className="hero-actions"><a className="button primary" href="#faq">FAQを探す</a><a className="button accent" href="#ask">質問する</a></div></section>
     <section className="section" id="faq"><div className="section-heading"><div><p className="eyebrow">公開FAQ</p><h2>まず、聞く前に探せます</h2></div><label className="search-label"><span className="sr-only">FAQを検索</span><input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="例：どこから申し込めばいい？" maxLength={100} type="search" /></label></div>
       {closest ? <article className="faq-card faq-card-featured"><span className="tag">{closest.category}</span><h3>Q. {closest.question}</h3><p>A. {closest.answer}</p>{matches.length > 1 && <details><summary>ほかのFAQ {matches.length - 1}件</summary><div className="faq-grid faq-grid-inner">{matches.slice(1).map((faq) => <article className="faq-card" key={faq.id}><span className="tag">{faq.category}</span><h3>Q. {faq.question}</h3><p>A. {faq.answer}</p></article>)}</div></details>}<div className="form-actions"><a className="button primary" href="#ask">これで解決した</a><a className="button secondary" href="#ask">それでも質問する</a></div></article> : <p className="empty">近いFAQは見つかりませんでした。下の窓口から気軽に質問できます。</p>}
