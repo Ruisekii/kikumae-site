@@ -143,7 +143,7 @@ export function KikumaeClient({ faqs }: Props) {
   function closeChat() { setChatOpen(false); setStatus(''); }
   async function copyCheckUrl() { if (!checkUrl) return; try { await navigator.clipboard.writeText(new URL(checkUrl, window.location.origin).toString()); setStatus('確認ページのURLをコピーしました。'); } catch { setStatus('URLをコピーできませんでした。リンクを長押しして保存してください。'); } }
 
-  return <main>
+  return <main className="evac-theme">
     <header className="site-header shelter-header"><a className="brand" href="#home" aria-label="ホームへ戻る">◌ 相談窓口</a><nav aria-label="主要メニュー"><a href="#faq">よくある質問</a><Link href="/questions">相談状況</Link><Link href="/admin">職員用</Link></nav></header>
     <section className="shelter-hero" id="home"><div className="shelter-hero-copy"><p className="eyebrow">避難所の相談窓口</p><h1>困っていることを、<br /><span>教えてください。</span></h1><p>言葉がまとまっていなくても大丈夫です。AIがいったん受け止め、必要なことを職員へ分かりやすく届けます。</p><div className="shelter-actions"><button className="button accent large" type="button" onClick={() => beginChat()}>▱ 文字で相談する</button><button className="button secondary large" type="button" onClick={() => beginChat(true)}>◉ 音声で話す</button></div><p className="shelter-reassure">相談は匿名です。原文もそのまま保存され、職員が確認します。</p></div><div className="shelter-hero-note"><span className="note-icon">＋</span><div><strong>あなたの声を、<br />職員に届けます</strong><p>受付後は、対応状況をいつでも確認できます。</p></div></div></section>
     <section className="quick-links" aria-label="相談以外の入口"><a href="#faq"><span className="quick-icon">?</span><span><strong>よくある質問を見る</strong><small>水・食料・トイレなど</small></span><b>›</b></a><Link href="/questions"><span className="quick-icon">◷</span><span><strong>自分の相談状況を見る</strong><small>受付済み・確認中・対応中</small></span><b>›</b></Link></section>

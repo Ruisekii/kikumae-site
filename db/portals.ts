@@ -45,6 +45,10 @@ const PBKDF2_ITERATIONS = 210_000;
 const PORTAL_PASSWORD_ITERATIONS = 20_000;
 let pbkdf2Supported: boolean | null = null;
 
+// 窓口が存在しない場合でも、実在する場合と同じ処理コストで
+// パスワード照合を行うためのダミーハッシュです。
+export const DUMMY_PASSWORD_HASH = `pbkdf2sha256$${PBKDF2_ITERATIONS}$AAAAAAAAAAAAAAAAAAAAAA$${'0'.repeat(64)}`;
+
 async function derivePortalPassword(password: string, salt: string, iterations = PORTAL_PASSWORD_ITERATIONS): Promise<string> {
   const key = await crypto.subtle.importKey('raw', new TextEncoder().encode(password), { name: 'HMAC', hash: 'SHA-256' }, false, ['sign']);
   let value = new TextEncoder().encode(`${salt}:${password}`);

@@ -278,3 +278,159 @@ button, input, textarea, select { font-size: 1rem; }
   .merge-actions .button { width: 100%; }
   .pagination-controls { flex-wrap: wrap; }
 }
+
+/* ============================================================
+   Claude側の「となりの相談所」世界観
+   避難者側と職員側で同じ暖かさを共有し、職員画面だけ情報密度を上げる。
+   ============================================================ */
+:root {
+  --shelter-ink: #33291f;
+  --shelter-muted: #6b5f4f;
+  --shelter-paper: #fbf3e6;
+  --shelter-surface: #fffdf8;
+  --shelter-line: #ecdfc9;
+  --shelter-coral: #e2694f;
+  --shelter-coral-soft: #fbe0d7;
+  --shelter-coral-text: #a83e22;
+  --shelter-coral-strong: #bf4a2c;
+  --shelter-sunflower: #e7a83a;
+  --shelter-sunflower-soft: #faecd0;
+  --shelter-sunflower-text: #7a5a12;
+  --shelter-sage: #6f8f6a;
+  --shelter-sage-soft: #e3ecdd;
+  --shelter-sage-text: #4d6b48;
+  --shelter-plum: #7a3358;
+  --shelter-plum-soft: #f4e0ea;
+  --shelter-urgent-bg: #a13228;
+}
+
+.evac-theme {
+  min-height: 100vh;
+  color: var(--shelter-ink);
+  background-color: var(--shelter-paper);
+  background-image: radial-gradient(rgba(51,41,31,.05) 1px, transparent 1px);
+  background-size: 15px 15px;
+}
+.evac-theme .eyebrow { color: var(--shelter-coral-text); }
+.evac-theme .site-header { background: var(--shelter-surface); border-bottom-color: var(--shelter-line); }
+.evac-theme .site-header .brand, .evac-theme .site-header nav a { color: var(--shelter-ink); }
+.evac-theme .site-header nav a:hover { background: var(--shelter-sage-soft); }
+.evac-theme .shelter-hero { background-image: radial-gradient(circle at 84% 18%, var(--shelter-sunflower-soft) 0 12%, transparent 12.4%), radial-gradient(circle at 94% 72%, var(--shelter-sage-soft) 0 9%, transparent 9.3%); }
+.evac-theme .shelter-hero h1 { color: var(--shelter-ink); letter-spacing: -.03em; }
+.evac-theme .shelter-hero h1 span { color: var(--shelter-coral-text); }
+.evac-theme .shelter-hero-copy > p:not(.eyebrow):not(.shelter-reassure), .evac-theme .shelter-reassure { color: var(--shelter-muted); }
+.evac-theme .shelter-hero-note { border-color: var(--shelter-line); background: var(--shelter-surface); border-top: 4px solid var(--shelter-sage); box-shadow: 0 8px 22px rgba(90,60,30,.12); }
+.evac-theme .shelter-hero-note .note-icon { background: var(--shelter-sage); color: #fff; }
+.evac-theme .shelter-hero-note strong { color: var(--shelter-ink); }
+.evac-theme .shelter-hero-note p { color: var(--shelter-muted); }
+.evac-theme .button { border: 0; border-radius: 18px; box-shadow: 0 7px 16px rgba(90,60,30,.15); }
+.evac-theme .button.primary, .evac-theme .button.accent { background: var(--shelter-coral-strong); color: #fff; }
+.evac-theme .button.secondary { border: 1.5px solid var(--shelter-line); background: var(--shelter-surface); color: var(--shelter-ink); box-shadow: none; }
+.evac-theme .button.secondary:hover { border-color: var(--shelter-coral-strong); }
+.evac-theme .quick-links a { border-color: var(--shelter-line); background: var(--shelter-surface); }
+.evac-theme .quick-links a:hover { box-shadow: 0 7px 16px rgba(90,60,30,.15); }
+.evac-theme .quick-links .quick-icon { background: var(--shelter-sunflower-soft); color: var(--shelter-ink); }
+.evac-theme .quick-links strong, .evac-theme .quick-links b { color: var(--shelter-ink); }
+.evac-theme .quick-links small, .evac-theme .chat-invite p:not(.eyebrow), .evac-theme .chat-safety { color: var(--shelter-muted); }
+.evac-theme .chat-invite, .evac-theme .chat-panel { border-color: var(--shelter-line); background: var(--shelter-surface); box-shadow: 0 8px 22px rgba(90,60,30,.12); }
+.evac-theme .chat-panel-head { border-bottom-color: var(--shelter-line); background: var(--shelter-sage-soft); }
+.evac-theme .chat-panel-head h2, .evac-theme .chat-bubble span, .evac-theme .chat-bubble p { color: var(--shelter-ink); }
+.evac-theme .text-button { color: var(--shelter-coral-text); }
+.evac-theme .chat-bubble.ai { border-color: var(--shelter-line); background: var(--shelter-surface); }
+.evac-theme .chat-bubble.person { background: var(--shelter-sage-soft); }
+.evac-theme .chat-faq-card, .evac-theme .chat-confirm-card { border-color: var(--shelter-line); background: #fdf6ea; }
+.evac-theme .chat-faq-card article { border-top-color: var(--shelter-line); }
+.evac-theme .chat-faq-card article strong, .evac-theme .faq-question { color: var(--shelter-ink); }
+.evac-theme .quick-replies button, .evac-theme .location-choices button, .evac-theme .check-link-actions button { border-color: var(--shelter-line); background: var(--shelter-surface); color: var(--shelter-ink); }
+.evac-theme .quick-replies button:hover, .evac-theme .location-choices button:hover, .evac-theme .check-link-actions button:hover { background: var(--shelter-sage-soft); }
+.evac-theme .chat-input { border-color: var(--shelter-line); background: var(--shelter-surface); }
+.evac-theme .voice-button { background: var(--shelter-sage-soft); color: var(--shelter-ink); }
+.evac-theme .send-button { background: var(--shelter-sunflower); color: var(--shelter-ink); }
+.evac-theme .faq-section { border-top-color: var(--shelter-line); }
+.evac-theme .shelter-faq-card { border-color: var(--shelter-line); background: var(--shelter-surface); }
+.evac-theme .faq-category { color: var(--shelter-coral-text); }
+.evac-theme .shelter-faq-card summary strong, .evac-theme .faq-card-actions button { color: var(--shelter-ink); }
+.evac-theme .shelter-faq-card > p, .evac-theme .section-lead { color: var(--shelter-muted); }
+.evac-theme .shelter-footer-note { border-color: #cbdac5; background: var(--shelter-sage-soft); }
+.evac-theme .shelter-footer-note > span { background: var(--shelter-sage); }
+.evac-theme .shelter-footer-note strong { color: var(--shelter-sage-text); }
+.evac-theme .shelter-footer-note p { color: var(--shelter-muted); }
+.evac-theme .shelter-footer-note a { color: var(--shelter-ink); }
+.evac-theme.public-page { background-color: var(--shelter-paper); }
+.evac-theme .status-lookup-card, .evac-theme .status-card { border-color: var(--shelter-line); background: var(--shelter-surface); box-shadow: 0 8px 22px rgba(90,60,30,.12); }
+.evac-theme .status-lookup-card h1, .evac-theme .status-card h1 { color: var(--shelter-ink); }
+.evac-theme .status-lookup-card > p:not(.eyebrow), .evac-theme .status-card > p:not(.eyebrow), .evac-theme .timeline-item p { color: var(--shelter-muted); }
+.evac-theme .status-badge { background: var(--shelter-sage-soft); color: var(--shelter-sage-text); }
+.evac-theme .status-badge.urgent { background: var(--shelter-urgent-bg); color: #fff; }
+.evac-theme .timeline::before { background: var(--shelter-line); }
+.evac-theme .timeline-item.done, .evac-theme .timeline-item.current { color: var(--shelter-ink); }
+.evac-theme .timeline-item.done .timeline-dot { color: var(--shelter-sage); }
+.evac-theme .timeline-item.current .timeline-dot { color: var(--shelter-coral-strong); }
+.evac-theme .public-updates, .evac-theme .public-answer { border-top-color: var(--shelter-line); }
+.evac-theme .public-updates h2, .evac-theme .public-answer h2 { color: var(--shelter-ink); }
+.evac-theme .public-update { border-left-color: var(--shelter-sage); background: var(--shelter-sage-soft); }
+.evac-theme .status-original { border-color: var(--shelter-line); }
+.evac-theme .status-original summary { color: var(--shelter-ink); }
+
+/* 職員画面は同じ暖色を土台にし、濃い左ナビで一覧性を確保する。 */
+.staff-page {
+  --ink: var(--shelter-ink);
+  --muted: var(--shelter-muted);
+  --navy: #33291f;
+  --paper: var(--shelter-paper);
+  --line: var(--shelter-line);
+  --blue: var(--shelter-sage-soft);
+  --green: var(--shelter-sage-soft);
+  background: #f6f0e3;
+}
+.staff-topbar { min-height: 70px; box-shadow: 0 1px 0 rgba(90,60,30,.10); }
+.staff-topbar .brand { color: var(--shelter-ink); font-weight: 950; letter-spacing: -.02em; }
+.staff-topbar .brand::first-letter { color: var(--shelter-coral-strong); }
+.staff-sidebar { border-right: 0; background: #24190f; color: #fff; box-shadow: 10px 0 26px rgba(90,60,30,.14); }
+.sidebar-kicker { color: #e8b39c; }
+.sidebar-link { color: #d9c7ae; }
+.sidebar-link:hover, .sidebar-link.active { background: var(--shelter-coral-strong); color: #fff; }
+.sidebar-link span { background: rgba(255,255,255,.14); color: #fff; }
+.sidebar-note { border-color: rgba(255,255,255,.16); color: #b8a58a; }
+.shelter-staff-content { background: #f6f0e3; }
+.metric-card, .priority-card, .category-card, .cases-section, .settings-card { box-shadow: 0 8px 24px rgba(90,60,30,.09); }
+.metric-blue { border-top-color: var(--shelter-sage); }
+.metric-soft { border-top-color: #b4a4c7; }
+.metric-yellow { border-top-color: var(--shelter-sunflower); }
+.metric-green { border-top-color: var(--shelter-sage); }
+.urgent-card { border-left-color: var(--shelter-coral-strong); }
+.surge-card { border-left-color: var(--shelter-sunflower); background: #fffaf0; }
+.cases-section { border-top-color: var(--shelter-coral-strong); }
+.shelter-question-card { background: var(--shelter-surface); border-left-color: transparent; }
+.shelter-question-card.selected, .shelter-question-card.bulk-selected { border-left-color: var(--shelter-coral-strong); background: #faf2e2; }
+.shelter-detail-card { border-top-color: var(--shelter-coral-strong); box-shadow: 0 14px 30px rgba(90,60,30,.10); }
+.bulk-toolbar, .command-summary { border-color: var(--shelter-line); background: #faf2e2; }
+.bulk-select-all input, .bulk-row-checkbox-input { accent-color: var(--shelter-coral-strong); }
+.bulk-check { border-color: var(--shelter-line); }
+.shelter-question-card.bulk-selected .bulk-check { border-color: var(--shelter-coral-strong); background: var(--shelter-coral-strong); }
+.status-new { background: var(--shelter-coral-soft); color: var(--shelter-coral-text); }
+.status-reviewing, .status-assigned { background: var(--shelter-slate-soft, #e9e4d8); color: #52514a; }
+.status-in_progress { background: var(--shelter-sunflower-soft); color: var(--shelter-sunflower-text); }
+.status-waiting { background: var(--shelter-plum-soft); color: var(--shelter-plum); }
+.status-resolved { background: var(--shelter-sage-soft); color: var(--shelter-sage-text); }
+.status-cannot_resolve { background: #eee6df; color: #765447; }
+.urgency-chip-critical, .urgent-badge, .critical-warning { background: var(--shelter-coral-soft); color: var(--shelter-coral-text); }
+.urgency-chip-high { background: var(--shelter-sunflower-soft); color: var(--shelter-sunflower-text); }
+.urgency-chip-normal { background: #eee8dc; color: #665b4d; }
+.urgency-chip-low { background: var(--shelter-sage-soft); color: var(--shelter-sage-text); }
+.analysis-label { color: var(--shelter-coral-text); }
+.emotion-box, .missing-chips span, .bulk-answer-confirm { background: var(--shelter-sunflower-soft); color: var(--shelter-sunflower-text); }
+.related-group-heading, .request-section { background: #fdf6ea; }
+.response-grid input, .response-grid textarea, .answer-editor textarea, .candidate-review input, .candidate-review textarea, .issue-search input { border-color: var(--shelter-line); background: var(--shelter-surface); }
+.detail-tabs button.active { border-bottom-color: var(--shelter-coral-strong); }
+.detail-tabs b { color: var(--shelter-coral-strong); }
+.status-actions .action-resolve, .answer-history { border-color: var(--shelter-sage); background: var(--shelter-sage-soft); color: var(--shelter-sage-text); }
+.update-history > div { border-bottom-color: var(--shelter-line); }
+.settings-grid div { background: #f7f1e6; }
+.button.ghost:hover { background: var(--shelter-sage-soft); }
+.portal-origin-notice { max-width: 1120px; margin: 20px auto 0; padding: 14px 20px; border: 2px solid var(--ink); border-radius: 14px; background: var(--blue); box-shadow: 4px 4px 0 var(--ink); font-weight: 800; font-size: .92rem; line-height: 1.6; }
+.portal-origin-notice a { text-decoration: underline; }
+
+@media (max-width: 680px) {
+  .portal-origin-notice { margin: 14px 16px 0; padding: 12px 14px; }
+}
