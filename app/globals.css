@@ -299,6 +299,7 @@ button, input, textarea, select { font-size: 1rem; }
   --shelter-sage: #6f8f6a;
   --shelter-sage-soft: #e3ecdd;
   --shelter-sage-text: #4d6b48;
+  --shelter-slate-soft: #e9e4d8;
   --shelter-plum: #7a3358;
   --shelter-plum-soft: #f4e0ea;
   --shelter-urgent-bg: #a13228;
@@ -428,6 +429,14 @@ button, input, textarea, select { font-size: 1rem; }
 .update-history > div { border-bottom-color: var(--shelter-line); }
 .settings-grid div { background: #f7f1e6; }
 .button.ghost:hover { background: var(--shelter-sage-soft); }
+.admin-login-page { background: var(--shelter-paper); background-image: radial-gradient(rgba(51,41,31,.05) 1px, transparent 1px); background-size: 15px 15px; }
+.admin-login-card { border-color: var(--shelter-line); background: var(--shelter-surface); box-shadow: 0 14px 34px rgba(90,60,30,.12); }
+.admin-login-mark { background: var(--shelter-sage-soft); color: var(--shelter-sage-text); }
+.admin-login-card h1, .admin-login-card label { color: var(--shelter-ink); }
+.admin-login-lead { color: var(--shelter-muted); }
+.admin-login-card input { border-color: var(--shelter-line); background: var(--shelter-surface); color: var(--shelter-ink); }
+.admin-login-card .button { border: 0; border-radius: 18px; background: var(--shelter-coral-strong); color: #fff; box-shadow: 0 7px 16px rgba(90,60,30,.15); }
+.admin-login-back { color: var(--shelter-coral-text); }
 .portal-origin-notice { max-width: 1120px; margin: 20px auto 0; padding: 14px 20px; border: 2px solid var(--ink); border-radius: 14px; background: var(--blue); box-shadow: 4px 4px 0 var(--ink); font-weight: 800; font-size: .92rem; line-height: 1.6; }
 .portal-origin-notice a { text-decoration: underline; }
 
