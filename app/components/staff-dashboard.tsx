@@ -34,6 +34,7 @@ export function StaffDashboard({ displayName, authorized = false, adminApiToken,
   const [message, setMessage] = useState(authorized ? '課題を読み込んでいます…' : '管理権限を確認しています…');
   const [busy, setBusy] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
 
   const loadIssues = useCallback(async ({ silent = false, pageNumber = page, searchTerm = search }: { silent?: boolean; pageNumber?: number; searchTerm?: string } = {}) => {
     setRefreshing(true);
@@ -86,6 +87,13 @@ export function StaffDashboard({ displayName, authorized = false, adminApiToken,
     const timer = window.setTimeout(() => setMessage(''), 2400);
     return () => window.clearTimeout(timer);
   }, [message]);
+
+  useEffect(() => {
+    if (!menuOpen) return;
+    const closeOnEscape = (event: KeyboardEvent) => { if (event.key === 'Escape') setMenuOpen(false); };
+    document.addEventListener('keydown', closeOnEscape);
+    return () => document.removeEventListener('keydown', closeOnEscape);
+  }, [menuOpen]);
 
   const selected = useMemo(() => issues.find((issue) => issue.id === selectedId) ?? null, [issues, selectedId]);
   const visibleIssues = useMemo(() => caseFilter === 'all' ? issues : issues.filter((issue) => issue.status === caseFilter), [caseFilter, issues]);
@@ -238,9 +246,10 @@ export function StaffDashboard({ displayName, authorized = false, adminApiToken,
   }
 
   return <main className="staff-page">
-    <header className="site-header staff-topbar"><Link className="brand" href="/">◌ 避難所の相談窓口</Link><div className="header-actions"><span className="staff-user">{displayName || '職員'}さん</span><Link href="/">避難者画面</Link>{signOutHref && <Link href={signOutHref}>ログアウト</Link>}</div></header>
+    <header className="site-header staff-topbar"><Link className="brand" href="/">◌ 避難所の相談窓口</Link><div className="header-actions"><span className="staff-user">{displayName || '職員'}さん</span><button className="staff-menu-toggle" type="button" onClick={() => setMenuOpen(true)} aria-expanded={menuOpen} aria-controls="staff-navigation">☰ メニュー</button><Link href="/">避難者画面</Link>{signOutHref && <Link href={signOutHref}>ログアウト</Link>}</div></header>
     <div className="staff-shell">
-      <aside className="staff-sidebar" aria-label="職員メニュー"><div className="sidebar-kicker">避難所スタッフ</div><a className="sidebar-link active" href="#overview">▦ 指令盤</a><a className="sidebar-link" href="#issues">▤ 対応すべき課題 <span>{issues.filter((issue) => !['resolved', 'cannot_resolve'].includes(issue.status)).length}</span></a><a className="sidebar-link" href="#faq-management">▧ FAQ・最新案内</a><a className="sidebar-link" href="#metrics">◔ 統計・分析</a><a className="sidebar-link" href="#settings">⚙ 設定</a><div className="sidebar-note">AIは声を課題に整理します。重大な判断と返信は、必ず職員が確認します。</div></aside>
+      {menuOpen && <button className="staff-menu-backdrop" type="button" onClick={() => setMenuOpen(false)} aria-label="職員メニューを閉じる" />}
+      <aside className={`staff-sidebar ${menuOpen ? 'is-open' : ''}`} id="staff-navigation" aria-label="職員メニュー"><div className="sidebar-mobile-heading"><strong>職員メニュー</strong><button className="text-button" type="button" onClick={() => setMenuOpen(false)}>閉じる</button></div><div className="sidebar-kicker">避難所スタッフ</div><a className="sidebar-link active" href="#overview" onClick={() => setMenuOpen(false)}>▦ 指令盤</a><a className="sidebar-link" href="#issues" onClick={() => setMenuOpen(false)}>▤ 対応すべき課題 <span>{issues.filter((issue) => !['resolved', 'cannot_resolve'].includes(issue.status)).length}</span></a><a className="sidebar-link" href="#faq-management" onClick={() => setMenuOpen(false)}>▧ FAQ・最新案内</a><a className="sidebar-link" href="#metrics" onClick={() => setMenuOpen(false)}>◔ 統計・分析</a><a className="sidebar-link" href="#settings" onClick={() => setMenuOpen(false)}>⚙ 設定</a><div className="sidebar-note">AIは声を課題に整理します。重大な判断と返信は、必ず職員が確認します。</div></aside>
       <section className="staff-content shelter-staff-content">
         <div className="staff-heading" id="overview"><div><p className="eyebrow">避難所の状況</p><h1>いま対応する課題</h1><p className="staff-note">原文を大量に読まなくても、必要な事実と要望を課題単位で確認できます。</p></div><button className="button secondary" type="button" onClick={() => void loadIssues()} disabled={busy || refreshing}>↻ {refreshing ? '更新中…' : '更新'}</button></div>
         {message && <p className="form-status" role="status">{message}</p>}
