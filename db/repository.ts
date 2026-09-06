@@ -493,12 +493,26 @@ function mapFaq(row: Record<string, unknown>): Faq {
   };
 }
 
-export async function listPublishedFaqs(portalId: number | null = null): Promise<Faq[]> {
-  const db = await initialise();
+async function readPublishedFaqs(db: D1Database, portalId: number | null): Promise<Faq[]> {
   const result = portalId == null
     ? await db.prepare(`SELECT id, question, answer, category, status, created_at, updated_at, source, expires_at, verified FROM faqs WHERE status = 'published' AND portal_id IS NULL AND (expires_at IS NULL OR expires_at > ?) AND category IN (${SHELTER_CATEGORIES.map(() => '?').join(',')}) ORDER BY updated_at DESC`).bind(Date.now(), ...SHELTER_CATEGORIES).all<Record<string, unknown>>()
     : await db.prepare("SELECT id, question, answer, category, status, created_at, updated_at, source, expires_at, verified FROM faqs WHERE status = 'published' AND portal_id = ? AND (expires_at IS NULL OR expires_at > ?) ORDER BY updated_at DESC").bind(portalId, Date.now()).all<Record<string, unknown>>();
   return (result.results ?? []).map(mapFaq);
+}
+
+export async function listPublishedFaqs(portalId: number | null = null): Promise<Faq[]> {
+  // The public home page only needs published FAQ rows. Read that small,
+  // stable surface first so a cold Worker does not block the first screen on
+  // the administrator schema migration. New or legacy databases still fall
+  // back to the full additive initialisation when the FAQ schema is missing.
+  const db = database();
+  try {
+    return await readPublishedFaqs(db, portalId);
+  } catch (error) {
+    const message = error instanceof Error ? error.message.toLowerCase() : String(error).toLowerCase();
+    if (!message.includes('no such table') && !message.includes('no such column')) throw error;
+    return readPublishedFaqs(await initialise(), portalId);
+  }
 }
 
 function faqScope(portalId: number | null): { clause: string; values: number[] } {
