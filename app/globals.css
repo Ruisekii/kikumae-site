@@ -757,6 +757,24 @@ button, input, textarea, select { font-size: 1rem; }
 .command-secondary-panel { max-width: 1600px; margin: 16px auto 0; padding: 15px; border: 1px solid #dfd2c1; border-radius: 12px; background: #fffaf3; }.secondary-panel-heading h2 { margin: 0; color: #493a2d; font-size: 1rem; }.secondary-panel-heading > span { color: #a08e7a; font-size: .68rem; }.compact-metrics { display: flex; flex-wrap: wrap; gap: 7px; margin: 10px 0; }.compact-metrics span { padding: 6px 9px; border-radius: 7px; background: #f0e7da; color: #806c55; font-size: .7rem; }.compact-metrics b { margin-right: 3px; color: #574331; font-size: .9rem; }.command-secondary-panel .category-bars { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 7px 14px; margin-top: 7px; }.command-secondary-panel .category-bar { grid-template-columns: 92px minmax(0,1fr) 24px; gap: 6px; font-size: .7rem; }.command-secondary-panel .category-bar > div { height: 6px; background: #e4ddd2; }.command-secondary-panel .category-bar i { background: #cb856f; }
 .staff-page .faq-management, .staff-page .audit-log-section { max-width: 1600px; margin-left: auto; margin-right: auto; padding-left: 0; padding-right: 0; }.staff-page .settings-card { margin-top: 16px; }
 
+/* Category icons: the emoji carries the meaning, while the colored badge keeps it legible at a glance. */
+.staff-page .issue-category-icon, .staff-page .summary-main-icon { font-family: "Segoe UI Emoji", "Apple Color Emoji", "Noto Color Emoji", sans-serif; line-height: 1; text-align: center; border: 1px solid transparent; }
+.staff-page .issue-category-icon { font-size: 1.35rem; }
+.staff-page .summary-main-icon { border-width: 2px; }
+.staff-page .issue-category-water { background: #e3f5ff; border-color: #8ac8e5; }
+.staff-page .issue-category-supplies { background: #fff1d5; border-color: #e4b966; }
+.staff-page .issue-category-medical { background: #ffe7e8; border-color: #ee9c9e; }
+.staff-page .issue-category-hygiene { background: #e4f7f5; border-color: #8dcfc5; }
+.staff-page .issue-category-equipment { background: #eeeaff; border-color: #aaa1df; }
+.staff-page .issue-category-pet { background: #fff0e4; border-color: #e4aa78; }
+.staff-page .issue-category-comfort { background: #eaf1ff; border-color: #a5bce5; }
+.staff-page .issue-category-safety { background: #ffe9dc; border-color: #e49b68; }
+.staff-page .issue-category-accessibility { background: #e9f0ff; border-color: #9eb9e5; }
+.staff-page .issue-category-other { background: #f2ece5; border-color: #d7c5b2; }
+.staff-page .status-pill i, .staff-page .fact-card > span, .staff-page .response-actions button, .staff-page .sidebar-link { font-family: "Segoe UI Emoji", "Apple Color Emoji", "Noto Color Emoji", sans-serif; }
+.staff-page .fact-card > span { font-size: 1.16rem; }
+.shelter-map-issue-icon { fill: #fff; font-family: "Segoe UI Emoji", "Apple Color Emoji", "Noto Color Emoji", sans-serif; font-size: 20px; font-weight: 900; }
+
 @media (max-width: 1200px) {
   .staff-page .header-stats { gap: 4px; }.header-stat { padding: 5px 7px; }.header-stat small { font-size: .62rem; }.command-center { grid-template-columns: minmax(245px, .85fr) minmax(340px, 1.15fr); }.response-pane { grid-column: 1 / -1; min-height: 0; }.response-pane .response-card { min-height: auto; }
 }

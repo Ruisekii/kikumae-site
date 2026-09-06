@@ -110,13 +110,16 @@ export function ShelterZone({ zone, selected, interactive, onSelect }: ShelterZo
 }
 
 function issueIcon(category: string): string {
-  if (/トイレ|衛生/.test(category)) return '水・衛';
-  if (/水/.test(category)) return '水';
-  if (/食料/.test(category)) return '食';
-  if (/医療/.test(category)) return '救';
-  if (/睡眠/.test(category)) return '寝';
-  if (/安全/.test(category)) return '安全';
-  return '相談';
+  if (/救護|医療|薬|けが|怪我|体調|熱/.test(category)) return '🩺';
+  if (/トイレ/.test(category)) return '🚻';
+  if (/衛生|手洗い|入浴/.test(category)) return '🧼';
+  if (/水|飲料/.test(category)) return '💧';
+  if (/食料|物資|毛布|衣類|おむつ|ミルク/.test(category)) return '🍱';
+  if (/充電|通信/.test(category)) return '🔌';
+  if (/ペット/.test(category)) return '🐾';
+  if (/睡眠|寒さ|暑さ/.test(category)) return '🧣';
+  if (/安全|危険|暴力|火災/.test(category)) return '🚨';
+  return '💬';
 }
 
 export function IssueMarker({ zone, count, selected, issue, onSelect }: { zone: ShelterMapZone; count: number; selected: boolean; issue: ShelterMapIssue; onSelect: (issue: ShelterMapIssue) => void }) {
