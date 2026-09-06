@@ -7,7 +7,7 @@ import { FaqManagement } from './faq-management';
 import { AuditLogList } from './audit-log-list';
 
 type Props = { params: Promise<{ slug: string }> };
-const dateLabel = (value: number | null) => value ? new Intl.DateTimeFormat('ja-JP', { dateStyle: 'medium', timeStyle: 'short' }).format(new Date(value)) : '';
+const dateLabel = (value: number | null) => value ? new Intl.DateTimeFormat('ja-JP', { timeZone: 'Asia/Tokyo', dateStyle: 'medium', timeStyle: 'short' }).format(new Date(value)) : '';
 
 export function PortalStaffDashboard({ params }: Props) {
   const { slug } = use(params);

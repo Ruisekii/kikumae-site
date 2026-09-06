@@ -12,7 +12,7 @@ type MergeAction = 'accept' | 'reject';
 
 const statusLabel: Record<string, string> = { new: '未確認', reviewing: '確認中', assigned: '担当決定', in_progress: '対応中', waiting: '追加情報を確認中', resolved: '解決済み', cannot_resolve: '対応困難' };
 const urgencyLabel: Record<string, string> = { critical: '要緊急確認', high: '高', normal: '通常', low: '低' };
-const dateLabel = (value: number | null) => value ? new Intl.DateTimeFormat('ja-JP', { dateStyle: 'medium', timeStyle: 'short' }).format(new Date(value)) : '';
+const dateLabel = (value: number | null) => value ? new Intl.DateTimeFormat('ja-JP', { timeZone: 'Asia/Tokyo', dateStyle: 'medium', timeStyle: 'short' }).format(new Date(value)) : '';
 const relativeLabel = (value: number) => { const minutes = Math.max(0, Math.round((Date.now() - value) / 60000)); return minutes < 1 ? 'いま' : minutes < 60 ? `${minutes}分前` : `${Math.floor(minutes / 60)}時間前`; };
 const durationLabel = (seconds: number | null | undefined) => { if (seconds == null) return '—'; if (seconds < 60) return `${seconds}秒`; const minutes = Math.round(seconds / 60); return minutes < 60 ? `${minutes}分` : `${Math.floor(minutes / 60)}時間${minutes % 60 ? `${minutes % 60}分` : ''}`; };
 const adminHeaders = (token: string | undefined, headers: Record<string, string> = {}) => token ? { ...headers, 'x-kikumae-admin-token': token } : headers;
