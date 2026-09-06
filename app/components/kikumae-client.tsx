@@ -5,6 +5,8 @@ import Link from 'next/link';
 import type { Faq, RelatedFaq } from '../../db/repository';
 import { generateShelterAnalysis, searchFaqs, shelterFollowUp } from '../../db/local-ai';
 import { LocationSelector } from './shelter-map';
+import { appendConsultHistory } from './consult-history';
+import { ShelterHomeBoard } from './shelter-home-board';
 
 type Intake = { location: string; issueLocation: string; reporterLocation: string; peopleCount: string; resourceRemaining: string; lastReceivedAt: string; additionalDetails: string };
 type Analysis = { title: string; overview: string; facts: string[]; emotion: string; missingInformation: string[]; urgencyCandidate: string; urgentReview: boolean; category: string; location: string; issueLocation: string; peopleCount: string; resourceRemaining: string; lastReceivedAt: string };
@@ -69,33 +71,6 @@ function supplementFields(analysis: Analysis, body: string, intake: Intake): Sup
   return fields;
 }
 
-export type ConsultHistoryEntry = { id: number; checkUrl: string; title: string; savedAt: number };
-const HISTORY_STORAGE_KEY = 'kikumae-consult-history';
-const HISTORY_MAX_AGE_MS = 7 * 24 * 60 * 60 * 1000;
-
-export function loadConsultHistory(): ConsultHistoryEntry[] {
-  try {
-    const raw = window.localStorage.getItem(HISTORY_STORAGE_KEY);
-    if (!raw) return [];
-    const parsed = JSON.parse(raw) as unknown;
-    if (!Array.isArray(parsed)) return [];
-    const fresh = (parsed as ConsultHistoryEntry[]).filter((entry) => {
-      if (!entry || typeof entry.id !== 'number' || typeof entry.checkUrl !== 'string' || typeof entry.title !== 'string' || typeof entry.savedAt !== 'number' || Date.now() - entry.savedAt > HISTORY_MAX_AGE_MS) return false;
-      try { const url = new URL(entry.checkUrl, window.location.origin); return url.origin === window.location.origin && /^\/questions\/[0-9a-f-]{32,80}$/i.test(url.pathname); } catch { return false; }
-    });
-    if (fresh.length !== parsed.length) window.localStorage.setItem(HISTORY_STORAGE_KEY, JSON.stringify(fresh));
-    return fresh;
-  } catch { return []; }
-}
-
-export function appendConsultHistory(entry: ConsultHistoryEntry) {
-  try { window.localStorage.setItem(HISTORY_STORAGE_KEY, JSON.stringify([entry, ...loadConsultHistory()].slice(0, 30))); } catch { /* 共用端末やプライベートモードでは保存しない */ }
-}
-
-export function clearConsultHistory() {
-  try { window.localStorage.removeItem(HISTORY_STORAGE_KEY); } catch { /* 保存されていない場合は何もしない */ }
-}
-
 type ReceptionFlowProps = {
   faqs: Faq[];
   intakeStep: IntakeStep;
@@ -114,6 +89,7 @@ type ReceptionFlowProps = {
   busy: boolean;
   checkUrl: string;
   questionId: number | null;
+  emergencyOpen: boolean;
   onChooseCategory: (category: IntakeCategory) => void;
   onChooseDetail: (detail: string) => void;
   onChooseLocation: (location: string) => void;
@@ -129,23 +105,30 @@ type ReceptionFlowProps = {
   onSubmitFreeText: () => void;
   onStartOver: () => void;
   onCopyUrl: () => void;
+  onOpenEmergency: () => void;
+  onCloseEmergency: () => void;
+  onSubmitEmergency: () => void;
 };
 
-function ReceptionFlow({ faqs, intakeStep, selectedCategory, selectedDetail, selectedLocation, selectedPeople, intakeNote, intake, preview, faqDecision, readyToSubmit, supplementValues, input, status, busy, checkUrl, questionId, onChooseCategory, onChooseDetail, onChooseLocation, onChoosePeople, onSetIntakeStep, onSetIntakeNote, onSetInput, onSetSupplementValue, onChangeQuantity, onFaqResult, onConfirmSupplements, onSubmit, onSubmitFreeText, onStartOver, onCopyUrl }: ReceptionFlowProps) {
+function ReceptionFlow({ faqs, intakeStep, selectedCategory, selectedDetail, selectedLocation, selectedPeople, intakeNote, intake, preview, faqDecision, readyToSubmit, supplementValues, input, status, busy, checkUrl, questionId, emergencyOpen, onChooseCategory, onChooseDetail, onChooseLocation, onChoosePeople, onSetIntakeStep, onSetIntakeNote, onSetInput, onSetSupplementValue, onChangeQuantity, onFaqResult, onConfirmSupplements, onSubmit, onSubmitFreeText, onStartOver, onCopyUrl, onOpenEmergency, onCloseEmergency, onSubmitEmergency }: ReceptionFlowProps) {
   const fields = preview ? supplementFields(preview.analysis, preview.body, intake) : [];
   const stageIndex = checkUrl ? 1 : 0;
   const stages = ['受付済み', '確認中', '現場確認中', '対応中', '解決済み'];
+  const detailProgress = intakeStep === 'category' || intakeStep === 'freeText' ? '' : intakeStep === 'confirm' ? 'done' : 'current';
   return <main className="evac-theme reception-app">
-    <header className="reception-header"><a className="brand" href="#reception-top" aria-label="受付画面の先頭へ">◌ 避難所の受付</a><nav aria-label="補助メニュー"><a href="#reception-faq">よくある質問</a><Link href="/questions">相談状況</Link></nav></header>
+    <header className="reception-header"><a className="brand" href="#reception-top" aria-label="受付画面の先頭へ">◌ 避難所の受付</a><nav aria-label="利用者メニュー"><a href="#reception-top" aria-current={!checkUrl && !emergencyOpen && intakeStep === 'category' ? 'page' : undefined}>困りごと</a><a href="#reception-faq">よくある質問</a><Link href="/questions">相談状況</Link></nav></header>
     <section className="reception-shell" id="reception-top">
-      {!checkUrl && <div className="reception-progress" aria-label="受付の進み具合"><span className={intakeStep === 'category' ? 'current' : 'done'}>困りごと</span><i>→</i><span className={['detail', 'faq', 'location', 'people', 'supplement', 'confirm'].includes(intakeStep) ? 'current' : ''}>内容</span><i>→</i><span className={intakeStep === 'confirm' ? 'current' : ''}>確認</span></div>}
-      {intakeStep === 'category' && !checkUrl && <section className="reception-step reception-category-step" aria-labelledby="reception-title"><p className="eyebrow">避難所の受付</p><h1 id="reception-title">今、困っていることはありますか？</h1><p className="reception-lead">近いものを選んでください。うまく当てはまらなくても大丈夫です。</p><div className="reception-category-grid">{INTAKE_CATEGORIES.map((category, index) => <button className="reception-category-card" type="button" key={category.id} onClick={() => onChooseCategory(category)}><span className={`reception-category-art art-${index + 1}`} role="img" aria-label={`${category.label}の生活イラスト`} /><strong>{category.label}</strong><span className="reception-card-arrow" aria-hidden="true">›</span></button>)}</div><div className="reception-secondary-actions"><button type="button" onClick={() => onSetIntakeStep('freeText')}>文章で伝えたい</button><button type="button" onClick={() => onSetIntakeStep('freeText')}>選択肢にない・うまく言えない</button></div></section>}
+      {!checkUrl && <button className="reception-emergency-link" type="button" onClick={onOpenEmergency}><span aria-hidden="true">🚨</span> 命に関わる・今すぐ助けが必要</button>}
+      {!checkUrl && !emergencyOpen && <div className="reception-progress" aria-label="受付の進み具合"><span className={intakeStep === 'category' ? 'current' : 'done'}>困りごと</span><i>→</i><span className={detailProgress}>詳細</span><i>→</i><span className={intakeStep === 'confirm' ? 'current' : ''}>確認</span>{intakeStep !== 'category' && <small>あと少しです</small>}</div>}
+      {emergencyOpen && !checkUrl ? <section className="reception-step reception-emergency-panel" aria-labelledby="emergency-title"><button className="reception-back" type="button" onClick={onCloseEmergency}>← 通常の相談に戻る</button><p className="eyebrow">緊急時の案内</p><h1 id="emergency-title">今すぐ助けが必要ですか？</h1><div className="emergency-instruction"><strong>命に関わる症状、呼吸が苦しい、意識がない、火事や暴力などの場合</strong><p>通常の相談フォームを使わず、近くの職員に直接声をかけてください。</p></div><button className="button emergency-primary" type="button" disabled={busy} onClick={onSubmitEmergency}>{busy ? '職員へ知らせています…' : '職員にも緊急で知らせる'}</button><p className="emergency-note">このボタンでも職員へ緊急の相談を送ります。送信後も、必ず近くの職員に直接声をかけてください。</p></section> : <>
+      {intakeStep === 'category' && !checkUrl && <><section className="reception-step reception-category-step" aria-labelledby="reception-title"><p className="eyebrow">避難所の受付</p><h1 id="reception-title">今、困っていることはありますか？</h1><p className="reception-lead">近いものを選んでください。文章を書かなくても職員に伝わります。うまく当てはまらなくても大丈夫です。</p><div className="reception-category-grid">{INTAKE_CATEGORIES.map((category, index) => <button className="reception-category-card" type="button" key={category.id} onClick={() => onChooseCategory(category)}><span className={`reception-category-art art-${index + 1}`} role="img" aria-label={`${category.label}の生活イラスト`} /><strong>{category.label}</strong><span className="reception-card-arrow" aria-hidden="true">›</span></button>)}</div><div className="reception-secondary-actions"><button type="button" onClick={() => onSetIntakeStep('freeText')}>文章で伝えたい</button><button type="button" onClick={() => onSetIntakeStep('freeText')}>選択肢にない・うまく言えない</button></div></section><ShelterHomeBoard /></>}
       {intakeStep === 'detail' && selectedCategory && !checkUrl && <section className="reception-step" aria-labelledby="detail-title"><button className="reception-back" type="button" onClick={() => onSetIntakeStep('category')}>← 困りごとの選択に戻る</button><p className="eyebrow">{selectedCategory.label}</p><h1 id="detail-title">どんなことで困っていますか？</h1><p className="reception-lead">近い内容を選んでください。</p><div className="reception-choice-list">{selectedCategory.details.map((detail) => <button type="button" key={detail} onClick={() => onChooseDetail(detail)}>{detail}<span>›</span></button>)}</div></section>}
       {intakeStep === 'faq' && !checkUrl && <section className="reception-step" aria-labelledby="faq-step-title"><p className="eyebrow">選んだ内容を確認</p><h1 id="faq-step-title">この案内で解決できそうですか？</h1>{preview?.related.length && !faqDecision ? <div className="reception-faq-card"><p className="reception-faq-label">近い案内が見つかりました</p>{preview.related.slice(0, 2).map((faq) => <article key={faq.id}><h2>{faq.question}</h2><p>{faq.answer}</p></article>)}<div className="reception-faq-actions"><button className="button secondary" type="button" onClick={() => onFaqResult(true)}>解決した</button><button className="button accent" type="button" onClick={() => onFaqResult(false)}>まだ困っている</button></div></div> : faqDecision && !preview ? <div className="reception-resolved"><span aria-hidden="true">✓</span><h2>解決につながってよかったです</h2><p>職員への相談送信は不要です。</p><button className="button secondary" type="button" onClick={onStartOver}>別のことを相談する</button></div> : <div className="reception-no-faq"><h2>この内容を職員へ伝えます</h2><p>{busy ? '必要な情報を確認しています…' : 'このまま次へ進んでください。必要な項目だけお聞きします。'}</p>{!busy && <button className="button accent" type="button" onClick={() => onSetIntakeStep(fields.length ? 'supplement' : 'confirm')}>次へ</button>}</div>}</section>}
       {intakeStep === 'supplement' && preview && !checkUrl && <section className="reception-step" aria-labelledby="supplement-title"><p className="eyebrow">あと少しだけ</p><h1 id="supplement-title">対応に必要なことを教えてください</h1><p className="reception-lead">分かる範囲で大丈夫です。必要な項目だけ表示しています。</p><div className="reception-supplement-list">{fields.map((field) => <div className="reception-field" key={field.key}><label>{field.label}</label>{field.kind === 'location' && <LocationSelector value={supplementValues.location ?? ''} onChange={(zoneId) => onSetSupplementValue('location', zoneId)} />}{field.kind === 'select' && <select value={supplementValues[field.key] ?? ''} onChange={(event) => onSetSupplementValue(field.key, event.target.value)}><option value="">選んでください</option>{field.options?.map((option) => <option key={option}>{option}</option>)}</select>}{field.kind === 'choice' && <div className="reception-choice-grid">{field.options?.map((option) => <button className={supplementValues[field.key] === option ? 'selected' : ''} type="button" key={option} onClick={() => onSetSupplementValue(field.key, option)} aria-pressed={supplementValues[field.key] === option}>{option}</button>)}</div>}{field.kind === 'stepper' && <div className="reception-stepper"><button type="button" onClick={() => onChangeQuantity(-1)} aria-label="枚数を減らす">−</button><strong>{supplementValues[field.key] ?? '1'}枚</strong><button type="button" onClick={() => onChangeQuantity(1)} aria-label="枚数を増やす">＋</button></div>}{field.help && <p>{field.help}</p>}</div>)}</div><button className="button accent reception-next" type="button" onClick={onConfirmSupplements}>この内容で次へ</button></section>}
       {intakeStep === 'freeText' && !checkUrl && <section className="reception-step" aria-labelledby="free-text-title"><button className="reception-back" type="button" onClick={() => onSetIntakeStep('category')}>← カテゴリ選択に戻る</button><p className="eyebrow">補助手段</p><h1 id="free-text-title">文章で伝えたいこと</h1><p className="reception-lead">短い言葉で大丈夫です。書かなくても、カテゴリから相談できます。</p><textarea className="reception-free-text" value={input} onChange={(event) => onSetInput(event.target.value)} placeholder="例：北トイレの水が流れません" maxLength={500} autoFocus /><button className="button accent reception-next" type="button" disabled={!input.trim() || busy} onClick={onSubmitFreeText}>{busy ? '確認しています…' : '内容を確認する'}</button></section>}
       {intakeStep === 'confirm' && preview && !checkUrl && <section className="reception-step" aria-labelledby="confirm-title"><p className="eyebrow">送信前の確認</p><h1 id="confirm-title">この内容で職員へ伝えます</h1><dl className="reception-summary"><div><dt>カテゴリ</dt><dd>{selectedCategory?.label ?? preview.category}</dd></div><div><dt>困っていること</dt><dd>{selectedDetail || preview.analysis.title}</dd></div><div><dt>場所</dt><dd>{intake.location || selectedLocation || '指定なし'}</dd></div><div><dt>人数</dt><dd>{intake.peopleCount || selectedPeople || '指定なし'}</dd></div><div><dt>補足</dt><dd>{intakeNote || 'なし'}</dd></div></dl><label className="reception-note-label">補足（任意）<textarea value={intakeNote} onChange={(event) => onSetIntakeNote(event.target.value)} placeholder="追加で伝えたいことがあれば書いてください" maxLength={500} /></label><div className="reception-confirm-actions"><button className="button secondary" type="button" onClick={() => onSetIntakeStep('detail')}>修正する</button><button className="button accent" type="button" disabled={busy || !readyToSubmit} onClick={onSubmit}>{busy ? '送信しています…' : 'この内容で送信する'}</button></div></section>}
-      {checkUrl && <section className="reception-step reception-complete" aria-labelledby="complete-title"><p className="eyebrow">相談を受け付けました</p><h1 id="complete-title">職員へ届きました</h1><p>このページを保存すると、対応状況を確認できます。</p>{questionId != null && <p className="reception-id">受付番号 <strong>#{String(questionId).padStart(4, '0')}</strong></p>}<ol className="reception-status-timeline">{stages.map((stage, index) => <li className={index <= stageIndex ? 'done' : ''} key={stage}><span aria-hidden="true">{index <= stageIndex ? '✓' : '○'}</span><strong>{stage}</strong></li>)}</ol><div className="reception-url-box"><input readOnly value={checkUrl} onFocus={(event) => event.currentTarget.select()} aria-label="相談状況の確認URL" /><button className="button secondary" type="button" onClick={onCopyUrl}>URLをコピー</button></div><Link className="button accent reception-next" href={checkUrl}>相談状況を見る</Link><button className="reception-text-button" type="button" onClick={onStartOver}>新しく相談する</button></section>}
+      </>}
+      {checkUrl && <section className="reception-step reception-complete" aria-labelledby="complete-title"><p className="eyebrow">相談を受け付けました</p><h1 id="complete-title">職員へ届きました</h1><p>今は「確認中」です。対応状況はあとから更新されます。</p>{questionId != null && <p className="reception-id">受付番号 <strong>#{String(questionId).padStart(4, '0')}</strong></p>}<ol className="reception-status-timeline" aria-label="相談の対応状況">{stages.map((stage, index) => <li className={`${index <= stageIndex ? 'done' : ''} ${index === stageIndex ? 'current' : ''}`} key={stage}><span aria-hidden="true">{index <= stageIndex ? '✓' : '○'}</span><strong>{stage}</strong></li>)}</ol><div className="reception-url-box"><input readOnly value={checkUrl} onFocus={(event) => event.currentTarget.select()} aria-label="相談状況の確認URL" /><button className="button secondary" type="button" onClick={onCopyUrl}>URLをコピー</button></div><Link className="button accent reception-next" href={checkUrl}>相談状況を見る</Link><button className="reception-text-button" type="button" onClick={onStartOver}>新しく相談する</button></section>}
     </section>
     <section className="reception-faq-section" id="reception-faq" aria-labelledby="reception-faq-title"><p className="eyebrow">補助案内</p><h2 id="reception-faq-title">よくある質問</h2><p>選択肢で解決しないときは、職員へ相談できます。</p>{faqs.slice(0, 6).map((faq) => <details key={faq.id}><summary>{faq.question}</summary><p>{faq.answer}</p></details>)}</section>
     {status && !checkUrl && <p className="reception-status" role="status">{status}</p>}
@@ -177,6 +160,7 @@ export function KikumaeClient({ faqs }: Props) {
   const [questionId, setQuestionId] = useState<number | null>(null);
   const [status, setStatus] = useState('');
   const [busy, setBusy] = useState(false);
+  const [emergencyOpen, setEmergencyOpen] = useState(false);
   const [listening, setListening] = useState(false);
   const [voiceSupported, setVoiceSupported] = useState(false);
   const [offline, setOffline] = useState(false);
@@ -230,7 +214,7 @@ export function KikumaeClient({ faqs }: Props) {
   function addMessage(message: ChatMessage) { setMessages((current) => [...current, message]); }
 
   function beginChat() {
-    setChatOpen(false); setIntakeOpen(true); setIntakeStep('category'); setSelectedCategory(null); setSelectedDetail(''); setSelectedLocation(intake.location); setSelectedPeople(intake.peopleCount); setIntakeNote(''); setMessages([]); setInput(''); setOriginalBody(''); setContextBody(''); setPreview(null); setFaqDecision(false); setShowFaqCard(false); setShowSupplementSheet(false); setSupplementValues({}); setReadyToSubmit(false); setQuestionId(null); setCheckUrl(''); setStatus('');
+    setChatOpen(false); setEmergencyOpen(false); setIntakeOpen(true); setIntakeStep('category'); setSelectedCategory(null); setSelectedDetail(''); setSelectedLocation(intake.location); setSelectedPeople(intake.peopleCount); setIntakeNote(''); setMessages([]); setInput(''); setOriginalBody(''); setContextBody(''); setPreview(null); setFaqDecision(false); setShowFaqCard(false); setShowSupplementSheet(false); setSupplementValues({}); setReadyToSubmit(false); setQuestionId(null); setCheckUrl(''); setStatus('');
     try { localStorage.removeItem('kikumae-shelter-draft'); } catch { /* 下書きは利用できる場合だけ消去 */ }
   }
 
@@ -381,6 +365,22 @@ export function KikumaeClient({ faqs }: Props) {
     finally { submitLockRef.current = false; setBusy(false); }
   }
 
+  async function submitEmergency() {
+    if (busy || submitLockRef.current) return;
+    submitLockRef.current = true; previewRequestRef.current += 1; setBusy(true); setStatus('緊急の知らせを送っています…');
+    const body = '【緊急】命に関わる・今すぐ助けが必要です。近くの職員への即時対応をお願いします。';
+    try {
+      const response = await fetch('/api/questions', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ body, summary: '緊急のため、職員による即時確認が必要です。', category: 'その他', submissionKey: crypto.randomUUID(), intake: { ...emptyIntake, additionalDetails: '近くの職員にも直接声をかけてください。' } }), signal: AbortSignal.timeout(15000) });
+      const payload = await response.json() as { message?: string; checkUrl?: string; id?: number };
+      if (!response.ok) { setStatus(payload.message ?? '緊急の知らせを送れませんでした。近くの職員へ直接声をかけてください。'); return; }
+      const url = payload.checkUrl ?? ''; const id = typeof payload.id === 'number' ? payload.id : null;
+      setCheckUrl(url); setQuestionId(id); setEmergencyOpen(false); setStatus('緊急の相談が職員へ届きました。'); addMessage({ from: 'ai', text: '緊急の相談を受け付けました。送信後も、必ず近くの職員に直接声をかけてください。' });
+      if (id != null && url) { try { appendConsultHistory({ id, checkUrl: url, title: '緊急の相談', savedAt: Date.now() }); } catch { /* 履歴保存はベストエフォート */ } }
+      try { localStorage.removeItem('kikumae-shelter-draft'); } catch { /* 下書きは利用できる場合だけ消去 */ }
+    } catch (error) { setStatus(error instanceof Error && error.name === 'TimeoutError' ? '送信に時間がかかっています。近くの職員へ直接声をかけてください。' : '通信に失敗しました。近くの職員へ直接声をかけてください。'); }
+    finally { submitLockRef.current = false; setBusy(false); }
+  }
+
   function closeChat() { setChatOpen(false); setStatus(''); }
 
   async function copyCheckUrl() {
@@ -392,6 +392,6 @@ export function KikumaeClient({ faqs }: Props) {
 
   const knownContext = [intake.location && `場所：${intake.location}`, intake.peopleCount && `人数：${intake.peopleCount}`].filter(Boolean);
 
-  return <ReceptionFlow faqs={faqs} intakeStep={intakeStep} selectedCategory={selectedCategory} selectedDetail={selectedDetail} selectedLocation={selectedLocation} selectedPeople={selectedPeople} intakeNote={intakeNote} intake={intake} preview={preview} faqDecision={faqDecision} readyToSubmit={readyToSubmit} supplementValues={supplementValues} input={input} status={status} busy={busy} checkUrl={checkUrl} questionId={questionId} onChooseCategory={chooseCategory} onChooseDetail={(detail) => { void chooseDetail(detail); }} onChooseLocation={chooseLocation} onChoosePeople={choosePeople} onSetIntakeStep={setIntakeStep} onSetIntakeNote={setIntakeNote} onSetInput={setInput} onSetSupplementValue={setSupplementValue} onChangeQuantity={changeQuantity} onFaqResult={(resolved) => { void faqResult(resolved); }} onConfirmSupplements={confirmSupplements} onSubmit={() => { void submitStructuredIntake(); }} onSubmitFreeText={() => { void submitFreeText(); }} onStartOver={beginChat} onCopyUrl={() => { void copyCheckUrl(); }} />;
+  return <ReceptionFlow faqs={faqs} intakeStep={intakeStep} selectedCategory={selectedCategory} selectedDetail={selectedDetail} selectedLocation={selectedLocation} selectedPeople={selectedPeople} intakeNote={intakeNote} intake={intake} preview={preview} faqDecision={faqDecision} readyToSubmit={readyToSubmit} supplementValues={supplementValues} input={input} status={status} busy={busy} checkUrl={checkUrl} questionId={questionId} emergencyOpen={emergencyOpen} onChooseCategory={chooseCategory} onChooseDetail={(detail) => { void chooseDetail(detail); }} onChooseLocation={chooseLocation} onChoosePeople={choosePeople} onSetIntakeStep={setIntakeStep} onSetIntakeNote={setIntakeNote} onSetInput={setInput} onSetSupplementValue={setSupplementValue} onChangeQuantity={changeQuantity} onFaqResult={(resolved) => { void faqResult(resolved); }} onConfirmSupplements={confirmSupplements} onSubmit={() => { void submitStructuredIntake(); }} onSubmitFreeText={() => { void submitFreeText(); }} onStartOver={beginChat} onCopyUrl={() => { void copyCheckUrl(); }} onOpenEmergency={() => { setStatus(''); setEmergencyOpen(true); }} onCloseEmergency={() => setEmergencyOpen(false)} onSubmitEmergency={() => { void submitEmergency(); }} />;
 
 }
