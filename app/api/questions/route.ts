@@ -35,6 +35,8 @@ export async function POST(request: Request): Promise<Response> {
   const rawIntake = (data.intake && typeof data.intake === 'object') ? data.intake as Record<string, unknown> : {};
   const intake: ShelterIntake = {
     location: typeof rawIntake.location === 'string' ? rawIntake.location : '',
+    issueLocation: typeof rawIntake.issueLocation === 'string' ? rawIntake.issueLocation : '',
+    reporterLocation: typeof rawIntake.reporterLocation === 'string' ? rawIntake.reporterLocation : '',
     peopleCount: typeof rawIntake.peopleCount === 'string' ? rawIntake.peopleCount : '',
     resourceRemaining: typeof rawIntake.resourceRemaining === 'string' ? rawIntake.resourceRemaining : '',
     lastReceivedAt: typeof rawIntake.lastReceivedAt === 'string' ? rawIntake.lastReceivedAt : '',

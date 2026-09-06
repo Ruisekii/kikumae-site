@@ -19,6 +19,7 @@ import {
   type IssueCategory,
   type UrgencyLevel,
 } from './local-ai';
+import { resolveShelterZoneId } from '../lib/shelter-map-data';
 
 export type Faq = {
   id: number;
@@ -81,6 +82,8 @@ export type SubmittedQuestion = {
   workflowStatus: string;
   title: string;
   location: string;
+  issueLocation: string;
+  reporterLocation: string;
   peopleCount: string;
   resourceRemaining: string;
   lastReceivedAt: string;
@@ -118,6 +121,8 @@ export type IssueReport = {
   createdAt: number;
   workflowStatus: string;
   location: string;
+  issueLocation: string;
+  reporterLocation: string;
   urgency: UrgencyLevel;
   displayBody: string;
   originalBody?: string;
@@ -130,6 +135,8 @@ export type Issue = {
   request: string;
   category: IssueCategory | string;
   location: string;
+  issueLocation: string;
+  reporterLocation: string;
   urgency: UrgencyLevel;
   urgencyConfidence: number;
   urgencyConfirmed: UrgencyLevel | null;
@@ -237,7 +244,7 @@ async function initialise(): Promise<D1Database> {
   }
 }
 
-async function initialiseDatabase(db: D1Database): Promise<void> {
+async function initialiseDatabase(db: D1Database): Promise<D1Database> {
   const now = Date.now();
   await db.batch([
     db.prepare("CREATE TABLE IF NOT EXISTS faqs (id INTEGER PRIMARY KEY AUTOINCREMENT, question TEXT NOT NULL UNIQUE, answer TEXT NOT NULL, category TEXT NOT NULL, status TEXT NOT NULL DEFAULT 'published', created_at INTEGER NOT NULL DEFAULT 0, updated_at INTEGER NOT NULL, source TEXT NOT NULL DEFAULT '避難所スタッフ', expires_at INTEGER, verified INTEGER NOT NULL DEFAULT 1)"),
@@ -354,6 +361,18 @@ async function initialiseDatabase(db: D1Database): Promise<void> {
     await safeRun(db, 'CREATE INDEX IF NOT EXISTS questions_issue_idx ON questions (issue_id, created_at DESC)');
     await db.prepare("INSERT OR REPLACE INTO schema_meta (key, value) VALUES ('schema_v3', 'ready')").run();
   }
+  const mapSchemaMarker = await db.prepare("SELECT value FROM schema_meta WHERE key = 'shelter_map_location_v1' LIMIT 1").first<{ value: string }>();
+  if (mapSchemaMarker?.value !== 'ready') {
+    for (const migration of [
+      "ALTER TABLE questions ADD COLUMN issue_location TEXT NOT NULL DEFAULT ''",
+      "ALTER TABLE questions ADD COLUMN reporter_location TEXT NOT NULL DEFAULT ''",
+      "ALTER TABLE issues ADD COLUMN issue_location TEXT NOT NULL DEFAULT ''",
+      "ALTER TABLE issues ADD COLUMN reporter_location TEXT NOT NULL DEFAULT ''",
+    ]) await safeRun(db, migration);
+    await safeRun(db, "UPDATE questions SET issue_location = location WHERE issue_location = '' AND location <> ''");
+    await safeRun(db, "UPDATE issues SET issue_location = location WHERE issue_location = '' AND location <> ''");
+    await db.prepare("INSERT OR REPLACE INTO schema_meta (key, value) VALUES ('shelter_map_location_v1', 'ready')").run();
+  }
   await ensureFaqIsolationSchema(db);
   await ensureIssueMigration(db);
   const seedMarker = await db.prepare("SELECT value FROM schema_meta WHERE key = 'shelter_faq_seed_v1' LIMIT 1").first<{ value: string }>();
@@ -401,7 +420,7 @@ async function ensureFaqIsolationSchema(db: D1Database): Promise<void> {
 async function ensureIssueMigration(db: D1Database): Promise<void> {
   const marker = await db.prepare("SELECT value FROM schema_meta WHERE key = 'issue_v1' LIMIT 1").first<{ value: string }>();
   if (marker?.value === 'ready') return;
-  const rows = await db.prepare(`SELECT id, portal_id, similar_group_id, body_original, ai_summary, request_text, category, location,
+  const rows = await db.prepare(`SELECT id, portal_id, similar_group_id, body_original, ai_summary, request_text, category, location, issue_location, reporter_location,
     urgency_candidate, urgent_review, urgency_confidence, affected_people, vulnerable_people, created_at,
     title, fact_summary, emotion_summary, grouping_confidence, issue_id
     FROM questions WHERE issue_id IS NULL ORDER BY created_at ASC LIMIT 1000`).all<Record<string, unknown>>();
@@ -420,10 +439,10 @@ async function ensureIssueMigration(db: D1Database): Promise<void> {
     const lastReported = Math.max(...bucket.map((row) => Number(row.created_at ?? now)));
     const legacyUrgency = String(first.urgency_candidate ?? 'normal');
     const urgency = Number(first.urgent_review ?? 0) === 1 || legacyUrgency === 'critical' ? 'critical' : legacyUrgency === '高' || legacyUrgency === 'high' ? 'high' : legacyUrgency === '中' || legacyUrgency === 'normal' ? 'normal' : 'low';
-    const issue = await db.prepare(`INSERT INTO issues (portal_id, title, summary, request, category, location, urgency_candidate, status,
+    const issue = await db.prepare(`INSERT INTO issues (portal_id, title, summary, request, category, location, issue_location, reporter_location, urgency_candidate, status,
       report_count, affected_people, vulnerable_people, first_reported_at, last_reported_at, created_at, updated_at, grouping_confidence, grouping_mode)
-      VALUES (?, ?, ?, ?, ?, ?, ?, 'new', ?, ?, ?, ?, ?, ?, ?, ?, ?)`)
-      .bind(first.portal_id == null ? null : Number(first.portal_id), String(first.title ?? first.ai_summary ?? '相談'), String(first.ai_summary ?? ''), String(first.request_text ?? ''), String(first.category ?? 'その他'), String(first.location ?? ''), urgency, bucket.length, String(first.affected_people ?? ''), JSON.stringify(vulnerable.length ? vulnerable : ['不明']), firstReported, lastReported, firstReported, now, bucket.length > 1 ? Number(first.grouping_confidence ?? 0.7) : 1, bucket.length > 1 ? 'auto' : 'single').run();
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'new', ?, ?, ?, ?, ?, ?, ?, ?, ?)`)
+      .bind(first.portal_id == null ? null : Number(first.portal_id), String(first.title ?? first.ai_summary ?? '相談'), String(first.ai_summary ?? ''), String(first.request_text ?? ''), String(first.category ?? 'その他'), String(first.location ?? ''), String(first.issue_location ?? first.location ?? ''), String(first.reporter_location ?? ''), urgency, bucket.length, String(first.affected_people ?? ''), JSON.stringify(vulnerable.length ? vulnerable : ['不明']), firstReported, lastReported, firstReported, now, bucket.length > 1 ? Number(first.grouping_confidence ?? 0.7) : 1, bucket.length > 1 ? 'auto' : 'single').run();
     const issueId = Number(issue.meta.last_row_id);
     await db.batch(bucket.flatMap((row) => [
       db.prepare('INSERT OR IGNORE INTO issue_reports (issue_id, question_id, confidence, link_type, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?)').bind(issueId, Number(row.id), Number(row.grouping_confidence ?? 1), bucket.length > 1 ? 'legacy-group' : 'single', Number(row.created_at ?? now), now),
@@ -599,6 +618,8 @@ export async function createQuestion(body: string, requestedSummary = '', reques
   const aiSummary = requestedSummary.trim().slice(0, 300) || canonicalSummary;
   const category = categorizeQuestion(body, requestedCategory);
   const analysis = shelterAnalysis ?? generateShelterAnalysis(body, intake);
+  const issueLocation = analysis.issueLocation || resolveShelterZoneId(analysis.location) || analysis.location;
+  const reporterLocation = intake.reporterLocation?.trim().slice(0, 120) ?? '';
   const related = await listRelatedFaqs(aiSummary || body, 3, portalId, analysis.category);
   const draft = generateLocalDraft(aiSummary, body, related);
   const alternatives = generateAlternativeDrafts(aiSummary, body, related);
@@ -610,15 +631,16 @@ export async function createQuestion(body: string, requestedSummary = '', reques
   const displayBody = redactSensitiveInformation(body);
   const result = await db.prepare("INSERT INTO questions (body, body_original, ai_summary, summary_edited, category, status, workflow_status, title, location, people_count, resource_remaining, last_received_at, fact_summary, emotion_summary, missing_information, urgency_candidate, urgent_review, request_text, affected_people, vulnerable_people, emotional_intensity, contains_abusive_language, urgency_confidence, grouping_confidence, display_body, contact_type, answer_draft, answer_alternatives, answer_grounds, portal_id, check_token_hash, check_token_expires_at, submission_key_hash, created_at) VALUES (?, ?, ?, ?, ?, 'open', 'received', ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'anonymous', ?, ?, ?, ?, ?, ?, ?, ?)").bind(body, body, aiSummary, aiSummary !== canonicalSummary ? 1 : 0, category, analysis.title, analysis.location, analysis.peopleCount, analysis.resourceRemaining, analysis.lastReceivedAt, JSON.stringify(analysis.facts), analysis.emotion, JSON.stringify(analysis.missingInformation), analysis.urgencyCandidate, analysis.urgentReview ? 1 : 0, analysis.request, analysis.affectedPeople, JSON.stringify(analysis.vulnerablePeople), analysis.emotionalIntensity, analysis.containsAbusiveLanguage ? 1 : 0, analysis.urgencyConfidence, 1, displayBody, draft, JSON.stringify(alternatives), JSON.stringify(related.map((faq) => faq.question)), portalId, await hashCheckToken(checkToken), checkTokenExpiresAt, submissionKeyHash, createdAt).run();
   const id = Number(result.meta.last_row_id);
+  await db.prepare('UPDATE questions SET issue_location = ?, reporter_location = ? WHERE id = ?').bind(issueLocation, reporterLocation, id).run();
   await db.prepare("INSERT INTO case_updates (question_id, status, message, is_public, actor_user_id, created_at) VALUES (?, 'received', ?, 1, NULL, ?)").bind(id, '相談を受け付けました。避難所スタッフが内容を確認します。', createdAt).run();
   await recordQuestionEvent(id, 'question_received', null, '相談受付');
-  await attachQuestionToIssue(db, id, portalId, analysis, createdAt);
+  await attachQuestionToIssue(db, id, portalId, analysis, createdAt, reporterLocation);
   if (portalId === null) await assignSimilarGroup(db, id, analysis, createdAt);
   return {
     id, body, bodyOriginal: body, aiSummary, summaryEdited: aiSummary !== canonicalSummary,
     category, status: 'open', createdAt, answerBody: null, answerDraft: draft, answerAlternatives: alternatives, answerUsedAi: false,
     answerGrounds: related.map((faq) => faq.question), answeredAt: null, portalId, workflowStatus: 'received', title: analysis.title,
-    location: analysis.location, peopleCount: analysis.peopleCount, resourceRemaining: analysis.resourceRemaining, lastReceivedAt: analysis.lastReceivedAt,
+    location: analysis.location, issueLocation, reporterLocation, peopleCount: analysis.peopleCount, resourceRemaining: analysis.resourceRemaining, lastReceivedAt: analysis.lastReceivedAt,
     factSummary: analysis.facts, emotionSummary: analysis.emotion, missingInformation: analysis.missingInformation, urgencyCandidate: analysis.urgencyCandidate,
     urgencyConfirmed: null, urgentReview: analysis.urgentReview, faqResolved: null, similarGroupId: null, similarGroupTitle: '', similarCount: 0,
     assigneeName: '', internalNote: '', firstConfirmedAt: null, resolvedAt: null, updates: [{ id: 0, status: 'received', message: '相談を受け付けました。避難所スタッフが内容を確認します。', isPublic: true, createdAt }], similarQuestions: [], candidate: null, checkToken,
@@ -635,7 +657,7 @@ function mergeList(left: string[], right: string[]): string[] {
   return Array.from(new Set([...left, ...right].filter(Boolean))).slice(0, 12);
 }
 
-async function attachQuestionToIssue(db: D1Database, questionId: number, portalId: number | null, analysis: ReturnType<typeof generateShelterAnalysis>, now: number): Promise<number> {
+async function attachQuestionToIssue(db: D1Database, questionId: number, portalId: number | null, analysis: ReturnType<typeof generateShelterAnalysis>, now: number, reporterLocation = ''): Promise<number> {
   const portalClause = portalId === null ? 'portal_id IS NULL' : 'portal_id = ?';
   const portalValues = portalId === null ? [] : [portalId];
   const candidates = await db.prepare(`SELECT id, title, summary, request, category, location, urgency_candidate, report_count, affected_people, vulnerable_people, grouping_mode
@@ -660,6 +682,9 @@ async function attachQuestionToIssue(db: D1Database, questionId: number, portalI
   const issueId = autoGroup ? Number(best!.row.id) : Number((await db.prepare(`INSERT INTO issues (portal_id, title, summary, request, category, location, urgency_candidate, status, report_count, affected_people, vulnerable_people, first_reported_at, last_reported_at, created_at, updated_at, grouping_confidence, grouping_mode)
     VALUES (?, ?, ?, ?, ?, ?, ?, 'new', 1, ?, ?, ?, ?, ?, ?, ?, ?)`)
     .bind(portalId, analysis.title, analysis.overview, analysis.request, analysis.issueCategory, analysis.location, analysis.urgencyLevel, analysis.affectedPeople, JSON.stringify(analysis.vulnerablePeople), now, now, now, now, suggested ? bestScore : 1, suggested ? 'suggested' : 'single').run()).meta.last_row_id);
+
+  await db.prepare("UPDATE issues SET issue_location = CASE WHEN issue_location = '' THEN ? ELSE issue_location END, reporter_location = CASE WHEN reporter_location = '' THEN ? ELSE reporter_location END WHERE id = ?")
+    .bind(analysis.issueLocation || resolveShelterZoneId(analysis.location) || analysis.location, reporterLocation, issueId).run();
 
   if (autoGroup) {
     const existingVulnerable = parseStringList(best!.row.vulnerable_people == null ? null : String(best!.row.vulnerable_people));
@@ -824,7 +849,7 @@ function mapQuestion(row: Record<string, unknown>): SubmittedQuestion {
     answerGrounds: parseGrounds(row.answer_grounds == null ? null : String(row.answer_grounds)),
     answeredAt: row.answered_at == null ? null : Number(row.answered_at), portalId: row.portal_id == null ? null : Number(row.portal_id),
     workflowStatus: String(row.workflow_status ?? (row.status === 'answered' ? 'resolved' : 'received')),
-    title: String(row.title ?? row.ai_summary ?? ''), location: String(row.location ?? ''), peopleCount: String(row.people_count ?? ''),
+    title: String(row.title ?? row.ai_summary ?? ''), location: String(row.location ?? ''), issueLocation: String(row.issue_location ?? (resolveShelterZoneId(String(row.location ?? '')) || row.location || '')), reporterLocation: String(row.reporter_location ?? ''), peopleCount: String(row.people_count ?? ''),
     resourceRemaining: String(row.resource_remaining ?? ''), lastReceivedAt: String(row.last_received_at ?? ''),
     factSummary: parseStringList(row.fact_summary == null ? null : String(row.fact_summary)), emotionSummary: String(row.emotion_summary ?? ''),
     missingInformation: parseStringList(row.missing_information == null ? null : String(row.missing_information)),
@@ -844,7 +869,7 @@ function mapQuestion(row: Record<string, unknown>): SubmittedQuestion {
 }
 
 const QUESTION_SELECT = `SELECT q.id, q.body, q.body_original, q.ai_summary, q.summary_edited, q.category, q.status, q.created_at, q.answer_body, q.answer_draft, q.answer_alternatives, q.answer_used_ai, q.answer_grounds, q.answered_at, q.portal_id,
-  q.workflow_status, q.title, q.location, q.people_count, q.resource_remaining, q.last_received_at, q.fact_summary, q.emotion_summary, q.missing_information, q.urgency_candidate, q.urgency_confirmed, q.urgent_review, q.faq_resolved, q.faq_id, q.similar_group_id, q.assignee_name, q.internal_note, q.first_confirmed_at, q.resolved_at,
+  q.workflow_status, q.title, q.location, q.issue_location, q.reporter_location, q.people_count, q.resource_remaining, q.last_received_at, q.fact_summary, q.emotion_summary, q.missing_information, q.urgency_candidate, q.urgency_confirmed, q.urgent_review, q.faq_resolved, q.faq_id, q.similar_group_id, q.assignee_name, q.internal_note, q.first_confirmed_at, q.resolved_at,
   q.request_text, q.affected_people, q.vulnerable_people, q.emotional_intensity, q.contains_abusive_language, q.urgency_confidence, q.grouping_confidence, q.display_body, q.issue_id,
   sg.title AS similar_group_title, (SELECT COUNT(*) FROM questions sq WHERE sq.similar_group_id = q.similar_group_id) AS similar_count,
   c.id AS candidate_id, c.question_id, c.q_text, c.a_text, c.category AS candidate_category, c.status AS candidate_status, c.created_at AS candidate_created_at
@@ -913,7 +938,7 @@ export async function getQuestionByCheckToken(token: string): Promise<SubmittedQ
   return result ? hydrateQuestion(db, mapQuestion(result)) : null;
 }
 
-const ISSUE_SELECT = `SELECT id, portal_id, title, summary, request, category, location, urgency_candidate, urgency_confirmed, status,
+const ISSUE_SELECT = `SELECT id, portal_id, title, summary, request, category, location, issue_location, reporter_location, urgency_candidate, urgency_confirmed, status,
   report_count, affected_people, vulnerable_people, first_reported_at, last_reported_at, assigned_team, assigned_user,
   response_message, estimated_resolution_time, internal_note, resolved_at, created_at, updated_at, version, grouping_confidence, grouping_mode
   FROM issues`;
@@ -922,9 +947,10 @@ function mapIssue(row: Record<string, unknown>): Issue {
   const urgency = String(row.urgency_candidate ?? 'normal');
   const confirmed = row.urgency_confirmed == null ? null : String(row.urgency_confirmed) as UrgencyLevel;
   const vulnerable = parseStringList(row.vulnerable_people == null ? null : String(row.vulnerable_people));
+  const issueLocation = String(row.issue_location ?? (resolveShelterZoneId(String(row.location ?? '')) || row.location || ''));
   return {
     id: Number(row.id), title: String(row.title ?? '課題'), summary: String(row.summary ?? ''), request: String(row.request ?? ''),
-    category: String(row.category ?? 'その他'), location: String(row.location ?? ''), urgency: urgency as UrgencyLevel, urgencyConfidence: Number(row.urgency_confidence ?? 0), urgencyConfirmed: confirmed,
+    category: String(row.category ?? 'その他'), location: String(row.location ?? ''), issueLocation, reporterLocation: String(row.reporter_location ?? ''), urgency: urgency as UrgencyLevel, urgencyConfidence: Number(row.urgency_confidence ?? 0), urgencyConfirmed: confirmed,
     status: String(row.status ?? 'new') as Issue['status'], reportCount: Number(row.report_count ?? 0), affectedPeople: String(row.affected_people ?? ''),
     vulnerablePeople: vulnerable.length ? vulnerable : ['不明'], firstReportedAt: Number(row.first_reported_at ?? row.created_at ?? 0),
     lastReportedAt: Number(row.last_reported_at ?? row.updated_at ?? 0), assignedTeam: String(row.assigned_team ?? ''), assignedUser: String(row.assigned_user ?? ''),
@@ -936,12 +962,12 @@ function mapIssue(row: Record<string, unknown>): Issue {
 }
 
 async function hydrateIssue(db: D1Database, issue: Issue, includeReports = true): Promise<Issue> {
-  const reportRows = includeReports ? await db.prepare(`SELECT q.id, q.title, q.created_at, q.workflow_status, q.location, q.urgency_candidate, q.urgency_confidence, q.display_body, q.body_original,
+  const reportRows = includeReports ? await db.prepare(`SELECT q.id, q.title, q.created_at, q.workflow_status, q.location, q.issue_location, q.reporter_location, q.urgency_candidate, q.urgency_confidence, q.display_body, q.body_original,
       q.fact_summary, q.emotion_summary, q.missing_information FROM issue_reports ir JOIN questions q ON q.id = ir.question_id
       WHERE ir.issue_id = ? ORDER BY q.created_at ASC, q.id ASC LIMIT 200`).bind(issue.id).all<Record<string, unknown>>() : { results: [] };
   const reports = (reportRows.results ?? []).map((row) => ({
     id: Number(row.id), title: String(row.title ?? '相談'), createdAt: Number(row.created_at ?? 0), workflowStatus: String(row.workflow_status ?? 'received'),
-    location: String(row.location ?? ''), urgency: String(row.urgency_candidate ?? 'normal') as UrgencyLevel, displayBody: String(row.display_body ?? ''), originalBody: String(row.body_original ?? row.display_body ?? ''),
+    location: String(row.location ?? ''), issueLocation: String(row.issue_location ?? (resolveShelterZoneId(String(row.location ?? '')) || row.location || '')), reporterLocation: String(row.reporter_location ?? ''), urgency: String(row.urgency_candidate ?? 'normal') as UrgencyLevel, displayBody: String(row.display_body ?? ''), originalBody: String(row.body_original ?? row.display_body ?? ''),
   }));
   const facts: string[] = []; const emotions: string[] = []; const missing: string[] = [];
   const urgencyConfidence = Math.max(issue.urgencyConfidence, ...(reportRows.results ?? []).map((row) => Number(row.urgency_confidence ?? 0)));

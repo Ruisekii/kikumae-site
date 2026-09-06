@@ -5,6 +5,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import type { Issue, ShelterDashboardStats } from '../../db/repository';
 import { FaqManagement } from './faq-management';
 import { AuditLogList } from './audit-log-list';
+import { ShelterMap } from './shelter-map';
 
 type Props = { displayName: string; authorized?: boolean; adminApiToken?: string; signOutHref?: string };
 type Draft = { draft: string; alternatives: string[]; grounds: string[]; mode: string };
@@ -216,8 +217,7 @@ function IssueSummary({ issue, mapIssues, onOriginalViewed, onMerge, onSelectIss
 function FactCard({ label, value, icon }: { label: string; value: string; icon: string }) { return <div className="fact-card"><span aria-hidden="true">{icon}</span><small>{label}</small><strong>{value}</strong></div>; }
 
 function MiniShelterMap({ issues, selectedLocation, onSelect }: { issues: Issue[]; selectedLocation: string; onSelect: (issue: Issue) => void }) {
-  const points = [...new Map(issues.filter((issue) => issue.location).map((issue) => [issue.location, issue])).values()].slice(0, 6);
-  return <div className="mini-map"><div className="mini-map-canvas">{(points.length ? points : [{ id: 0, location: selectedLocation || '場所を確認中', category: 'その他', reportCount: 1 } as Issue]).map((point, index) => <button className={`map-point map-point-${index % 4} ${point.location === selectedLocation ? 'selected' : ''}`} type="button" key={`${point.id}-${point.location}`} onClick={() => onSelect(point)}><span>{iconForCategory(point.category)}</span><b>{point.location}</b><small>{point.reportCount}件</small></button>)}</div><p>※相談者のいる場所ではなく、問題が起きている場所を表示しています。</p></div>;
+  return <ShelterMap mode="issue-overview" issues={issues} focusLocation={selectedLocation} onSelectIssue={(issue) => onSelect(issues.find((candidate) => candidate.id === issue.id) ?? issues[0])} />;
 }
 
 function IssueResponsePanel({ issue, draft, answerText, setAnswerText, answerUsesAi, setAnswerUsesAi, displayName, busy, onGenerateDraft, onApprove, onStatus, onBack }: { issue: Issue; draft?: Draft; answerText: string; setAnswerText: (value: string) => void; answerUsesAi: boolean; setAnswerUsesAi: (value: boolean) => void; displayName: string; busy: boolean; onGenerateDraft: () => void; onApprove: () => void; onStatus: (status: string, message: string, isPublic: boolean, assignedTeam: string, assignedUser: string, urgencyConfirmed: string, internalNote: string) => Promise<boolean>; onBack: () => void }) {

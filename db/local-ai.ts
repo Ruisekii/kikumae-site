@@ -8,6 +8,7 @@
  */
 
 import type { Faq, RelatedFaq } from './repository';
+import { resolveShelterZoneId, shelterLocationLabel } from '../lib/shelter-map-data';
 
 export type AiFaq = Faq;
 export type AiRelatedFaq = RelatedFaq;
@@ -20,6 +21,8 @@ export type UrgencyLevel = 'critical' | 'high' | 'normal' | 'low';
 
 export type ShelterIntake = {
   location?: string;
+  issueLocation?: string;
+  reporterLocation?: string;
   peopleCount?: string;
   resourceRemaining?: string;
   lastReceivedAt?: string;
@@ -42,6 +45,7 @@ export type ShelterAnalysis = {
   category: ShelterCategory;
   issueCategory: IssueCategory;
   location: string;
+  issueLocation: string;
   peopleCount: string;
   affectedPeople: string;
   vulnerablePeople: string[];
@@ -201,7 +205,9 @@ export function generateShelterAnalysis(value: string, intake: ShelterIntake = {
   // Keep the original report separately, but never copy common contact data
   // into derived titles, facts, locations, or reply context.
   const text = redactSensitiveInformation(rawText);
-  const location = extractLocation(text, intake.location ?? '');
+  const rawLocation = extractLocation(text, intake.issueLocation ?? intake.location ?? '');
+  const location = shelterLocationLabel(rawLocation);
+  const issueLocation = resolveShelterZoneId(rawLocation) || rawLocation;
   const peopleCount = extractAffectedPeople(text, intake.peopleCount ?? '');
   const resourceRemaining = extractResourceRemaining(text, intake.resourceRemaining ?? '');
   const lastReceivedAt = extractLastReceivedAt(text, intake.lastReceivedAt ?? '');
@@ -234,7 +240,7 @@ export function generateShelterAnalysis(value: string, intake: ShelterIntake = {
     title, overview, request, facts, emotion, emotionalIntensity: emotionalIntensity(text),
     containsAbusiveLanguage: containsAbusiveLanguage(text), missingInformation, urgencyCandidate,
     urgencyLevel: urgencyLevel(urgentReview, urgencyCandidate), urgencyConfidence: confidence,
-    urgentReview, category, issueCategory, location, peopleCount, affectedPeople: peopleCount,
+    urgentReview, category, issueCategory, location, issueLocation, peopleCount, affectedPeople: peopleCount,
     vulnerablePeople: vulnerablePeople(text), resourceRemaining, lastReceivedAt,
   };
 }
