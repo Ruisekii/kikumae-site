@@ -5,11 +5,12 @@ import type { Faq } from '../../db/repository';
 import { SHELTER_CATEGORIES } from '../../db/local-ai';
 
 const categories = SHELTER_CATEGORIES;
-type Props = { apiBase: string; title?: string };
+type Props = { apiBase: string; title?: string; adminApiToken?: string };
 type FormState = { question: string; answer: string; category: string };
 const emptyForm: FormState = { question: '', answer: '', category: 'その他' };
+const adminHeaders = (token: string | undefined, headers: Record<string, string> = {}) => token ? { ...headers, 'x-kikumae-admin-token': token } : headers;
 
-export function FaqManagement({ apiBase, title = 'FAQ管理' }: Props) {
+export function FaqManagement({ apiBase, title = 'FAQ管理', adminApiToken }: Props) {
   const [faqs, setFaqs] = useState<Faq[]>([]);
   const [form, setForm] = useState<FormState>(emptyForm);
   const [editingId, setEditingId] = useState<number | null>(null);
@@ -20,7 +21,7 @@ export function FaqManagement({ apiBase, title = 'FAQ管理' }: Props) {
     let cancelled = false;
     async function fetchFaqs() {
       try {
-        const response = await fetch(apiBase, { cache: 'no-store' });
+        const response = await fetch(apiBase, { cache: 'no-store', credentials: 'same-origin', headers: adminHeaders(adminApiToken, { Accept: 'application/json' }) });
         const body = await response.json() as { faqs?: Faq[]; message?: string };
         if (cancelled) return;
         if (!response.ok) { setMessage(body.message ?? 'FAQを読み込めませんでした。'); return; }
@@ -31,7 +32,7 @@ export function FaqManagement({ apiBase, title = 'FAQ管理' }: Props) {
     }
     void fetchFaqs();
     return () => { cancelled = true; };
-  }, [apiBase]);
+  }, [apiBase, adminApiToken]);
 
   function edit(faq: Faq) {
     setEditingId(faq.id); setForm({ question: faq.question, answer: faq.answer, category: faq.category }); setMessage('');
@@ -42,7 +43,7 @@ export function FaqManagement({ apiBase, title = 'FAQ管理' }: Props) {
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault(); setBusy(true); setMessage(editingId ? 'FAQを更新しています…' : 'FAQを追加しています…');
     try {
-      const response = await fetch(editingId ? `${apiBase}/${editingId}` : apiBase, { method: editingId ? 'PATCH' : 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(form) });
+      const response = await fetch(editingId ? `${apiBase}/${editingId}` : apiBase, { method: editingId ? 'PATCH' : 'POST', credentials: 'same-origin', headers: adminHeaders(adminApiToken, { 'Content-Type': 'application/json', Accept: 'application/json' }), body: JSON.stringify(form) });
       const body = await response.json() as { faq?: Faq; message?: string };
       if (!response.ok || !body.faq) { setMessage(body.message ?? 'FAQを保存できませんでした。'); return; }
       setFaqs((current) => editingId ? current.map((faq) => faq.id === body.faq!.id ? body.faq! : faq) : [body.faq!, ...current]);
@@ -55,7 +56,7 @@ export function FaqManagement({ apiBase, title = 'FAQ管理' }: Props) {
     if (!window.confirm(`「${faq.question}」をFAQから削除しますか？\nこの操作は元に戻せません。`)) return;
     setBusy(true); setMessage('FAQを削除しています…');
     try {
-      const response = await fetch(`${apiBase}/${faq.id}`, { method: 'DELETE' });
+      const response = await fetch(`${apiBase}/${faq.id}`, { method: 'DELETE', credentials: 'same-origin', headers: adminHeaders(adminApiToken, { Accept: 'application/json' }) });
       const body = await response.json() as { message?: string };
       if (!response.ok) { setMessage(body.message ?? 'FAQを削除できませんでした。'); return; }
       setFaqs((current) => current.filter((item) => item.id !== faq.id));
