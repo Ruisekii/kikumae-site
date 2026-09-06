@@ -38,6 +38,7 @@ export async function POST(request: Request): Promise<Response> {
     peopleCount: typeof rawIntake.peopleCount === 'string' ? rawIntake.peopleCount : '',
     resourceRemaining: typeof rawIntake.resourceRemaining === 'string' ? rawIntake.resourceRemaining : '',
     lastReceivedAt: typeof rawIntake.lastReceivedAt === 'string' ? rawIntake.lastReceivedAt : '',
+    additionalDetails: typeof rawIntake.additionalDetails === 'string' ? rawIntake.additionalDetails : '',
   };
   if (!body || body.length > MAX_QUESTION_CHARS) return json('質問は1〜500文字で入力してください。', 400);
   if (summary.length > 300) return json('要約は300文字以内で入力してください。', 400);

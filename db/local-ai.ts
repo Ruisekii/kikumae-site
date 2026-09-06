@@ -23,6 +23,7 @@ export type ShelterIntake = {
   peopleCount?: string;
   resourceRemaining?: string;
   lastReceivedAt?: string;
+  additionalDetails?: string;
 };
 
 export type ShelterAnalysis = {
@@ -117,6 +118,18 @@ function extractAffectedPeople(value: string, intakePeople: string): string {
   return match?.[1] ? `${match[1]}人` : '';
 }
 
+function extractResourceRemaining(value: string, intakeValue: string): string {
+  if (intakeValue.trim()) return intakeValue.trim().slice(0, 120);
+  const quantity = value.match(/(\d{1,3})\s*(枚|個|本|箱|セット|人分)/);
+  return quantity ? `${quantity[1]}${quantity[2]}` : '';
+}
+
+function extractLastReceivedAt(value: string, intakeValue: string): string {
+  if (intakeValue.trim()) return intakeValue.trim().slice(0, 120);
+  const time = value.match(/(昨日|一昨日|今朝|今晩|さっき|先ほど|数時間前|朝から|昼から|夜から)/);
+  return time?.[1] ?? '';
+}
+
 function vulnerablePeople(value: string): string[] {
   const found: string[] = [];
   if (/(子ども|こども|乳児|赤ちゃん)/.test(value)) found.push('子ども');
@@ -186,8 +199,9 @@ export function generateShelterAnalysis(value: string, intake: ShelterIntake = {
   const text = redactSensitiveInformation(rawText);
   const location = extractLocation(text, intake.location ?? '');
   const peopleCount = extractAffectedPeople(text, intake.peopleCount ?? '');
-  const resourceRemaining = intake.resourceRemaining?.trim().slice(0, 120) ?? '';
-  const lastReceivedAt = intake.lastReceivedAt?.trim().slice(0, 120) ?? '';
+  const resourceRemaining = extractResourceRemaining(text, intake.resourceRemaining ?? '');
+  const lastReceivedAt = extractLastReceivedAt(text, intake.lastReceivedAt ?? '');
+  const additionalDetails = intake.additionalDetails?.trim().slice(0, 120) ?? '';
   const category = categorizeShelterQuestion(text);
   const issueCategory = canonicalIssueCategory(category, text);
   const facts: string[] = [];
@@ -195,6 +209,7 @@ export function generateShelterAnalysis(value: string, intake: ShelterIntake = {
   if (peopleCount) facts.push(`人数：${peopleCount}`);
   if (resourceRemaining) facts.push(`残量・不足状況：${resourceRemaining}`);
   if (lastReceivedAt) facts.push(`最後に受け取った時刻：${lastReceivedAt}`);
+  if (additionalDetails) facts.push(`追加確認：${additionalDetails}`);
   if (category !== 'その他') facts.push(`相談分類：${category}`);
   if (/(子ども|こども|乳児|赤ちゃん)/.test(text)) facts.push('子どもを含む可能性');
   if (/(高齢|お年寄り)/.test(text)) facts.push('高齢者を含む可能性');
@@ -203,7 +218,7 @@ export function generateShelterAnalysis(value: string, intake: ShelterIntake = {
   if (!location) missingInformation.push('場所');
   if (!peopleCount && /(水|食料|物資|薬|トイレ|毛布|足り|不足|ない|切れ)/.test(text)) missingInformation.push('人数');
   if (!resourceRemaining && /(水|食料|物資|薬|足り|不足|ない|切れ)/.test(text)) missingInformation.push('残量');
-  if (!lastReceivedAt && /(水|食料|物資|薬|届|来ない|配布)/.test(text)) missingInformation.push('最後に受け取った時刻');
+  if (!lastReceivedAt && /(水|食料|物資|薬|毛布|届|来ない|配布|足り|不足)/.test(text)) missingInformation.push('最後に受け取った時刻');
   const urgentReview = URGENT_PATTERNS.test(text);
   const urgencyCandidate: '高' | '中' | '低' = urgentReview ? '高' : HIGH_URGENCY_PATTERNS.test(text) ? '中' : '低';
   const emotion = emotionLabel(text);
