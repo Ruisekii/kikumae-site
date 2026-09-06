@@ -5,6 +5,7 @@ const ADMIN_COOKIE = 'kikumae_admin_session';
 const SESSION_SECONDS = 8 * 60 * 60;
 const API_TOKEN_SECONDS = 60 * 60;
 const MIN_PASSWORD_LENGTH = 8;
+const PROTOTYPE_STAFF_NAME = '避難所統括-田中';
 const encoder = new TextEncoder();
 
 export type AdminSession = {
@@ -98,12 +99,12 @@ export async function getAdminSession(): Promise<AdminSession | null> {
   if (!Number.isSafeInteger(expiresAt) || expiresAt <= Date.now() || !signature) return null;
   const key = await importHmacKey(secret, ['verify']);
   const valid = await crypto.subtle.verify('HMAC', key, signature as BufferSource, encoder.encode(payload));
-  return valid ? { userId: 'admin-password', displayName: '避難所管理者', expiresAt } : null;
+  return valid ? { userId: 'admin-password', displayName: PROTOTYPE_STAFF_NAME, expiresAt } : null;
 }
 
 export async function getAdminUser(request?: Request): Promise<{ userId: string; displayName: string } | null> {
   const apiToken = request?.headers.get('x-kikumae-admin-token')?.trim() ?? '';
-  if (apiToken && await verifyAdminApiToken(apiToken)) return { userId: 'admin-password', displayName: '避難所管理者' };
+  if (apiToken && await verifyAdminApiToken(apiToken)) return { userId: 'admin-password', displayName: PROTOTYPE_STAFF_NAME };
   const session = await getAdminSession();
-  return session ? { userId: session.userId, displayName: session.displayName } : null;
+  return session ? { userId: session.userId, displayName: PROTOTYPE_STAFF_NAME } : null;
 }

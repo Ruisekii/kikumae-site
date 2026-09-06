@@ -974,7 +974,7 @@ export async function listIssuesForAdministratorPage(portalId: number | null = n
   return { issues: await Promise.all(rows.slice(0, safePageSize).map((row) => hydrateIssue(db, mapIssue(row)))), hasMore };
 }
 
-export async function reviewIssueMergeCandidate(candidateId: number, action: 'accept' | 'reject', actorUserId: string, actorDisplayName = '避難所管理者'): Promise<{ action: 'accepted' | 'rejected'; issueId: number; targetIssueId: number | null }> {
+export async function reviewIssueMergeCandidate(candidateId: number, action: 'accept' | 'reject', actorUserId: string, actorDisplayName = '避難所統括-田中'): Promise<{ action: 'accepted' | 'rejected'; issueId: number; targetIssueId: number | null }> {
   if (!Number.isInteger(candidateId) || candidateId <= 0) throw new Error('MERGE_CANDIDATE_INVALID');
   const db = await initialise();
   const candidate = await db.prepare(`SELECT c.id, c.issue_id, c.candidate_issue_id, source.status AS source_status, target.status AS target_status,
@@ -1041,12 +1041,12 @@ function issueStatusPublicMessage(status: string): string {
 }
 
 export async function ensureStaffUser(externalId: string, displayName: string, role = 'staff'): Promise<void> {
-  const db = await initialise(); const id = externalId.trim().slice(0, 120) || 'admin-password'; const name = displayName.trim().slice(0, 120) || '避難所管理者';
+  const db = await initialise(); const id = externalId.trim().slice(0, 120) || 'admin-password'; const name = displayName.trim().slice(0, 120) || '避難所統括-田中';
   await db.prepare(`INSERT INTO staff_users (external_id, display_name, role, active, last_seen_at) VALUES (?, ?, ?, 1, ?)
     ON CONFLICT(external_id) DO UPDATE SET display_name = excluded.display_name, role = excluded.role, active = 1, last_seen_at = excluded.last_seen_at`).bind(id, name, role, Date.now()).run();
 }
 
-export async function updateIssueWorkflow(issueId: number, status: string, message: string, isPublic: boolean, assignedTeam: string, assignedUser: string, urgencyConfirmed: string, internalNote: string, expectedVersion: number | null, actorUserId: string, actorDisplayName = '避難所管理者'): Promise<Issue> {
+export async function updateIssueWorkflow(issueId: number, status: string, message: string, isPublic: boolean, assignedTeam: string, assignedUser: string, urgencyConfirmed: string, internalNote: string, expectedVersion: number | null, actorUserId: string, actorDisplayName = '避難所統括-田中'): Promise<Issue> {
   const allowed = new Set(['new', 'reviewing', 'assigned', 'field_checking', 'in_progress', 'waiting', 'resolved', 'cannot_resolve']);
   if (!allowed.has(status)) throw new Error('ISSUE_STATUS_INVALID');
   const db = await initialise(); const issue = await getIssueForAdministrator(issueId, null); if (!issue) throw new Error('ISSUE_NOT_FOUND');
@@ -1087,7 +1087,7 @@ export async function generateIssueDraft(issueId: number, portalId: number | nul
   return { draft: generateShelterReplyDraft(context, representative, shelterRelated), alternatives: generateShelterAlternativeDrafts(context, representative, shelterRelated), grounds: shelterRelated.map((faq) => faq.question), mode: 'local-rules' };
 }
 
-export async function approveIssueResponse(issueId: number, body: string, usedAi: boolean, grounds: string[], actorUserId: string, actorDisplayName = '避難所管理者'): Promise<FaqCandidate | null> {
+export async function approveIssueResponse(issueId: number, body: string, usedAi: boolean, grounds: string[], actorUserId: string, actorDisplayName = '避難所統括-田中'): Promise<FaqCandidate | null> {
   const issue = await getIssueForAdministrator(issueId, null); if (!issue) throw new Error('ISSUE_NOT_FOUND');
   if (issue.status === 'resolved' || issue.status === 'cannot_resolve') throw new Error('ISSUE_ALREADY_RESOLVED');
   const answer = body.trim().slice(0, 4000); if (!answer) throw new Error('ANSWER_REQUIRED');
