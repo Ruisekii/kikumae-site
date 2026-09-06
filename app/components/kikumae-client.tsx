@@ -197,7 +197,7 @@ export function KikumaeClient({ faqs }: Props) {
     if (!preview) return;
     const values = { ...supplementValues };
     for (const field of supplementFields(preview.analysis, preview.body, intake)) if (field.kind === 'stepper' && !values[field.key]) values[field.key] = '1';
-    const nextIntake = { ...intake, ...Object.fromEntries(Object.entries(values).filter(([, value]) => typeof value === 'string' && value.length > 0)) } as Intake;
+    const normalizedValues = Object.fromEntries(Object.entries(values).filter(([, value]) => typeof value === 'string' && value.length > 0).map(([key, value]) => [key, key === 'resourceRemaining' && supplementFields(preview.analysis, preview.body, intake).some((field) => field.key === 'resourceRemaining' && field.kind === 'stepper') && /^\d+$/.test(value) ? `${value}枚` : value])); const nextIntake = { ...intake, ...normalizedValues } as Intake;
     const facts = [...preview.analysis.facts];
     const factLabels: Array<[string, SupplementKey]> = [['場所', 'location'], ['人数', 'peopleCount'], ['残量・不足状況', 'resourceRemaining'], ['最後に受け取った時刻', 'lastReceivedAt'], ['追加確認', 'additionalDetails']];
     for (const [label, key] of factLabels) { const value = nextIntake[key]; if (!value) continue; const index = facts.findIndex((fact) => fact.startsWith(`${label}：`)); if (index >= 0) facts[index] = `${label}：${value}`; else facts.push(`${label}：${value}`); }
