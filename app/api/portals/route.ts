@@ -1,15 +1,10 @@
 import { createPortal } from '../../../db/portals';
 import { allowBurstShared, readRequestText } from '../../../db/request-guard';
+import { getAdminUser } from '../../admin-auth';
 
 export const runtime = 'edge';
 const RESERVED_PORTAL_SLUGS = new Set(['admin', 'api', 'callback', 'open', 'owner', 'questions', 'signin-with-chatgpt', 'signout-with-chatgpt', 'staff']);
 const MAX_REQUEST_BYTES = 8_192;
-const IMPERSONATION_TERMS = ['避難所', '避難', '安否', '被災', '災害', '救援', '市役所', '区役所', '町役場', '役所', '自治体', '公式', 'police', 'shelter', 'official'];
-
-function containsImpersonationTerm(value: string): boolean {
-  const normalized = value.normalize('NFKC').toLowerCase().replace(/\s+/g, '');
-  return IMPERSONATION_TERMS.some((term) => normalized.includes(term.normalize('NFKC').toLowerCase()));
-}
 
 function sameOrigin(request: Request): boolean {
   const origin = request.headers.get('origin');
@@ -18,15 +13,15 @@ function sameOrigin(request: Request): boolean {
 
 export async function POST(request: Request): Promise<Response> {
   if (!sameOrigin(request)) return Response.json({ message: 'この送信元は許可されていません。' }, { status: 403 });
+  if (!await getAdminUser()) return Response.json({ message: '避難所の登録には管理者としてのログインが必要です。/admin からログインしてから、もう一度お試しください。' }, { status: 401, headers: { 'Cache-Control': 'no-store' } });
   if (!await allowBurstShared(request, 'portal-create', 10, 10 * 60 * 1000)) return Response.json({ message: '作成操作が多すぎます。少し時間をおいて再度お試しください。' }, { status: 429, headers: { 'Retry-After': '600', 'Cache-Control': 'no-store' } });
   try {
     const raw = await readRequestText(request, MAX_REQUEST_BYTES);
     const body = JSON.parse(raw) as { name?: string; slug?: string; description?: string; password?: string; passwordConfirmation?: string };
     const name = String(body.name ?? '').trim(); const slug = String(body.slug ?? '').trim().toLowerCase(); const description = String(body.description ?? '').trim(); const password = String(body.password ?? '');
-    if (name.length < 2 || name.length > 80) return Response.json({ message: '窓口名は2〜80文字で入力してください。' }, { status: 400 });
+    if (name.length < 2 || name.length > 80) return Response.json({ message: '避難所の名称は2〜80文字で入力してください。' }, { status: 400 });
     if (!/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(slug) || slug.length > 48) return Response.json({ message: 'URL用の名前は英数字とハイフンで入力してください。' }, { status: 400 });
     if (RESERVED_PORTAL_SLUGS.has(slug)) return Response.json({ message: 'そのURL用の名前はシステムで予約されています。別の名前を入力してください。' }, { status: 400 });
-    if (containsImpersonationTerm(name) || containsImpersonationTerm(slug)) return Response.json({ message: '避難所や市区町村などの公的な窓口を装う言葉は、窓口名やURL用の名前に使えません。別の言葉で入力してください。' }, { status: 400 });
     if (description.length > 300) return Response.json({ message: '説明は300文字以内で入力してください。' }, { status: 400 });
     if (password.length < 10 || password.length > 128) return Response.json({ message: '管理者パスワードは10文字以上で設定してください。' }, { status: 400 });
     if (password !== String(body.passwordConfirmation ?? '')) return Response.json({ message: 'パスワード確認が一致しません。' }, { status: 400 });

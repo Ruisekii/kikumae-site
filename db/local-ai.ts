@@ -231,6 +231,7 @@ const SYNONYM_GROUPS = [
   ['初心者', '未経験', '初めて', 'はじめて'], ['部費', '費用', 'お金', '料金'],
   ['活動日', '曜日', '日時', '時間', 'いつ'], ['持ち物', '道具', '必要'],
   ['入部', '参加', '入り'], ['一人', '1人', 'ひとり'],
+  ['水', '飲料水', 'お水'], ['薬', 'くすり'],
 ];
 
 function normalize(value: string): string {
@@ -260,7 +261,7 @@ function cosineSimilarity(a: string, b: string): number {
 function keywords(value: string): Set<string> {
   const text = value.normalize('NFKC');
   const found = new Set(text.match(KEYWORD_RE) ?? []);
-  ['いつ', '急に', '一人', '1人', 'ひとり', 'はじめて', '初めて', 'お金'].forEach((hint) => { if (text.includes(hint)) found.add(hint); });
+  ['いつ', '急に', '一人', '1人', 'ひとり', 'はじめて', '初めて', 'お金', 'くすり', '水', '薬', '熱', '火'].forEach((hint) => { if (text.includes(hint)) found.add(hint); });
   const expanded = new Set(found);
   found.forEach((word) => SYNONYM_GROUPS.forEach((group) => { if (group.includes(word)) group.forEach((synonym) => expanded.add(synonym)); }));
   return expanded;
@@ -280,8 +281,12 @@ export function combinedSimilarity(query: string, target: string): number {
 export function searchFaqs(query: string, faqs: AiFaq[], limit = 5): AiRelatedFaq[] {
   if (!query.trim()) return [];
   return faqs
-    .map((faq) => ({ ...faq, score: Math.max(combinedSimilarity(query, faq.question), combinedSimilarity(query, faq.answer) * 0.9) }))
-    .filter((faq) => faq.score >= 0.2)
+    .map((faq) => {
+      const keywordHit = Math.max(keywordScore(query, faq.question), keywordScore(query, faq.answer));
+      const score = keywordHit > 0 ? Math.max(combinedSimilarity(query, faq.question), combinedSimilarity(query, faq.answer) * 0.9) : 0;
+      return { ...faq, score };
+    })
+    .filter((faq) => faq.score >= 0.3)
     .sort((a, b) => b.score - a.score)
     .slice(0, limit)
     .map((faq) => ({ ...faq, score: Math.round(faq.score * 1000) / 1000 }));

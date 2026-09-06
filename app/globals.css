@@ -443,3 +443,16 @@ button, input, textarea, select { font-size: 1rem; }
 @media (max-width: 680px) {
   .portal-origin-notice { margin: 14px 16px 0; padding: 12px 14px; }
 }
+
+/* Claude reception and device-history layout, using the existing warm palette. */
+.evac-theme .evac-footer { padding: 20px 24px 80px; text-align: center; }
+.evac-footer a, .save-hint, .device-history-note, .device-history-date { color: var(--muted); }
+.consult-id { font-size: 1.3rem; font-weight: 900; }
+.check-url-box { display: flex; flex-wrap: wrap; gap: 8px; width: 100%; }
+.check-url-input { flex: 1 1 240px; min-width: 0; padding: 12px; border: 1px solid var(--line); border-radius: 10px; }
+.consult-receipt { display: grid; gap: 12px; }
+.device-history { margin-top: 30px; padding-top: 22px; border-top: 1px solid var(--line); }
+.device-history-list { display: grid; gap: 12px; padding: 0; list-style: none; }
+.device-history-list li { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8px; }
+.device-history-list a { color: var(--ink); font-weight: 800; }
+.voice-slot { display: inline-flex; }
