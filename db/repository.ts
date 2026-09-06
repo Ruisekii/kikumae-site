@@ -133,7 +133,7 @@ export type Issue = {
   urgency: UrgencyLevel;
   urgencyConfidence: number;
   urgencyConfirmed: UrgencyLevel | null;
-  status: 'new' | 'reviewing' | 'assigned' | 'in_progress' | 'waiting' | 'resolved' | 'cannot_resolve' | string;
+  status: 'new' | 'reviewing' | 'assigned' | 'field_checking' | 'in_progress' | 'waiting' | 'resolved' | 'cannot_resolve' | string;
   reportCount: number;
   affectedPeople: string;
   vulnerablePeople: string[];
@@ -739,7 +739,7 @@ export async function getShelterDashboardStats(): Promise<ShelterDashboardStats>
   const urgentResult = await db.prepare(`${ISSUE_SELECT} WHERE portal_id IS NULL AND urgency_candidate IN ('critical','high') AND status NOT IN ('resolved','cannot_resolve') ORDER BY CASE urgency_candidate WHEN 'critical' THEN 2 ELSE 1 END DESC, report_count DESC, last_reported_at ASC LIMIT 8`).all<Record<string, unknown>>();
   const surgeResult = await db.prepare("SELECT category, SUM(report_count) AS count FROM issues WHERE portal_id IS NULL AND last_reported_at > ? GROUP BY category ORDER BY count DESC LIMIT 1").bind(Date.now() - 30 * 60 * 1000).first<Record<string, unknown>>();
   const urgent = await Promise.all((urgentResult.results ?? []).map((row) => hydrateIssue(db, mapIssue(row), false)));
-  const counts: Record<string, number> = { new: 0, reviewing: 0, assigned: 0, in_progress: 0, waiting: 0, resolved: 0, cannot_resolve: 0 };
+  const counts: Record<string, number> = { new: 0, reviewing: 0, assigned: 0, field_checking: 0, in_progress: 0, waiting: 0, resolved: 0, cannot_resolve: 0 };
   (countsResult.results ?? []).forEach((row) => { counts[String(row.status ?? 'new')] = Number(row.count ?? 0); });
   const reportMetric = await db.prepare("SELECT COUNT(*) AS count FROM questions WHERE portal_id IS NULL").first<Record<string, unknown>>();
   const issueMetric = await db.prepare("SELECT COUNT(*) AS count FROM issues WHERE portal_id IS NULL").first<Record<string, unknown>>();
@@ -1023,7 +1023,7 @@ export async function getIssueForAdministrator(issueId: number, portalId: number
 }
 
 function questionStatusForIssue(status: string): string {
-  return status === 'resolved' || status === 'cannot_resolve' ? 'resolved' : status === 'in_progress' ? 'in_progress' : status === 'waiting' ? 'awaiting_info' : status === 'new' ? 'received' : 'reviewing';
+  return status === 'resolved' || status === 'cannot_resolve' ? 'resolved' : status === 'in_progress' ? 'in_progress' : status === 'field_checking' ? 'field_checking' : status === 'waiting' ? 'awaiting_info' : status === 'new' ? 'received' : 'reviewing';
 }
 
 function issueStatusPublicMessage(status: string): string {
@@ -1031,6 +1031,7 @@ function issueStatusPublicMessage(status: string): string {
     new: '相談を受け付けました。避難所スタッフが内容を確認します。',
     reviewing: '避難所スタッフが状況を確認しています。',
     assigned: '担当スタッフを決めて、対応を進めます。',
+    field_checking: '避難所スタッフが現場の状況を確認しています。',
     in_progress: '避難所スタッフが対応を進めています。',
     waiting: '対応に必要な情報を確認しています。',
     resolved: '対応が完了しました。',
@@ -1046,7 +1047,7 @@ export async function ensureStaffUser(externalId: string, displayName: string, r
 }
 
 export async function updateIssueWorkflow(issueId: number, status: string, message: string, isPublic: boolean, assignedTeam: string, assignedUser: string, urgencyConfirmed: string, internalNote: string, expectedVersion: number | null, actorUserId: string, actorDisplayName = '避難所管理者'): Promise<Issue> {
-  const allowed = new Set(['new', 'reviewing', 'assigned', 'in_progress', 'waiting', 'resolved', 'cannot_resolve']);
+  const allowed = new Set(['new', 'reviewing', 'assigned', 'field_checking', 'in_progress', 'waiting', 'resolved', 'cannot_resolve']);
   if (!allowed.has(status)) throw new Error('ISSUE_STATUS_INVALID');
   const db = await initialise(); const issue = await getIssueForAdministrator(issueId, null); if (!issue) throw new Error('ISSUE_NOT_FOUND');
   if (expectedVersion != null && issue.version !== expectedVersion) throw new Error('ISSUE_CONFLICT');

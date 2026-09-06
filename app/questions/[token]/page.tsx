@@ -7,15 +7,17 @@ export const dynamic = 'force-dynamic';
 const stages = [
   { key: 'received', label: '受付済み', description: '相談が届いています。' },
   { key: 'reviewing', label: '確認中', description: '避難所スタッフが状況を確認しています。' },
+  { key: 'field_checking', label: '現場確認中', description: '避難所スタッフが現場の状況を確認しています。' },
   { key: 'in_progress', label: '対応中', description: '必要な対応を進めています。' },
   { key: 'awaiting_info', label: '追加情報を確認中', description: '対応に必要な情報を確認しています。' },
   { key: 'resolved', label: '解決済み', description: '対応が完了しました。' },
 ] as const;
 
 function timelineIndex(status: string): number {
-  if (status === 'resolved') return 4;
-  if (status === 'awaiting_info') return 3;
-  if (status === 'in_progress') return 2;
+  if (status === 'resolved') return 5;
+  if (status === 'awaiting_info') return 4;
+  if (status === 'in_progress') return 3;
+  if (status === 'field_checking') return 2;
   if (status === 'reviewing') return 1;
   return 0;
 }
