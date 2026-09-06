@@ -200,6 +200,8 @@ function database(): D1Database {
   return env.DB;
 }
 
+let initialisationPromise: Promise<D1Database> | null = null;
+
 function configuredOwnerUserId(): string | null {
   const value = env.KIKUMAE_OWNER_USER_ID?.trim();
   return value || null;
@@ -222,16 +224,20 @@ async function ensureAdminState(db: D1Database): Promise<void> {
 }
 
 async function initialise(): Promise<D1Database> {
-  try {
-    return await initialiseDatabase();
-  } catch (error) {
+  if (!initialisationPromise) {
+    const db = database();
+    initialisationPromise = initialiseDatabase(db).then(() => db).catch((error) => {
+      initialisationPromise = null;
+      throw error;
+    });
+  }
+  try { return await initialisationPromise; } catch (error) {
     console.error('KIKUMAE_INITIALISE_FAILED', error instanceof Error ? error.message : String(error));
     throw error;
   }
 }
 
-async function initialiseDatabase(): Promise<D1Database> {
-  const db = database();
+async function initialiseDatabase(db: D1Database): Promise<void> {
   const now = Date.now();
   await db.batch([
     db.prepare("CREATE TABLE IF NOT EXISTS faqs (id INTEGER PRIMARY KEY AUTOINCREMENT, question TEXT NOT NULL UNIQUE, answer TEXT NOT NULL, category TEXT NOT NULL, status TEXT NOT NULL DEFAULT 'published', created_at INTEGER NOT NULL DEFAULT 0, updated_at INTEGER NOT NULL, source TEXT NOT NULL DEFAULT '避難所スタッフ', expires_at INTEGER, verified INTEGER NOT NULL DEFAULT 1)"),
@@ -734,26 +740,28 @@ export async function recordOriginalViewed(questionId: number, actorUserId: stri
 
 export async function getShelterDashboardStats(): Promise<ShelterDashboardStats> {
   const db = await initialise();
-  const countsResult = await db.prepare("SELECT status, COUNT(*) AS count FROM issues WHERE portal_id IS NULL GROUP BY status").all<Record<string, unknown>>();
-  const categoryResult = await db.prepare("SELECT category, SUM(report_count) AS count FROM issues WHERE portal_id IS NULL GROUP BY category ORDER BY count DESC").all<Record<string, unknown>>();
-  const urgentResult = await db.prepare(`${ISSUE_SELECT} WHERE portal_id IS NULL AND urgency_candidate IN ('critical','high') AND status NOT IN ('resolved','cannot_resolve') ORDER BY CASE urgency_candidate WHEN 'critical' THEN 2 ELSE 1 END DESC, report_count DESC, last_reported_at ASC LIMIT 8`).all<Record<string, unknown>>();
-  const surgeResult = await db.prepare("SELECT category, SUM(report_count) AS count FROM issues WHERE portal_id IS NULL AND last_reported_at > ? GROUP BY category ORDER BY count DESC LIMIT 1").bind(Date.now() - 30 * 60 * 1000).first<Record<string, unknown>>();
+  const japanNow = new Date(Date.now() + 9 * 60 * 60 * 1000);
+  const startOfJapanDay = Date.UTC(japanNow.getUTCFullYear(), japanNow.getUTCMonth(), japanNow.getUTCDate()) - 9 * 60 * 60 * 1000;
+  const [countsResult, categoryResult, urgentResult, surgeResult, reportMetric, issueMetric, groupedMetric, originalQuestionMetric, originalIssueMetric, responseMetric, faqResolvedMetric, staffHandledMetric, originalNotOpenedMetric, timingMetric, resolvedTodayMetric] = await Promise.all([
+    db.prepare("SELECT status, COUNT(*) AS count FROM issues WHERE portal_id IS NULL GROUP BY status").all<Record<string, unknown>>(),
+    db.prepare("SELECT category, SUM(report_count) AS count FROM issues WHERE portal_id IS NULL GROUP BY category ORDER BY count DESC").all<Record<string, unknown>>(),
+    db.prepare(`${ISSUE_SELECT} WHERE portal_id IS NULL AND urgency_candidate IN ('critical','high') AND status NOT IN ('resolved','cannot_resolve') ORDER BY CASE urgency_candidate WHEN 'critical' THEN 2 ELSE 1 END DESC, report_count DESC, last_reported_at ASC LIMIT 8`).all<Record<string, unknown>>(),
+    db.prepare("SELECT category, SUM(report_count) AS count FROM issues WHERE portal_id IS NULL AND last_reported_at > ? GROUP BY category ORDER BY count DESC LIMIT 1").bind(Date.now() - 30 * 60 * 1000).first<Record<string, unknown>>(),
+    db.prepare("SELECT COUNT(*) AS count FROM questions WHERE portal_id IS NULL").first<Record<string, unknown>>(),
+    db.prepare("SELECT COUNT(*) AS count FROM issues WHERE portal_id IS NULL").first<Record<string, unknown>>(),
+    db.prepare("SELECT COUNT(*) AS count FROM issue_reports ir JOIN issues i ON i.id = ir.issue_id WHERE i.portal_id IS NULL AND ir.link_type = 'auto'").first<Record<string, unknown>>(),
+    db.prepare("SELECT COUNT(*) AS count FROM question_events qe JOIN questions q ON q.id = qe.question_id WHERE q.portal_id IS NULL AND qe.event_type = 'original_opened'").first<Record<string, unknown>>(),
+    db.prepare("SELECT COUNT(DISTINCT h.issue_id) AS count FROM issue_operation_history h JOIN issues i ON i.id = h.issue_id WHERE i.portal_id IS NULL AND h.operation = 'original_opened'").first<Record<string, unknown>>(),
+    db.prepare("SELECT COUNT(*) AS count FROM issue_responses ir JOIN issues i ON i.id = ir.issue_id WHERE i.portal_id IS NULL").first<Record<string, unknown>>(),
+    db.prepare("SELECT COUNT(*) AS count FROM questions WHERE portal_id IS NULL AND faq_resolved = 1").first<Record<string, unknown>>(),
+    db.prepare("SELECT COUNT(*) AS count FROM issues WHERE portal_id IS NULL AND status != 'new'").first<Record<string, unknown>>(),
+    db.prepare("SELECT COUNT(*) AS count FROM issues i WHERE i.portal_id IS NULL AND i.status != 'new' AND NOT EXISTS (SELECT 1 FROM issue_operation_history h WHERE h.issue_id = i.id AND h.operation = 'original_opened')").first<Record<string, unknown>>(),
+    db.prepare("SELECT AVG(first_confirmed_at - created_at) AS first_confirmation_ms, AVG(resolved_at - created_at) AS resolution_ms FROM questions WHERE portal_id IS NULL AND (first_confirmed_at IS NOT NULL OR resolved_at IS NOT NULL)").first<Record<string, unknown>>(),
+    db.prepare("SELECT COUNT(*) AS count FROM issues WHERE portal_id IS NULL AND resolved_at >= ?").bind(startOfJapanDay).first<Record<string, unknown>>(),
+  ]);
   const urgent = await Promise.all((urgentResult.results ?? []).map((row) => hydrateIssue(db, mapIssue(row), false)));
   const counts: Record<string, number> = { new: 0, reviewing: 0, assigned: 0, field_checking: 0, in_progress: 0, waiting: 0, resolved: 0, cannot_resolve: 0 };
   (countsResult.results ?? []).forEach((row) => { counts[String(row.status ?? 'new')] = Number(row.count ?? 0); });
-  const reportMetric = await db.prepare("SELECT COUNT(*) AS count FROM questions WHERE portal_id IS NULL").first<Record<string, unknown>>();
-  const issueMetric = await db.prepare("SELECT COUNT(*) AS count FROM issues WHERE portal_id IS NULL").first<Record<string, unknown>>();
-  const groupedMetric = await db.prepare("SELECT COUNT(*) AS count FROM issue_reports ir JOIN issues i ON i.id = ir.issue_id WHERE i.portal_id IS NULL AND ir.link_type = 'auto'").first<Record<string, unknown>>();
-  const originalQuestionMetric = await db.prepare("SELECT COUNT(*) AS count FROM question_events qe JOIN questions q ON q.id = qe.question_id WHERE q.portal_id IS NULL AND qe.event_type = 'original_opened'").first<Record<string, unknown>>();
-  const originalIssueMetric = await db.prepare("SELECT COUNT(DISTINCT h.issue_id) AS count FROM issue_operation_history h JOIN issues i ON i.id = h.issue_id WHERE i.portal_id IS NULL AND h.operation = 'original_opened'").first<Record<string, unknown>>();
-  const responseMetric = await db.prepare("SELECT COUNT(*) AS count FROM issue_responses ir JOIN issues i ON i.id = ir.issue_id WHERE i.portal_id IS NULL").first<Record<string, unknown>>();
-  const faqResolvedMetric = await db.prepare("SELECT COUNT(*) AS count FROM questions WHERE portal_id IS NULL AND faq_resolved = 1").first<Record<string, unknown>>();
-  const staffHandledMetric = await db.prepare("SELECT COUNT(*) AS count FROM issues WHERE portal_id IS NULL AND status != 'new'").first<Record<string, unknown>>();
-  const originalNotOpenedMetric = await db.prepare("SELECT COUNT(*) AS count FROM issues i WHERE i.portal_id IS NULL AND i.status != 'new' AND NOT EXISTS (SELECT 1 FROM issue_operation_history h WHERE h.issue_id = i.id AND h.operation = 'original_opened')").first<Record<string, unknown>>();
-  const timingMetric = await db.prepare("SELECT AVG(first_confirmed_at - created_at) AS first_confirmation_ms, AVG(resolved_at - created_at) AS resolution_ms FROM questions WHERE portal_id IS NULL AND (first_confirmed_at IS NOT NULL OR resolved_at IS NOT NULL)").first<Record<string, unknown>>();
-  const japanNow = new Date(Date.now() + 9 * 60 * 60 * 1000);
-  const startOfJapanDay = Date.UTC(japanNow.getUTCFullYear(), japanNow.getUTCMonth(), japanNow.getUTCDate()) - 9 * 60 * 60 * 1000;
-  const resolvedTodayMetric = await db.prepare("SELECT COUNT(*) AS count FROM issues WHERE portal_id IS NULL AND resolved_at >= ?").bind(startOfJapanDay).first<Record<string, unknown>>();
   const averageSeconds = (value: unknown): number | null => value == null ? null : Math.max(0, Math.round(Number(value) / 1000));
   return {
     counts, categoryCounts: (categoryResult.results ?? []).map((row) => ({ category: String(row.category ?? 'その他'), count: Number(row.count ?? 0) })),

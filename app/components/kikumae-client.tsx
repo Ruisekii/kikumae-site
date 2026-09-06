@@ -3,6 +3,7 @@
 import { FormEvent, useEffect, useMemo, useRef, useState } from 'react';
 import Link from 'next/link';
 import type { Faq, RelatedFaq } from '../../db/repository';
+import { generateShelterAnalysis, searchFaqs, shelterFollowUp } from '../../db/local-ai';
 
 type Intake = { location: string; peopleCount: string; resourceRemaining: string; lastReceivedAt: string; additionalDetails: string };
 type Analysis = { title: string; overview: string; facts: string[]; emotion: string; missingInformation: string[]; urgencyCandidate: string; urgentReview: boolean; category: string; location: string; peopleCount: string; resourceRemaining: string; lastReceivedAt: string };
@@ -41,6 +42,17 @@ const emptyIntake: Intake = { location: '', peopleCount: '', resourceRemaining: 
 const LOCATION_OPTIONS = ['体育館', '体育館北側', '体育館南側', '北トイレ', '南トイレ', '受付', '救護スペース', '駐車場', '屋外'];
 const normalize = (value: string) => value.toLocaleLowerCase('ja-JP').replace(/\s/g, '');
 const isUrgentAnalysis = (analysis: Analysis) => analysis.urgentReview || analysis.urgencyCandidate === '高';
+
+function buildInstantPreview(body: string, intake: Intake, faqs: Faq[], submissionKey: string): Preview {
+  const analysis = generateShelterAnalysis(body, intake);
+  const ranked = searchFaqs(body, faqs, 6);
+  const categoryFaqs = faqs.filter((faq) => faq.category === analysis.category).map((faq) => {
+    const existing = ranked.find((item) => item.id === faq.id);
+    return existing ?? { ...faq, score: 0.65 };
+  });
+  const related = [...categoryFaqs, ...ranked.filter((faq) => faq.category !== analysis.category)].slice(0, 3);
+  return { body, summary: analysis.overview, category: analysis.category, related, analysis, followUp: analysis.missingInformation[0] ? shelterFollowUp(analysis.missingInformation[0], analysis.category) : null, submissionKey };
+}
 
 function supplementFields(analysis: Analysis, body: string, intake: Intake): SupplementField[] {
   const missing = new Set(analysis.missingInformation);
@@ -169,6 +181,7 @@ export function KikumaeClient({ faqs }: Props) {
   const [voiceSupported, setVoiceSupported] = useState(false);
   const [offline, setOffline] = useState(false);
   const submitLockRef = useRef(false);
+  const previewRequestRef = useRef(0);
   const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -231,12 +244,15 @@ export function KikumaeClient({ faqs }: Props) {
     setSelectedCategory(category); setSelectedDetail(''); setIntakeStep('detail');
   }
 
-  async function chooseDetail(detail: string) {
+  function chooseDetail(detail: string) {
     if (!selectedCategory || busy) return;
     const nextIntake = { ...intake };
     const body = [`困りごとの種類：${selectedCategory.label}`, `困っていること：${detail}`].join('\n');
-    setSelectedDetail(detail); setOriginalBody(body); setContextBody(body); setIntake(nextIntake); setIntakeStep('faq'); setPreview(null); setFaqDecision(false); setReadyToSubmit(false); setStatus('');
-    await inspect(body, nextIntake);
+    const instantPreview = buildInstantPreview(body, nextIntake, faqs, crypto.randomUUID());
+    const urgent = isUrgentAnalysis(instantPreview.analysis);
+    const fields = supplementFields(instantPreview.analysis, instantPreview.body, nextIntake);
+    setSelectedDetail(detail); setOriginalBody(body); setContextBody(body); setIntake(nextIntake); setIntakeStep('faq'); setPreview(instantPreview); setFaqDecision(false); setReadyToSubmit(urgent || (!instantPreview.related.length && !fields.length)); setStatus('');
+    void inspect(body, nextIntake, instantPreview.submissionKey, true);
   }
 
   function chooseLocation(location: string) {
@@ -271,27 +287,30 @@ export function KikumaeClient({ faqs }: Props) {
     recognition.start();
   }
 
-  async function inspect(body: string, nextIntake: Intake) {
-    setBusy(true); setStatus('内容を整理しています…');
+  async function inspect(body: string, nextIntake: Intake, submissionKey = preview?.submissionKey ?? crypto.randomUUID(), background = false) {
+    const requestId = ++previewRequestRef.current;
+    if (!background) { setBusy(true); setStatus('内容を整理しています…'); }
     try {
       const response = await fetch('/api/questions/preview', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ body, intake: nextIntake }), signal: AbortSignal.timeout(15000) });
       const payload = await response.json() as { message?: string; body?: string; summary?: string; category?: string; related?: RelatedFaq[]; analysis?: Analysis; followUp?: Preview['followUp'] };
-      if (!response.ok || !payload.analysis) { setStatus(payload.message ?? '内容を整理できませんでした。'); return false; }
-      const nextPreview: Preview = { body: payload.body ?? body, summary: payload.summary ?? '', category: payload.category ?? 'その他', related: payload.related ?? [], analysis: payload.analysis, followUp: payload.followUp ?? null, submissionKey: preview?.submissionKey ?? crypto.randomUUID() };
+      if (requestId !== previewRequestRef.current || submitLockRef.current) return false;
+      if (!response.ok || !payload.analysis) { if (!background) setStatus(payload.message ?? '内容を整理できませんでした。'); return false; }
+      const nextPreview: Preview = { body: payload.body ?? body, summary: payload.summary ?? '', category: payload.category ?? 'その他', related: payload.related ?? [], analysis: payload.analysis, followUp: payload.followUp ?? null, submissionKey };
       setPreview(nextPreview); setIntake(nextIntake); setFaqDecision(false);
+      if (background) return true;
       setStatus('');
       const urgent = isUrgentAnalysis(nextPreview.analysis);
       const fields = supplementFields(nextPreview.analysis, nextPreview.body, nextIntake);
       setShowFaqCard(!urgent && nextPreview.related.length > 0);
-      if (intakeOpen) setIntakeStep('faq');
+      if (intakeOpen) setIntakeStep((current) => current === 'faq' || current === 'detail' ? 'faq' : current);
       if (urgent) addMessage({ from: 'ai', text: '緊急の可能性がある内容として受け止めました。追加の確認を待たず、このまま職員へ届けられます。' });
       else if (nextPreview.related.length) addMessage({ from: 'ai', text: '近い案内が見つかりました。解決しなければ、整理した内容をそのまま職員へ届けられます。' });
       else addMessage({ from: 'ai', text: fields.length ? '内容を整理しました。必要な項目だけ、下からまとめて選んでください。' : '内容を整理しました。この内容を職員へ届ける前に確認できます。' });
       if (urgent || (!nextPreview.related.length && !fields.length)) setReadyToSubmit(true);
-      else if (!nextPreview.related.length) { setSupplementValues({}); setShowSupplementSheet(!intakeOpen); setIntakeStep(intakeOpen ? 'supplement' : intakeStep); setReadyToSubmit(false); }
+      else if (!nextPreview.related.length) { setSupplementValues({}); setShowSupplementSheet(!intakeOpen); if (intakeOpen) setIntakeStep((current) => current === 'faq' || current === 'detail' ? 'supplement' : current); setReadyToSubmit(false); }
       return true;
-    } catch (error) { setStatus(error instanceof Error && error.name === 'TimeoutError' ? '通信が遅いようです。もう一度お試しください。' : '通信に失敗しました。もう一度お試しください。'); return false; }
-    finally { setBusy(false); }
+    } catch (error) { if (!background && requestId === previewRequestRef.current && !submitLockRef.current) setStatus(error instanceof Error && error.name === 'TimeoutError' ? '通信が遅いようです。もう一度お試しください。' : '通信に失敗しました。もう一度お試しください。'); return false; }
+    finally { if (!background && requestId === previewRequestRef.current) setBusy(false); }
   }
 
   async function sendMessage(event: FormEvent<HTMLFormElement>) {
@@ -344,7 +363,7 @@ export function KikumaeClient({ faqs }: Props) {
 
   async function submitQuestion() {
     if (!preview || busy || submitLockRef.current) return;
-    submitLockRef.current = true; setBusy(true); setStatus('相談を届けています…');
+    submitLockRef.current = true; previewRequestRef.current += 1; setBusy(true); setStatus('相談を届けています…');
     try {
       const response = await fetch('/api/questions', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ body: originalBody, summary: preview.summary, category: preview.category, submissionKey: preview.submissionKey, intake }), signal: AbortSignal.timeout(15000) });
       const payload = await response.json() as { message?: string; checkUrl?: string; id?: number };
