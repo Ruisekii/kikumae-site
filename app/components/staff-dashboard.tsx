@@ -16,7 +16,7 @@ const statusLabel: Record<string, string> = { new: '未確認', reviewing: '確�
 const statusIcon: Record<string, string> = { new: '📥', reviewing: '🔎', assigned: '👤', field_checking: '📍', in_progress: '▶️', waiting: '⏳', resolved: '✅', cannot_resolve: '⚠️' };
 const urgencyLabel: Record<string, string> = { critical: '要緊急確認', high: '高', normal: '通常', low: '低' };
 const urgencyRank: Record<string, number> = { critical: 4, high: 3, normal: 2, low: 1 };
-const categoryIcon: Record<string, string> = { 水: '💧', '水・飲料': '💧', 食料: '🍱', '食料・物資': '🍱', 医療: '🩺', '医療・薬': '🩺', 救護: '🩺', 衛生: '🧼', 'トイレ・衛生': '🚻', トイレ: '🚻', 設備: '🔧', '設備・充電': '🔌', 充電: '🔌', 通信: '📶', ペット: '🐾', 寒さ: '🧣', 安全: '🚨', '安全・その他': '🚨', バリアフリー: '♿️', その他: '💬' };
+const categoryIcon: Record<string, string> = { '水・飲料': '💧', 水: '💧', '食料・物資': '🍱', 食料: '🍱', '医療・薬': '🩺', 医療: '🩺', 救護: '🩺', 'トイレ・衛生': '🚻', トイレ: '🚻', 衛生: '🧼', '設備・充電': '🔌', 充電: '🔌', 通信: '📶', 設備: '🔧', ペット: '🐾', 寒さ: '🧣', '安全・その他': '🚨', 安全: '🚨', バリアフリー: '♿️', その他: '💬' };
 const dateLabel = (value: number | null) => value ? new Intl.DateTimeFormat('ja-JP', { timeZone: 'Asia/Tokyo', dateStyle: 'medium', timeStyle: 'short' }).format(new Date(value)) : '';
 const clockLabel = (value: number | null) => value == null ? '—' : new Intl.DateTimeFormat('ja-JP', { timeZone: 'Asia/Tokyo', hour: '2-digit', minute: '2-digit' }).format(new Date(value));
 const relativeLabel = (value: number) => { const minutes = Math.max(0, Math.round((Date.now() - value) / 60000)); return minutes < 1 ? 'いま' : minutes < 60 ? `${minutes}分前` : `${Math.floor(minutes / 60)}時間前`; };
