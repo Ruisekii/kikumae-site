@@ -72,8 +72,8 @@ const SHELTER_CATEGORY_KEYWORDS: Record<ShelterCategory, string[]> = {
   その他: [],
 };
 
-const URGENT_PATTERNS = /(意識|呼吸|出血|けが|怪我|救急|持病|薬がない|薬切れ|火事|火災|煙|暴力|殴|襲|閉じ込め|倒れ|命|生命|危険|虐待)/i;
-const HIGH_URGENCY_PATTERNS = /(足りない|ない|切れ|動けない|痛い|苦しい|子ども|高齢|乳児|妊娠|一人で|困って)/i;
+const URGENT_PATTERNS = /(意識|呼吸|出血|けが|怪我|救急|持病|薬がない|薬切れ|薬.{0,12}(?:明日|今夜|今日|なくな|切れ)|脱水|熱中症|水分(?:が|を)取れない|糖尿病.{0,12}(?:薬|インスリン)|火事|火災|煙|暴力|殴|襲|閉じ込め|倒れ|命|生命|危険|虐待)/i;
+const HIGH_URGENCY_PATTERNS = /(足りない|ない|切れ|動けない|痛い|苦しい|使えない|使えません|壊れ|子ども|高齢|乳児|妊娠|一人で|困って)/i;
 
 export function isShelterQuestion(value: string): boolean {
   return /(避難所|避難|給水|飲料|物資|トイレ|充電|薬|医療|ペット|毛布|食料|水が|水の|困っている|困って)/.test(value);
@@ -107,13 +107,17 @@ function containsAbusiveLanguage(value: string): boolean {
 }
 
 function extractLocation(value: string, intakeLocation: string): string {
-  if (intakeLocation.trim()) return intakeLocation.trim().slice(0, 120);
   const match = value.match(/(体育館(?:北側|南側)?|北トイレ|南トイレ|受付(?:付近)?|救護スペース|駐車場|屋外)/);
-  return match?.[1] ?? '';
+  if (match?.[1]) return match[1];
+  return intakeLocation.trim().slice(0, 120);
 }
 
 function extractAffectedPeople(value: string, intakePeople: string): string {
   if (intakePeople.trim()) return intakePeople.trim().slice(0, 80);
+  const coupleChildren = value.match(/(?:夫婦|両親)\s*(?:と|、)\s*(?:子ども|こども|子供)\s*(\d{1,3})\s*(?:人|名)/);
+  if (coupleChildren?.[1]) return `${Number(coupleChildren[1]) + 2}人`;
+  const adultsChildren = value.match(/(?:大人|成人)\s*(\d{1,3})\s*(?:人|名).*?(?:子ども|こども|子供)\s*(\d{1,3})\s*(?:人|名)/) ?? value.match(/(?:子ども|こども|子供)\s*(\d{1,3})\s*(?:人|名).*?(?:大人|成人)\s*(\d{1,3})\s*(?:人|名)/);
+  if (adultsChildren?.[1] && adultsChildren?.[2]) return `${Number(adultsChildren[1]) + Number(adultsChildren[2])}人`;
   const match = value.match(/(\d{1,3})\s*(?:人|名)/);
   return match?.[1] ? `${match[1]}人` : '';
 }
