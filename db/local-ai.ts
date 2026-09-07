@@ -193,11 +193,55 @@ export function redactSensitiveInformation(value: string): string {
     .slice(0, 500);
 }
 
-function shelterTitle(category: ShelterCategory, location: string, value: string): string {
-  const place = location ? `${location}の` : '';
-  const topic = category === '水・飲料' ? '飲料水不足' : category === '医療・薬' ? '医療・薬の相談' : category === '食料・物資' ? '物資不足' : category === 'トイレ・衛生' ? 'トイレ・衛生の相談' : category === '設備・充電' ? '設備・充電の相談' : category === 'ペット' ? 'ペットの相談' : '避難所での困りごと';
-  if (!location && category === 'その他') return value.trim().replace(/\s+/g, ' ').slice(0, 34);
-  return `${place}${topic}`;
+function shelterCategorySubject(category: string): string {
+  if (category === '水・飲料' || category === '水') return '飲料水';
+  if (category === '食料・物資' || category === '食料') return '食事・物資';
+  if (category === '医療・薬' || category === '医療') return '体調・薬';
+  if (category === 'トイレ・衛生' || category === 'トイレ') return 'トイレ';
+  if (category === '衛生') return '衛生';
+  if (category === '設備・充電' || category === '充電・通信') return '設備・充電';
+  if (category === 'ペット') return 'ペット';
+  if (category === '睡眠') return '寝る場所';
+  if (category === '安全・その他' || category === '安全') return '安全';
+  if (category === 'バリアフリー') return '移動・バリアフリー';
+  if (category === '人間関係') return '騒音・人間関係';
+  return '避難所の案内・対応';
+}
+
+function shelterDetail(value: string, location: string): string {
+  const lines = value.split(/\r?\n/).map((line) => line.trim()).filter(Boolean);
+  const inlineExplicit = value.match(/困っていること\s*[:：]\s*(.*?)(?=\s+(?:場所|対象人数|人数|補足|残量・不足状況|最後に受け取った時刻)\s*[:：]|$)/);
+  const explicit = lines.find((line) => /^困っていること\s*[:：]/.test(line));
+  const detail = (inlineExplicit?.[1] ?? (explicit ? explicit.replace(/^困っていること\s*[:：]\s*/, '') : lines
+    .filter((line) => !/^(困りごとの種類|場所|対象人数|人数|補足|残量・不足状況|最後に受け取った時刻)\s*[:：]/.test(line))
+    .join(' ')))
+    .replace(/\s+/g, ' ')
+    .trim()
+    .replace(/[。.!！?？]+$/, '');
+  if (!detail) return '';
+  if (location) {
+    const escapedLocation = location.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    return detail.replace(new RegExp(`^${escapedLocation}(?:の|で)?`), '').trim();
+  }
+  return detail;
+}
+
+/** 一覧で一読できる「メール件名」形式の課題タイトルを作る。個人情報は必ず除去済みの本文から作成する。 */
+export function buildShelterIssueTitle(category: string, location: string, value: string, fallback = ''): string {
+  const safeValue = redactSensitiveInformation(value.trim());
+  const safeLocation = location.trim().replace(/\s+/g, ' ').slice(0, 80);
+  const detail = shelterDetail(safeValue, safeLocation) || fallback.trim().replace(/\s+/g, ' ').replace(/[。.!！?？]+$/, '');
+  const subject = (detail || shelterCategorySubject(category)).slice(0, 52);
+  const prefix = safeLocation || shelterCategorySubject(category);
+  return `${prefix}：${subject}`.slice(0, 72);
+}
+
+export function isGenericShelterIssueTitle(title: string): boolean {
+  return /(?:避難所での困りごと|の困りごと|飲料水不足$|物資不足$|(?:医療・薬|トイレ・衛生|設備・充電|ペット)の相談$)/.test(title.trim());
+}
+
+function shelterTitle(category: ShelterCategory, location: string, value: string, fallback = ''): string {
+  return buildShelterIssueTitle(category, location, value, fallback);
 }
 
 export function generateShelterAnalysis(value: string, intake: ShelterIntake = {}): ShelterAnalysis {
@@ -231,9 +275,9 @@ export function generateShelterAnalysis(value: string, intake: ShelterIntake = {
   if (!lastReceivedAt && /(水|食料|物資|薬|毛布|届|来ない|配布|足り|不足)/.test(text)) missingInformation.push('最後に受け取った時刻');
   const urgentReview = URGENT_PATTERNS.test(text);
   const urgencyCandidate: '高' | '中' | '低' = urgentReview ? '高' : HIGH_URGENCY_PATTERNS.test(text) ? '中' : '低';
-  const emotion = emotionLabel(text);
-  const title = shelterTitle(category, location, text);
   const request = requestLabel(category, text);
+  const emotion = emotionLabel(text);
+  const title = shelterTitle(category, location, text, request);
   const overview = `${title}。${request}が必要な状況です。`;
   const confidence = urgentReview ? 0.78 : HIGH_URGENCY_PATTERNS.test(text) ? 0.66 : 0.54;
   return {

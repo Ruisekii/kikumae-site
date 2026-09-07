@@ -11,6 +11,8 @@ import {
   searchFaqs,
   combinedSimilarity,
   generateShelterAnalysis,
+  buildShelterIssueTitle,
+  isGenericShelterIssueTitle,
   redactSensitiveInformation,
   SHELTER_CATEGORIES,
   isShelterQuestion,
@@ -1020,8 +1022,11 @@ async function hydrateIssue(db: D1Database, issue: Issue, includeReports = true)
   const candidate = await db.prepare(`SELECT c.id, c.candidate_issue_id, c.confidence, c.reason, target.title AS candidate_issue_title
     FROM issue_merge_candidates c JOIN issues target ON target.id = c.candidate_issue_id
     WHERE c.issue_id = ? AND c.status = 'pending' ORDER BY c.confidence DESC LIMIT 1`).bind(issue.id).first<Record<string, unknown>>();
+  const readableTitle = isGenericShelterIssueTitle(issue.title)
+    ? buildShelterIssueTitle(issue.category, issue.location, reports[0]?.displayBody ?? '', issue.request || issue.title)
+    : issue.title;
   return {
-    ...issue, urgencyConfidence, reports, reportCount: Math.max(issue.reportCount, reports.length), facts: Array.from(new Set(facts)).slice(0, 16),
+    ...issue, title: readableTitle, urgencyConfidence, reports, reportCount: Math.max(issue.reportCount, reports.length), facts: Array.from(new Set(facts)).slice(0, 16),
     emotions: Array.from(new Set(emotions)).slice(0, 8), missingInformation: Array.from(new Set(missing)).slice(0, 12),
     representativeReportId: reports[0]?.id ?? null,
     candidateId: candidate?.id == null ? null : Number(candidate.id),
