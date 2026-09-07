@@ -79,8 +79,13 @@ export async function POST(request: Request): Promise<Response> {
     const candidate = record(result);
     if (mode === 'conversation') {
       const reply = typeof candidate.reply === 'string' ? candidate.reply.trim().slice(0, 500) : '';
-      const nextField = candidate.nextField === null || candidate.nextField === undefined ? null : String(candidate.nextField);
-      if (!reply || (nextField !== null && !VALID_FIELDS.has(nextField))) return json({ ok: false, aiMode: 'local-rules', safety, reason: 'MODEL_OUTPUT_INVALID' }, 502);
+      const requestedField = candidate.nextField === null || candidate.nextField === undefined ? null : String(candidate.nextField);
+      const missingFields = new Set(state.missingFields);
+      const askedFields = new Set(state.askedFields);
+      const nextField = requestedField && VALID_FIELDS.has(requestedField) && missingFields.has(requestedField) && !askedFields.has(requestedField)
+        ? requestedField
+        : null;
+      if (!reply || (requestedField !== null && !VALID_FIELDS.has(requestedField))) return json({ ok: false, aiMode: 'local-rules', safety, reason: 'MODEL_OUTPUT_INVALID' }, 502);
       return json({ ok: true, aiMode: 'model-gateway', provider: status.provider, reply, nextField, requiresConfirmation: candidate.requiresConfirmation === true, safety });
     }
     const incident = normalizeIncidentCandidate(candidate, state);
