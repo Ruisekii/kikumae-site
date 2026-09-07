@@ -92,7 +92,7 @@ export function QuestionStatusLookup() {
 
   return <main className="evac-theme public-page status-lookup-page">
     <header className="site-header status-site-header">
-      <Link className="brand" href="/">◌ 避難所の受付</Link>
+      <Link className="brand" href="/">◌ イセキ避難所</Link>
       <nav aria-label="利用者メニュー"><Link href="/">困りごと</Link><Link href="/#reception-faq">よくある質問</Link><Link href="/questions" aria-current="page">相談状況</Link></nav>
     </header>
     <section className="status-lookup-card">

@@ -193,13 +193,26 @@ export type ShelterDashboardStats = {
 export type AuditLog = { action: string; actorUserId: string | null; createdAt: number };
 
 
-const SEED_FAQS: Omit<Faq, 'id' | 'status' | 'createdAt' | 'updatedAt'>[] = [
-  { question: '飲料水はどこで受け取れますか？', answer: '避難所の受付または物資配布場所で案内しています。配布場所や時間が分からない場合は、近くのスタッフへ声をかけてください。', category: '水・飲料' },
-  { question: '食料や物資の配布はいつですか？', answer: '配布の時間と場所は、避難所内の掲示とスタッフから案内します。数が足りない場合は、世帯の人数をスタッフへ伝えてください。', category: '食料・物資' },
-  { question: '薬が必要なときはどうすればいいですか？', answer: '受付または近くのスタッフへ、必要な薬と体調を伝えてください。緊急の場合は、すぐにスタッフへ知らせてください。', category: '医療・薬' },
-  { question: 'トイレや手洗いの場所を教えてください', answer: '避難所内の案内表示を確認してください。見つからない場合は、受付で場所を案内します。', category: 'トイレ・衛生' },
-  { question: 'スマートフォンを充電できる場所はありますか？', answer: '充電場所の有無と利用方法は、受付または掲示で案内しています。順番や時間のルールがある場合は、現地の案内に従ってください。', category: '設備・充電' },
-  { question: 'ペットと一緒に避難できますか？', answer: 'ペットの受け入れ場所やルールは避難所ごとに異なります。受付で確認し、案内された場所で過ごしてください。', category: 'ペット' },
+const ISEKI_FAQS: Omit<Faq, 'id' | 'status' | 'createdAt' | 'updatedAt'>[] = [
+  { question: 'イセキ避難所で飲料水はどこでもらえますか？', answer: '体育館南入口の給水テーブルで、8:00〜20:00に案内しています。1人2本を目安に受け取れます。在庫や時間が変わる場合は、現地の掲示と職員の案内を優先してください。', category: '水・飲料' },
+  { question: 'イセキ避難所の食事配布は何時ですか？', answer: '次回の食事配布は18:30〜19:30、体育館入口の配布テーブルです。1人1食を目安にしています。配布状況は現地の掲示を確認してください。', category: '食料・物資' },
+  { question: 'イセキ避難所で薬が必要なときはどこへ行けばいいですか？', answer: '体育館となりの保健室にある救護所、または受付へ、必要な薬と体調を伝えてください。呼吸が苦しい、意識がない、強い痛みがある場合は、FAQを待たず近くの職員へ直接知らせてください。', category: '医療・薬' },
+  { question: 'イセキ避難所のトイレと手洗いはどこですか？', answer: '北トイレと南トイレを利用できます。北トイレは混雑しやすく、南トイレは比較的すいています。手洗い場は各トイレの入口です。清掃予定は20:00ですが、汚れや故障は受付へ知らせてください。', category: 'トイレ・衛生' },
+  { question: 'イセキ避難所でスマートフォンを充電できる場所はどこですか？', answer: '多目的室の充電スペースを8:00〜22:00に利用できます。コンセントの数に限りがあるため、1人30分を目安に交代してください。', category: '設備・充電' },
+  { question: 'イセキ避難所でペットと過ごせる場所はどこですか？', answer: 'ペットは屋外テントスペースで過ごせます。ケージを使用し、場所やルールが分からないときは受付で職員に声をかけてください。', category: 'ペット' },
+  { question: 'イセキ避難所で毛布が足りないときはどうすればいいですか？', answer: '受付で必要な人数を伝えてください。体育館入口の物資配布テーブルで在庫を確認し、足りない場合は相談として受け付けます。', category: '食料・物資' },
+  { question: 'イセキ避難所の救護所はどこですか？', answer: '救護所は体育館となりの保健室です。対応時間は8:00〜20:00で、医師の巡回は午前と午後に予定されています。緊急の場合は、近くの職員へ直接知らせてください。', category: '医療・薬' },
+];
+
+const SEED_FAQS = ISEKI_FAQS;
+
+const LEGACY_FAQ_RENAMES = [
+  { from: '飲料水はどこで受け取れますか？', to: ISEKI_FAQS[0] },
+  { from: '食料や物資の配布はいつですか？', to: ISEKI_FAQS[1] },
+  { from: '薬が必要なときはどうすればいいですか？', to: ISEKI_FAQS[2] },
+  { from: 'トイレや手洗いの場所を教えてください', to: ISEKI_FAQS[3] },
+  { from: 'スマートフォンを充電できる場所はありますか？', to: ISEKI_FAQS[4] },
+  { from: 'ペットと一緒に避難できますか？', to: ISEKI_FAQS[5] },
 ];
 
 function database(): D1Database {
@@ -382,8 +395,20 @@ async function initialiseDatabase(db: D1Database): Promise<D1Database> {
       db.prepare("INSERT OR REPLACE INTO schema_meta (key, value) VALUES ('shelter_faq_seed_v1', 'ready')"),
     ]);
   }
+  await ensureIsekiShelterFaqs(db);
   await safeRun(db, 'CREATE UNIQUE INDEX IF NOT EXISTS questions_submission_key_unique ON questions (submission_key_hash) WHERE submission_key_hash IS NOT NULL');
   return db;
+}
+
+async function ensureIsekiShelterFaqs(db: D1Database): Promise<void> {
+  const marker = await db.prepare("SELECT value FROM schema_meta WHERE key = 'iseki_shelter_faq_v1' LIMIT 1").first<{ value: string }>();
+  if (marker?.value === 'ready') return;
+  const now = Date.now();
+  await db.batch([
+    ...LEGACY_FAQ_RENAMES.map(({ from, to }) => db.prepare('UPDATE faqs SET question = ?, answer = ?, category = ?, status = \'published\', updated_at = ? WHERE question = ? AND portal_id IS NULL').bind(to.question, to.answer, to.category, now, from)),
+    ...ISEKI_FAQS.slice(6).map((faq) => db.prepare("INSERT OR IGNORE INTO faqs (question, answer, category, status, created_at, updated_at) VALUES (?, ?, ?, 'published', ?, ?)").bind(faq.question, faq.answer, faq.category, now, now)),
+    db.prepare("INSERT OR REPLACE INTO schema_meta (key, value) VALUES ('iseki_shelter_faq_v1', 'ready')"),
+  ]);
 }
 
 /**
@@ -507,6 +532,7 @@ export async function listPublishedFaqs(portalId: number | null = null): Promise
   // back to the full additive initialisation when the FAQ schema is missing.
   const db = database();
   try {
+    if (portalId == null) await ensureIsekiShelterFaqs(db);
     return await readPublishedFaqs(db, portalId);
   } catch (error) {
     const message = error instanceof Error ? error.message.toLowerCase() : String(error).toLowerCase();
