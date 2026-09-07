@@ -8,6 +8,7 @@ import {
   type ShelterMapZone,
   type ShelterZoneType,
 } from '../../lib/shelter-map-data';
+import { useUserI18n } from '../user-i18n';
 
 export type ShelterMapIssue = {
   id: number | string;
@@ -29,8 +30,23 @@ type ShelterZoneProps = {
   onSelect?: (zoneId: string) => void;
 };
 
-function zoneTypeLabel(type: ShelterZoneType): string {
-  return type === 'section' ? '避難区画' : type === 'gymnasium' ? '建物' : '施設';
+const zoneNameKeys: Record<string, string> = {
+  'toilet-north': 'map.zone.toiletNorth.name', reception: 'map.zone.reception.name', medical: 'map.zone.medical.name', water: 'map.zone.water.name', food: 'map.zone.food.name', gymnasium: 'map.zone.gymnasium.name', 'shelter-a': 'map.zone.shelterA.name', 'shelter-b': 'map.zone.shelterB.name', 'shelter-c': 'map.zone.shelterC.name', 'shelter-d': 'map.zone.shelterD.name', 'toilet-south': 'map.zone.toiletSouth.name', entrance: 'map.zone.entrance.name',
+};
+const zoneDescriptionKeys: Record<string, string> = {
+  'toilet-north': 'map.zone.toiletNorth.description', reception: 'map.zone.reception.description', medical: 'map.zone.medical.description', water: 'map.zone.water.description', food: 'map.zone.food.description', gymnasium: 'map.zone.gymnasium.description', 'shelter-a': 'map.zone.shelterA.description', 'shelter-b': 'map.zone.shelterB.description', 'shelter-c': 'map.zone.shelterC.description', 'shelter-d': 'map.zone.shelterD.description', 'toilet-south': 'map.zone.toiletSouth.description', entrance: 'map.zone.entrance.description',
+};
+
+function zoneTypeLabel(type: ShelterZoneType, t: (key: string) => string): string {
+  return type === 'section' ? t('map.type.section') : type === 'gymnasium' ? t('map.type.building') : t('map.type.facility');
+}
+
+function zoneName(zone: ShelterMapZone, t: (key: string) => string): string {
+  return zoneNameKeys[zone.id] ? t(zoneNameKeys[zone.id]) : zone.name;
+}
+
+function zoneDescription(zone: ShelterMapZone, t: (key: string) => string): string {
+  return zoneDescriptionKeys[zone.id] ? t(zoneDescriptionKeys[zone.id]) : zone.description;
 }
 
 function shapeElement(zone: ShelterMapZone) {
@@ -86,6 +102,9 @@ function ZoneIllustration({ zone }: { zone: ShelterMapZone }) {
 }
 
 export function ShelterZone({ zone, selected, interactive, onSelect }: ShelterZoneProps) {
+  const { t } = useUserI18n();
+  const label = zoneName(zone, t);
+  const description = zoneDescription(zone, t);
   const handleKeyDown = (event: KeyboardEvent<SVGGElement>) => {
     if (!interactive || !onSelect) return;
     if (event.key === 'Enter' || event.key === ' ') {
@@ -97,14 +116,14 @@ export function ShelterZone({ zone, selected, interactive, onSelect }: ShelterZo
     className={`shelter-map-zone shelter-map-zone-${zone.type} ${selected ? 'is-selected' : ''} ${interactive ? 'is-interactive' : ''}`}
     role={interactive ? 'button' : undefined}
     tabIndex={interactive ? 0 : undefined}
-    aria-label={`${zone.name}（${zoneTypeLabel(zone.type)}）。${zone.description}`}
+    aria-label={`${label} (${zoneTypeLabel(zone.type, t)}). ${description}`}
     aria-pressed={interactive ? selected : undefined}
     onClick={interactive && onSelect ? () => onSelect(zone.id) : undefined}
     onKeyDown={handleKeyDown}
   >
     {shapeElement(zone)}
     <ZoneIllustration zone={zone} />
-    <text className="shelter-map-zone-label" x={zone.labelPosition.x} y={zone.labelPosition.y} textAnchor="middle">{zone.name}</text>
+    <text className="shelter-map-zone-label" x={zone.labelPosition.x} y={zone.labelPosition.y} textAnchor="middle">{label}</text>
     {selected && <path className="shelter-map-zone-check" d={`M${zone.labelPosition.x + 32} ${zone.labelPosition.y - 9}l7 7 13-16`} fill="none" />}
   </g>;
 }
@@ -123,8 +142,9 @@ function issueIcon(category: string): string {
 }
 
 export function IssueMarker({ zone, count, selected, issue, onSelect }: { zone: ShelterMapZone; count: number; selected: boolean; issue: ShelterMapIssue; onSelect: (issue: ShelterMapIssue) => void }) {
+  const { t } = useUserI18n();
   const { x, y } = zone.markerPosition;
-  const label = `${zone.name}、${issueIcon(issue.category)}の課題、相談${count}件。選択すると課題の詳細を表示します。`;
+  const label = t('map.issueAria', { zone: zoneName(zone, t), count });
   return <g
     className={`shelter-map-issue-marker ${selected ? 'is-selected' : ''} shelter-map-issue-${issue.urgency ?? 'normal'}`}
     role="button"
@@ -142,14 +162,15 @@ export function IssueMarker({ zone, count, selected, issue, onSelect }: { zone: 
     <circle className="shelter-map-issue-badge" cx={x} cy={y - 12} r="24" />
     <text className="shelter-map-issue-icon" x={x} y={y - 17} textAnchor="middle">{issueIcon(issue.category)}</text>
     <text className="shelter-map-issue-count" x={x} y={y + 2} textAnchor="middle">{count}</text>
-    <text className="shelter-map-issue-unit" x={x + 32} y={y - 20}>件</text>
+    <text className="shelter-map-issue-unit" x={x + 32} y={y - 20}>{t('map.issueUnit')}</text>
   </g>;
 }
 
 export function MapLegend({ mode }: { mode: 'location-select' | 'issue-overview' }) {
-  return <div className="shelter-map-legend" aria-label="マップの見方">
-    {mode === 'location-select' ? <span><i className="shelter-map-legend-swatch shelter-map-legend-select" aria-hidden="true" />選択できます</span> : <span><i className="shelter-map-legend-swatch shelter-map-legend-issue" aria-hidden="true">3</i>課題の相談件数</span>}
-    <span><i className="shelter-map-legend-swatch shelter-map-legend-life" aria-hidden="true">＋</i>生活施設</span>
+  const { t } = useUserI18n();
+  return <div className="shelter-map-legend" aria-label={t('map.legendAria')}>
+    {mode === 'location-select' ? <span><i className="shelter-map-legend-swatch shelter-map-legend-select" aria-hidden="true" />{t('map.selectable')}</span> : <span><i className="shelter-map-legend-swatch shelter-map-legend-issue" aria-hidden="true">3</i>{t('map.issueCount')}</span>}
+    <span><i className="shelter-map-legend-swatch shelter-map-legend-life" aria-hidden="true">＋</i>{t('map.facilities')}</span>
   </div>;
 }
 
@@ -174,6 +195,7 @@ export function ShelterMap({
   onSelectIssue?: (issue: ShelterMapIssue) => void;
   className?: string;
 }) {
+  const { t } = useUserI18n();
   const titleId = `${useId()}-title`;
   const descId = `${useId()}-description`;
   const selectedZoneId = resolveShelterZoneId(selectedLocation);
@@ -193,8 +215,8 @@ export function ShelterMap({
 
   return <div className={`shelter-map ${className}`.trim()}>
     <svg className="shelter-map-svg" viewBox={DEMO_SHELTER_MAP.viewBox} role="group" aria-labelledby={`${titleId} ${descId}`}>
-      <title id={titleId}>{mode === 'location-select' ? '場所を選ぶ避難所内マップ' : '課題件数を表示する避難所内マップ'}</title>
-      <desc id={descId}>中央の体育館と、周囲のトイレ、受付、救護所、給水所、食事配布所、入口を表示しています。</desc>
+      <title id={titleId}>{mode === 'location-select' ? t('map.selectTitle') : t('map.issueTitle')}</title>
+      <desc id={descId}>{t('map.description')}</desc>
       <rect className="shelter-map-ground" x="14" y="14" width="872" height="592" rx="34" />
       <path className="shelter-map-path" d="M176 158H194M176 290H194M726 158H744M726 290H744M460 88V106M460 492V524M726 471H704" />
       {DEMO_SHELTER_MAP.zones.map((zone) => <ShelterZone key={zone.id} zone={zone} selected={mode === 'location-select' ? zone.id === selectedZoneId : zone.id === focusedZoneId} interactive={mode === 'location-select'} onSelect={onSelectLocation} />)}
@@ -204,11 +226,12 @@ export function ShelterMap({
       })}
     </svg>
     <MapLegend mode={mode} />
-    {mode === 'issue-overview' && <p className="shelter-map-help">数字のマーカーを選ぶと、その場所の課題詳細を確認できます。表示しているのは問題が起きている場所です。</p>}
+    {mode === 'issue-overview' && <p className="shelter-map-help">{t('map.issueHelp')}</p>}
   </div>;
 }
 
 export function LocationSelector({ value, onChange }: { value: string; onChange: (zoneId: string) => void }) {
+  const { t } = useUserI18n();
   const [confirmedLocation, setConfirmedLocation] = useState('');
   const selectedZone = getShelterZone(value);
   const selectedZoneId = selectedZone?.id ?? resolveShelterZoneId(value);
@@ -220,14 +243,14 @@ export function LocationSelector({ value, onChange }: { value: string; onChange:
   return <div className="location-selector">
     <ShelterMap mode="location-select" selectedLocation={selectedZoneId} onSelectLocation={selectZone} />
     <div className="location-selector-choice" aria-live="polite">
-      {selectedZone ? <p className="location-selector-selected"><span aria-hidden="true">✓</span><strong>{selectedZone.name}を選択しています</strong><small>{selectedZone.description}</small></p> : <p className="location-selector-placeholder">MAP上の場所を選ぶか、一覧から選んでください。</p>}
-      <button className="button secondary location-selector-confirm" type="button" disabled={!selectedZoneId} onClick={() => setConfirmedLocation(selectedZoneId)}>この場所で決める</button>
-      {confirmedLocation === selectedZoneId && selectedZone && <p className="location-selector-confirmed" role="status">{selectedZone.name}で受け付けます。下の「この内容で次へ」を押してください。</p>}
+      {selectedZone ? <p className="location-selector-selected"><span aria-hidden="true">✓</span><strong>{t('map.selected', { zone: zoneName(selectedZone, t) })}</strong><small>{zoneDescription(selectedZone, t)}</small></p> : <p className="location-selector-placeholder">{t('map.selectHelp')}</p>}
+      <button className="button secondary location-selector-confirm" type="button" disabled={!selectedZoneId} onClick={() => setConfirmedLocation(selectedZoneId)}>{t('map.confirmLocation')}</button>
+      {confirmedLocation === selectedZoneId && selectedZone && <p className="location-selector-confirmed" role="status">{t('map.confirmed', { zone: zoneName(selectedZone, t) })}</p>}
     </div>
     <details className="location-selector-list">
-      <summary>一覧から選ぶ</summary>
-      <div role="listbox" aria-label="避難所内の場所一覧">
-        {selectableZones.map((zone) => <button type="button" role="option" aria-selected={zone.id === selectedZoneId} className={zone.id === selectedZoneId ? 'selected' : ''} key={zone.id} onClick={() => selectZone(zone.id)}><span aria-hidden="true">{zone.type === 'toilet' ? '🚻' : zone.type === 'section' ? '▤' : '＋'}</span><strong>{zone.name}</strong><small>{zone.description}</small></button>)}
+      <summary>{t('map.listTitle')}</summary>
+      <div role="listbox" aria-label={t('map.listAria')}>
+        {selectableZones.map((zone) => <button type="button" role="option" aria-selected={zone.id === selectedZoneId} className={zone.id === selectedZoneId ? 'selected' : ''} key={zone.id} onClick={() => selectZone(zone.id)}><span aria-hidden="true">{zone.type === 'toilet' ? '🚻' : zone.type === 'section' ? '▤' : '＋'}</span><strong>{zoneName(zone, t)}</strong><small>{zoneDescription(zone, t)}</small></button>)}
       </div>
     </details>
   </div>;

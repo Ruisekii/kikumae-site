@@ -208,6 +208,73 @@ button, input, textarea, select { font-size: 1rem; }
   .bulk-row-checkbox { padding-top: 17px; }
 }
 
+.voice-entry-card { display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 14px; width: 100%; margin: 22px 0 18px; padding: 16px 18px; border: 2px solid #7dbdca; border-radius: 18px; background: linear-gradient(105deg, #effbfc, #fff); color: var(--navy); text-align: left; cursor: pointer; box-shadow: 0 7px 0 #d4edf0; }
+.voice-entry-card:hover { transform: translateY(-2px); box-shadow: 0 9px 0 #d4edf0; }
+.voice-entry-card > span:nth-child(2) { display: grid; gap: 4px; min-width: 0; }
+.voice-entry-card strong { font-size: 1.08rem; }
+.voice-entry-card small { color: var(--muted); line-height: 1.5; }
+.voice-entry-card > b { font-size: 1.8rem; color: #5aa5b5; }
+.voice-entry-icon { display: grid; width: 52px; height: 52px; place-items: center; border-radius: 16px; background: #79c5d1; font-size: 1.7rem; }
+.voice-consultation { max-width: 760px; margin: 0 auto; padding: 22px 0 30px; }
+.voice-consult-head { display: flex; align-items: start; justify-content: space-between; gap: 20px; }
+.voice-consult-head h1 { margin: 4px 0 6px; color: var(--navy); font-size: clamp(1.55rem, 4vw, 2.2rem); }
+.voice-consult-head > div > p:last-child { margin: 0; color: var(--muted); line-height: 1.6; }
+.voice-close { flex: none; padding: 8px 0; }
+.voice-state { display: flex; align-items: center; gap: 8px; margin: 20px 0 12px; padding: 11px 14px; border-radius: 12px; background: #edf8fa; color: #316d7b; font-weight: 900; }
+.voice-state-dot { width: 12px; height: 12px; border-radius: 50%; background: #67b5c5; }
+.voice-state-user_speaking .voice-state-dot, .voice-state-listening .voice-state-dot { background: #ed9b4e; animation: voice-pulse 1.2s infinite; }
+.voice-state-ai_speaking .voice-state-dot { background: #6b9ee7; animation: voice-pulse 1.2s infinite; }
+.voice-state-error .voice-state-dot { background: #c55346; }
+@keyframes voice-pulse { 50% { box-shadow: 0 0 0 7px rgba(103,181,197,.18); } }
+.voice-messages { display: grid; gap: 10px; max-height: 350px; overflow-y: auto; padding: 6px 2px; }
+.voice-message { max-width: 88%; padding: 12px 15px; border: 1px solid #d2e7eb; border-radius: 16px; background: #f6fbfc; }
+.voice-message.person { justify-self: end; border-color: #c8e4b7; background: #eef9e8; }
+.voice-message span, .voice-caption span { display: block; color: #6a8a93; font-size: .78rem; font-weight: 900; }
+.voice-message p, .voice-caption p { margin: 5px 0 0; white-space: pre-wrap; line-height: 1.6; }
+.voice-caption { padding: 12px 15px; border: 2px dashed #e3b76c; border-radius: 16px; background: #fffaf0; color: #765a2a; }
+.voice-safety-alert { margin: 16px 0; padding: 15px 17px; border: 2px solid #d45b4c; border-radius: 14px; background: #fff0ec; color: #793b32; }
+.voice-safety-alert strong { display: block; font-size: 1.05rem; }
+.voice-safety-alert p { margin: 6px 0; line-height: 1.55; }
+.voice-safety-alert small { color: #9d554a; }
+.voice-quick-card, .voice-confirm-card, .voice-sent-card { margin-top: 16px; padding: 18px; border: 1px solid #c9e3e9; border-radius: 16px; background: #fff; box-shadow: 0 8px 22px rgba(22,91,121,.07); }
+.voice-quick-card h2, .voice-confirm-card h2, .voice-sent-card h2 { margin: 4px 0 12px; color: var(--navy); font-size: 1.15rem; }
+.voice-quick-card > p:last-child { margin: 12px 0 0; color: var(--muted); font-size: .88rem; }
+.voice-quick-options { display: flex; flex-wrap: wrap; gap: 8px; }
+.voice-quick-options button { min-height: 48px; padding: 9px 15px; border: 2px solid #9bcfda; border-radius: 999px; background: #f7fdfe; color: var(--navy); cursor: pointer; font-weight: 900; }
+.voice-quick-options button:hover { background: #dff3f6; }
+.voice-confirm-card pre { margin: 0; padding: 14px; overflow-x: auto; white-space: pre-wrap; border-radius: 12px; background: #f3f8f5; color: #274b39; font: inherit; line-height: 1.7; }
+.voice-confirm-actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 15px; }
+.voice-confirm-actions .button { flex: 1 1 180px; }
+.voice-sent-card { text-align: center; background: #f2fbf3; border-color: #b9dfc0; }
+.voice-sent-check { display: grid; width: 46px; height: 46px; place-items: center; margin: 0 auto 10px; border-radius: 50%; background: #62af76; color: #fff; font-size: 1.5rem; }
+.voice-sent-card p { color: #4f7660; }
+.voice-receipt { font-size: 1.08rem; }
+.voice-controls { display: grid; justify-items: center; gap: 8px; margin: 24px 0 14px; }
+.voice-mic-button { display: grid; justify-items: center; gap: 8px; min-width: 190px; min-height: 150px; padding: 18px 22px; border: 0; border-radius: 34px; background: #65b7c7; color: #fff; cursor: pointer; box-shadow: 0 9px 0 #388999; }
+.voice-mic-button:hover { transform: translateY(-2px); box-shadow: 0 11px 0 #388999; }
+.voice-mic-button:active, .voice-mic-button.is-listening { transform: translateY(5px); box-shadow: 0 4px 0 #388999; background: #e19a50; }
+.voice-mic-button > span { font-size: 2.5rem; line-height: 1; }
+.voice-mic-button strong { font-size: 1.05rem; }
+.voice-controls > p { margin: 0; color: var(--muted); font-size: .9rem; }
+.voice-secondary-actions { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; }
+.voice-secondary-actions button { min-height: 42px; padding: 8px 13px; border: 1px solid #b7d8de; border-radius: 999px; background: #fff; color: var(--navy); cursor: pointer; font-weight: 800; }
+.voice-secondary-actions button:hover { background: #eef9fb; }
+.voice-status { margin: 14px 0 0; padding: 10px 12px; border-radius: 10px; background: #fff8df; color: #806723; text-align: center; }
+
+@media (max-width: 680px) {
+  .voice-consultation { padding: 15px 0 24px; }
+  .voice-consult-head { gap: 8px; }
+  .voice-consult-head h1 { font-size: 1.42rem; }
+  .voice-consult-head > div > p:last-child { font-size: .88rem; }
+  .voice-close { font-size: .83rem; }
+  .voice-messages { max-height: 280px; }
+  .voice-message { max-width: 94%; }
+  .voice-mic-button { min-width: 170px; min-height: 132px; }
+  .voice-entry-card { grid-template-columns: auto 1fr auto; padding: 13px; }
+  .voice-entry-icon { width: 44px; height: 44px; }
+  .voice-entry-card small { font-size: .78rem; }
+}
+
 /* 避難者向け受付の入口は、説明用ヒーローより先に選択肢を見せる。 */
 .evac-theme > .shelter-hero { display: none; }
 .evac-theme > .shelter-chat-section { margin-top: 24px; }

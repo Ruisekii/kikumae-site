@@ -7,6 +7,8 @@ import { generateShelterAnalysis, searchFaqs, shelterFollowUp } from '../../db/l
 import { LocationSelector } from './shelter-map';
 import { appendConsultHistory } from './consult-history';
 import { ShelterHomeBoard } from './shelter-home-board';
+import { VoiceConsultation } from './voice-consultation';
+import { UserHeader, translatedCategoryKey, translatedChoiceKey, translatedDetailKey, translatedShelterCategoryKey, translatedZoneKey, translateUserFaq, useUserI18n } from '../user-i18n';
 
 type Intake = { location: string; issueLocation: string; reporterLocation: string; peopleCount: string; resourceRemaining: string; lastReceivedAt: string; additionalDetails: string };
 type Analysis = { title: string; overview: string; facts: string[]; emotion: string; missingInformation: string[]; urgencyCandidate: string; urgentReview: boolean; category: string; location: string; issueLocation: string; peopleCount: string; resourceRemaining: string; lastReceivedAt: string };
@@ -14,26 +16,9 @@ type Preview = { body: string; summary: string; category: string; related: Relat
 type ChatMessage = { from: 'ai' | 'person'; text: string };
 type SupplementKey = 'location' | 'peopleCount' | 'resourceRemaining' | 'lastReceivedAt' | 'additionalDetails';
 type SupplementField = { key: SupplementKey; label: string; kind: 'choice' | 'select' | 'location' | 'stepper'; options?: string[]; help?: string };
-type SpeechRecognitionLike = { lang: string; interimResults: boolean; onresult: ((event: { results: ArrayLike<ArrayLike<{ transcript: string }>> }) => void) | null; onerror: (() => void) | null; onend: (() => void) | null; start: () => void; stop: () => void };
-type SpeechWindow = Window & { SpeechRecognition?: new () => SpeechRecognitionLike; webkitSpeechRecognition?: new () => SpeechRecognitionLike };
 type IntakeStep = 'category' | 'detail' | 'faq' | 'location' | 'people' | 'supplement' | 'confirm' | 'freeText';
 type SavedDraft = { savedAt?: number; input?: string; originalBody?: string; contextBody?: string; intake?: Intake; chatOpen?: boolean; intakeOpen?: boolean; intakeStep?: IntakeStep; selectedCategoryId?: string; selectedDetail?: string; selectedLocation?: string; selectedPeople?: string; intakeNote?: string; messages?: ChatMessage[]; preview?: Preview | null; faqDecision?: boolean; readyToSubmit?: boolean; showSupplementSheet?: boolean };
 type Props = { faqs: Faq[] };
-type Language = 'ja' | 'en' | 'zh' | 'ko';
-
-const LANGUAGE_OPTIONS: Array<{ value: Language; label: string }> = [
-  { value: 'ja', label: '日本語' },
-  { value: 'en', label: 'English' },
-  { value: 'zh', label: '中文' },
-  { value: 'ko', label: '한국어' }
-];
-
-const LANGUAGE_COPY: Record<Language, { selector: string; issues: string; faq: string; status: string; admin: string }> = {
-  ja: { selector: '言語', issues: '困りごと', faq: 'よくある質問', status: '相談状況', admin: '管理者ページ' },
-  en: { selector: 'Language', issues: 'What I need', faq: 'FAQs', status: 'My status', admin: 'Staff portal' },
-  zh: { selector: '语言', issues: '我遇到的困难', faq: '常见问题', status: '咨询状态', admin: '工作人员页面' },
-  ko: { selector: '언어', issues: '불편한 점', faq: '자주 묻는 질문', status: '상담 상황', admin: '관리자 페이지' }
-};
 
 type IntakeCategory = {
   id: string;
@@ -59,7 +44,7 @@ const INTAKE_CATEGORIES: IntakeCategory[] = [
 const emptyIntake: Intake = { location: '', issueLocation: '', reporterLocation: '', peopleCount: '', resourceRemaining: '', lastReceivedAt: '', additionalDetails: '' };
 const normalize = (value: string) => value.toLocaleLowerCase('ja-JP').replace(/\s/g, '');
 const isUrgentAnalysis = (analysis: Analysis) => analysis.urgentReview || analysis.urgencyCandidate === '高';
-const formatFaqUpdatedAt = (value: number) => new Intl.DateTimeFormat('ja-JP', { timeZone: 'Asia/Tokyo', year: 'numeric', month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit' }).format(new Date(value));
+const formatFaqUpdatedAt = (value: number, language: 'ja' | 'en' | 'zh' | 'ko' = 'ja') => new Intl.DateTimeFormat(language === 'ja' ? 'ja-JP' : language === 'zh' ? 'zh-CN' : language === 'ko' ? 'ko-KR' : 'en-US', { timeZone: 'Asia/Tokyo', year: 'numeric', month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit' }).format(new Date(value));
 
 function buildInstantPreview(body: string, intake: Intake, faqs: Faq[], submissionKey: string): Preview {
   const analysis = generateShelterAnalysis(body, intake);
@@ -106,6 +91,7 @@ type ReceptionFlowProps = {
   checkUrl: string;
   questionId: number | null;
   emergencyOpen: boolean;
+  voiceOpen: boolean;
   onChooseCategory: (category: IntakeCategory) => void;
   onChooseDetail: (detail: string) => void;
   onChooseLocation: (location: string) => void;
@@ -124,51 +110,56 @@ type ReceptionFlowProps = {
   onOpenEmergency: () => void;
   onCloseEmergency: () => void;
   onSubmitEmergency: () => void;
-  language: Language;
-  languageOpen: boolean;
-  onToggleLanguage: () => void;
-  onChangeLanguage: (language: Language) => void;
+  onOpenVoice: () => void;
+  onUseText: () => void;
+  onDirectStaff: () => void;
 };
 
 function ConsultCancelAction({ onStartOver }: { onStartOver: () => void }) {
+  const { t } = useUserI18n();
   const [dialogOpen, setDialogOpen] = useState(false);
   return <>
     <div className="reception-cancel-area">
-      <button className="reception-cancel-trigger" type="button" onClick={() => setDialogOpen(true)}>相談をやめて最初に戻る</button>
+      <button className="reception-cancel-trigger" type="button" onClick={() => setDialogOpen(true)}>{t('reception.cancelTrigger')}</button>
     </div>
-    {dialogOpen && <div className="reception-cancel-backdrop" role="presentation"><section className="reception-cancel-dialog" role="dialog" aria-modal="true" aria-labelledby="reception-cancel-title"><p className="eyebrow">入力途中の相談</p><h2 id="reception-cancel-title">この相談をやめて、最初に戻りますか？</h2><p>入力した内容は消えます。まだ続ける場合は「このまま続ける」を選んでください。</p><div className="reception-cancel-actions"><button className="button secondary" type="button" onClick={() => setDialogOpen(false)}>このまま続ける</button><button className="button danger reception-cancel-confirm" type="button" onClick={onStartOver}>最初に戻る</button></div></section></div>}
+    {dialogOpen && <div className="reception-cancel-backdrop" role="presentation"><section className="reception-cancel-dialog" role="dialog" aria-modal="true" aria-labelledby="reception-cancel-title"><p className="eyebrow">{t('reception.cancelEyebrow')}</p><h2 id="reception-cancel-title">{t('reception.cancelTitle')}</h2><p>{t('reception.cancelLead')}</p><div className="reception-cancel-actions"><button className="button secondary" type="button" onClick={() => setDialogOpen(false)}>{t('reception.continue')}</button><button className="button danger reception-cancel-confirm" type="button" onClick={onStartOver}>{t('reception.backToStart')}</button></div></section></div>}
   </>;
 }
 
-function ReceptionFlow({ faqs, intakeStep, selectedCategory, selectedDetail, selectedLocation, selectedPeople, intakeNote, intake, preview, faqDecision, readyToSubmit, supplementValues, input, status, busy, checkUrl, questionId, emergencyOpen, onChooseCategory, onChooseDetail, onChooseLocation, onChoosePeople, onSetIntakeStep, onSetIntakeNote, onSetInput, onSetSupplementValue, onChangeQuantity, onFaqResult, onConfirmSupplements, onSubmit, onSubmitFreeText, onStartOver, onCopyUrl, onOpenEmergency, onCloseEmergency, onSubmitEmergency, language, languageOpen, onToggleLanguage, onChangeLanguage }: ReceptionFlowProps) {
+function ReceptionFlow({ faqs, intakeStep, selectedCategory, selectedDetail, selectedLocation, selectedPeople, intakeNote, intake, preview, faqDecision, readyToSubmit, supplementValues, input, status, busy, checkUrl, questionId, emergencyOpen, voiceOpen, onChooseCategory, onChooseDetail, onChooseLocation, onChoosePeople, onSetIntakeStep, onSetIntakeNote, onSetInput, onSetSupplementValue, onChangeQuantity, onFaqResult, onConfirmSupplements, onSubmit, onSubmitFreeText, onStartOver, onCopyUrl, onOpenEmergency, onCloseEmergency, onSubmitEmergency, onOpenVoice, onUseText, onDirectStaff }: ReceptionFlowProps) {
+  const { t, language } = useUserI18n();
   const fields = preview ? supplementFields(preview.analysis, preview.body, intake) : [];
+  const locationValue = intake.location || selectedLocation;
+  const locationLabel = locationValue ? (translatedZoneKey(locationValue) ? t(translatedZoneKey(locationValue)!) : locationValue) : t('reception.unspecified');
+  const peopleValue = intake.peopleCount || selectedPeople;
+  const peopleLabel = peopleValue ? (translatedChoiceKey(peopleValue) ? t(translatedChoiceKey(peopleValue)!) : peopleValue) : t('reception.unspecified');
+  const previewCategoryLabel = preview ? (translatedShelterCategoryKey(preview.category) ? t(translatedShelterCategoryKey(preview.category)!) : preview.category) : t('reception.unspecified');
   const stageIndex = checkUrl ? 1 : 0;
-  const stages = ['受付済み', '確認中', '現場確認中', '対応中', '解決済み'];
+  const stages = ['status.received', 'status.reviewing', 'status.fieldChecking', 'status.inProgress', 'status.resolved'];
   const detailProgress = intakeStep === 'category' || intakeStep === 'freeText' ? '' : intakeStep === 'confirm' ? 'done' : 'current';
-  const copy = LANGUAGE_COPY[language];
-  const selectedLanguage = LANGUAGE_OPTIONS.find((option) => option.value === language)?.label ?? '日本語';
   return <main className="evac-theme reception-app">
-    <header className="reception-header"><a className="brand" href="#reception-top" aria-label="イセキ避難所の受付画面の先頭へ">◌ イセキ避難所</a><div className="reception-header-tools"><nav aria-label="利用者メニュー"><a href="#reception-top" aria-current={!checkUrl && !emergencyOpen && intakeStep === 'category' ? 'page' : undefined}>{copy.issues}</a><a href="#reception-faq">{copy.faq}</a><Link href="/questions">{copy.status}</Link><Link className="reception-admin-link" href="/admin">{copy.admin}</Link></nav><div className="reception-language-picker"><button className="reception-language-trigger" type="button" aria-label={`${copy.selector}: ${selectedLanguage}`} aria-expanded={languageOpen} aria-controls="reception-language-menu" onClick={onToggleLanguage}><span aria-hidden="true">🌐</span><span>{selectedLanguage}</span><span aria-hidden="true">⌄</span></button>{languageOpen && <div className="reception-language-menu" id="reception-language-menu" role="menu" aria-label={copy.selector}><p>{copy.selector}</p>{LANGUAGE_OPTIONS.map((option) => <button type="button" role="menuitemradio" aria-checked={language === option.value} className={language === option.value ? 'selected' : ''} key={option.value} onClick={() => onChangeLanguage(option.value)}>{option.label}<span aria-hidden="true">{language === option.value ? '✓' : ''}</span></button>)}</div>}</div></div></header>
+    <UserHeader brand="◌ イセキ避難所" brandHref="#reception-top" faqHref="#reception-faq" brandAria={t('reception.brandAria')} />
     <section className="reception-shell" id="reception-top">
-      {!checkUrl && <button className="reception-emergency-link" type="button" onClick={onOpenEmergency}><span aria-hidden="true">🚨</span> 命に関わる・今すぐ助けが必要</button>}
-      {!checkUrl && !emergencyOpen && <div className="reception-progress" aria-label="受付の進み具合"><span className={intakeStep === 'category' ? 'current' : 'done'}>困りごと</span><i>→</i><span className={detailProgress}>詳細</span><i>→</i><span className={intakeStep === 'confirm' ? 'current' : ''}>確認</span>{intakeStep !== 'category' && <small>あと少しです</small>}</div>}
-      {emergencyOpen && !checkUrl ? <section className="reception-step reception-emergency-panel" aria-labelledby="emergency-title"><button className="reception-back" type="button" onClick={onCloseEmergency}>← 通常の相談に戻る</button><p className="eyebrow">緊急時の案内</p><h1 id="emergency-title">今すぐ助けが必要ですか？</h1><div className="emergency-instruction"><strong>命に関わる症状、呼吸が苦しい、意識がない、火事や暴力などの場合</strong><p>通常の相談フォームを使わず、近くの職員に直接声をかけてください。</p></div><button className="button emergency-primary" type="button" disabled={busy} onClick={onSubmitEmergency}>{busy ? '職員へ知らせています…' : '職員にも緊急で知らせる'}</button><p className="emergency-note">このボタンでも職員へ緊急の相談を送ります。送信後も、必ず近くの職員に直接声をかけてください。</p></section> : <>
-      {intakeStep === 'category' && !checkUrl && <><section className="reception-step reception-category-step" aria-labelledby="reception-title"><p className="eyebrow">避難所の受付</p><h1 id="reception-title">今、困っていることはありますか？</h1><p className="reception-lead">近いものを選んでください。文章を書かなくても職員に伝わります。うまく当てはまらなくても大丈夫です。</p><div className="reception-category-grid">{INTAKE_CATEGORIES.map((category, index) => <button className="reception-category-card" type="button" key={category.id} onClick={() => onChooseCategory(category)}><span className={`reception-category-art art-${index + 1}`} role="img" aria-label={`${category.label}の生活イラスト`} /><strong>{category.label}</strong><span className="reception-card-arrow" aria-hidden="true">›</span></button>)}</div><div className="reception-secondary-actions"><button type="button" onClick={() => onSetIntakeStep('freeText')}>文章で伝えたい</button><button type="button" onClick={() => onSetIntakeStep('freeText')}>選択肢にない・うまく言えない</button></div></section><ShelterHomeBoard /></>}
-      {intakeStep === 'detail' && selectedCategory && !checkUrl && <section className="reception-step" aria-labelledby="detail-title"><button className="reception-back" type="button" onClick={() => onSetIntakeStep('category')}>← 困りごとの選択に戻る</button><p className="eyebrow">{selectedCategory.label}</p><h1 id="detail-title">どんなことで困っていますか？</h1><p className="reception-lead">近い内容を選んでください。</p><div className="reception-choice-list">{selectedCategory.details.map((detail) => <button type="button" key={detail} onClick={() => onChooseDetail(detail)}>{detail}<span>›</span></button>)}</div></section>}
-      {intakeStep === 'faq' && !checkUrl && <section className="reception-step" aria-labelledby="faq-step-title"><p className="eyebrow">選んだ内容を確認</p><h1 id="faq-step-title">この案内で解決できそうですか？</h1>{preview?.related.length && !faqDecision ? <div className="reception-faq-card"><p className="reception-faq-label">近い案内が見つかりました</p>{preview.related.slice(0, 2).map((faq) => <article key={faq.id}><h2>{faq.question}</h2><p>{faq.answer}</p></article>)}<div className="reception-faq-actions"><button className="button secondary" type="button" onClick={() => onFaqResult(true)}>解決した</button><button className="button accent" type="button" onClick={() => onFaqResult(false)}>まだ困っている</button></div></div> : faqDecision && !preview ? <div className="reception-resolved"><span aria-hidden="true">✓</span><h2>解決につながってよかったです</h2><p>職員への相談送信は不要です。</p><button className="button secondary" type="button" onClick={onStartOver}>別のことを相談する</button></div> : <div className="reception-no-faq"><h2>この内容を職員へ伝えます</h2><p>{busy ? '必要な情報を確認しています…' : 'このまま次へ進んでください。必要な項目だけお聞きします。'}</p>{!busy && <button className="button accent" type="button" onClick={() => onSetIntakeStep(fields.length ? 'supplement' : 'confirm')}>次へ</button>}</div>}</section>}
-      {intakeStep === 'supplement' && preview && !checkUrl && <section className="reception-step" aria-labelledby="supplement-title"><p className="eyebrow">あと少しだけ</p><h1 id="supplement-title">対応に必要なことを教えてください</h1><p className="reception-lead">分かる範囲で大丈夫です。必要な項目だけ表示しています。</p><div className="reception-supplement-list">{fields.map((field) => <div className="reception-field" key={field.key}><label>{field.label}</label>{field.kind === 'location' && <LocationSelector value={supplementValues.location ?? ''} onChange={(zoneId) => onSetSupplementValue('location', zoneId)} />}{field.kind === 'select' && <select value={supplementValues[field.key] ?? ''} onChange={(event) => onSetSupplementValue(field.key, event.target.value)}><option value="">選んでください</option>{field.options?.map((option) => <option key={option}>{option}</option>)}</select>}{field.kind === 'choice' && <div className="reception-choice-grid">{field.options?.map((option) => <button className={supplementValues[field.key] === option ? 'selected' : ''} type="button" key={option} onClick={() => onSetSupplementValue(field.key, option)} aria-pressed={supplementValues[field.key] === option}>{option}</button>)}</div>}{field.kind === 'stepper' && <div className="reception-stepper"><button type="button" onClick={() => onChangeQuantity(-1)} aria-label="枚数を減らす">−</button><strong>{supplementValues[field.key] ?? '1'}枚</strong><button type="button" onClick={() => onChangeQuantity(1)} aria-label="枚数を増やす">＋</button></div>}{field.help && <p>{field.help}</p>}</div>)}</div><button className="button accent reception-next" type="button" onClick={onConfirmSupplements}>この内容で次へ</button></section>}
-      {intakeStep === 'freeText' && !checkUrl && <section className="reception-step" aria-labelledby="free-text-title"><button className="reception-back" type="button" onClick={() => onSetIntakeStep('category')}>← カテゴリ選択に戻る</button><p className="eyebrow">補助手段</p><h1 id="free-text-title">文章で伝えたいこと</h1><p className="reception-lead">短い言葉で大丈夫です。書かなくても、カテゴリから相談できます。</p><textarea className="reception-free-text" value={input} onChange={(event) => onSetInput(event.target.value)} placeholder="例：北トイレの水が流れません" maxLength={500} autoFocus /><button className="button accent reception-next" type="button" disabled={!input.trim() || busy} onClick={onSubmitFreeText}>{busy ? '確認しています…' : '内容を確認する'}</button></section>}
-      {intakeStep === 'confirm' && preview && !checkUrl && <section className="reception-step" aria-labelledby="confirm-title"><p className="eyebrow">送信前の確認</p><h1 id="confirm-title">この内容で職員へ伝えます</h1><dl className="reception-summary"><div><dt>カテゴリ</dt><dd>{selectedCategory?.label ?? preview.category}</dd></div><div><dt>困っていること</dt><dd>{selectedDetail || preview.analysis.title}</dd></div><div><dt>場所</dt><dd>{intake.location || selectedLocation || '指定なし'}</dd></div><div><dt>人数</dt><dd>{intake.peopleCount || selectedPeople || '指定なし'}</dd></div><div><dt>補足</dt><dd>{intakeNote || 'なし'}</dd></div></dl><label className="reception-note-label">補足（任意）<textarea value={intakeNote} onChange={(event) => onSetIntakeNote(event.target.value)} placeholder="追加で伝えたいことがあれば書いてください" maxLength={500} /></label><div className="reception-confirm-actions"><button className="button secondary" type="button" onClick={() => onSetIntakeStep('detail')}>修正する</button><button className="button accent" type="button" disabled={busy || !readyToSubmit} onClick={onSubmit}>{busy ? '送信しています…' : 'この内容で送信する'}</button></div></section>}
+      {!checkUrl && <button className="reception-emergency-link" type="button" onClick={onOpenEmergency}><span aria-hidden="true">🚨</span> {t('reception.emergency')}</button>}
+      {!checkUrl && !emergencyOpen && <div className="reception-progress" aria-label={t('reception.progressAria')}><span className={intakeStep === 'category' ? 'current' : 'done'}>{t('reception.progressIssues')}</span><i>→</i><span className={detailProgress}>{t('reception.progressDetail')}</span><i>→</i><span className={intakeStep === 'confirm' ? 'current' : ''}>{t('reception.progressConfirm')}</span>{intakeStep !== 'category' && <small>{t('reception.progressAlmost')}</small>}</div>}
+      {emergencyOpen && !checkUrl ? <section className="reception-step reception-emergency-panel" aria-labelledby="emergency-title"><button className="reception-back" type="button" onClick={onCloseEmergency}>← {t('reception.emergencyBack')}</button><p className="eyebrow">{t('reception.emergencyEyebrow')}</p><h1 id="emergency-title">{t('reception.emergencyTitle')}</h1><div className="emergency-instruction"><strong>{t('reception.emergencyCondition')}</strong><p>{t('reception.emergencyInstruction')}</p></div><button className="button emergency-primary" type="button" disabled={busy} onClick={onSubmitEmergency}>{busy ? t('reception.emergencySending') : t('reception.emergencySend')}</button><p className="emergency-note">{t('reception.emergencyNote')}</p></section> : <>
+      {intakeStep === 'category' && !checkUrl && <>{voiceOpen ? <VoiceConsultation initialIntake={intake} onClose={onUseText} onUseText={onUseText} onDirectStaff={onDirectStaff} /> : <><section className="reception-step reception-category-step" aria-labelledby="reception-title"><p className="eyebrow">{t('reception.eyebrow')}</p><h1 id="reception-title">{t('reception.title')}</h1><p className="reception-lead">{t('reception.lead')}</p><button className="voice-entry-card" type="button" onClick={onOpenVoice}><span className="voice-entry-icon" aria-hidden="true">🎙</span><span><strong>{t('voice.title')}</strong><small>{t('voice.lead')}</small></span><b aria-hidden="true">›</b></button><div className="reception-category-grid">{INTAKE_CATEGORIES.map((category, index) => { const label = t(translatedCategoryKey(category.id)); return <button className="reception-category-card" type="button" key={category.id} onClick={() => onChooseCategory(category)}><span className={`reception-category-art art-${index + 1}`} role="img" aria-label={t('reception.artAria', { label })} /><strong>{label}</strong><span className="reception-card-arrow" aria-hidden="true">›</span></button>; })}</div><div className="reception-secondary-actions"><button type="button" onClick={() => onSetIntakeStep('freeText')}>{t('reception.freeTextTitle')}</button><button type="button" onClick={() => onSetIntakeStep('freeText')}>{t('reception.freeTextChoice')}</button></div></section><ShelterHomeBoard /></>}</>}
+      {intakeStep === 'detail' && selectedCategory && !checkUrl && <section className="reception-step" aria-labelledby="detail-title"><button className="reception-back" type="button" onClick={() => onSetIntakeStep('category')}>← {t('reception.detailBack')}</button><p className="eyebrow">{t(translatedCategoryKey(selectedCategory.id))}</p><h1 id="detail-title">{t('reception.detailTitle')}</h1><p className="reception-lead">{t('reception.detailLead')}</p><div className="reception-choice-list">{selectedCategory.details.map((detail) => <button type="button" key={detail} onClick={() => onChooseDetail(detail)}>{translatedDetailKey(selectedCategory.id, detail) ? t(translatedDetailKey(selectedCategory.id, detail)!) : detail}<span>›</span></button>)}</div></section>}
+      {intakeStep === 'faq' && !checkUrl && <section className="reception-step" aria-labelledby="faq-step-title"><p className="eyebrow">{t('reception.faqEyebrow')}</p><h1 id="faq-step-title">{t('reception.faqTitle')}</h1>{preview?.related.length && !faqDecision ? <div className="reception-faq-card"><p className="reception-faq-label">{t('reception.faqFound')}</p>{preview.related.slice(0, 2).map((faq) => { const translatedFaq = translateUserFaq(faq, language); return <article key={faq.id}><h2>{translatedFaq.question}</h2><p>{translatedFaq.answer}</p></article>; })}<div className="reception-faq-actions"><button className="button secondary" type="button" onClick={() => onFaqResult(true)}>{t('reception.faqSolved')}</button><button className="button accent" type="button" onClick={() => onFaqResult(false)}>{t('reception.faqStill')}</button></div></div> : faqDecision && !preview ? <div className="reception-resolved"><span aria-hidden="true">✓</span><h2>{t('reception.faqResolved')}</h2><p>{t('reception.faqNoSend')}</p><button className="button secondary" type="button" onClick={onStartOver}>{t('reception.faqOther')}</button></div> : <div className="reception-no-faq"><h2>{t('reception.forwardTitle')}</h2><p>{busy ? t('reception.forwardBusy') : t('reception.forwardLead')}</p>{!busy && <button className="button accent" type="button" onClick={() => onSetIntakeStep(fields.length ? 'supplement' : 'confirm')}>{t('reception.next')}</button>}</div>}</section>}
+      {intakeStep === 'supplement' && preview && !checkUrl && <section className="reception-step" aria-labelledby="supplement-title"><p className="eyebrow">{t('reception.supplementEyebrow')}</p><h1 id="supplement-title">{t('reception.supplementTitle')}</h1><p className="reception-lead">{t('reception.supplementLead')}</p><div className="reception-supplement-list">{fields.map((field) => <div className="reception-field" key={field.key}><label>{t(field.key === 'location' ? 'field.locationLabel' : field.key === 'peopleCount' ? 'field.peopleLabel' : field.key === 'resourceRemaining' ? (/毛布|枚/.test(preview.body) ? 'field.resourceBlanketLabel' : 'field.resourceLabel') : field.key === 'lastReceivedAt' ? 'field.lastReceivedLabel' : 'field.additionalLabel')}</label>{field.kind === 'location' && <LocationSelector value={supplementValues.location ?? ''} onChange={(zoneId) => onSetSupplementValue('location', zoneId)} />}{field.kind === 'select' && <select value={supplementValues[field.key] ?? ''} onChange={(event) => onSetSupplementValue(field.key, event.target.value)}><option value="">{t('reception.selectPrompt')}</option>{field.options?.map((option) => <option key={option}>{translatedChoiceKey(option) ? t(translatedChoiceKey(option)!) : option}</option>)}</select>}{field.kind === 'choice' && <div className="reception-choice-grid">{field.options?.map((option) => <button className={supplementValues[field.key] === option ? 'selected' : ''} type="button" key={option} onClick={() => onSetSupplementValue(field.key, option)} aria-pressed={supplementValues[field.key] === option}>{translatedChoiceKey(option) ? t(translatedChoiceKey(option)!) : option}</button>)}</div>}{field.kind === 'stepper' && <div className="reception-stepper"><button type="button" onClick={() => onChangeQuantity(-1)} aria-label={t('reception.quantityDecrease')}>−</button><strong>{supplementValues[field.key] ?? '1'}{language === 'ja' ? '枚' : ''}</strong><button type="button" onClick={() => onChangeQuantity(1)} aria-label={t('reception.quantityIncrease')}>＋</button></div>}{field.help && <p>{field.key === 'location' ? t('field.locationHelp') : field.key === 'resourceRemaining' ? t('field.resourceBlanketHelp') : field.help}</p>}</div>)}</div><button className="button accent reception-next" type="button" onClick={onConfirmSupplements}>{t('reception.supplementNext')}</button></section>}
+      {intakeStep === 'freeText' && !checkUrl && <section className="reception-step" aria-labelledby="free-text-title"><button className="reception-back" type="button" onClick={() => onSetIntakeStep('category')}>← {t('reception.freeTextBack')}</button><p className="eyebrow">{t('reception.freeTextEyebrow')}</p><h1 id="free-text-title">{t('reception.freeTextTitle')}</h1><p className="reception-lead">{t('reception.freeTextLead')}</p><textarea className="reception-free-text" value={input} onChange={(event) => onSetInput(event.target.value)} placeholder={t('reception.freeTextPlaceholder')} maxLength={500} autoFocus /><button className="button accent reception-next" type="button" disabled={!input.trim() || busy} onClick={onSubmitFreeText}>{busy ? t('reception.forwardBusy') : t('reception.freeTextCheck')}</button></section>}
+      {intakeStep === 'confirm' && preview && !checkUrl && <section className="reception-step" aria-labelledby="confirm-title"><p className="eyebrow">{t('reception.confirmEyebrow')}</p><h1 id="confirm-title">{t('reception.confirmTitle')}</h1><dl className="reception-summary"><div><dt>{t('reception.summaryCategory')}</dt><dd>{selectedCategory ? t(translatedCategoryKey(selectedCategory.id)) : previewCategoryLabel}</dd></div><div><dt>{t('reception.summaryIssue')}</dt><dd>{selectedDetail && selectedCategory ? (translatedDetailKey(selectedCategory.id, selectedDetail) ? t(translatedDetailKey(selectedCategory.id, selectedDetail)!) : selectedDetail) : preview.analysis.title}</dd></div><div><dt>{t('reception.summaryLocation')}</dt><dd>{locationLabel}</dd></div><div><dt>{t('reception.summaryPeople')}</dt><dd>{peopleLabel}</dd></div><div><dt>{t('reception.summaryNote')}</dt><dd>{intakeNote || t('reception.none')}</dd></div></dl><label className="reception-note-label">{t('reception.noteLabel')}<textarea value={intakeNote} onChange={(event) => onSetIntakeNote(event.target.value)} placeholder={t('reception.notePlaceholder')} maxLength={500} /></label><div className="reception-confirm-actions"><button className="button secondary" type="button" onClick={() => onSetIntakeStep('detail')}>{t('reception.edit')}</button><button className="button accent" type="button" disabled={busy || !readyToSubmit} onClick={onSubmit}>{busy ? t('reception.sending') : t('reception.send')}</button></div></section>}
       </>}
-      {checkUrl && <section className="reception-step reception-complete" aria-labelledby="complete-title"><p className="eyebrow">相談を受け付けました</p><h1 id="complete-title">職員へ届きました</h1><p>今は「確認中」です。対応状況はあとから更新されます。</p>{questionId != null && <p className="reception-id">受付番号 <strong>#{String(questionId).padStart(4, '0')}</strong></p>}<ol className="reception-status-timeline" aria-label="相談の対応状況">{stages.map((stage, index) => <li className={`${index <= stageIndex ? 'done' : ''} ${index === stageIndex ? 'current' : ''}`} key={stage}><span aria-hidden="true">{index <= stageIndex ? '✓' : '○'}</span><strong>{stage}</strong></li>)}</ol><div className="reception-url-box"><input readOnly value={checkUrl} onFocus={(event) => event.currentTarget.select()} aria-label="相談状況の確認URL" /><button className="button secondary" type="button" onClick={onCopyUrl}>URLをコピー</button></div><Link className="button accent reception-next" href={checkUrl}>相談状況を見る</Link><button className="reception-text-button" type="button" onClick={onStartOver}>新しく相談する</button></section>}
+      {checkUrl && <section className="reception-step reception-complete" aria-labelledby="complete-title"><p className="eyebrow">{t('reception.completeEyebrow')}</p><h1 id="complete-title">{t('reception.completeTitle')}</h1><p>{t('reception.completeLead')}</p>{questionId != null && <p className="reception-id">{t('reception.receiptNumber')} <strong>#{String(questionId).padStart(4, '0')}</strong></p>}<ol className="reception-status-timeline" aria-label={t('reception.statusAria')}>{stages.map((stage, index) => <li className={`${index <= stageIndex ? 'done' : ''} ${index === stageIndex ? 'current' : ''}`} key={stage}><span aria-hidden="true">{index <= stageIndex ? '✓' : '○'}</span><strong>{t(stage)}</strong></li>)}</ol><div className="reception-url-box"><input id="check-url-text" readOnly value={checkUrl} onFocus={(event) => event.currentTarget.select()} aria-label={t('reception.urlAria')} /><button className="button secondary" type="button" onClick={onCopyUrl}>{t('reception.copyUrl')}</button></div><Link className="button accent reception-next" href={checkUrl}>{t('reception.viewStatus')}</Link><button className="reception-text-button" type="button" onClick={onStartOver}>{t('reception.newConsult')}</button></section>}
       {!checkUrl && !emergencyOpen && !busy && intakeStep !== 'category' && <ConsultCancelAction onStartOver={onStartOver} />}
     </section>
-    <section className="reception-faq-section" id="reception-faq" aria-labelledby="reception-faq-title"><p className="eyebrow">イセキ避難所の案内</p><h2 id="reception-faq-title">イセキ避難所でよくある質問</h2><p>今いる場所で確認できる、食事・水・トイレ・救護などの案内です。解決しないときは、そのまま職員へ相談できます。</p>{faqs.slice(0, 6).map((faq) => <details key={faq.id}><summary>{faq.question}</summary><p className="reception-faq-updated"><time dateTime={new Date(faq.updatedAt).toISOString()}>更新日時：{formatFaqUpdatedAt(faq.updatedAt)}</time></p><p>{faq.answer}</p></details>)}</section>
+    <section className="reception-faq-section" id="reception-faq" aria-labelledby="reception-faq-title"><p className="eyebrow">{t('reception.faqSectionEyebrow')}</p><h2 id="reception-faq-title">{t('reception.faqSectionTitle')}</h2><p>{t('reception.faqSectionLead')}</p>{faqs.slice(0, 6).map((faq) => { const translatedFaq = translateUserFaq(faq, language); return <details key={faq.id}><summary>{translatedFaq.question}</summary><p className="reception-faq-updated"><time dateTime={new Date(faq.updatedAt).toISOString()}>{t('reception.faqUpdated', { date: formatFaqUpdatedAt(faq.updatedAt, language) })}</time></p><p>{translatedFaq.answer}</p></details>; })}</section>
     {status && !checkUrl && <p className="reception-status" role="status">{status}</p>}
   </main>;
 }
 
 export function KikumaeClient({ faqs }: Props) {
+  const { t } = useUserI18n();
   const [query, setQuery] = useState('');
   const [chatOpen, setChatOpen] = useState(false);
   const [intakeOpen, setIntakeOpen] = useState(true);
@@ -194,19 +185,10 @@ export function KikumaeClient({ faqs }: Props) {
   const [status, setStatus] = useState('');
   const [busy, setBusy] = useState(false);
   const [emergencyOpen, setEmergencyOpen] = useState(false);
-  const [listening, setListening] = useState(false);
-  const [voiceSupported, setVoiceSupported] = useState(false);
+  const [voiceOpen, setVoiceOpen] = useState(false);
   const [offline, setOffline] = useState(false);
-  const [language, setLanguage] = useState<Language>('ja');
-  const [languageOpen, setLanguageOpen] = useState(false);
   const submitLockRef = useRef(false);
   const previewRequestRef = useRef(0);
-  const inputRef = useRef<HTMLInputElement>(null);
-
-  useEffect(() => {
-    const languageTags: Record<Language, string> = { ja: 'ja', en: 'en', zh: 'zh-CN', ko: 'ko' };
-    document.documentElement.lang = languageTags[language];
-  }, [language]);
 
   useEffect(() => {
     const updateConnection = () => setOffline(!navigator.onLine);
@@ -239,12 +221,6 @@ export function KikumaeClient({ faqs }: Props) {
     try { localStorage.setItem('kikumae-shelter-draft', JSON.stringify({ savedAt: Date.now(), input, originalBody, contextBody, intake, chatOpen, intakeOpen, intakeStep, selectedCategoryId: selectedCategory?.id, selectedDetail, selectedLocation, selectedPeople, intakeNote, messages, preview, faqDecision, readyToSubmit, showSupplementSheet } satisfies SavedDraft)); } catch { /* 共用端末やプライベートモードでは保存しない */ }
   }, [input, originalBody, contextBody, intake, chatOpen, intakeOpen, intakeStep, selectedCategory, selectedDetail, selectedLocation, selectedPeople, intakeNote, messages, preview, faqDecision, readyToSubmit, showSupplementSheet, checkUrl]);
 
-  useEffect(() => {
-    const speechWindow = window as SpeechWindow;
-    const timer = window.setTimeout(() => setVoiceSupported(Boolean(speechWindow.SpeechRecognition ?? speechWindow.webkitSpeechRecognition)), 0);
-    return () => window.clearTimeout(timer);
-  }, []);
-
   const matches = useMemo(() => {
     const term = normalize(query);
     if (!term) return faqs;
@@ -255,9 +231,13 @@ export function KikumaeClient({ faqs }: Props) {
 
   function beginChat() {
     previewRequestRef.current += 1; setBusy(false);
-    setChatOpen(false); setEmergencyOpen(false); setIntakeOpen(true); setIntakeStep('category'); setSelectedCategory(null); setSelectedDetail(''); setSelectedLocation(intake.location); setSelectedPeople(intake.peopleCount); setIntakeNote(''); setMessages([]); setInput(''); setOriginalBody(''); setContextBody(''); setPreview(null); setFaqDecision(false); setShowFaqCard(false); setShowSupplementSheet(false); setSupplementValues({}); setReadyToSubmit(false); setQuestionId(null); setCheckUrl(''); setStatus('');
+    setChatOpen(false); setEmergencyOpen(false); setVoiceOpen(false); setIntakeOpen(true); setIntakeStep('category'); setSelectedCategory(null); setSelectedDetail(''); setSelectedLocation(intake.location); setSelectedPeople(intake.peopleCount); setIntakeNote(''); setMessages([]); setInput(''); setOriginalBody(''); setContextBody(''); setPreview(null); setFaqDecision(false); setShowFaqCard(false); setShowSupplementSheet(false); setSupplementValues({}); setReadyToSubmit(false); setQuestionId(null); setCheckUrl(''); setStatus('');
     try { localStorage.removeItem('kikumae-shelter-draft'); } catch { /* 下書きは利用できる場合だけ消去 */ }
   }
+
+  function openVoice() { setEmergencyOpen(false); setVoiceOpen(true); setIntakeStep('category'); }
+  function useTextConsultation() { setVoiceOpen(false); setIntakeStep('freeText'); setStatus(''); }
+  function directStaffFromVoice() { setVoiceOpen(false); setEmergencyOpen(true); setStatus(''); }
 
   function moveToNextFlowStep(category: IntakeCategory, detail: string) {
     const needsLocation = Boolean(category.needsLocationFor?.includes(detail)) && !intake.location;
@@ -300,29 +280,18 @@ export function KikumaeClient({ faqs }: Props) {
       nextIntake.peopleCount ? `対象人数：${nextIntake.peopleCount}` : '',
       intakeNote.trim() ? `補足：${intakeNote.trim()}` : ''
     ].filter(Boolean).join('\n');
-    setIntake(nextIntake); setOriginalBody(body); setContextBody(body); setMessages([{ from: 'ai', text: '選んだ内容をもとに、職員へ届く形に整理しています。' }, { from: 'person', text: body }]); setStatus(''); setIntakeStep('faq');
+    setIntake(nextIntake); setOriginalBody(body); setContextBody(body); setMessages([{ from: 'ai', text: t('messages.structuredOrganized') }, { from: 'person', text: body }]); setStatus(''); setIntakeStep('faq');
     await inspect(body, nextIntake);
-  }
-
-  function startVoice() {
-    const speechWindow = window as SpeechWindow;
-    const SpeechRecognition = speechWindow.SpeechRecognition ?? speechWindow.webkitSpeechRecognition;
-    if (!SpeechRecognition) { setStatus('このブラウザでは音声入力が使えないため、文字でお話しください。'); inputRef.current?.focus(); return; }
-    const recognition = new SpeechRecognition(); recognition.lang = 'ja-JP'; recognition.interimResults = false; setListening(true);
-    recognition.onresult = (event) => { const transcript = Array.from(event.results).map((result) => result[0]?.transcript ?? '').join(''); setInput(transcript); setListening(false); };
-    recognition.onerror = () => { setListening(false); setStatus('音声を聞き取れませんでした。文字でも入力できます。'); };
-    recognition.onend = () => setListening(false);
-    recognition.start();
   }
 
   async function inspect(body: string, nextIntake: Intake, submissionKey = preview?.submissionKey ?? crypto.randomUUID(), background = false) {
     const requestId = ++previewRequestRef.current;
-    if (!background) { setBusy(true); setStatus('内容を整理しています…'); }
+    if (!background) { setBusy(true); setStatus(t('messages.organizing')); }
     try {
       const response = await fetch('/api/questions/preview', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ body, intake: nextIntake }), signal: AbortSignal.timeout(15000) });
       const payload = await response.json() as { message?: string; body?: string; summary?: string; category?: string; related?: RelatedFaq[]; analysis?: Analysis; followUp?: Preview['followUp'] };
       if (requestId !== previewRequestRef.current || submitLockRef.current) return false;
-      if (!response.ok || !payload.analysis) { if (!background) setStatus(payload.message ?? '内容を整理できませんでした。'); return false; }
+      if (!response.ok || !payload.analysis) { if (!background) setStatus(t('reception.previewError')); return false; }
       const nextPreview: Preview = { body: payload.body ?? body, summary: payload.summary ?? '', category: payload.category ?? 'その他', related: payload.related ?? [], analysis: payload.analysis, followUp: payload.followUp ?? null, submissionKey };
       setPreview(nextPreview); setIntake(nextIntake); setFaqDecision(false);
       if (background) return true;
@@ -331,13 +300,13 @@ export function KikumaeClient({ faqs }: Props) {
       const fields = supplementFields(nextPreview.analysis, nextPreview.body, nextIntake);
       setShowFaqCard(!urgent && nextPreview.related.length > 0);
       if (intakeOpen) setIntakeStep((current) => current === 'faq' || current === 'detail' ? 'faq' : current);
-      if (urgent) addMessage({ from: 'ai', text: '緊急の可能性がある内容として受け止めました。追加の確認を待たず、このまま職員へ届けられます。' });
-      else if (nextPreview.related.length) addMessage({ from: 'ai', text: '近い案内が見つかりました。解決しなければ、整理した内容をそのまま職員へ届けられます。' });
-      else addMessage({ from: 'ai', text: fields.length ? '内容を整理しました。必要な項目だけ、下からまとめて選んでください。' : '内容を整理しました。この内容を職員へ届ける前に確認できます。' });
+      if (urgent) addMessage({ from: 'ai', text: t('messages.urgent') });
+      else if (nextPreview.related.length) addMessage({ from: 'ai', text: t('messages.faqFound') });
+      else addMessage({ from: 'ai', text: fields.length ? t('messages.moreInfo') : t('messages.ready') });
       if (urgent || (!nextPreview.related.length && !fields.length)) setReadyToSubmit(true);
       else if (!nextPreview.related.length) { setSupplementValues({}); setShowSupplementSheet(!intakeOpen); if (intakeOpen) setIntakeStep((current) => current === 'faq' || current === 'detail' ? 'supplement' : current); setReadyToSubmit(false); }
       return true;
-    } catch (error) { if (!background && requestId === previewRequestRef.current && !submitLockRef.current) setStatus(error instanceof Error && error.name === 'TimeoutError' ? '通信が遅いようです。もう一度お試しください。' : '通信に失敗しました。もう一度お試しください。'); return false; }
+    } catch (error) { if (!background && requestId === previewRequestRef.current && !submitLockRef.current) setStatus(error instanceof Error && error.name === 'TimeoutError' ? t('errors.previewSlow') : t('errors.connection')); return false; }
     finally { if (!background && requestId === previewRequestRef.current) setBusy(false); }
   }
 
@@ -367,8 +336,8 @@ export function KikumaeClient({ faqs }: Props) {
 
   function editOriginal() {
     const original = originalBody;
-    setShowSupplementSheet(false); setShowFaqCard(false); setReadyToSubmit(false); setPreview(null); setOriginalBody(''); setContextBody(''); setInput(original); setMessages([{ from: 'ai', text: '内容を直せます。変更したいところを入力して、もう一度確認してください。' }]);
-    window.setTimeout(() => inputRef.current?.focus(), 50);
+    setShowSupplementSheet(false); setShowFaqCard(false); setReadyToSubmit(false); setPreview(null); setOriginalBody(''); setContextBody(''); setInput(original); setMessages([{ from: 'ai', text: t('messages.editable') }]);
+    window.setTimeout(() => document.querySelector<HTMLTextAreaElement>('.reception-free-text')?.focus(), 50);
   }
 
   function confirmSupplements() {
@@ -386,39 +355,39 @@ export function KikumaeClient({ faqs }: Props) {
 
   async function faqResult(resolved: boolean) {
     setFaqDecision(true); setShowFaqCard(false);
-    if (resolved) { const faqId = preview?.related[0]?.id ?? null; void fetch('/api/faq-feedback', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ faqId, query: originalBody }) }); addMessage({ from: 'ai', text: '解決につながってよかったです。必要なときは、いつでもここから相談してください。' }); setPreview(null); setOriginalBody(''); setContextBody(''); setReadyToSubmit(false); if (intakeOpen) setIntakeStep('faq'); return; }
-    addMessage({ from: 'ai', text: 'まだ困っていることがあるのですね。必要な項目だけ、まとめて確認します。' });
+    if (resolved) { const faqId = preview?.related[0]?.id ?? null; void fetch('/api/faq-feedback', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ faqId, query: originalBody }) }); addMessage({ from: 'ai', text: t('messages.faqResolved') }); setPreview(null); setOriginalBody(''); setContextBody(''); setReadyToSubmit(false); if (intakeOpen) setIntakeStep('faq'); return; }
+    addMessage({ from: 'ai', text: t('messages.stillNeedHelp') });
     if (preview) { const fields = supplementFields(preview.analysis, preview.body, intake); setSupplementValues({}); if (fields.length) { setShowSupplementSheet(!intakeOpen); setIntakeStep(intakeOpen ? 'supplement' : intakeStep); setReadyToSubmit(false); } else { setReadyToSubmit(true); if (intakeOpen) setIntakeStep('confirm'); } }
   }
 
   async function submitQuestion() {
     if (!preview || busy || submitLockRef.current) return;
-    submitLockRef.current = true; previewRequestRef.current += 1; setBusy(true); setStatus('相談を届けています…');
+    submitLockRef.current = true; previewRequestRef.current += 1; setBusy(true); setStatus(t('messages.delivering'));
     try {
       const response = await fetch('/api/questions', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ body: originalBody, summary: preview.summary, category: preview.category, submissionKey: preview.submissionKey, intake }), signal: AbortSignal.timeout(15000) });
       const payload = await response.json() as { message?: string; checkUrl?: string; id?: number };
-      if (!response.ok) { setStatus(payload.message ?? '相談を届けられませんでした。'); return; }
+      if (!response.ok) { setStatus(t('errors.deliver')); return; }
       const url = payload.checkUrl ?? ''; const id = typeof payload.id === 'number' ? payload.id : null;
-      setCheckUrl(url); setQuestionId(id); setReadyToSubmit(false); setStatus('相談が届きました。この画面を写真に撮るか、確認URLを保存してください。'); addMessage({ from: 'ai', text: `相談を受け付けました。相談ID${id != null ? ` #${String(id).padStart(4, '0')}` : ''}で対応状況を確認できます。` });
+      setCheckUrl(url); setQuestionId(id); setReadyToSubmit(false); setStatus(t('reception.receivedHint')); addMessage({ from: 'ai', text: t('messages.received', { id: id != null ? ` #${String(id).padStart(4, '0')}` : '' }) });
       if (id != null && url) { try { appendConsultHistory({ id, checkUrl: url, title: preview.category, savedAt: Date.now() }); } catch { /* 履歴保存はベストエフォート */ } }
       try { localStorage.removeItem('kikumae-shelter-draft'); } catch { /* 下書きは利用できる場合だけ消去 */ }
-    } catch (error) { setStatus(error instanceof Error && error.name === 'TimeoutError' ? '通信が遅いようです。もう一度お試しください。' : '通信に失敗しました。もう一度お試しください。'); }
+    } catch (error) { setStatus(error instanceof Error && error.name === 'TimeoutError' ? t('errors.previewSlow') : t('errors.connection')); }
     finally { submitLockRef.current = false; setBusy(false); }
   }
 
   async function submitEmergency() {
     if (busy || submitLockRef.current) return;
-    submitLockRef.current = true; previewRequestRef.current += 1; setBusy(true); setStatus('緊急の知らせを送っています…');
+    submitLockRef.current = true; previewRequestRef.current += 1; setBusy(true); setStatus(t('messages.emergencySending'));
     const body = '【緊急】命に関わる・今すぐ助けが必要です。近くの職員への即時対応をお願いします。';
     try {
       const response = await fetch('/api/questions', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ body, summary: '緊急のため、職員による即時確認が必要です。', category: 'その他', submissionKey: crypto.randomUUID(), intake: { ...emptyIntake, additionalDetails: '近くの職員にも直接声をかけてください。' } }), signal: AbortSignal.timeout(15000) });
       const payload = await response.json() as { message?: string; checkUrl?: string; id?: number };
-      if (!response.ok) { setStatus(payload.message ?? '緊急の知らせを送れませんでした。近くの職員へ直接声をかけてください。'); return; }
+      if (!response.ok) { setStatus(t('errors.emergencyDeliver')); return; }
       const url = payload.checkUrl ?? ''; const id = typeof payload.id === 'number' ? payload.id : null;
-      setCheckUrl(url); setQuestionId(id); setEmergencyOpen(false); setStatus('緊急の相談が職員へ届きました。'); addMessage({ from: 'ai', text: '緊急の相談を受け付けました。送信後も、必ず近くの職員に直接声をかけてください。' });
+      setCheckUrl(url); setQuestionId(id); setEmergencyOpen(false); setStatus(t('reception.emergencyReceived')); addMessage({ from: 'ai', text: t('messages.emergencyReceived') });
       if (id != null && url) { try { appendConsultHistory({ id, checkUrl: url, title: '緊急の相談', savedAt: Date.now() }); } catch { /* 履歴保存はベストエフォート */ } }
       try { localStorage.removeItem('kikumae-shelter-draft'); } catch { /* 下書きは利用できる場合だけ消去 */ }
-    } catch (error) { setStatus(error instanceof Error && error.name === 'TimeoutError' ? '送信に時間がかかっています。近くの職員へ直接声をかけてください。' : '通信に失敗しました。近くの職員へ直接声をかけてください。'); }
+    } catch (error) { setStatus(error instanceof Error && error.name === 'TimeoutError' ? t('reception.emergencyTimeout') : t('errors.emergencyConnection')); }
     finally { submitLockRef.current = false; setBusy(false); }
   }
 
@@ -427,12 +396,10 @@ export function KikumaeClient({ faqs }: Props) {
   async function copyCheckUrl() {
     const field = document.getElementById('check-url-text') as HTMLInputElement | null;
     field?.select();
-    try { if (navigator.clipboard?.writeText) { await navigator.clipboard.writeText(new URL(checkUrl, window.location.origin).toString()); setStatus('確認ページのURLをコピーしました。'); return; } } catch { /* 手動コピーへ */ }
-    setStatus('コピーできなかったため、URLを選択しました。そのまま保存してください。');
+    try { if (navigator.clipboard?.writeText) { await navigator.clipboard.writeText(new URL(checkUrl, window.location.origin).toString()); setStatus(t('errors.copied')); return; } } catch { /* 手動コピーへ */ }
+    setStatus(t('errors.copyManual'));
   }
 
-  const knownContext = [intake.location && `場所：${intake.location}`, intake.peopleCount && `人数：${intake.peopleCount}`].filter(Boolean);
-
-  return <ReceptionFlow faqs={faqs} intakeStep={intakeStep} selectedCategory={selectedCategory} selectedDetail={selectedDetail} selectedLocation={selectedLocation} selectedPeople={selectedPeople} intakeNote={intakeNote} intake={intake} preview={preview} faqDecision={faqDecision} readyToSubmit={readyToSubmit} supplementValues={supplementValues} input={input} status={status} busy={busy} checkUrl={checkUrl} questionId={questionId} emergencyOpen={emergencyOpen} language={language} languageOpen={languageOpen} onToggleLanguage={() => setLanguageOpen((current) => !current)} onChangeLanguage={(nextLanguage) => { setLanguage(nextLanguage); setLanguageOpen(false); }} onChooseCategory={chooseCategory} onChooseDetail={(detail) => { void chooseDetail(detail); }} onChooseLocation={chooseLocation} onChoosePeople={choosePeople} onSetIntakeStep={setIntakeStep} onSetIntakeNote={setIntakeNote} onSetInput={setInput} onSetSupplementValue={setSupplementValue} onChangeQuantity={changeQuantity} onFaqResult={(resolved) => { void faqResult(resolved); }} onConfirmSupplements={confirmSupplements} onSubmit={() => { void submitStructuredIntake(); }} onSubmitFreeText={() => { void submitFreeText(); }} onStartOver={beginChat} onCopyUrl={() => { void copyCheckUrl(); }} onOpenEmergency={() => { setStatus(''); setEmergencyOpen(true); }} onCloseEmergency={() => setEmergencyOpen(false)} onSubmitEmergency={() => { void submitEmergency(); }} />;
+  return <ReceptionFlow faqs={faqs} intakeStep={intakeStep} selectedCategory={selectedCategory} selectedDetail={selectedDetail} selectedLocation={selectedLocation} selectedPeople={selectedPeople} intakeNote={intakeNote} intake={intake} preview={preview} faqDecision={faqDecision} readyToSubmit={readyToSubmit} supplementValues={supplementValues} input={input} status={status} busy={busy} checkUrl={checkUrl} questionId={questionId} emergencyOpen={emergencyOpen} voiceOpen={voiceOpen} onChooseCategory={chooseCategory} onChooseDetail={(detail) => { void chooseDetail(detail); }} onChooseLocation={chooseLocation} onChoosePeople={choosePeople} onSetIntakeStep={setIntakeStep} onSetIntakeNote={setIntakeNote} onSetInput={setInput} onSetSupplementValue={setSupplementValue} onChangeQuantity={changeQuantity} onFaqResult={(resolved) => { void faqResult(resolved); }} onConfirmSupplements={confirmSupplements} onSubmit={() => { void submitStructuredIntake(); }} onSubmitFreeText={() => { void submitFreeText(); }} onStartOver={beginChat} onCopyUrl={() => { void copyCheckUrl(); }} onOpenEmergency={() => { setStatus(''); setEmergencyOpen(true); }} onCloseEmergency={() => setEmergencyOpen(false)} onSubmitEmergency={() => { void submitEmergency(); }} onOpenVoice={openVoice} onUseText={useTextConsultation} onDirectStaff={directStaffFromVoice} />;
 
 }

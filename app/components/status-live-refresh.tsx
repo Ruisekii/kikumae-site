@@ -2,15 +2,13 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { useUserI18n } from '../user-i18n';
 
 const REFRESH_INTERVAL_MS = 5_000;
 
-const japanTime = (value: Date) => new Intl.DateTimeFormat('ja-JP', {
-  timeZone: 'Asia/Tokyo', hour: '2-digit', minute: '2-digit', second: '2-digit',
-}).format(value);
-
 /** Keep the resident's status page current while staff work on the issue. */
 export function StatusLiveRefresh() {
+  const { t, language } = useUserI18n();
   const router = useRouter();
   const [lastCheckedAt, setLastCheckedAt] = useState<Date | null>(null);
 
@@ -29,5 +27,7 @@ export function StatusLiveRefresh() {
     };
   }, [router]);
 
-  return <p className="status-live-note" role="status">このページは自動で更新されます。約5秒ごとに確認{lastCheckedAt ? `（最終確認 ${japanTime(lastCheckedAt)}）` : '中…'}</p>;
+  const locale = language === 'ja' ? 'ja-JP' : language === 'zh' ? 'zh-CN' : language === 'ko' ? 'ko-KR' : 'en-US';
+  const time = lastCheckedAt ? new Intl.DateTimeFormat(locale, { timeZone: 'Asia/Tokyo', hour: '2-digit', minute: '2-digit', second: '2-digit' }).format(lastCheckedAt) : '';
+  return <p className="status-live-note" role="status">{t('statusPage.live', { time })}</p>;
 }

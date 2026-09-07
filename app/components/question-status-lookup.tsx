@@ -3,16 +3,17 @@
 import { FormEvent, useEffect, useState } from 'react';
 import Link from 'next/link';
 import { clearConsultHistory, loadConsultHistory, type ConsultHistoryEntry } from './consult-history';
+import { translateUserIssueTitle, UserHeader, useUserI18n } from '../user-i18n';
 
 type StatusRecord = { id: number; title: string; workflowStatus: string; updatedAt: number };
 type HistoryCard = ConsultHistoryEntry & { status?: StatusRecord; loading: boolean; unavailable: boolean };
 
 const stages = [
-  ['received', '受付済み'],
-  ['reviewing', '確認中'],
-  ['field_checking', '現場確認中'],
-  ['in_progress', '対応中'],
-  ['resolved', '解決済み'],
+  ['received', 'status.received'],
+  ['reviewing', 'status.reviewing'],
+  ['field_checking', 'status.fieldChecking'],
+  ['in_progress', 'status.inProgress'],
+  ['resolved', 'status.resolved'],
 ] as const;
 
 function statusIndex(status: string) {
@@ -23,10 +24,14 @@ function statusIndex(status: string) {
   return 0;
 }
 
-function statusLabel(status: string) {
-  if (status === 'waiting') return '追加情報を確認中';
-  if (status === 'cannot_resolve') return '対応状況を記録済み';
-  return stages[statusIndex(status)]?.[1] ?? '受付済み';
+function statusLabel(status: string, t: (key: string, options?: Record<string, unknown>) => string) {
+  if (status === 'waiting') return t('statusLookup.waiting');
+  if (status === 'cannot_resolve') return t('statusLookup.cannotResolve');
+  return t(stages[statusIndex(status)]?.[1] ?? 'status.received');
+}
+
+function formatStatusTime(value: Date, language: 'ja' | 'en' | 'zh' | 'ko', options: Intl.DateTimeFormatOptions) {
+  return new Intl.DateTimeFormat(language === 'ja' ? 'ja-JP' : language === 'zh' ? 'zh-CN' : language === 'ko' ? 'ko-KR' : 'en-US', { timeZone: 'Asia/Tokyo', ...options }).format(value);
 }
 
 async function fetchStatus(entry: ConsultHistoryEntry): Promise<{ status?: StatusRecord; unavailable: boolean }> {
@@ -42,6 +47,7 @@ async function fetchStatus(entry: ConsultHistoryEntry): Promise<{ status?: Statu
 }
 
 export function QuestionStatusLookup() {
+  const { t, language } = useUserI18n();
   const [value, setValue] = useState('');
   const [message, setMessage] = useState('');
   const [history, setHistory] = useState<HistoryCard[]>([]);
@@ -86,36 +92,34 @@ export function QuestionStatusLookup() {
     event.preventDefault();
     const input = value.trim();
     const match = input.match(/\/questions\/([0-9a-f-]{32,80})/i) ?? input.match(/^([0-9a-f-]{32,80})$/i);
-    if (!match) { setMessage('確認URLまたは確認用コードの形式を確認してください。'); return; }
+    if (!match) { setMessage(t('statusLookup.invalidToken')); return; }
     window.location.assign(`/questions/${match[1]}`);
   }
 
   return <main className="evac-theme public-page status-lookup-page">
-    <header className="site-header status-site-header">
-      <Link className="brand" href="/">◌ イセキ避難所</Link>
-      <nav aria-label="利用者メニュー"><Link href="/">困りごと</Link><Link href="/#reception-faq">よくある質問</Link><Link href="/questions" aria-current="page">相談状況</Link></nav>
-    </header>
+    <UserHeader brand="◌ イセキ避難所" brandHref="/" faqHref="/#reception-faq" statusHref="/questions" />
     <section className="status-lookup-card">
-      <p className="eyebrow">相談状況</p>
-      <h1>あなたの相談</h1>
-      <p>この端末から送った相談は、自動でここに表示されます。ログインは必要ありません。</p>
-      {lastCheckedAt && <p className="status-live-note" role="status">このページは自動で更新されます。最終確認 {new Intl.DateTimeFormat('ja-JP', { timeZone: 'Asia/Tokyo', hour: '2-digit', minute: '2-digit', second: '2-digit' }).format(lastCheckedAt)}</p>}
+      <p className="eyebrow">{t('statusLookup.eyebrow')}</p>
+      <h1>{t('statusLookup.title')}</h1>
+      <p>{t('statusLookup.lead')}</p>
+      {lastCheckedAt && <p className="status-live-note" role="status">{t('statusLookup.live', { time: formatStatusTime(lastCheckedAt, language, { hour: '2-digit', minute: '2-digit', second: '2-digit' }) })}</p>}
       {history.length > 0 ? <div className="device-history">
-        <div className="device-history-heading"><h2>いまの対応状況</h2><span>7日間表示</span></div>
+        <div className="device-history-heading"><h2>{t('statusLookup.current')}</h2><span>{t('statusLookup.days')}</span></div>
         <ul className="device-history-cards">{history.map((entry) => {
           const index = statusIndex(entry.status?.workflowStatus ?? 'received');
+          const title = translateUserIssueTitle(entry.status?.title || entry.title, language);
           return <li className="device-history-card" key={`${entry.id}-${entry.savedAt}`}>
-            <div className="device-history-card-top"><span className="device-history-category">{entry.status?.title || entry.title}</span><strong>{entry.loading ? '確認中…' : entry.unavailable ? '最新状況を確認できません' : statusLabel(entry.status?.workflowStatus ?? 'received')}</strong></div>
-            <div className="mini-status-track" aria-label={`${entry.status?.title || entry.title}の進み具合`}>{stages.map(([key, label], stage) => <span className={stage <= index ? 'done' : ''} key={key}><i aria-hidden="true">{stage <= index ? '●' : '○'}</i>{label}</span>)}</div>
-            <div className="device-history-card-bottom"><time dateTime={new Date(entry.status?.updatedAt ?? entry.savedAt).toISOString()}>{entry.unavailable ? '保存した確認ページから再確認できます' : `最終更新 ${new Intl.DateTimeFormat('ja-JP', { timeZone: 'Asia/Tokyo', month: 'numeric', day: 'numeric', hour: 'numeric', minute: '2-digit' }).format(new Date(entry.status?.updatedAt ?? entry.savedAt))}`}</time><a className="button secondary" href={entry.checkUrl}>詳しく見る</a></div>
+            <div className="device-history-card-top"><span className="device-history-category">{title}</span><strong>{entry.loading ? t('statusLookup.loading') : entry.unavailable ? t('statusLookup.unavailable') : statusLabel(entry.status?.workflowStatus ?? 'received', t)}</strong></div>
+            <div className="mini-status-track" aria-label={t('statusLookup.trackAria', { title })}>{stages.map(([key, label], stage) => <span className={stage <= index ? 'done' : ''} key={key}><i aria-hidden="true">{stage <= index ? '●' : '○'}</i>{t(label)}</span>)}</div>
+            <div className="device-history-card-bottom"><time dateTime={new Date(entry.status?.updatedAt ?? entry.savedAt).toISOString()}>{entry.unavailable ? t('statusLookup.savedPage') : t('statusLookup.lastUpdated', { time: formatStatusTime(new Date(entry.status?.updatedAt ?? entry.savedAt), language, { month: 'numeric', day: 'numeric', hour: 'numeric', minute: '2-digit' }) })}</time><a className="button secondary" href={entry.checkUrl}>{t('statusLookup.details')}</a></div>
           </li>;
         })}</ul>
-        <button className="text-button" type="button" onClick={() => { clearConsultHistory(); setHistory([]); }}>この端末の履歴を消す</button>
-      </div> : <div className="device-history-empty"><strong>この端末に保存された相談はありません。</strong><p>相談を送信すると、ここからいつでも状況を確認できます。</p><Link className="button accent" href="/">困りごとを選ぶ</Link></div>}
+        <button className="text-button" type="button" onClick={() => { clearConsultHistory(); setHistory([]); }}>{t('statusLookup.clear')}</button>
+      </div> : <div className="device-history-empty"><strong>{t('statusLookup.emptyTitle')}</strong><p>{t('statusLookup.emptyLead')}</p><Link className="button accent" href="/">{t('statusLookup.chooseIssue')}</Link></div>}
       <details className="status-advanced-lookup">
-        <summary>別の端末・保存したURLから確認する</summary>
-        <p>受付完了時の確認URLまたは確認用コードを入力してください。</p>
-        <form onSubmit={submit}><label htmlFor="status-token">確認URLまたは確認用コード<input id="status-token" value={value} onChange={(event) => setValue(event.target.value)} placeholder="https://…/questions/確認用コード" autoComplete="off" required /></label><button className="button secondary" type="submit">相談状況を開く</button>{message && <p className="form-status" role="alert">{message}</p>}</form>
+        <summary>{t('statusLookup.advanced')}</summary>
+        <p>{t('statusLookup.advancedLead')}</p>
+        <form onSubmit={submit}><label htmlFor="status-token">{t('statusLookup.tokenLabel')}<input id="status-token" value={value} onChange={(event) => setValue(event.target.value)} placeholder={t('statusLookup.tokenPlaceholder')} autoComplete="off" required /></label><button className="button secondary" type="submit">{t('statusLookup.open')}</button>{message && <p className="form-status" role="alert">{message}</p>}</form>
       </details>
     </section>
   </main>;

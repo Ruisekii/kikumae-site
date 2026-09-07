@@ -1,3 +1,7 @@
+'use client';
+
+import { useUserI18n } from '../user-i18n';
+
 type HomeNotice = {
   id: string;
   title: string;
@@ -8,8 +12,8 @@ type HomeNotice = {
   tone: 'warm' | 'cool' | 'green' | 'purple';
 };
 
-function formatUpdatedAt(value: string): string {
-  return new Intl.DateTimeFormat('ja-JP', {
+function formatUpdatedAt(value: string, language: 'ja' | 'en' | 'zh' | 'ko'): string {
+  return new Intl.DateTimeFormat(language === 'ja' ? 'ja-JP' : language === 'zh' ? 'zh-CN' : language === 'ko' ? 'ko-KR' : 'en-US', {
     timeZone: 'Asia/Tokyo',
     year: 'numeric',
     month: 'numeric',
@@ -33,17 +37,18 @@ const HOME_NOTICES: HomeNotice[] = [
 ];
 
 export function ShelterHomeBoard() {
+  const { t, language } = useUserI18n();
   return <section className="shelter-home-board" aria-labelledby="shelter-home-board-title">
     <div className="shelter-home-board-heading">
-      <div><p className="eyebrow">イセキ避難所の参考案内</p><h2 id="shelter-home-board-title">イセキ避難所にいる方へ</h2><p>食事・水・トイレ・救護など、今すぐ確認したい場所と時間をまとめています。</p></div>
-      <span className="shelter-home-board-note" aria-label="案内について">現在の状況は<br />現地の掲示を優先</span>
+      <div><p className="eyebrow">{t('home.eyebrow')}</p><h2 id="shelter-home-board-title">{t('home.title')}</h2><p>{t('home.lead')}</p></div>
+      <span className="shelter-home-board-note" aria-label={t('home.noticeAria')}>{t('home.noticeLine1')}<br />{t('home.noticeLine2')}</span>
     </div>
     <div className="shelter-home-notice-grid">{HOME_NOTICES.map((notice) => <article className={`shelter-home-notice tone-${notice.tone}`} key={notice.id}>
-      <div className="shelter-home-notice-title"><span className={`shelter-home-art art-${notice.art}`} aria-hidden="true" /><h3>{notice.title}</h3></div>
-      <dl>{notice.rows.map(([label, value]) => <div key={`${notice.id}-${label}`}><dt>{label}</dt><dd>{value}</dd></div>)}</dl>
-      <p className="shelter-home-status">{notice.status}</p>
-      <p className="shelter-home-updated"><span>更新日時</span><time dateTime={notice.updatedAt}>{formatUpdatedAt(notice.updatedAt)}</time></p>
+      <div className="shelter-home-notice-title"><span className={`shelter-home-art art-${notice.art}`} aria-hidden="true" /><h3>{t(`homeNotice.${notice.id}.title`)}</h3></div>
+      <dl>{notice.rows.map(([,], index) => <div key={`${notice.id}-${index}`}><dt>{t(`homeNotice.${notice.id}.row${index}.label`)}</dt><dd>{t(`homeNotice.${notice.id}.row${index}.value`)}</dd></div>)}</dl>
+      <p className="shelter-home-status">{t(`homeNotice.${notice.id}.status`)}</p>
+      <p className="shelter-home-updated"><span>{t('home.updated')}</span><time dateTime={notice.updatedAt}>{formatUpdatedAt(notice.updatedAt, language)}</time></p>
     </article>)}</div>
-    <p className="shelter-home-board-footnote">※ ここに表示される内容は「イセキ避難所」の案内例です。配布時間・場所・在庫などは、現地の掲示や職員の案内を優先してください。</p>
+    <p className="shelter-home-board-footnote">{t('home.footnote')}</p>
   </section>;
 }

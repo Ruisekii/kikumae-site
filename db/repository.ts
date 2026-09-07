@@ -1092,6 +1092,55 @@ export async function getQuestionByCheckToken(token: string): Promise<SubmittedQ
   return result ? hydrateQuestion(db, mapQuestion(result)) : null;
 }
 
+/**
+ * Update the structured incident after a resident answers a follow-up question.
+ * The check token is the same bearer secret used by the private status page, so
+ * the resident can add a location or other missing field without logging in.
+ */
+export async function updateQuestionFromPublicToken(token: string, body: string, intake: ShelterIntake): Promise<SubmittedQuestion | null> {
+  if (!/^[0-9a-f-]{32,80}$/i.test(token) || !body.trim() || body.trim().length > 500) return null;
+  const current = await getQuestionByCheckToken(token);
+  if (!current) return null;
+  const db = await initialise();
+  const analysis = generateShelterAnalysis(body, intake);
+  const faqs = await readPublishedFaqs(db, null);
+  const related = searchFaqs(`${analysis.title} ${analysis.request} ${analysis.facts.join(' ')}`, faqs.filter((faq) => faq.category === analysis.category), 3);
+  const context = {
+    category: analysis.category,
+    location: analysis.location,
+    peopleCount: analysis.peopleCount,
+    resourceRemaining: analysis.resourceRemaining,
+    lastReceivedAt: analysis.lastReceivedAt,
+    emotion: analysis.emotion,
+    missingInformation: analysis.missingInformation,
+    urgentReview: analysis.urgentReview,
+  };
+  const draft = generateShelterReplyDraft(context, body, related);
+  const now = Date.now();
+  await db.prepare(`UPDATE questions SET body = ?, body_original = ?, ai_summary = ?, summary_edited = 0, category = ?, title = ?,
+    location = ?, issue_location = ?, people_count = ?, resource_remaining = ?, last_received_at = ?, fact_summary = ?, emotion_summary = ?,
+    missing_information = ?, urgency_candidate = ?, urgent_review = ?, request_text = ?, affected_people = ?, vulnerable_people = ?,
+    emotional_intensity = ?, contains_abusive_language = ?, urgency_confidence = ?, display_body = ?,
+    answer_draft = CASE WHEN status = 'open' AND answer_body IS NULL THEN ? ELSE answer_draft END
+    WHERE id = ? AND portal_id IS NULL`).bind(
+    body.trim(), body.trim(), analysis.overview, analysis.category, analysis.title, analysis.location, analysis.issueLocation,
+    analysis.peopleCount, analysis.resourceRemaining, analysis.lastReceivedAt, JSON.stringify(analysis.facts), analysis.emotion,
+    JSON.stringify(analysis.missingInformation), analysis.urgencyCandidate, analysis.urgentReview ? 1 : 0, analysis.request,
+    analysis.affectedPeople, JSON.stringify(analysis.vulnerablePeople), analysis.emotionalIntensity, analysis.containsAbusiveLanguage ? 1 : 0,
+    analysis.urgencyConfidence, redactSensitiveInformation(body), draft, current.id,
+  ).run();
+  if (current.issueId) {
+    await db.prepare(`UPDATE issues SET title = ?, summary = ?, request = ?, category = ?, location = ?, issue_location = ?,
+      affected_people = ?, vulnerable_people = ?, urgency_candidate = ?, updated_at = ?, version = version + 1 WHERE id = ? AND portal_id IS NULL`)
+      .bind(analysis.title, analysis.overview, analysis.request, analysis.issueCategory, analysis.location, analysis.issueLocation,
+        analysis.affectedPeople, JSON.stringify(analysis.vulnerablePeople), analysis.urgencyLevel, now, current.issueId).run();
+  }
+  await db.prepare('INSERT INTO case_updates (question_id, status, message, is_public, actor_user_id, created_at) VALUES (?, ?, ?, 1, NULL, ?)')
+    .bind(current.id, current.workflowStatus, '相談内容に追加情報がありました。', now).run();
+  await recordQuestionEvent(current.id, 'public_intake_updated', null, '追加情報を構造化');
+  return getQuestionByCheckToken(token);
+}
+
 const ISSUE_SELECT = `SELECT id, portal_id, title, summary, request, category, location, issue_location, reporter_location, urgency_candidate, urgency_confirmed, status,
   report_count, affected_people, vulnerable_people, first_reported_at, last_reported_at, assigned_team, assigned_user,
   response_message, estimated_resolution_time, internal_note, resolved_at, created_at, updated_at, version, grouping_confidence, grouping_mode
