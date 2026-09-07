@@ -398,6 +398,7 @@ async function initialiseDatabase(db: D1Database): Promise<D1Database> {
     ]);
   }
   await ensureIsekiShelterFaqs(db);
+  await refreshShelterAiData(db);
   await safeRun(db, 'CREATE UNIQUE INDEX IF NOT EXISTS questions_submission_key_unique ON questions (submission_key_hash) WHERE submission_key_hash IS NOT NULL');
   return db;
 }
@@ -411,6 +412,84 @@ async function ensureIsekiShelterFaqs(db: D1Database): Promise<void> {
     ...ISEKI_FAQS.slice(6).map((faq) => db.prepare("INSERT OR IGNORE INTO faqs (question, answer, category, status, created_at, updated_at) VALUES (?, ?, ?, 'published', ?, ?)").bind(faq.question, faq.answer, faq.category, now, now)),
     db.prepare("INSERT OR REPLACE INTO schema_meta (key, value) VALUES ('iseki_shelter_faq_v1', 'ready')"),
   ]);
+}
+
+/**
+ * The first shelter sample rows were created before the structured summarizer
+ * was introduced. Refresh derived fields once so existing production rows do
+ * not keep showing the old near-verbatim summaries or cross-category drafts.
+ * Original text and any human-edited summary are preserved.
+ */
+async function refreshShelterAiData(db: D1Database): Promise<void> {
+  const marker = await db.prepare("SELECT value FROM schema_meta WHERE key = 'shelter_ai_refresh_v2' LIMIT 1").first<{ value: string }>();
+  if (marker?.value === 'ready') return;
+
+  const faqs = await readPublishedFaqs(db, null);
+   const result = await db.prepare(`SELECT id, body, body_original, ai_summary, summary_edited, category, location, people_count,
+    resource_remaining, last_received_at, issue_id, status, answer_body, created_at
+     FROM questions WHERE portal_id IS NULL ORDER BY created_at ASC, id ASC LIMIT 2000`).all<Record<string, unknown>>();
+  const questionRows = result.results ?? [];
+  const issueSeeds = new Map<number, ReturnType<typeof generateShelterAnalysis>>();
+  const statements: D1PreparedStatement[] = [];
+
+  for (const row of questionRows) {
+    const body = String(row.body_original ?? row.body ?? '');
+    if (!body.trim()) continue;
+    const analysis = generateShelterAnalysis(body, {
+      issueLocation: String(row.location ?? ''),
+      peopleCount: String(row.people_count ?? ''),
+      resourceRemaining: String(row.resource_remaining ?? ''),
+      lastReceivedAt: String(row.last_received_at ?? ''),
+    });
+    const categoryFaqs = faqs.filter((faq) => faq.category === analysis.category);
+     const rankedFaqs = searchFaqs(`${analysis.title} ${analysis.request} ${analysis.facts.join(' ')}`, categoryFaqs, 3);
+    const shelterRelated = rankedFaqs.length ? rankedFaqs : categoryFaqs.slice(0, 3);
+    const context = {
+      category: analysis.category,
+      location: analysis.location,
+      peopleCount: analysis.peopleCount,
+      resourceRemaining: analysis.resourceRemaining,
+      lastReceivedAt: analysis.lastReceivedAt,
+      emotion: analysis.emotion,
+      missingInformation: analysis.missingInformation,
+      urgentReview: analysis.urgentReview,
+    };
+    const draft = generateShelterReplyDraft(context, body, shelterRelated);
+    const alternatives = generateShelterAlternativeDrafts(context, body, shelterRelated);
+    const summaryEdited = Number(row.summary_edited ?? 0) === 1;
+    const aiSummary = summaryEdited ? String(row.ai_summary ?? analysis.overview) : analysis.overview;
+    const questionId = Number(row.id);
+    const issueId = row.issue_id == null ? null : Number(row.issue_id);
+    if (issueId != null && !issueSeeds.has(issueId)) issueSeeds.set(issueId, analysis);
+     statements.push(db.prepare(`UPDATE questions SET ai_summary = ?, category = ?, title = ?, location = ?, issue_location = ?,
+      people_count = ?, resource_remaining = ?, last_received_at = ?, fact_summary = ?, emotion_summary = ?,
+      missing_information = ?, urgency_candidate = ?, urgent_review = ?, request_text = ?, affected_people = ?,
+      vulnerable_people = ?, emotional_intensity = ?, contains_abusive_language = ?, urgency_confidence = ?,
+      display_body = ?, answer_draft = CASE WHEN status = 'open' AND answer_body IS NULL THEN ? ELSE answer_draft END,
+      answer_alternatives = CASE WHEN status = 'open' AND answer_body IS NULL THEN ? ELSE answer_alternatives END,
+      answer_grounds = CASE WHEN status = 'open' AND answer_body IS NULL THEN ? ELSE answer_grounds END
+       WHERE id = ? AND portal_id IS NULL`).bind(
+      aiSummary, analysis.category, analysis.title, analysis.location, analysis.issueLocation,
+      analysis.peopleCount, analysis.resourceRemaining, analysis.lastReceivedAt, JSON.stringify(analysis.facts),
+      analysis.emotion, JSON.stringify(analysis.missingInformation), analysis.urgencyCandidate, analysis.urgentReview ? 1 : 0,
+      analysis.request, analysis.affectedPeople, JSON.stringify(analysis.vulnerablePeople), analysis.emotionalIntensity,
+      analysis.containsAbusiveLanguage ? 1 : 0, analysis.urgencyConfidence, redactSensitiveInformation(body), draft,
+      JSON.stringify(alternatives), JSON.stringify(shelterRelated.map((faq) => faq.question)), questionId,
+    ));
+  }
+
+  for (const [issueId, analysis] of issueSeeds) {
+     statements.push(db.prepare(`UPDATE issues SET title = ?, summary = ?, request = ?, category = ?, location = ?,
+      issue_location = ?, affected_people = ?, vulnerable_people = ?, urgency_candidate = ?
+       WHERE id = ? AND portal_id IS NULL`).bind(
+      analysis.title, analysis.overview, analysis.request, analysis.category, analysis.location,
+      analysis.issueLocation, analysis.affectedPeople, JSON.stringify(analysis.vulnerablePeople),
+      analysis.urgencyLevel, issueId,
+    ));
+  }
+
+  if (statements.length) await db.batch(statements);
+  await db.prepare("INSERT OR REPLACE INTO schema_meta (key, value) VALUES ('shelter_ai_refresh_v2', 'ready')").run();
 }
 
 /**
@@ -663,15 +742,42 @@ export async function createQuestion(body: string, requestedSummary = '', reques
   const issueLocation = analysis.issueLocation || resolveShelterZoneId(analysis.location) || analysis.location;
   const reporterLocation = intake.reporterLocation?.trim().slice(0, 120) ?? '';
   const related = await listRelatedFaqs(aiSummary || body, 3, portalId, analysis.category);
-  const draft = generateLocalDraft(aiSummary, body, related);
-  const alternatives = generateAlternativeDrafts(aiSummary, body, related);
+  // 避難所案件では同カテゴリの承認済みFAQだけを回答案の根拠にする。
+  // 以前は検索結果全体を連結していたため、例えばペット相談に
+  // 医療FAQが混ざり、職員にも住民にも不適切な下書きが生成されていた。
+  const shelterRelated = shelterAnalysis ? related.filter((faq) => faq.category === analysis.category) : [];
+  const draft = shelterAnalysis
+    ? generateShelterReplyDraft({
+        category: analysis.category,
+        location: analysis.location,
+        peopleCount: analysis.peopleCount,
+        resourceRemaining: analysis.resourceRemaining,
+        lastReceivedAt: analysis.lastReceivedAt,
+        emotion: analysis.emotion,
+        missingInformation: analysis.missingInformation,
+        urgentReview: analysis.urgentReview,
+      }, body, shelterRelated)
+    : generateLocalDraft(aiSummary, body, related);
+  const alternatives = shelterAnalysis
+    ? generateShelterAlternativeDrafts({
+        category: analysis.category,
+        location: analysis.location,
+        peopleCount: analysis.peopleCount,
+        resourceRemaining: analysis.resourceRemaining,
+        lastReceivedAt: analysis.lastReceivedAt,
+        emotion: analysis.emotion,
+        missingInformation: analysis.missingInformation,
+        urgentReview: analysis.urgentReview,
+      }, body, shelterRelated)
+    : generateAlternativeDrafts(aiSummary, body, related);
+  const answerGrounds = shelterAnalysis ? shelterRelated.map((faq) => faq.question) : related.map((faq) => faq.question);
   const checkToken = crypto.randomUUID() + crypto.randomUUID();
   // Keep the question/FAQ data indefinitely, but limit the bearer URL used to
   // check a private question to 30 days.  Legacy rows without an expiry remain
   // readable so existing users are not broken during migration.
   const checkTokenExpiresAt = createdAt + 30 * 24 * 60 * 60 * 1000;
   const displayBody = redactSensitiveInformation(body);
-  const result = await db.prepare("INSERT INTO questions (body, body_original, ai_summary, summary_edited, category, status, workflow_status, title, location, people_count, resource_remaining, last_received_at, fact_summary, emotion_summary, missing_information, urgency_candidate, urgent_review, request_text, affected_people, vulnerable_people, emotional_intensity, contains_abusive_language, urgency_confidence, grouping_confidence, display_body, contact_type, answer_draft, answer_alternatives, answer_grounds, portal_id, check_token_hash, check_token_expires_at, submission_key_hash, created_at) VALUES (?, ?, ?, ?, ?, 'open', 'received', ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'anonymous', ?, ?, ?, ?, ?, ?, ?, ?)").bind(body, body, aiSummary, aiSummary !== canonicalSummary ? 1 : 0, category, analysis.title, analysis.location, analysis.peopleCount, analysis.resourceRemaining, analysis.lastReceivedAt, JSON.stringify(analysis.facts), analysis.emotion, JSON.stringify(analysis.missingInformation), analysis.urgencyCandidate, analysis.urgentReview ? 1 : 0, analysis.request, analysis.affectedPeople, JSON.stringify(analysis.vulnerablePeople), analysis.emotionalIntensity, analysis.containsAbusiveLanguage ? 1 : 0, analysis.urgencyConfidence, 1, displayBody, draft, JSON.stringify(alternatives), JSON.stringify(related.map((faq) => faq.question)), portalId, await hashCheckToken(checkToken), checkTokenExpiresAt, submissionKeyHash, createdAt).run();
+  const result = await db.prepare("INSERT INTO questions (body, body_original, ai_summary, summary_edited, category, status, workflow_status, title, location, people_count, resource_remaining, last_received_at, fact_summary, emotion_summary, missing_information, urgency_candidate, urgent_review, request_text, affected_people, vulnerable_people, emotional_intensity, contains_abusive_language, urgency_confidence, grouping_confidence, display_body, contact_type, answer_draft, answer_alternatives, answer_grounds, portal_id, check_token_hash, check_token_expires_at, submission_key_hash, created_at) VALUES (?, ?, ?, ?, ?, 'open', 'received', ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'anonymous', ?, ?, ?, ?, ?, ?, ?, ?)").bind(body, body, aiSummary, aiSummary !== canonicalSummary ? 1 : 0, category, analysis.title, analysis.location, analysis.peopleCount, analysis.resourceRemaining, analysis.lastReceivedAt, JSON.stringify(analysis.facts), analysis.emotion, JSON.stringify(analysis.missingInformation), analysis.urgencyCandidate, analysis.urgentReview ? 1 : 0, analysis.request, analysis.affectedPeople, JSON.stringify(analysis.vulnerablePeople), analysis.emotionalIntensity, analysis.containsAbusiveLanguage ? 1 : 0, analysis.urgencyConfidence, 1, displayBody, draft, JSON.stringify(alternatives), JSON.stringify(answerGrounds), portalId, await hashCheckToken(checkToken), checkTokenExpiresAt, submissionKeyHash, createdAt).run();
   const id = Number(result.meta.last_row_id);
   await db.prepare('UPDATE questions SET issue_location = ?, reporter_location = ? WHERE id = ?').bind(issueLocation, reporterLocation, id).run();
   await db.prepare("INSERT INTO case_updates (question_id, status, message, is_public, actor_user_id, created_at) VALUES (?, 'received', ?, 1, NULL, ?)").bind(id, '相談を受け付けました。避難所スタッフが内容を確認します。', createdAt).run();
@@ -681,7 +787,7 @@ export async function createQuestion(body: string, requestedSummary = '', reques
   return {
     id, body, bodyOriginal: body, aiSummary, summaryEdited: aiSummary !== canonicalSummary,
     category, status: 'open', createdAt, answerBody: null, answerDraft: draft, answerAlternatives: alternatives, answerUsedAi: false,
-    answerGrounds: related.map((faq) => faq.question), answeredAt: null, portalId, workflowStatus: 'received', title: analysis.title,
+    answerGrounds, answeredAt: null, portalId, workflowStatus: 'received', title: analysis.title,
     location: analysis.location, issueLocation, reporterLocation, peopleCount: analysis.peopleCount, resourceRemaining: analysis.resourceRemaining, lastReceivedAt: analysis.lastReceivedAt,
     factSummary: analysis.facts, emotionSummary: analysis.emotion, missingInformation: analysis.missingInformation, urgencyCandidate: analysis.urgencyCandidate,
     urgencyConfirmed: null, urgentReview: analysis.urgentReview, faqResolved: null, similarGroupId: null, similarGroupTitle: '', similarCount: 0,

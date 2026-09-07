@@ -94,14 +94,14 @@ export function categorizeShelterQuestion(value: string, requested = ''): Shelte
 }
 
 function emotionLabel(value: string): string {
-  if (/(怒|何回|いい加減|ふざけ|困る|最悪|いつまで)/.test(value)) return '強い不満・焦り';
+  if (/(怒|何回|何度|いい加減|ふざけ|困る|最悪|いつまで|限界|見捨て)/.test(value)) return '強い不満・焦り';
   if (/(怖|恐|不安|心配|どうしよう|泣)/.test(value)) return '不安・心配';
   if (/(助けて|苦しい|痛い|つらい)/.test(value)) return '切迫感・つらさ';
   return '不安や困りごとがある';
 }
 
 function emotionalIntensity(value: string): 'low' | 'medium' | 'high' {
-  if (/(死ね|消えろ|ふざけんな|ふざけるな|何回言|いい加減|最悪|怒鳴|許さ|どうなってる)/.test(value)) return 'high';
+  if (/(死ね|消えろ|ふざけんな|ふざけるな|何回言|何度言|いい加減|最悪|怒鳴|許さ|どうなってる|限界|見捨て)/.test(value)) return 'high';
   if (/(怒|焦|不安|心配|怖|恐|困る|助けて|苦しい|つらい|泣)/.test(value)) return 'medium';
   return 'low';
 }
@@ -111,9 +111,12 @@ function containsAbusiveLanguage(value: string): boolean {
 }
 
 function extractLocation(value: string, intakeLocation: string): string {
+  // 入力補助で確定した場所は、本文中の「受付へ伝えた」などの
+  // 別の地名・動詞より優先する。既知情報を再推定して上書きしない。
+  if (intakeLocation.trim()) return intakeLocation.trim().slice(0, 120);
   const match = value.match(/(体育館(?:北側|南側)?|北トイレ|南トイレ|受付(?:付近)?|救護スペース|駐車場|屋外)/);
   if (match?.[1]) return match[1];
-  return intakeLocation.trim().slice(0, 120);
+  return '';
 }
 
 function extractAffectedPeople(value: string, intakePeople: string): string {
@@ -208,6 +211,63 @@ function shelterCategorySubject(category: string): string {
   return '避難所の案内・対応';
 }
 
+/**
+ * 避難所案件の見出しは、原文の一部を切り取るのではなく、
+ * 「何が起きているか」を短い業務用ラベルへ正規化する。
+ * 職員が最初に見る場所へ感情的な原文を流し込まないための境界。
+ */
+function shelterIssueSubject(category: ShelterCategory, value: string): string {
+  if (category === '水・飲料') return /(配布|給水|どこ|いつ|受け取)/.test(value) && !/(足り|不足|ない|切れ|一滴も)/.test(value) ? '給水・配布案内' : '飲料水不足';
+  if (category === '食料・物資') {
+    if (/毛布/.test(value)) return '毛布の追加配布';
+    if (/(いつ|時間|配布|受け取|どこ)/.test(value) && !/(足り|不足|ない|切れ)/.test(value)) return '食事配布の案内';
+    if (/(おむつ|ミルク)/.test(value)) return '育児用品の不足';
+    return '食料・物資不足';
+  }
+  if (category === '医療・薬') {
+    if (/(薬|糖尿病|インスリン|持病)/.test(value)) return '薬の不足・医療支援';
+    if (/(熱|痛|苦し|体調|けが|怪我)/.test(value)) return '体調不良・医療支援';
+    return '救護案内';
+  }
+  if (category === 'トイレ・衛生') {
+    if (/(入浴|着替え)/.test(value)) return '入浴・着替え案内';
+    if (/(汚|詰|壊|使え|使えません)/.test(value)) return 'トイレの使用・衛生';
+    return 'トイレ・衛生案内';
+  }
+  if (category === '設備・充電') {
+    if (/(充電|電源|コンセント)/.test(value)) return '充電場所・利用状況';
+    if (/(寒|暑|空調|照明)/.test(value)) return '避難所設備の不具合';
+    return '設備利用の案内';
+  }
+  if (category === 'ペット') return 'ペットの受け入れ・ルール';
+  if (category === '安全・その他') {
+    if (/(怒鳴|騒|眠れ|怖|不審|暴力|危険)/.test(value)) return '夜間の安全・騒音';
+    if (/(掲示|お知らせ|更新|情報)/.test(value)) return '最新情報の案内';
+    return '安全確認';
+  }
+  return '避難所の案内・対応';
+}
+
+function shelterRequestLabel(category: ShelterCategory, value: string): string {
+  if (category === '食料・物資' && /(いつ|時間|配布|受け取|どこ)/.test(value) && !/(足り|不足|ない|切れ)/.test(value)) return '食事配布時間・場所の案内';
+  if (category === '食料・物資' && /毛布/.test(value)) return '毛布の追加配布・在庫確認';
+  if (category === 'トイレ・衛生' && /(入浴|着替え)/.test(value)) return '入浴・着替えの場所と時間の案内';
+  if (category === '設備・充電' && /(充電|電源|コンセント)/.test(value)) return '充電場所と利用時間の案内';
+  if (category === '安全・その他' && /(怒鳴|騒|眠れ|怖|不審|暴力|危険)/.test(value)) return '夜間の安全確認と環境改善';
+  if (category === '安全・その他' && /(掲示|お知らせ|更新|情報)/.test(value)) return '最新のお知らせと更新時刻の案内';
+  return requestLabel(category, value);
+}
+
+function structuredShelterOverview(title: string, request: string, peopleCount: string, resourceRemaining: string, lastReceivedAt: string, vulnerable: string[]): string {
+  const details = [
+    peopleCount ? `対象：${peopleCount}` : '',
+    resourceRemaining ? `状況：${resourceRemaining}` : '',
+    lastReceivedAt ? `時期：${lastReceivedAt}` : '',
+    vulnerable.filter((item) => item !== '不明').length ? `要配慮者：${vulnerable.filter((item) => item !== '不明').join('・')}` : '',
+  ].filter(Boolean);
+  return `${title}${details.length ? `（${details.join('／')}）` : ''}。${request}。`;
+}
+
 function shelterDetail(value: string, location: string): string {
   const lines = value.split(/\r?\n/).map((line) => line.trim()).filter(Boolean);
   const inlineExplicit = value.match(/困っていること\s*[:：]\s*(.*?)(?=\s+(?:場所|対象人数|人数|補足|残量・不足状況|最後に受け取った時刻)\s*[:：]|$)/);
@@ -241,7 +301,8 @@ export function isGenericShelterIssueTitle(title: string): boolean {
 }
 
 function shelterTitle(category: ShelterCategory, location: string, value: string, fallback = ''): string {
-  return buildShelterIssueTitle(category, location, value, fallback);
+  const subject = shelterIssueSubject(category, value);
+  return `${location ? `${location}の` : ''}${subject}`.slice(0, 72);
 }
 
 export function generateShelterAnalysis(value: string, intake: ShelterIntake = {}): ShelterAnalysis {
@@ -275,17 +336,18 @@ export function generateShelterAnalysis(value: string, intake: ShelterIntake = {
   if (!lastReceivedAt && /(水|食料|物資|薬|毛布|届|来ない|配布|足り|不足)/.test(text)) missingInformation.push('最後に受け取った時刻');
   const urgentReview = URGENT_PATTERNS.test(text);
   const urgencyCandidate: '高' | '中' | '低' = urgentReview ? '高' : HIGH_URGENCY_PATTERNS.test(text) ? '中' : '低';
-  const request = requestLabel(category, text);
+  const request = shelterRequestLabel(category, text);
   const emotion = emotionLabel(text);
   const title = shelterTitle(category, location, text, request);
-  const overview = `${title}。${request}が必要な状況です。`;
+  const vulnerable = vulnerablePeople(text);
+  const overview = structuredShelterOverview(title, request, peopleCount, resourceRemaining, lastReceivedAt, vulnerable);
   const confidence = urgentReview ? 0.78 : HIGH_URGENCY_PATTERNS.test(text) ? 0.66 : 0.54;
   return {
-    title, overview, request, facts, emotion, emotionalIntensity: emotionalIntensity(text),
+    title, overview, request, facts: [`困りごと：${shelterIssueSubject(category, text)}`, ...facts], emotion, emotionalIntensity: emotionalIntensity(text),
     containsAbusiveLanguage: containsAbusiveLanguage(text), missingInformation, urgencyCandidate,
     urgencyLevel: urgencyLevel(urgentReview, urgencyCandidate), urgencyConfidence: confidence,
     urgentReview, category, issueCategory, location, issueLocation, peopleCount, affectedPeople: peopleCount,
-    vulnerablePeople: vulnerablePeople(text), resourceRemaining, lastReceivedAt,
+    vulnerablePeople: vulnerable, resourceRemaining, lastReceivedAt,
   };
 }
 

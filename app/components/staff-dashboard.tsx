@@ -249,7 +249,6 @@ function QuickPriorityControls({ issue, busy, onNext }: { issue: Issue; busy: bo
   const [status, setStatus] = useState(issue.status);
   const [saving, setSaving] = useState(false);
   const [feedback, setFeedback] = useState('');
-  useEffect(() => { setPriority(issue.urgencyConfirmed ?? ''); setStatus(issue.status); setFeedback(''); }, [issue.id, issue.urgencyConfirmed, issue.status]);
   const changed = priority !== (issue.urgencyConfirmed ?? '') || status !== issue.status;
   async function save() {
     if (!changed || saving || busy) return;
