@@ -23,14 +23,14 @@ const HOME_NOTICES: HomeNotice[] = [
 export function ShelterHomeBoard() {
   return <section className="shelter-home-board" aria-labelledby="shelter-home-board-title">
     <div className="shelter-home-board-heading">
-      <div><p className="eyebrow">いま確認できる案内</p><h2 id="shelter-home-board-title">避難所のいま</h2><p>食事・水・トイレなど、よく使う場所の情報をまとめています。</p></div>
-      <span className="shelter-home-board-note" aria-label="案内について">必要な情報を<br />すぐに確認できます</span>
+      <div><p className="eyebrow">参考案内</p><h2 id="shelter-home-board-title">避難所でよく確認する情報</h2><p>食事・水・トイレなど、よく使う場所の情報をまとめています。</p></div>
+      <span className="shelter-home-board-note" aria-label="案内について">実際の状況は<br />現地の掲示を優先</span>
     </div>
     <div className="shelter-home-notice-grid">{HOME_NOTICES.map((notice) => <article className={`shelter-home-notice tone-${notice.tone}`} key={notice.id}>
       <div className="shelter-home-notice-title"><span className={`shelter-home-art art-${notice.art}`} aria-hidden="true" /><h3>{notice.title}</h3></div>
       <dl>{notice.rows.map(([label, value]) => <div key={`${notice.id}-${label}`}><dt>{label}</dt><dd>{value}</dd></div>)}</dl>
       <p className="shelter-home-status">{notice.status}</p>
     </article>)}</div>
-    <p className="shelter-home-board-footnote">※ 表示はデモ用の避難所案内です。実際の状況は、現地の掲示や職員の案内もご確認ください。</p>
+    <p className="shelter-home-board-footnote">※ ここに表示される案内は参考情報です。配布時間・場所・在庫などは、現地の掲示や職員の案内を優先してください。</p>
   </section>;
 }
