@@ -812,7 +812,7 @@ export async function getShelterDashboardStats(): Promise<ShelterDashboardStats>
   const [countsResult, categoryResult, urgentResult, surgeResult, reportMetric, issueMetric, groupedMetric, originalQuestionMetric, originalIssueMetric, responseMetric, faqResolvedMetric, staffHandledMetric, originalNotOpenedMetric, timingMetric, resolvedTodayMetric] = await Promise.all([
     db.prepare("SELECT status, COUNT(*) AS count FROM issues WHERE portal_id IS NULL GROUP BY status").all<Record<string, unknown>>(),
     db.prepare("SELECT category, SUM(report_count) AS count FROM issues WHERE portal_id IS NULL GROUP BY category ORDER BY count DESC").all<Record<string, unknown>>(),
-    db.prepare(`${ISSUE_SELECT} WHERE portal_id IS NULL AND urgency_candidate IN ('critical','high') AND status NOT IN ('resolved','cannot_resolve') ORDER BY CASE urgency_candidate WHEN 'critical' THEN 2 ELSE 1 END DESC, report_count DESC, last_reported_at ASC LIMIT 8`).all<Record<string, unknown>>(),
+    db.prepare(`${ISSUE_SELECT} WHERE portal_id IS NULL AND COALESCE(NULLIF(urgency_confirmed, ''), urgency_candidate) IN ('critical','high') AND status NOT IN ('resolved','cannot_resolve') ORDER BY CASE COALESCE(NULLIF(urgency_confirmed, ''), urgency_candidate) WHEN 'critical' THEN 2 ELSE 1 END DESC, report_count DESC, last_reported_at DESC LIMIT 8`).all<Record<string, unknown>>(),
     db.prepare("SELECT category, SUM(report_count) AS count FROM issues WHERE portal_id IS NULL AND last_reported_at > ? GROUP BY category ORDER BY count DESC LIMIT 1").bind(Date.now() - 30 * 60 * 1000).first<Record<string, unknown>>(),
     db.prepare("SELECT COUNT(*) AS count FROM questions WHERE portal_id IS NULL").first<Record<string, unknown>>(),
     db.prepare("SELECT COUNT(*) AS count FROM issues WHERE portal_id IS NULL").first<Record<string, unknown>>(),
@@ -986,7 +986,7 @@ const ISSUE_SELECT = `SELECT id, portal_id, title, summary, request, category, l
   FROM issues`;
 
 function mapIssue(row: Record<string, unknown>): Issue {
-  const urgency = String(row.urgency_candidate ?? 'normal');
+  const urgency = String(row.urgency_confirmed ?? row.urgency_candidate ?? 'normal');
   const confirmed = row.urgency_confirmed == null ? null : String(row.urgency_confirmed) as UrgencyLevel;
   const vulnerable = parseStringList(row.vulnerable_people == null ? null : String(row.vulnerable_people));
   const issueLocation = String(row.issue_location ?? (resolveShelterZoneId(String(row.location ?? '')) || row.location || ''));
@@ -1042,11 +1042,11 @@ export async function listIssuesForAdministratorPage(portalId: number | null = n
   const db = await initialise();
   const safePage = Math.max(1, Math.trunc(page) || 1); const safePageSize = Math.min(Math.max(Math.trunc(pageSize) || 100, 1), 100); const offset = (safePage - 1) * safePageSize;
   const scope = portalId === null ? 'portal_id IS NULL' : 'portal_id = ?';
-  const priority = "CASE urgency_candidate WHEN 'critical' THEN 4 WHEN 'high' THEN 3 WHEN 'normal' THEN 2 ELSE 1 END";
+  const priority = "CASE COALESCE(NULLIF(urgency_confirmed, ''), urgency_candidate) WHEN 'critical' THEN 4 WHEN 'high' THEN 3 WHEN 'normal' THEN 2 ELSE 1 END";
   const term = search.trim().slice(0, 80);
   const searchClause = term ? " AND (title LIKE ? OR summary LIKE ? OR request LIKE ? OR location LIKE ? OR category LIKE ? OR assigned_team LIKE ? OR assigned_user LIKE ?)" : '';
   const searchValues = term ? Array.from({ length: 7 }, () => `%${term}%`) : [];
-  const statement = db.prepare(`${ISSUE_SELECT} WHERE ${scope}${searchClause} ORDER BY CASE WHEN status IN ('resolved','cannot_resolve') THEN 1 ELSE 0 END ASC, ${priority} DESC, report_count DESC, last_reported_at ASC LIMIT ? OFFSET ?`);
+  const statement = db.prepare(`${ISSUE_SELECT} WHERE ${scope}${searchClause} ORDER BY CASE WHEN status IN ('resolved','cannot_resolve') THEN 1 ELSE 0 END ASC, ${priority} DESC, report_count DESC, last_reported_at DESC LIMIT ? OFFSET ?`);
   const values = portalId === null ? [...searchValues, safePageSize + 1, offset] : [portalId, ...searchValues, safePageSize + 1, offset];
   const result = await statement.bind(...values).all<Record<string, unknown>>();
   const rows = result.results ?? []; const hasMore = rows.length > safePageSize;
@@ -1128,11 +1128,13 @@ export async function ensureStaffUser(externalId: string, displayName: string, r
 export async function updateIssueWorkflow(issueId: number, status: string, message: string, isPublic: boolean, assignedTeam: string, assignedUser: string, urgencyConfirmed: string, internalNote: string, expectedVersion: number | null, actorUserId: string, actorDisplayName = '避難所統括-田中'): Promise<Issue> {
   const allowed = new Set(['new', 'reviewing', 'assigned', 'field_checking', 'in_progress', 'waiting', 'resolved', 'cannot_resolve']);
   if (!allowed.has(status)) throw new Error('ISSUE_STATUS_INVALID');
+  const normalizedUrgency = urgencyConfirmed.trim().slice(0, 16);
+  if (normalizedUrgency && !['critical', 'high', 'normal', 'low'].includes(normalizedUrgency)) throw new Error('ISSUE_URGENCY_INVALID');
   const db = await initialise(); const issue = await getIssueForAdministrator(issueId, null); if (!issue) throw new Error('ISSUE_NOT_FOUND');
   if (expectedVersion != null && issue.version !== expectedVersion) throw new Error('ISSUE_CONFLICT');
   await ensureStaffUser(actorUserId, actorDisplayName);
   const now = Date.now(); const resolvedAt = status === 'resolved' || status === 'cannot_resolve' ? (issue.resolvedAt ?? now) : null;
-  const binds = [status, assignedTeam.trim().slice(0, 120), assignedUser.trim().slice(0, 120), urgencyConfirmed.trim().slice(0, 16) || null, internalNote.trim().slice(0, 2000), resolvedAt, now, issueId];
+  const binds = [status, assignedTeam.trim().slice(0, 120), assignedUser.trim().slice(0, 120), normalizedUrgency || null, internalNote.trim().slice(0, 2000), resolvedAt, now, issueId];
   const result = expectedVersion == null
     ? await db.prepare(`UPDATE issues SET status = ?, assigned_team = ?, assigned_user = ?, urgency_confirmed = ?, internal_note = ?, resolved_at = ?, updated_at = ?, version = version + 1 WHERE id = ? AND portal_id IS NULL`).bind(...binds).run()
     : await db.prepare(`UPDATE issues SET status = ?, assigned_team = ?, assigned_user = ?, urgency_confirmed = ?, internal_note = ?, resolved_at = ?, updated_at = ?, version = version + 1 WHERE id = ? AND portal_id IS NULL AND version = ?`).bind(...binds, expectedVersion).run();
@@ -1148,7 +1150,7 @@ export async function updateIssueWorkflow(issueId: number, status: string, messa
     const reportIds = await db.prepare('SELECT question_id FROM issue_reports WHERE issue_id = ?').bind(issueId).all<{ question_id: number }>();
     await db.batch((reportIds.results ?? []).map((row) => db.prepare('INSERT INTO case_updates (question_id, status, message, is_public, actor_user_id, created_at) VALUES (?, ?, ?, ?, ?, ?)').bind(Number(row.question_id), mappedStatus, residentMessage, publicMessage ? publicFlag : 1, actor, now)));
   }
-  await db.prepare('UPDATE questions SET workflow_status = ?, assignee_name = ?, urgency_confirmed = ?, internal_note = ?, first_confirmed_at = COALESCE(first_confirmed_at, ?) WHERE issue_id = ?').bind(mappedStatus, assignedUser.trim().slice(0, 120), urgencyConfirmed.trim().slice(0, 8) || null, internalNote.trim().slice(0, 2000), status === 'new' ? null : now, issueId).run();
+  await db.prepare('UPDATE questions SET workflow_status = ?, assignee_name = ?, urgency_confirmed = ?, internal_note = ?, first_confirmed_at = COALESCE(first_confirmed_at, ?) WHERE issue_id = ?').bind(mappedStatus, assignedUser.trim().slice(0, 120), normalizedUrgency || null, internalNote.trim().slice(0, 2000), status === 'new' ? null : now, issueId).run();
   if (status === 'resolved' || status === 'cannot_resolve') await db.prepare('UPDATE questions SET resolved_at = COALESCE(resolved_at, ?) WHERE issue_id = ?').bind(now, issueId).run();
   await db.prepare('INSERT INTO issue_operation_history (issue_id, report_id, operation, actor_user_id, detail, created_at) VALUES (?, NULL, ?, ?, ?, ?)').bind(issueId, `issue_${status}`, await auditActorId(actorUserId), publicMessage ? `public:${publicFlag}` : 'status only', now).run();
   await writeAuditLog('issue_workflow_updated', actorUserId, null, null, `issue:${issueId} status:${status}`);

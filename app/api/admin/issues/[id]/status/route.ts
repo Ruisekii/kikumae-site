@@ -16,7 +16,7 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
     return Response.json({ issue }, { headers: { 'Cache-Control': 'no-store' } });
   } catch (error) {
     const code = error instanceof Error ? error.message : '';
-    const message = code === 'ISSUE_STATUS_INVALID' ? '状態の指定が正しくありません。' : code === 'ISSUE_CONFLICT' ? '別の職員が先に更新しました。最新状態を読み込みました。' : '課題の状態を更新できませんでした。';
+    const message = code === 'ISSUE_STATUS_INVALID' ? '状態の指定が正しくありません。' : code === 'ISSUE_URGENCY_INVALID' ? '優先度の指定が正しくありません。' : code === 'ISSUE_CONFLICT' ? '別の職員が先に更新しました。最新状態を読み込みました。' : '課題の状態を更新できませんでした。';
     return Response.json({ message }, { status: code === 'ISSUE_CONFLICT' ? 409 : 400 });
   }
 }
