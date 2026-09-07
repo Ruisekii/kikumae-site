@@ -15,7 +15,17 @@ export async function GET(_request: Request, { params }: { params: Promise<{ tok
   const { token } = await params;
   const question = await getQuestionByCheckToken(token);
   if (!question) return Response.json({ message: '確認用URLが正しくありません。' }, { status: 404 });
-  return Response.json({ id: question.id, title: question.title, status: question.status, workflowStatus: question.workflowStatus, answer: question.answerBody, answeredAt: question.answeredAt, updatedAt: question.updates.at(-1)?.createdAt ?? question.createdAt }, { headers: { 'Cache-Control': 'no-store' } });
+  return Response.json({
+    id: question.id,
+    title: question.title,
+    status: question.status,
+    workflowStatus: question.workflowStatus,
+    answer: question.answerBody,
+    answeredAt: question.answeredAt,
+    updatedAt: question.updates.at(-1)?.createdAt ?? question.createdAt,
+    assigneeName: question.assigneeName,
+    firstConfirmedAt: question.firstConfirmedAt,
+  }, { headers: { 'Cache-Control': 'no-store' } });
 }
 
 export async function PATCH(request: Request, { params }: { params: Promise<{ token: string }> }): Promise<Response> {
@@ -38,7 +48,14 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ to
     if (!body || body.length > 500) return Response.json({ message: '追加情報を確認できませんでした。' }, { status: 400 });
     const updated = await updateQuestionFromPublicToken(token, body, intake, structuredIncident);
     if (!updated) return Response.json({ message: '確認用URLが正しくありません。' }, { status: 404 });
-    return Response.json({ id: updated.id, title: updated.title, workflowStatus: updated.workflowStatus, updatedAt: updated.updates.at(-1)?.createdAt ?? updated.createdAt }, { headers: { 'Cache-Control': 'no-store' } });
+    return Response.json({
+      id: updated.id,
+      title: updated.title,
+      workflowStatus: updated.workflowStatus,
+      updatedAt: updated.updates.at(-1)?.createdAt ?? updated.createdAt,
+      assigneeName: updated.assigneeName,
+      firstConfirmedAt: updated.firstConfirmedAt,
+    }, { headers: { 'Cache-Control': 'no-store' } });
   } catch (error) {
     if (error instanceof Error && error.message === 'REQUEST_BODY_TOO_LARGE') return Response.json({ message: '追加情報が長すぎます。' }, { status: 413 });
     console.error('KIKUMAE_PUBLIC_INTAKE_UPDATE_FAILED', error instanceof Error ? error.message : String(error));

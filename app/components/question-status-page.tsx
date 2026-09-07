@@ -9,6 +9,8 @@ export type PublicQuestion = {
   workflowStatus: string;
   urgentReview: boolean;
   similarCount: number;
+  assigneeName: string;
+  firstConfirmedAt: number | null;
   bodyOriginal: string;
   answerBody: string | null;
   updates: Array<{ id: number; status: string; createdAt: number; isPublic: boolean; message: string | null }>;
@@ -55,6 +57,7 @@ export function QuestionStatusView({ question }: { question: PublicQuestion }) {
     <section className="status-card"><p className="eyebrow">{t('statusPage.eyebrow')}</p><div className="status-card-heading"><div><h1>{t('statusPage.title')}</h1><p>{t('statusPage.id')} <strong>#{String(question.id).padStart(4, '0')}</strong></p></div><span className={`status-badge ${question.urgentReview ? 'urgent' : ''}`}>{question.urgentReview ? t('statusPage.urgent') : currentStatusLabel}</span></div>
       <StatusLiveRefresh />
       {question.similarCount > 0 && <p className="group-notice">{t('statusPage.similar', { count: question.similarCount })}</p>}
+      {question.assigneeName && <section className="status-assignee" aria-label={t('statusPage.assigneeAria')}><div className="status-assignee-mark" aria-hidden="true">担当</div><div className="status-assignee-copy"><span>{t('statusPage.assigneeLabel')}</span><strong>{question.assigneeName}</strong>{question.firstConfirmedAt && <time dateTime={new Date(question.firstConfirmedAt).toISOString()}>{t('statusPage.assigneeAt', { time: formatStatusTime(new Date(question.firstConfirmedAt), language, { month: 'numeric', day: 'numeric', hour: 'numeric', minute: '2-digit' }) })}</time>}</div></section>}
       <div className="timeline" aria-label={t('reception.statusAria')}>{stages.map((stage, index) => <div className={`timeline-item ${index <= currentIndex ? 'done' : ''} ${index === currentIndex ? 'current' : ''}`} key={stage.key}><span className="timeline-dot" aria-hidden="true">{index <= currentIndex ? '●' : '○'}</span><div><div className="timeline-heading"><strong>{t(stage.label)}</strong>{stageTimes.has(stage.key) && <time dateTime={new Date(stageTimes.get(stage.key)!).toISOString()}>{formatStatusTime(new Date(stageTimes.get(stage.key)!), language, { month: 'numeric', day: 'numeric', hour: 'numeric', minute: '2-digit' })}</time>}</div><p>{index === currentIndex ? displayPublicMessage(publicUpdates.at(-1)?.message ?? null) || (question.workflowStatus === 'waiting' ? t('statusPage.waiting') : t(stage.description)) : index < currentIndex ? t('statusPage.updated') : t(stage.description)}</p></div></div>)}</div>
       {publicUpdates.length > 0 && <section className="public-updates"><h2>{t('statusPage.updates')}</h2>{publicUpdates.map((update) => <div className="public-update" key={update.id}><time>{formatStatusTime(new Date(update.createdAt), language, { dateStyle: 'medium', timeStyle: 'short' })}</time><p>{displayPublicMessage(update.message)}</p></div>)}</section>}
       {question.answerBody && <section className="answer-history public-answer"><h2>{t('statusPage.answer')}</h2><p>{question.answerBody}</p></section>}

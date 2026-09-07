@@ -378,6 +378,9 @@ button, input, textarea, select { font-size: 1rem; }
 .device-history-cards { display: grid; gap: 12px; margin: 14px 0 12px; padding: 0; list-style: none; }
 .device-history-card { padding: 15px; border: 1px solid #cfe2df; border-radius: 15px; background: #fbfefc; }
 .device-history-card-top, .device-history-card-bottom { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.device-history-assignee { display: flex; flex-wrap: wrap; gap: 5px 12px; margin: -3px 0 11px; color: var(--muted); font-size: .8rem; line-height: 1.4; }
+.device-history-assignee span { color: var(--ink); font-weight: 800; }
+.device-history-assignee time { color: var(--muted); }
 .device-history-category { color: var(--ink); font-weight: 900; }
 .device-history-card-top strong { color: #2f7a5a; font-size: .92rem; white-space: nowrap; }
 .mini-status-track { display: grid; grid-template-columns: repeat(5, 1fr); gap: 3px; margin: 15px 0 13px; }
@@ -484,6 +487,12 @@ button, input, textarea, select { font-size: 1rem; }
 .check-link-actions span { color: var(--muted); font-size: .82rem; }
 .group-notice { margin: 14px 0 0; padding: 10px 12px; border-radius: 10px; background: #edf8fb; color: #326b80; font-weight: 800; }
 .status-live-note { margin: 12px 0 0; color: #4b8798; font-size: .85rem; font-weight: 800; }
+.status-assignee { display: flex; align-items: center; gap: 12px; margin: 20px 0 4px; padding: 14px 16px; border: 1px solid #ddcdb9; border-radius: 14px; background: #fff9ef; }
+.status-assignee-mark { display: grid; width: 48px; height: 48px; flex: none; place-items: center; border: 2px solid #d7a977; border-radius: 50%; background: #fff0d9; color: #8b5c36; font-size: .76rem; font-weight: 900; }
+.status-assignee-copy { display: grid; gap: 2px; min-width: 0; }
+.status-assignee-copy > span { color: #8a7763; font-size: .82rem; font-weight: 800; }
+.status-assignee-copy strong { color: var(--navy); font-size: 1.08rem; overflow-wrap: anywhere; }
+.status-assignee-copy time { color: var(--muted); font-size: .82rem; }
 .merge-candidate { margin-top: 18px; padding: 15px; border: 1px solid #c8dff0; border-left: 5px solid #5d9bc2; border-radius: 12px; background: #f2f8fc; }
 .merge-candidate h3 { margin: 0; color: var(--navy); }
 .merge-candidate p { margin: 6px 0 0; color: var(--muted); line-height: 1.6; }

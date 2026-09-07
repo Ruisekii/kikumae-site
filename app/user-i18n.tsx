@@ -269,6 +269,15 @@ for (const [language, values] of Object.entries(mapTranslations) as Array<[UserL
   i18n.addResourceBundle(language, 'translation', values, true, true);
 }
 
+for (const [language, values] of Object.entries({
+  ja: { 'statusLookup.assignee': '担当：{{name}}', 'statusLookup.assigneeAt': '対応開始：{{time}}', 'statusPage.assigneeAria': '担当スタッフ', 'statusPage.assigneeLabel': '担当スタッフ', 'statusPage.assigneeAt': '{{time}}から対応' },
+  en: { 'statusLookup.assignee': 'Assigned staff: {{name}}', 'statusLookup.assigneeAt': 'Started: {{time}}', 'statusPage.assigneeAria': 'Assigned staff', 'statusPage.assigneeLabel': 'Assigned staff', 'statusPage.assigneeAt': 'Working since {{time}}' },
+  zh: { 'statusLookup.assignee': '负责人员：{{name}}', 'statusLookup.assigneeAt': '开始处理：{{time}}', 'statusPage.assigneeAria': '负责工作人员', 'statusPage.assigneeLabel': '负责人员', 'statusPage.assigneeAt': '从{{time}}开始处理' },
+  ko: { 'statusLookup.assignee': '담당 직원: {{name}}', 'statusLookup.assigneeAt': '대응 시작: {{time}}', 'statusPage.assigneeAria': '담당 직원', 'statusPage.assigneeLabel': '담당 직원', 'statusPage.assigneeAt': '{{time}}부터 대응' },
+}) as Array<[UserLanguage, Record<string, string>]>) {
+  i18n.addResourceBundle(language, 'translation', values, true, true);
+}
+
 // Keep the reviewed Chinese emergency/help wording free of accidental mixed-language fragments.
 i18n.addResourceBundle('zh', 'translation', {
   'reception.faqTitle': '这份说明可能解决问题吗？',

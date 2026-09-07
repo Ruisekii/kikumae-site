@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { clearConsultHistory, loadConsultHistory, type ConsultHistoryEntry } from './consult-history';
 import { translateUserIssueTitle, UserHeader, useUserI18n } from '../user-i18n';
 
-type StatusRecord = { id: number; title: string; workflowStatus: string; updatedAt: number };
+type StatusRecord = { id: number; title: string; workflowStatus: string; updatedAt: number; assigneeName: string; firstConfirmedAt: number | null };
 type HistoryCard = ConsultHistoryEntry & { status?: StatusRecord; loading: boolean; unavailable: boolean };
 
 const stages = [
@@ -42,7 +42,7 @@ async function fetchStatus(entry: ConsultHistoryEntry): Promise<{ status?: Statu
     if (!response.ok) return { unavailable: true };
     const payload = await response.json() as Partial<StatusRecord>;
     if (typeof payload.workflowStatus !== 'string') return { unavailable: true };
-    return { status: { id: typeof payload.id === 'number' ? payload.id : entry.id, title: payload.title || entry.title, workflowStatus: payload.workflowStatus, updatedAt: typeof payload.updatedAt === 'number' ? payload.updatedAt : entry.savedAt }, unavailable: false };
+    return { status: { id: typeof payload.id === 'number' ? payload.id : entry.id, title: payload.title || entry.title, workflowStatus: payload.workflowStatus, updatedAt: typeof payload.updatedAt === 'number' ? payload.updatedAt : entry.savedAt, assigneeName: typeof payload.assigneeName === 'string' ? payload.assigneeName : '', firstConfirmedAt: typeof payload.firstConfirmedAt === 'number' ? payload.firstConfirmedAt : null }, unavailable: false };
   } catch { return { unavailable: true }; }
 }
 
@@ -111,6 +111,7 @@ export function QuestionStatusLookup() {
           return <li className="device-history-card" key={`${entry.id}-${entry.savedAt}`}>
             <div className="device-history-card-top"><span className="device-history-category">{title}</span><strong>{entry.loading ? t('statusLookup.loading') : entry.unavailable ? t('statusLookup.unavailable') : statusLabel(entry.status?.workflowStatus ?? 'received', t)}</strong></div>
             <div className="mini-status-track" aria-label={t('statusLookup.trackAria', { title })}>{stages.map(([key, label], stage) => <span className={stage <= index ? 'done' : ''} key={key}><i aria-hidden="true">{stage <= index ? '●' : '○'}</i>{t(label)}</span>)}</div>
+            {entry.status?.assigneeName && <div className="device-history-assignee"><span>{t('statusLookup.assignee', { name: entry.status.assigneeName })}</span>{entry.status.firstConfirmedAt && <time dateTime={new Date(entry.status.firstConfirmedAt).toISOString()}>{t('statusLookup.assigneeAt', { time: formatStatusTime(new Date(entry.status.firstConfirmedAt), language, { month: 'numeric', day: 'numeric', hour: 'numeric', minute: '2-digit' }) })}</time>}</div>}
             <div className="device-history-card-bottom"><time dateTime={new Date(entry.status?.updatedAt ?? entry.savedAt).toISOString()}>{entry.unavailable ? t('statusLookup.savedPage') : t('statusLookup.lastUpdated', { time: formatStatusTime(new Date(entry.status?.updatedAt ?? entry.savedAt), language, { month: 'numeric', day: 'numeric', hour: 'numeric', minute: '2-digit' }) })}</time><a className="button secondary" href={entry.checkUrl}>{t('statusLookup.details')}</a></div>
           </li>;
         })}</ul>
