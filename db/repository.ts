@@ -398,7 +398,13 @@ async function initialiseDatabase(db: D1Database): Promise<D1Database> {
     ]);
   }
   await ensureIsekiShelterFaqs(db);
-  await refreshShelterAiData(db);
+  try {
+    await refreshShelterAiData(db);
+  } catch (error) {
+    // Derived AI data must never make the public shelter page unavailable.
+    console.error('KIKUMAE_SHELTER_AI_REFRESH_FAILED', error instanceof Error ? error.message : String(error));
+    try { await db.prepare("INSERT OR REPLACE INTO schema_meta (key, value) VALUES ('shelter_ai_refresh_v2', 'skipped')").run(); } catch { /* best effort */ }
+  }
   await safeRun(db, 'CREATE UNIQUE INDEX IF NOT EXISTS questions_submission_key_unique ON questions (submission_key_hash) WHERE submission_key_hash IS NOT NULL');
   return db;
 }
@@ -422,7 +428,7 @@ async function ensureIsekiShelterFaqs(db: D1Database): Promise<void> {
  */
 async function refreshShelterAiData(db: D1Database): Promise<void> {
   const marker = await db.prepare("SELECT value FROM schema_meta WHERE key = 'shelter_ai_refresh_v2' LIMIT 1").first<{ value: string }>();
-  if (marker?.value === 'ready') return;
+  if (marker?.value === 'ready' || marker?.value === 'skipped') return;
 
   const faqs = await readPublishedFaqs(db, null);
    const result = await db.prepare(`SELECT id, body, body_original, ai_summary, summary_edited, category, location, people_count,
@@ -1128,12 +1134,26 @@ async function hydrateIssue(db: D1Database, issue: Issue, includeReports = true)
   const candidate = await db.prepare(`SELECT c.id, c.candidate_issue_id, c.confidence, c.reason, target.title AS candidate_issue_title
     FROM issue_merge_candidates c JOIN issues target ON target.id = c.candidate_issue_id
     WHERE c.issue_id = ? AND c.status = 'pending' ORDER BY c.confidence DESC LIMIT 1`).bind(issue.id).first<Record<string, unknown>>();
-  const readableTitle = isGenericShelterIssueTitle(issue.title)
+  const derivedAnalysis = reports[0]?.originalBody
+    ? generateShelterAnalysis(reports[0].originalBody, {
+      issueLocation: issue.location || reports[0].location,
+      peopleCount: issue.affectedPeople,
+    })
+    : null;
+  const readableTitle = derivedAnalysis?.title || (isGenericShelterIssueTitle(issue.title)
     ? buildShelterIssueTitle(issue.category, issue.location, reports[0]?.displayBody ?? '', issue.request || issue.title)
-    : issue.title;
+    : issue.title);
   return {
-    ...issue, title: readableTitle, urgencyConfidence, reports, reportCount: Math.max(issue.reportCount, reports.length), facts: Array.from(new Set(facts)).slice(0, 16),
-    emotions: Array.from(new Set(emotions)).slice(0, 8), missingInformation: Array.from(new Set(missing)).slice(0, 12),
+    ...issue,
+    title: readableTitle,
+    summary: derivedAnalysis?.overview || issue.summary,
+    request: derivedAnalysis?.request || issue.request,
+    urgencyConfidence,
+    reports,
+    reportCount: Math.max(issue.reportCount, reports.length),
+    facts: Array.from(new Set([...(derivedAnalysis?.facts ?? []), ...facts])).slice(0, 16),
+    emotions: Array.from(new Set([...(derivedAnalysis?.emotion ? [derivedAnalysis.emotion] : []), ...emotions])).slice(0, 8),
+    missingInformation: Array.from(new Set([...(derivedAnalysis?.missingInformation ?? []), ...missing])).slice(0, 12),
     representativeReportId: reports[0]?.id ?? null,
     candidateId: candidate?.id == null ? null : Number(candidate.id),
     candidateIssueId: candidate?.candidate_issue_id == null ? null : Number(candidate.candidate_issue_id),
