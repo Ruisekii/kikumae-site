@@ -1,10 +1,10 @@
 /**
- * 外部サービスへ送信しない、Worker内のローカル補助AI。
+ * 外部サービスへ送信しない、Worker内のlocal-rules fallback。
  *
- * Sites版ではランタイムからOllamaへ接続できないため、決定的な安全な
- * ルールモデルを標準実装にしています。ローカル版は同じ責務のOllama
- * アダプターへ差し替えられるよう、要約・回答案・FAQ候補を関数境界で
- * 分離しています。どの経路でも人の承認なしに公開状態へ進みません。
+ * Sites版の標準経路は決定的な安全処理です。Phase 2では別のモデルゲートウェイ
+ * をConversation / Incident Extractionへ接続できるようにし、ここはAI障害時と
+ * 完全障害時のFallbackとして残します。どの経路でも人の承認なしに公開状態へ
+ * 進みません。
  */
 
 import type { Faq, RelatedFaq } from './repository';
@@ -27,6 +27,20 @@ export type ShelterIntake = {
   resourceRemaining?: string;
   lastReceivedAt?: string;
   additionalDetails?: string;
+};
+
+/** Structured model output accepted by the persistence boundary. */
+export type StructuredIncident = {
+  language?: string;
+  location?: string | null;
+  target?: { type?: string | null; count?: number | null; ageGroup?: string | null } | null;
+  facts?: string[];
+  request?: string | null;
+  urgency?: string;
+  safetyFlags?: string[];
+  missingFields?: string[];
+  confidence?: number | null;
+  category?: ShelterCategory | null;
 };
 
 export type ShelterAnalysis = {
@@ -348,6 +362,45 @@ export function generateShelterAnalysis(value: string, intake: ShelterIntake = {
     urgencyLevel: urgencyLevel(urgentReview, urgencyCandidate), urgencyConfidence: confidence,
     urgentReview, category, issueCategory, location, issueLocation, peopleCount, affectedPeople: peopleCount,
     vulnerablePeople: vulnerable, resourceRemaining, lastReceivedAt,
+  };
+}
+
+/**
+ * Apply validated Incident Extraction fields to the existing shelter analysis.
+ * Rule analysis remains the fallback for fields the model did not provide;
+ * model text is never allowed to replace the original resident message.
+ */
+export function applyStructuredIncident(analysis: ShelterAnalysis, incident: StructuredIncident): ShelterAnalysis {
+  const category = incident.category && SHELTER_CATEGORIES.includes(incident.category) ? incident.category : analysis.category;
+  const location = typeof incident.location === 'string' && incident.location.trim() ? incident.location.trim().slice(0, 120) : analysis.location;
+  const count = incident.target?.count && incident.target.count > 0 ? `${Math.round(incident.target.count)}人` : analysis.peopleCount;
+  const facts = Array.isArray(incident.facts) && incident.facts.length
+    ? Array.from(new Set(incident.facts.filter((item) => typeof item === 'string').map((item) => item.trim()).filter(Boolean))).slice(0, 20)
+    : analysis.facts;
+  const request = typeof incident.request === 'string' && incident.request.trim() ? incident.request.trim().slice(0, 160) : analysis.request;
+  const urgency = typeof incident.urgency === 'string' ? incident.urgency : '';
+  const urgentReview = analysis.urgentReview || (incident.safetyFlags?.length ?? 0) > 0 || urgency === 'critical';
+  const urgencyCandidate: '高' | '中' | '低' = urgentReview || urgency === 'high' ? '高' : urgency === 'medium' ? '中' : urgency === 'low' || urgency === 'normal' ? '低' : analysis.urgencyCandidate;
+  const missingInformation = Array.isArray(incident.missingFields)
+    ? Array.from(new Set(incident.missingFields.filter((item) => typeof item === 'string').map((item) => item.trim()).filter(Boolean))).slice(0, 12)
+    : analysis.missingInformation;
+  const confidence = typeof incident.confidence === 'number' && Number.isFinite(incident.confidence) ? Math.max(0, Math.min(1, incident.confidence)) : analysis.urgencyConfidence;
+  return {
+    ...analysis,
+    category,
+    issueCategory: canonicalIssueCategory(category, analysis.title),
+    location,
+    issueLocation: resolveShelterZoneId(location) || location,
+    peopleCount: count,
+    affectedPeople: count,
+    facts,
+    request,
+    missingInformation,
+    urgencyCandidate,
+    urgencyLevel: urgencyLevel(urgentReview, urgencyCandidate),
+    urgencyConfidence: confidence,
+    urgentReview,
+    overview: analysis.overview,
   };
 }
 

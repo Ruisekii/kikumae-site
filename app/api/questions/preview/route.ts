@@ -1,6 +1,7 @@
 import { listRelatedFaqs } from '../../../../db/repository';
 import { categorizeShelterQuestion, generateShelterAnalysis, shelterFollowUp, type ShelterIntake } from '../../../../db/local-ai';
 import { allowBurstShared, readRequestText } from '../../../../db/request-guard';
+import { getModelRuntimeStatus } from '../../../lib/model-gateway';
 
 export const runtime = 'edge';
 
@@ -27,7 +28,8 @@ export async function POST(request: Request): Promise<Response> {
     const analysis = generateShelterAnalysis(body, intake);
     const related = await listRelatedFaqs(body, 3, null, analysis.category);
     const followUpKey = analysis.missingInformation[0] ?? '';
-    return json({ body, summary: analysis.overview, category: categorizeShelterQuestion(body), analysis, related, followUp: followUpKey ? shelterFollowUp(followUpKey, analysis.category) : null, aiMode: 'local-rules' });
+    const modelStatus = getModelRuntimeStatus();
+    return json({ body, summary: analysis.overview, category: categorizeShelterQuestion(body), analysis, related, followUp: followUpKey ? shelterFollowUp(followUpKey, analysis.category) : null, aiMode: 'local-rules-fallback', modelGateway: modelStatus });
   } catch (error) {
     if (error instanceof Error && error.message === 'REQUEST_BODY_TOO_LARGE') return json({ message: '質問は500文字以内で入力してください。' }, 413);
     return json({ message: '入力形式が正しくありません。' }, 400);

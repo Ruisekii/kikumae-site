@@ -5,6 +5,9 @@ import {
   type ShelterCategory,
   type ShelterIntake,
 } from '../../db/local-ai';
+import { normalizeIncidentCandidate, type CanonicalIncidentState } from './incident-schema';
+import { safetyGuard, type SafetyResult } from './safety-guard';
+import { requestVoiceModel } from './model-client';
 
 export type TurnState = 'IDLE' | 'LISTENING' | 'USER_SPEAKING' | 'PROCESSING' | 'AI_SPEAKING' | 'INTERRUPTED' | 'ERROR';
 
@@ -28,11 +31,6 @@ export interface IncidentState {
   analysis?: ShelterAnalysis;
 }
 
-export type SafetyResult = {
-  flags: string[];
-  immediate: boolean;
-};
-
 export type ConversationTurn = {
   state: IncidentState;
   reply: string;
@@ -47,6 +45,8 @@ export interface ConversationProvider {
 
 export interface VADProvider {
   prepare(): Promise<boolean>;
+  start(callbacks: { onSpeechStart: () => void; onSpeechEnd: () => void }): void;
+  stop(): void;
   release(): void;
 }
 
@@ -64,36 +64,18 @@ export interface TTSProvider {
 }
 
 export interface IncidentExtractor {
-  extract(text: string, state: IncidentState, intake?: ShelterIntake): IncidentState;
-}
-
-export interface SafetyGuard {
-  inspect(text: string): SafetyResult;
+  extract(text: string, state: IncidentState, intake?: ShelterIntake): Promise<IncidentState>;
 }
 
 export interface EmbeddingProvider {
   embed(text: string): Promise<number[]>;
 }
 
-const SAFETY_RULES: Array<{ label: string; pattern: RegExp }> = [
-  { label: '意識・呼吸の異常', pattern: /(意識(?:が|は)?(?:ない|ありません|おかしい)|呼吸(?:が|は)?(?:苦しい|できない|おかしい|止ま)|息(?:が|を)(?:できない|苦しい))/i },
-  { label: '大量出血', pattern: /(大量出血|血が止まら|出血が(?:ひど|多))/i },
-  { label: '強い胸痛', pattern: /(強い胸痛|胸(?:が|の)(?:強く)?痛|胸を締め付け)/i },
-  { label: '火災・煙', pattern: /(火災|火事|煙が|燃えて|焦げ臭)/i },
-  { label: '暴力・武器', pattern: /(暴力|殴ら|殴って|襲われ|武器|刃物|ナイフ)/i },
-  { label: '自傷・他害', pattern: /(自傷|自殺|死にたい|消えたい|殺す|他害|自分を傷つけ)/i },
-  { label: '重大な体調変化', pattern: /(ぐったり|倒れ|けいれん|痙攣|39度|40度|高熱|救急|命に関わ|生命の危険)/i },
-];
-
 const FIELD_ORDER: IncidentField[] = ['場所', '人数', '残量', '最後に受け取った時刻', '追加確認'];
 const FORBIDDEN_PHRASES = ['落ち着いてください', '深呼吸してください', '冷静になってください', 'お気持ちは完全に理解できます', '大丈夫です', '安心してください'];
 
-export function detectSafetyFlags(text: string): SafetyResult {
-  const flags = SAFETY_RULES.filter((rule) => rule.pattern.test(text)).map((rule) => rule.label);
-  return { flags: Array.from(new Set(flags)), immediate: flags.length > 0 };
-}
-
-export const safetyGuard: SafetyGuard = { inspect: detectSafetyFlags };
+export { detectSafetyFlags, safetyGuard } from './safety-guard';
+export type { SafetyGuard, SafetyResult } from './safety-guard';
 
 function countFromText(value: string): number | undefined {
   const match = value.match(/(\d{1,3})\s*(?:人|名)/);
@@ -217,7 +199,7 @@ function safeReply(text: string): string {
   return '状況を確認します。必要な情報を一つだけ教えてください。';
 }
 
-export class LocalConversationProvider implements ConversationProvider {
+export class LocalRulesConversationProvider implements ConversationProvider {
   async respond(text: string, state: IncidentState, intake: ShelterIntake = {}): Promise<ConversationTurn> {
     const nextState = extractIncident(text, state, intake);
     const safety = safetyGuard.inspect(nextState.originalText.join('\n'));
@@ -232,16 +214,90 @@ export class LocalConversationProvider implements ConversationProvider {
   }
 }
 
+/** Backward-compatible name for the Phase 1 fallback. */
+export { LocalRulesConversationProvider as LocalConversationProvider };
+
+export function canonicalFromIncident(state: IncidentState): CanonicalIncidentState {
+  return {
+    language: state.language,
+    location: state.location ?? null,
+    target: state.target ? {
+      type: state.target.type ?? null,
+      count: state.target.count ?? null,
+      ageGroup: state.target.ageGroup ?? null,
+    } : null,
+    facts: state.facts,
+    request: state.request ?? null,
+    urgency: state.urgency,
+    safetyFlags: state.safetyFlags,
+    missingFields: state.missingFields,
+    askedFields: state.askedFields,
+    originalText: state.originalText,
+    confidence: state.confidence ?? null,
+    category: state.category ?? null,
+  };
+}
+
+function stateFromCanonical(fallback: IncidentState, candidate: CanonicalIncidentState): IncidentState {
+  const safety = safetyGuard.inspect(fallback.originalText.join('\n'));
+  return {
+    ...fallback,
+    location: candidate.location ?? undefined,
+    target: candidate.target ? {
+      type: candidate.target.type ?? undefined,
+      count: candidate.target.count ?? undefined,
+      ageGroup: candidate.target.ageGroup ?? undefined,
+    } : undefined,
+    facts: mergeUnique(candidate.facts),
+    request: candidate.request ?? undefined,
+    urgency: candidate.urgency,
+    safetyFlags: mergeUnique([...fallback.safetyFlags, ...candidate.safetyFlags, ...safety.flags], 10),
+    missingFields: mergeUnique(candidate.missingFields, 10),
+    askedFields: mergeUnique(fallback.askedFields, 10),
+    originalText: fallback.originalText,
+    confidence: candidate.confidence ?? fallback.confidence,
+    category: candidate.category ?? fallback.category,
+  };
+}
+
+function fieldFromModel(value: unknown): IncidentField | null {
+  return value === '場所' || value === '人数' || value === '残量' || value === '最後に受け取った時刻' || value === '追加確認' ? value : null;
+}
+
+/** Phase 2 client adapter. It calls the server-side model gateway and falls back safely. */
+export class ApiConversationProvider implements ConversationProvider {
+  constructor(private readonly fallback: ConversationProvider = new LocalRulesConversationProvider()) {}
+
+  async respond(text: string, state: IncidentState, intake: ShelterIntake = {}): Promise<ConversationTurn> {
+    const fallback = await this.fallback.respond(text, state, intake);
+    try {
+      const result = await requestVoiceModel({ mode: 'conversation', text, state, intake });
+      const nextField = fieldFromModel(result.nextField) ?? fallback.nextField;
+      return {
+        state,
+        reply: safeReply(typeof result.reply === 'string' ? result.reply.trim().slice(0, 500) : fallback.reply),
+        nextField,
+        safety: fallback.safety,
+        requiresConfirmation: nextField === null && result.requiresConfirmation !== false,
+      };
+    } catch {
+      return fallback;
+    }
+  }
+}
+
 type SpeechRecognitionResultLike = { isFinal: boolean; 0?: { transcript?: string } };
 type SpeechRecognitionEventLike = { resultIndex?: number; results: ArrayLike<SpeechRecognitionResultLike> };
+type SpeechRecognitionErrorLike = { error?: string };
 type SpeechRecognitionLike = {
   lang: string;
   continuous: boolean;
   interimResults: boolean;
   maxAlternatives: number;
+  processLocally?: boolean;
   onstart: (() => void) | null;
   onresult: ((event: SpeechRecognitionEventLike) => void) | null;
-  onerror: (() => void) | null;
+  onerror: ((event?: SpeechRecognitionErrorLike) => void) | null;
   onend: (() => void) | null;
   start: () => void;
   stop: () => void;
@@ -251,7 +307,13 @@ type SpeechWindow = Window & { SpeechRecognition?: new () => SpeechRecognitionLi
 
 export class BrowserASRProvider implements ASRProvider {
   private recognition: SpeechRecognitionLike | null = null;
+  private callbacks: { onInterim: (text: string) => void; onFinal: (text: string) => void; onError: () => void; onEnd: () => void } | null = null;
+  private restartTimer: ReturnType<typeof setTimeout> | null = null;
+  private active = false;
+  private endNotified = false;
+  private localProcessingState: 'true' | 'false' | 'unknown' = 'unknown';
   readonly supported: boolean;
+  get localProcessing(): 'true' | 'false' | 'unknown' { return this.localProcessingState; }
 
   constructor(private readonly language = 'ja-JP') {
     const speechWindow = typeof window === 'undefined' ? null : window as SpeechWindow;
@@ -260,13 +322,24 @@ export class BrowserASRProvider implements ASRProvider {
 
   start(callbacks: { onInterim: (text: string) => void; onFinal: (text: string) => void; onError: () => void; onEnd: () => void }): void {
     if (!this.supported || typeof window === 'undefined') { callbacks.onError(); return; }
+    this.abort();
+    this.callbacks = callbacks;
+    this.active = true;
+    this.endNotified = false;
+    this.openRecognition();
+  }
+
+  private openRecognition(): void {
+    if (!this.active || typeof window === 'undefined') return;
     const speechWindow = window as SpeechWindow;
     const Constructor = speechWindow.SpeechRecognition ?? speechWindow.webkitSpeechRecognition;
-    if (!Constructor) { callbacks.onError(); return; }
-    this.abort();
+    if (!Constructor) { this.active = false; this.callbacks?.onError(); return; }
     const recognition = new Constructor();
+    this.localProcessingState = typeof recognition.processLocally === 'boolean' ? String(recognition.processLocally) as 'true' | 'false' : 'unknown';
     recognition.lang = this.language;
-    recognition.continuous = false;
+    // Chrome can end a non-continuous session immediately when it sees silence.
+    // Keep the user-visible session alive and restart only the browser recognizer.
+    recognition.continuous = true;
     recognition.interimResults = true;
     recognition.maxAlternatives = 1;
     recognition.onstart = () => undefined;
@@ -280,17 +353,55 @@ export class BrowserASRProvider implements ASRProvider {
         if (result?.isFinal) finalText += transcript;
         else interim += transcript;
       }
-      if (interim) callbacks.onInterim(interim);
-      if (finalText) callbacks.onFinal(finalText);
+      if (interim) this.callbacks?.onInterim(interim);
+      if (finalText) this.callbacks?.onFinal(finalText);
     };
-    recognition.onerror = callbacks.onError;
-    recognition.onend = callbacks.onEnd;
+    recognition.onerror = (event) => {
+      const terminal = ['not-allowed', 'service-not-allowed', 'audio-capture'].includes(event?.error ?? '');
+      if (terminal) {
+        this.active = false;
+        this.callbacks?.onError();
+      }
+      // no-speech and transient service errors are followed by onend, where the
+      // recognizer is restarted without resetting the resident's session.
+    };
+    recognition.onend = () => {
+      if (!this.active) { this.notifyEnd(); return; }
+      this.restartTimer = setTimeout(() => this.openRecognition(), 120);
+    };
     this.recognition = recognition;
-    try { recognition.start(); } catch { callbacks.onError(); }
+    try {
+      recognition.start();
+    } catch {
+      this.active = false;
+      this.callbacks?.onError();
+    }
   }
 
-  stop(): void { try { this.recognition?.stop(); } catch { /* already stopped */ } }
-  abort(): void { try { this.recognition?.abort(); } catch { /* already stopped */ } this.recognition = null; }
+  private notifyEnd(): void {
+    if (this.endNotified) return;
+    this.endNotified = true;
+    this.callbacks?.onEnd();
+  }
+
+  stop(): void {
+    this.active = false;
+    if (this.restartTimer) clearTimeout(this.restartTimer);
+    this.restartTimer = null;
+    const current = this.recognition;
+    this.recognition = null;
+    try { current?.stop(); } catch { /* already stopped */ }
+    this.notifyEnd();
+  }
+
+  abort(): void {
+    this.active = false;
+    if (this.restartTimer) clearTimeout(this.restartTimer);
+    this.restartTimer = null;
+    try { this.recognition?.abort(); } catch { /* already stopped */ }
+    this.recognition = null;
+    this.callbacks = null;
+  }
 }
 
 export class BrowserTTSProvider implements TTSProvider {
@@ -312,20 +423,94 @@ export class BrowserTTSProvider implements TTSProvider {
 
 export class BrowserVADProvider implements VADProvider {
   private stream: MediaStream | null = null;
+  private context: AudioContext | null = null;
+  private analyser: AnalyserNode | null = null;
+  private source: MediaStreamAudioSourceNode | null = null;
+  private frame: number | null = null;
+  private speaking = false;
+  private speechSince = 0;
+  private silenceSince = 0;
+  readonly mode = 'browser-level-vad' as const;
 
   async prepare(): Promise<boolean> {
     if (typeof navigator === 'undefined' || !navigator.mediaDevices?.getUserMedia) return false;
+    if (this.stream) return true;
     try {
       this.stream = await navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: true } });
       return true;
     } catch { return false; }
   }
 
-  release(): void { this.stream?.getTracks().forEach((track) => track.stop()); this.stream = null; }
+  start(callbacks: { onSpeechStart: () => void; onSpeechEnd: () => void }): void {
+    if (!this.stream || typeof window === 'undefined') return;
+    this.stop();
+    const AudioContextConstructor = window.AudioContext ?? (window as Window & { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;
+    if (!AudioContextConstructor) return;
+    this.context = new AudioContextConstructor();
+    this.analyser = this.context.createAnalyser();
+    this.analyser.fftSize = 512;
+    this.source = this.context.createMediaStreamSource(this.stream);
+    this.source.connect(this.analyser);
+    const buffer = new Uint8Array(this.analyser.fftSize);
+    const sample = () => {
+      if (!this.analyser) return;
+      this.analyser.getByteTimeDomainData(buffer);
+      let energy = 0;
+      for (const value of buffer) { const normalized = (value - 128) / 128; energy += normalized * normalized; }
+      const rms = Math.sqrt(energy / buffer.length);
+      const now = performance.now();
+      if (rms > 0.035) {
+        this.silenceSince = 0;
+        if (!this.speechSince) this.speechSince = now;
+        if (!this.speaking && now - this.speechSince > 100) { this.speaking = true; callbacks.onSpeechStart(); }
+      } else {
+        this.speechSince = 0;
+        if (this.speaking) {
+          if (!this.silenceSince) this.silenceSince = now;
+          if (now - this.silenceSince > 650) { this.speaking = false; callbacks.onSpeechEnd(); }
+        }
+      }
+      this.frame = requestAnimationFrame(sample);
+    };
+    this.frame = requestAnimationFrame(sample);
+  }
+
+  stop(): void {
+    if (this.frame !== null) cancelAnimationFrame(this.frame);
+    this.frame = null;
+    this.source?.disconnect();
+    this.source = null;
+    this.analyser = null;
+    void this.context?.close().catch(() => undefined);
+    this.context = null;
+    this.speaking = false;
+    this.speechSince = 0;
+    this.silenceSince = 0;
+  }
+
+  release(): void { this.stop(); this.stream?.getTracks().forEach((track) => track.stop()); this.stream = null; }
 }
 
 export class LocalIncidentExtractor implements IncidentExtractor {
-  extract(text: string, state: IncidentState, intake: ShelterIntake = {}): IncidentState { return extractIncident(text, state, intake); }
+  async extract(text: string, state: IncidentState, intake: ShelterIntake = {}): Promise<IncidentState> { return extractIncident(text, state, intake); }
+}
+
+/** Phase 2 adapter. The raw model JSON is validated before it can affect the card. */
+export class ApiIncidentExtractor implements IncidentExtractor {
+  constructor(private readonly fallback: IncidentExtractor = new LocalIncidentExtractor()) {}
+
+  async extract(text: string, state: IncidentState, intake: ShelterIntake = {}): Promise<IncidentState> {
+    // Quick-choice answers are already appended by applyIncidentAnswer.
+    // Do not append the same answer a second time before asking the model.
+    const fallback = state.originalText.at(-1) === text ? state : await this.fallback.extract(text, state, intake);
+    try {
+      const result = await requestVoiceModel({ mode: 'extract', text, state: fallback, intake });
+      const candidate = normalizeIncidentCandidate(result.incident, canonicalFromIncident(fallback));
+      return stateFromCanonical(fallback, candidate);
+    } catch {
+      return fallback;
+    }
+  }
 }
 
 export class LocalEmbeddingProvider implements EmbeddingProvider {

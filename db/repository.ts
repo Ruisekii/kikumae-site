@@ -14,9 +14,11 @@ import {
   buildShelterIssueTitle,
   isGenericShelterIssueTitle,
   redactSensitiveInformation,
+  applyStructuredIncident,
   SHELTER_CATEGORIES,
   isShelterQuestion,
   type ShelterIntake,
+  type StructuredIncident,
   type ShelterCategory,
   type IssueCategory,
   type UrgencyLevel,
@@ -732,7 +734,7 @@ export async function listRelatedFaqs(query: string, limit = 3, portalId: number
   return [...categoryFaqs, ...ranked.filter((faq) => faq.category !== shelterCategory)].slice(0, limit);
 }
 
-export async function createQuestion(body: string, requestedSummary = '', requestedCategory = '', portalId: number | null = null, submissionKey = '', intake: ShelterIntake = {}): Promise<SubmittedQuestion> {
+export async function createQuestion(body: string, requestedSummary = '', requestedCategory = '', portalId: number | null = null, submissionKey = '', intake: ShelterIntake = {}, structuredIncident?: StructuredIncident): Promise<SubmittedQuestion> {
   const db = await initialise();
   const createdAt = Date.now();
   const submissionKeyHash = submissionKey ? await hashCheckToken(submissionKey) : null;
@@ -744,7 +746,9 @@ export async function createQuestion(body: string, requestedSummary = '', reques
   const canonicalSummary = shelterAnalysis?.overview ?? generateLocalSummary(body);
   const aiSummary = requestedSummary.trim().slice(0, 300) || canonicalSummary;
   const category = categorizeQuestion(body, requestedCategory);
-  const analysis = shelterAnalysis ?? generateShelterAnalysis(body, intake);
+  const analysis = structuredIncident && shelterAnalysis
+    ? applyStructuredIncident(shelterAnalysis, structuredIncident)
+    : shelterAnalysis ?? generateShelterAnalysis(body, intake);
   const issueLocation = analysis.issueLocation || resolveShelterZoneId(analysis.location) || analysis.location;
   const reporterLocation = intake.reporterLocation?.trim().slice(0, 120) ?? '';
   const related = await listRelatedFaqs(aiSummary || body, 3, portalId, analysis.category);
@@ -1097,12 +1101,13 @@ export async function getQuestionByCheckToken(token: string): Promise<SubmittedQ
  * The check token is the same bearer secret used by the private status page, so
  * the resident can add a location or other missing field without logging in.
  */
-export async function updateQuestionFromPublicToken(token: string, body: string, intake: ShelterIntake): Promise<SubmittedQuestion | null> {
+export async function updateQuestionFromPublicToken(token: string, body: string, intake: ShelterIntake, structuredIncident?: StructuredIncident): Promise<SubmittedQuestion | null> {
   if (!/^[0-9a-f-]{32,80}$/i.test(token) || !body.trim() || body.trim().length > 500) return null;
   const current = await getQuestionByCheckToken(token);
   if (!current) return null;
   const db = await initialise();
-  const analysis = generateShelterAnalysis(body, intake);
+  const baseAnalysis = generateShelterAnalysis(body, intake);
+  const analysis = structuredIncident ? applyStructuredIncident(baseAnalysis, structuredIncident) : baseAnalysis;
   const faqs = await readPublishedFaqs(db, null);
   const related = searchFaqs(`${analysis.title} ${analysis.request} ${analysis.facts.join(' ')}`, faqs.filter((faq) => faq.category === analysis.category), 3);
   const context = {

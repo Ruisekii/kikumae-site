@@ -8,12 +8,16 @@ import {
   BrowserTTSProvider,
   BrowserVADProvider,
   buildIncidentCard,
+  canonicalFromIncident,
   createInitialIncident,
+  extractIncident,
   fieldOptions,
   fieldQuestion,
   intakeFromIncident,
-  LocalConversationProvider,
+  ApiConversationProvider,
+  ApiIncidentExtractor,
   nextMissingField,
+  safetyGuard,
   type IncidentField,
   type IncidentState,
   type TurnState,
@@ -41,7 +45,8 @@ function tokenFromCheckUrl(checkUrl: string): string {
 export function VoiceConsultation({ initialIntake, onClose, onUseText, onDirectStaff }: Props) {
   const { t } = useUserI18n();
   const initialIncident = createInitialIncident(initialIntake);
-  const providerRef = useRef(new LocalConversationProvider());
+  const providerRef = useRef(new ApiConversationProvider());
+  const extractorRef = useRef(new ApiIncidentExtractor());
   const asrRef = useRef(new BrowserASRProvider());
   const ttsRef = useRef(new BrowserTTSProvider());
   const vadRef = useRef(new BrowserVADProvider());
@@ -58,6 +63,7 @@ export function VoiceConsultation({ initialIntake, onClose, onUseText, onDirectS
   const [submission, setSubmission] = useState<Submission | null>(null);
   const [asrSupported, setAsrSupported] = useState(false);
   const mountedRef = useRef(true);
+  const listeningRef = useRef(false);
 
   useEffect(() => {
     incidentRef.current = incident;
@@ -67,6 +73,7 @@ export function VoiceConsultation({ initialIntake, onClose, onUseText, onDirectS
 
   useEffect(() => () => {
     mountedRef.current = false;
+    listeningRef.current = false;
     asrRef.current.abort();
     ttsRef.current.stop();
     vadRef.current.release();
@@ -115,7 +122,7 @@ export function VoiceConsultation({ initialIntake, onClose, onUseText, onDirectS
     try {
       const response = await fetch('/api/questions', {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ body, summary: buildIncidentCard(next), category: next.analysis?.category ?? 'その他', submissionKey: crypto.randomUUID(), intake: intakeFromIncident(next) }),
+        body: JSON.stringify({ body, summary: buildIncidentCard(next), category: next.analysis?.category ?? 'その他', submissionKey: crypto.randomUUID(), intake: intakeFromIncident(next), incident: canonicalFromIncident(next) }),
       });
       const payload = await response.json() as { id?: number; checkUrl?: string; message?: string };
       if (!response.ok || typeof payload.id !== 'number' || !payload.checkUrl) { setStatus(payload.message ?? t('voice.sendError')); return null; }
@@ -133,7 +140,7 @@ export function VoiceConsultation({ initialIntake, onClose, onUseText, onDirectS
     try {
       await fetch(`/api/questions/status/${token}`, {
         method: 'PATCH', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ body: next.originalText.join('\n').trim().slice(0, 500), intake: intakeFromIncident(next) }),
+        body: JSON.stringify({ body: next.originalText.join('\n').trim().slice(0, 500), intake: intakeFromIncident(next), incident: canonicalFromIncident(next) }),
       });
     } catch { /* 追加情報は次の再送を妨げない */ }
   }
@@ -143,27 +150,53 @@ export function VoiceConsultation({ initialIntake, onClose, onUseText, onDirectS
     setTurn('PROCESSING');
     setInterimTranscript('');
     addMessage({ role: 'person', text });
-    const result = await providerRef.current.respond(text, current, intakeFromIncident(current));
-    updateIncident(result.state);
-    if (result.safety.immediate && !submission) await submitIncident(result.state, true);
-    else if (submission) void appendPublicUpdate(result.state, submission);
-    setReply(result.reply, result.nextField, result.requiresConfirmation);
+    const safety = safetyGuard.inspect([...current.originalText, text].join('\n'));
+    // Safety Lane is independent of model availability. The deterministic
+    // state is sufficient to send the first alert before waiting for a model.
+    const fallbackState = extractIncident(text, current, intakeFromIncident(current));
+    const urgentState = { ...fallbackState, safetyFlags: Array.from(new Set([...fallbackState.safetyFlags, ...safety.flags])) };
+    let saved = submission;
+    if (safety.immediate && !saved) saved = await submitIncident(urgentState, true);
+    const [conversation, extracted] = await Promise.all([
+      providerRef.current.respond(text, current, intakeFromIncident(current)),
+      extractorRef.current.extract(text, current, intakeFromIncident(current)),
+    ]);
+    updateIncident(extracted);
+    const following = nextMissingField(extracted);
+    if (saved) void appendPublicUpdate(extracted, saved);
+    const reply = safety.immediate
+      ? `緊急の可能性がある内容として、先に職員へ知らせます。${following ? ' 今いる場所を教えてください。' : ' 近くの職員にもすぐ知らせてください。'}`
+      : conversation.reply;
+    setReply(reply, following, !safety.immediate && !following && conversation.requiresConfirmation);
   }
 
   function startListening() {
     interruptSpeech();
     setConfirmOpen(false);
-    void vadRef.current.prepare();
+    listeningRef.current = true;
     setTurn('LISTENING');
+    void vadRef.current.prepare().then((ready) => {
+      if (!ready || !mountedRef.current || !listeningRef.current) return;
+      vadRef.current.start({
+        onSpeechStart: () => mountedRef.current && setTurn((current) => current === 'LISTENING' ? 'USER_SPEAKING' : current),
+        onSpeechEnd: () => mountedRef.current && setTurn((current) => current === 'USER_SPEAKING' ? 'LISTENING' : current),
+      });
+    });
     asrRef.current.start({
       onInterim: (text) => { if (mountedRef.current) { setInterimTranscript(text); setTurn('USER_SPEAKING'); } },
-      onFinal: (text) => { if (text.trim()) void processTranscript(text.trim()); },
-      onError: () => { if (mountedRef.current) { setTurn('ERROR'); setStatus(t('voice.recognitionError')); } },
+      onFinal: (text) => { listeningRef.current = false; asrRef.current.stop(); vadRef.current.stop(); if (text.trim()) void processTranscript(text.trim()); },
+      onError: () => { listeningRef.current = false; vadRef.current.stop(); if (mountedRef.current) { setTurn('ERROR'); setStatus(t('voice.recognitionError')); } },
       onEnd: () => { if (mountedRef.current) setTurn((current) => current === 'LISTENING' || current === 'USER_SPEAKING' ? 'IDLE' : current); },
     });
   }
 
-  function stopListening() { asrRef.current.stop(); setInterimTranscript(''); if (turn === 'LISTENING' || turn === 'USER_SPEAKING') setTurn('IDLE'); }
+  function stopListening() {
+    listeningRef.current = false;
+    asrRef.current.stop();
+    vadRef.current.stop();
+    setInterimTranscript('');
+    setTurn((current) => current === 'LISTENING' || current === 'USER_SPEAKING' ? 'IDLE' : current);
+  }
 
   function handleMicClick() {
     // Pointer down/up owns push-to-talk. Ignoring the synthetic click that
@@ -187,8 +220,9 @@ export function VoiceConsultation({ initialIntake, onClose, onUseText, onDirectS
     stopListening();
   }
 
-  function handleFieldAnswer(field: IncidentField, value: string) {
-    const next = applyIncidentAnswer(incidentRef.current, field, value);
+  async function handleFieldAnswer(field: IncidentField, value: string) {
+    const localNext = applyIncidentAnswer(incidentRef.current, field, value);
+    const next = await extractorRef.current.extract(value, localNext, intakeFromIncident(localNext));
     updateIncident(next);
     addMessage({ role: 'person', text: value });
     const following = nextMissingField(next);

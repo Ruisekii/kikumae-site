@@ -1,0 +1,49 @@
+# AI runtime audit and Phase 2 boundary
+
+## Current implementation
+
+The published MVP does not claim to be fully local or offline.
+
+- ASR: `BrowserASRProvider` uses `SpeechRecognition` or `webkitSpeechRecognition` when the browser exposes it. It requests interim results and keeps the user-visible listening session alive when the browser ends a silent recognition sub-session.
+- ASR privacy: `processLocally` is inspected when the browser exposes the property, but the current browser runtime reports `unknown` unless the API explicitly exposes a boolean. No local language pack is assumed. Web Speech API traffic may therefore be handled by the browser vendor's service.
+- VAD: `BrowserVADProvider` obtains the microphone with echo cancellation, noise suppression, and automatic gain control, then runs a lightweight Web Audio RMS level detector. It is not Silero VAD.
+- Live subtitles: browser ASR interim results.
+- TTS: `BrowserTTSProvider` uses `SpeechSynthesis` and `SpeechSynthesisUtterance`. The selected voice and processing locality are browser-dependent.
+- Interruption: current speech synthesis is cancelled before ASR starts. The ASR provider is explicitly stopped after a final transcript and when the resident presses stop.
+- Conversation: the normal Phase 2 path calls `POST /api/ai/voice` with `mode=conversation`. When no model gateway is configured or the request fails, `LocalRulesConversationProvider` is used as the safe fallback.
+- Incident extraction: the same route accepts `mode=extract`. Its JSON is normalized against `incidentStateJsonSchema` before it can update an Incident Card. The resident's original text is always taken from application state, not model output.
+- Safety: `Safety Guard` is a local rule lane and runs independently before model output is trusted. It can trigger the first urgent submission immediately.
+- Similar incidents: existing D1 issue grouping and similarity logic remain in `db/repository.ts`; the browser `LocalEmbeddingProvider` is only a provider boundary placeholder and is not a Qwen embedding model.
+
+## Canonical Incident State
+
+`app/lib/incident-schema.ts` is the source of truth for the structured state. Conversation text is not used as the staff card. Model output is treated as untrusted JSON and reduced to the schema; unknown or missing values remain `null` or are listed in `missingFields`.
+
+## Phase 2 model gateway
+
+The gateway is OpenAI-compatible over HTTP so it can point to a local vLLM/Ollama-compatible service or another approved internal gateway without exposing credentials to the browser. It is opt-in and is not configured in the current public Site.
+
+Required runtime secrets/configuration:
+
+- `AI_MODEL_BASE_URL`
+- `AI_CONVERSATION_MODEL`
+- `AI_EXTRACTION_MODEL`
+- `AI_MODEL_API_KEY` when the gateway requires it
+
+Conversation and extraction use separate prompts and model selections. The gateway must return JSON; invalid or unavailable results fall back to local-rules. The current project does not yet ship Qwen, Gemma, Silero, VOICEVOX, or Qwen-TTS weights.
+
+## Candidate next adapters
+
+- Conversation: Qwen3.5-4B with thinking disabled for low latency.
+- Incident extraction: Qwen3.5-9B or Gemma 4 12B with constrained JSON output.
+- ASR: Qwen3-ASR-0.6B, compared with Qwen3-ASR-1.7B and Kotoba-Whisper v2.2.
+- VAD: Silero VAD.
+- Similar incident retrieval: Qwen3-Embedding-0.6B.
+- TTS: VOICEVOX Engine or Qwen3-TTS-0.6B.
+
+These are candidates, not currently connected components.
+
+## Conditions for “fully local”
+
+The UI and reports must not use “fully local AI”, “works without the internet”, or “audio is never sent externally” until ASR, VAD, conversation, extraction, similarity, TTS, and safety have all been verified with network access disabled in an end-to-end test.
+

@@ -1,5 +1,5 @@
 import { createQuestion } from '../../../db/repository';
-import type { ShelterIntake } from '../../../db/local-ai';
+import type { ShelterIntake, StructuredIncident } from '../../../db/local-ai';
 import { allowBurstShared, readRequestText } from '../../../db/request-guard';
 
 export const runtime = 'edge';
@@ -33,6 +33,7 @@ export async function POST(request: Request): Promise<Response> {
   const category = typeof data.category === 'string' ? data.category.trim() : '';
   const submissionKey = typeof data.submissionKey === 'string' ? data.submissionKey.trim().slice(0, 128) : '';
   const rawIntake = (data.intake && typeof data.intake === 'object') ? data.intake as Record<string, unknown> : {};
+  const structuredIncident = data.incident && typeof data.incident === 'object' && !Array.isArray(data.incident) ? data.incident as StructuredIncident : undefined;
   const intake: ShelterIntake = {
     location: typeof rawIntake.location === 'string' ? rawIntake.location : '',
     issueLocation: typeof rawIntake.issueLocation === 'string' ? rawIntake.issueLocation : '',
@@ -46,7 +47,7 @@ export async function POST(request: Request): Promise<Response> {
   if (summary.length > 300) return json('要約は300文字以内で入力してください。', 400);
 
   try {
-    const question = await createQuestion(body, summary, category, null, submissionKey, intake);
+    const question = await createQuestion(body, summary, category, null, submissionKey, intake, structuredIncident);
     return Response.json({ id: question.id, checkUrl: `${new URL(request.url).origin}/questions/${question.checkToken}`, message: '質問を受け付けました。管理者が確認します。' }, { status: 201, headers: { 'Cache-Control': 'no-store' } });
   } catch (error) {
     if (error instanceof Error && error.message === 'QUESTION_DUPLICATE') return json('この質問はすでに受け付けています。回答の確認URLをご確認ください。', 409);

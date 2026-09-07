@@ -1,5 +1,5 @@
 import { getQuestionByCheckToken, updateQuestionFromPublicToken } from '../../../../../db/repository';
-import type { ShelterIntake } from '../../../../../db/local-ai';
+import type { ShelterIntake, StructuredIncident } from '../../../../../db/local-ai';
 import { allowBurstShared, readRequestText } from '../../../../../db/request-guard';
 
 export const runtime = 'edge';
@@ -26,6 +26,7 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ to
     const payload = JSON.parse(await readRequestText(request, MAX_REQUEST_BYTES)) as Record<string, unknown>;
     const body = typeof payload.body === 'string' ? payload.body.trim() : '';
     const rawIntake = payload.intake && typeof payload.intake === 'object' ? payload.intake as Record<string, unknown> : {};
+    const structuredIncident = payload.incident && typeof payload.incident === 'object' && !Array.isArray(payload.incident) ? payload.incident as StructuredIncident : undefined;
     const intake: ShelterIntake = {
       location: typeof rawIntake.location === 'string' ? rawIntake.location : '',
       issueLocation: typeof rawIntake.issueLocation === 'string' ? rawIntake.issueLocation : '',
@@ -35,7 +36,7 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ to
       additionalDetails: typeof rawIntake.additionalDetails === 'string' ? rawIntake.additionalDetails : '',
     };
     if (!body || body.length > 500) return Response.json({ message: '追加情報を確認できませんでした。' }, { status: 400 });
-    const updated = await updateQuestionFromPublicToken(token, body, intake);
+    const updated = await updateQuestionFromPublicToken(token, body, intake, structuredIncident);
     if (!updated) return Response.json({ message: '確認用URLが正しくありません。' }, { status: 404 });
     return Response.json({ id: updated.id, title: updated.title, workflowStatus: updated.workflowStatus, updatedAt: updated.updates.at(-1)?.createdAt ?? updated.createdAt }, { headers: { 'Cache-Control': 'no-store' } });
   } catch (error) {
