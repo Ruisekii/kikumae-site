@@ -19,6 +19,21 @@ type SpeechWindow = Window & { SpeechRecognition?: new () => SpeechRecognitionLi
 type IntakeStep = 'category' | 'detail' | 'faq' | 'location' | 'people' | 'supplement' | 'confirm' | 'freeText';
 type SavedDraft = { savedAt?: number; input?: string; originalBody?: string; contextBody?: string; intake?: Intake; chatOpen?: boolean; intakeOpen?: boolean; intakeStep?: IntakeStep; selectedCategoryId?: string; selectedDetail?: string; selectedLocation?: string; selectedPeople?: string; intakeNote?: string; messages?: ChatMessage[]; preview?: Preview | null; faqDecision?: boolean; readyToSubmit?: boolean; showSupplementSheet?: boolean };
 type Props = { faqs: Faq[] };
+type Language = 'ja' | 'en' | 'zh' | 'ko';
+
+const LANGUAGE_OPTIONS: Array<{ value: Language; label: string }> = [
+  { value: 'ja', label: '日本語' },
+  { value: 'en', label: 'English' },
+  { value: 'zh', label: '中文' },
+  { value: 'ko', label: '한국어' }
+];
+
+const LANGUAGE_COPY: Record<Language, { selector: string; issues: string; faq: string; status: string; admin: string }> = {
+  ja: { selector: '言語', issues: '困りごと', faq: 'よくある質問', status: '相談状況', admin: '管理者ページ' },
+  en: { selector: 'Language', issues: 'What I need', faq: 'FAQs', status: 'My status', admin: 'Staff portal' },
+  zh: { selector: '语言', issues: '我遇到的困难', faq: '常见问题', status: '咨询状态', admin: '工作人员页面' },
+  ko: { selector: '언어', issues: '불편한 점', faq: '자주 묻는 질문', status: '상담 상황', admin: '관리자 페이지' }
+};
 
 type IntakeCategory = {
   id: string;
@@ -109,6 +124,10 @@ type ReceptionFlowProps = {
   onOpenEmergency: () => void;
   onCloseEmergency: () => void;
   onSubmitEmergency: () => void;
+  language: Language;
+  languageOpen: boolean;
+  onToggleLanguage: () => void;
+  onChangeLanguage: (language: Language) => void;
 };
 
 function ConsultCancelAction({ onStartOver }: { onStartOver: () => void }) {
@@ -121,13 +140,15 @@ function ConsultCancelAction({ onStartOver }: { onStartOver: () => void }) {
   </>;
 }
 
-function ReceptionFlow({ faqs, intakeStep, selectedCategory, selectedDetail, selectedLocation, selectedPeople, intakeNote, intake, preview, faqDecision, readyToSubmit, supplementValues, input, status, busy, checkUrl, questionId, emergencyOpen, onChooseCategory, onChooseDetail, onChooseLocation, onChoosePeople, onSetIntakeStep, onSetIntakeNote, onSetInput, onSetSupplementValue, onChangeQuantity, onFaqResult, onConfirmSupplements, onSubmit, onSubmitFreeText, onStartOver, onCopyUrl, onOpenEmergency, onCloseEmergency, onSubmitEmergency }: ReceptionFlowProps) {
+function ReceptionFlow({ faqs, intakeStep, selectedCategory, selectedDetail, selectedLocation, selectedPeople, intakeNote, intake, preview, faqDecision, readyToSubmit, supplementValues, input, status, busy, checkUrl, questionId, emergencyOpen, onChooseCategory, onChooseDetail, onChooseLocation, onChoosePeople, onSetIntakeStep, onSetIntakeNote, onSetInput, onSetSupplementValue, onChangeQuantity, onFaqResult, onConfirmSupplements, onSubmit, onSubmitFreeText, onStartOver, onCopyUrl, onOpenEmergency, onCloseEmergency, onSubmitEmergency, language, languageOpen, onToggleLanguage, onChangeLanguage }: ReceptionFlowProps) {
   const fields = preview ? supplementFields(preview.analysis, preview.body, intake) : [];
   const stageIndex = checkUrl ? 1 : 0;
   const stages = ['受付済み', '確認中', '現場確認中', '対応中', '解決済み'];
   const detailProgress = intakeStep === 'category' || intakeStep === 'freeText' ? '' : intakeStep === 'confirm' ? 'done' : 'current';
+  const copy = LANGUAGE_COPY[language];
+  const selectedLanguage = LANGUAGE_OPTIONS.find((option) => option.value === language)?.label ?? '日本語';
   return <main className="evac-theme reception-app">
-    <header className="reception-header"><a className="brand" href="#reception-top" aria-label="イセキ避難所の受付画面の先頭へ">◌ イセキ避難所</a><nav aria-label="利用者メニュー"><a href="#reception-top" aria-current={!checkUrl && !emergencyOpen && intakeStep === 'category' ? 'page' : undefined}>困りごと</a><a href="#reception-faq">よくある質問</a><Link href="/questions">相談状況</Link></nav></header>
+    <header className="reception-header"><a className="brand" href="#reception-top" aria-label="イセキ避難所の受付画面の先頭へ">◌ イセキ避難所</a><div className="reception-header-tools"><nav aria-label="利用者メニュー"><a href="#reception-top" aria-current={!checkUrl && !emergencyOpen && intakeStep === 'category' ? 'page' : undefined}>{copy.issues}</a><a href="#reception-faq">{copy.faq}</a><Link href="/questions">{copy.status}</Link><Link className="reception-admin-link" href="/admin">{copy.admin}</Link></nav><div className="reception-language-picker"><button className="reception-language-trigger" type="button" aria-label={`${copy.selector}: ${selectedLanguage}`} aria-expanded={languageOpen} aria-controls="reception-language-menu" onClick={onToggleLanguage}><span aria-hidden="true">🌐</span><span>{selectedLanguage}</span><span aria-hidden="true">⌄</span></button>{languageOpen && <div className="reception-language-menu" id="reception-language-menu" role="menu" aria-label={copy.selector}><p>{copy.selector}</p>{LANGUAGE_OPTIONS.map((option) => <button type="button" role="menuitemradio" aria-checked={language === option.value} className={language === option.value ? 'selected' : ''} key={option.value} onClick={() => onChangeLanguage(option.value)}>{option.label}<span aria-hidden="true">{language === option.value ? '✓' : ''}</span></button>)}</div>}</div></div></header>
     <section className="reception-shell" id="reception-top">
       {!checkUrl && <button className="reception-emergency-link" type="button" onClick={onOpenEmergency}><span aria-hidden="true">🚨</span> 命に関わる・今すぐ助けが必要</button>}
       {!checkUrl && !emergencyOpen && <div className="reception-progress" aria-label="受付の進み具合"><span className={intakeStep === 'category' ? 'current' : 'done'}>困りごと</span><i>→</i><span className={detailProgress}>詳細</span><i>→</i><span className={intakeStep === 'confirm' ? 'current' : ''}>確認</span>{intakeStep !== 'category' && <small>あと少しです</small>}</div>}
@@ -176,9 +197,16 @@ export function KikumaeClient({ faqs }: Props) {
   const [listening, setListening] = useState(false);
   const [voiceSupported, setVoiceSupported] = useState(false);
   const [offline, setOffline] = useState(false);
+  const [language, setLanguage] = useState<Language>('ja');
+  const [languageOpen, setLanguageOpen] = useState(false);
   const submitLockRef = useRef(false);
   const previewRequestRef = useRef(0);
   const inputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    const languageTags: Record<Language, string> = { ja: 'ja', en: 'en', zh: 'zh-CN', ko: 'ko' };
+    document.documentElement.lang = languageTags[language];
+  }, [language]);
 
   useEffect(() => {
     const updateConnection = () => setOffline(!navigator.onLine);
@@ -405,6 +433,6 @@ export function KikumaeClient({ faqs }: Props) {
 
   const knownContext = [intake.location && `場所：${intake.location}`, intake.peopleCount && `人数：${intake.peopleCount}`].filter(Boolean);
 
-  return <ReceptionFlow faqs={faqs} intakeStep={intakeStep} selectedCategory={selectedCategory} selectedDetail={selectedDetail} selectedLocation={selectedLocation} selectedPeople={selectedPeople} intakeNote={intakeNote} intake={intake} preview={preview} faqDecision={faqDecision} readyToSubmit={readyToSubmit} supplementValues={supplementValues} input={input} status={status} busy={busy} checkUrl={checkUrl} questionId={questionId} emergencyOpen={emergencyOpen} onChooseCategory={chooseCategory} onChooseDetail={(detail) => { void chooseDetail(detail); }} onChooseLocation={chooseLocation} onChoosePeople={choosePeople} onSetIntakeStep={setIntakeStep} onSetIntakeNote={setIntakeNote} onSetInput={setInput} onSetSupplementValue={setSupplementValue} onChangeQuantity={changeQuantity} onFaqResult={(resolved) => { void faqResult(resolved); }} onConfirmSupplements={confirmSupplements} onSubmit={() => { void submitStructuredIntake(); }} onSubmitFreeText={() => { void submitFreeText(); }} onStartOver={beginChat} onCopyUrl={() => { void copyCheckUrl(); }} onOpenEmergency={() => { setStatus(''); setEmergencyOpen(true); }} onCloseEmergency={() => setEmergencyOpen(false)} onSubmitEmergency={() => { void submitEmergency(); }} />;
+  return <ReceptionFlow faqs={faqs} intakeStep={intakeStep} selectedCategory={selectedCategory} selectedDetail={selectedDetail} selectedLocation={selectedLocation} selectedPeople={selectedPeople} intakeNote={intakeNote} intake={intake} preview={preview} faqDecision={faqDecision} readyToSubmit={readyToSubmit} supplementValues={supplementValues} input={input} status={status} busy={busy} checkUrl={checkUrl} questionId={questionId} emergencyOpen={emergencyOpen} language={language} languageOpen={languageOpen} onToggleLanguage={() => setLanguageOpen((current) => !current)} onChangeLanguage={(nextLanguage) => { setLanguage(nextLanguage); setLanguageOpen(false); }} onChooseCategory={chooseCategory} onChooseDetail={(detail) => { void chooseDetail(detail); }} onChooseLocation={chooseLocation} onChoosePeople={choosePeople} onSetIntakeStep={setIntakeStep} onSetIntakeNote={setIntakeNote} onSetInput={setInput} onSetSupplementValue={setSupplementValue} onChangeQuantity={changeQuantity} onFaqResult={(resolved) => { void faqResult(resolved); }} onConfirmSupplements={confirmSupplements} onSubmit={() => { void submitStructuredIntake(); }} onSubmitFreeText={() => { void submitFreeText(); }} onStartOver={beginChat} onCopyUrl={() => { void copyCheckUrl(); }} onOpenEmergency={() => { setStatus(''); setEmergencyOpen(true); }} onCloseEmergency={() => setEmergencyOpen(false)} onSubmitEmergency={() => { void submitEmergency(); }} />;
 
 }
