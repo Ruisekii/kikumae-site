@@ -111,6 +111,16 @@ type ReceptionFlowProps = {
   onSubmitEmergency: () => void;
 };
 
+function ConsultCancelAction({ onStartOver }: { onStartOver: () => void }) {
+  const [dialogOpen, setDialogOpen] = useState(false);
+  return <>
+    <div className="reception-cancel-area">
+      <button className="reception-cancel-trigger" type="button" onClick={() => setDialogOpen(true)}>相談をやめて最初に戻る</button>
+    </div>
+    {dialogOpen && <div className="reception-cancel-backdrop" role="presentation"><section className="reception-cancel-dialog" role="dialog" aria-modal="true" aria-labelledby="reception-cancel-title"><p className="eyebrow">入力途中の相談</p><h2 id="reception-cancel-title">この相談をやめて、最初に戻りますか？</h2><p>入力した内容は消えます。まだ続ける場合は「このまま続ける」を選んでください。</p><div className="reception-cancel-actions"><button className="button secondary" type="button" onClick={() => setDialogOpen(false)}>このまま続ける</button><button className="button danger reception-cancel-confirm" type="button" onClick={onStartOver}>最初に戻る</button></div></section></div>}
+  </>;
+}
+
 function ReceptionFlow({ faqs, intakeStep, selectedCategory, selectedDetail, selectedLocation, selectedPeople, intakeNote, intake, preview, faqDecision, readyToSubmit, supplementValues, input, status, busy, checkUrl, questionId, emergencyOpen, onChooseCategory, onChooseDetail, onChooseLocation, onChoosePeople, onSetIntakeStep, onSetIntakeNote, onSetInput, onSetSupplementValue, onChangeQuantity, onFaqResult, onConfirmSupplements, onSubmit, onSubmitFreeText, onStartOver, onCopyUrl, onOpenEmergency, onCloseEmergency, onSubmitEmergency }: ReceptionFlowProps) {
   const fields = preview ? supplementFields(preview.analysis, preview.body, intake) : [];
   const stageIndex = checkUrl ? 1 : 0;
@@ -130,6 +140,7 @@ function ReceptionFlow({ faqs, intakeStep, selectedCategory, selectedDetail, sel
       {intakeStep === 'confirm' && preview && !checkUrl && <section className="reception-step" aria-labelledby="confirm-title"><p className="eyebrow">送信前の確認</p><h1 id="confirm-title">この内容で職員へ伝えます</h1><dl className="reception-summary"><div><dt>カテゴリ</dt><dd>{selectedCategory?.label ?? preview.category}</dd></div><div><dt>困っていること</dt><dd>{selectedDetail || preview.analysis.title}</dd></div><div><dt>場所</dt><dd>{intake.location || selectedLocation || '指定なし'}</dd></div><div><dt>人数</dt><dd>{intake.peopleCount || selectedPeople || '指定なし'}</dd></div><div><dt>補足</dt><dd>{intakeNote || 'なし'}</dd></div></dl><label className="reception-note-label">補足（任意）<textarea value={intakeNote} onChange={(event) => onSetIntakeNote(event.target.value)} placeholder="追加で伝えたいことがあれば書いてください" maxLength={500} /></label><div className="reception-confirm-actions"><button className="button secondary" type="button" onClick={() => onSetIntakeStep('detail')}>修正する</button><button className="button accent" type="button" disabled={busy || !readyToSubmit} onClick={onSubmit}>{busy ? '送信しています…' : 'この内容で送信する'}</button></div></section>}
       </>}
       {checkUrl && <section className="reception-step reception-complete" aria-labelledby="complete-title"><p className="eyebrow">相談を受け付けました</p><h1 id="complete-title">職員へ届きました</h1><p>今は「確認中」です。対応状況はあとから更新されます。</p>{questionId != null && <p className="reception-id">受付番号 <strong>#{String(questionId).padStart(4, '0')}</strong></p>}<ol className="reception-status-timeline" aria-label="相談の対応状況">{stages.map((stage, index) => <li className={`${index <= stageIndex ? 'done' : ''} ${index === stageIndex ? 'current' : ''}`} key={stage}><span aria-hidden="true">{index <= stageIndex ? '✓' : '○'}</span><strong>{stage}</strong></li>)}</ol><div className="reception-url-box"><input readOnly value={checkUrl} onFocus={(event) => event.currentTarget.select()} aria-label="相談状況の確認URL" /><button className="button secondary" type="button" onClick={onCopyUrl}>URLをコピー</button></div><Link className="button accent reception-next" href={checkUrl}>相談状況を見る</Link><button className="reception-text-button" type="button" onClick={onStartOver}>新しく相談する</button></section>}
+      {!checkUrl && !emergencyOpen && !busy && intakeStep !== 'category' && <ConsultCancelAction onStartOver={onStartOver} />}
     </section>
     <section className="reception-faq-section" id="reception-faq" aria-labelledby="reception-faq-title"><p className="eyebrow">イセキ避難所の案内</p><h2 id="reception-faq-title">イセキ避難所でよくある質問</h2><p>今いる場所で確認できる、食事・水・トイレ・救護などの案内です。解決しないときは、そのまま職員へ相談できます。</p>{faqs.slice(0, 6).map((faq) => <details key={faq.id}><summary>{faq.question}</summary><p className="reception-faq-updated"><time dateTime={new Date(faq.updatedAt).toISOString()}>更新日時：{formatFaqUpdatedAt(faq.updatedAt)}</time></p><p>{faq.answer}</p></details>)}</section>
     {status && !checkUrl && <p className="reception-status" role="status">{status}</p>}
@@ -215,6 +226,7 @@ export function KikumaeClient({ faqs }: Props) {
   function addMessage(message: ChatMessage) { setMessages((current) => [...current, message]); }
 
   function beginChat() {
+    previewRequestRef.current += 1; setBusy(false);
     setChatOpen(false); setEmergencyOpen(false); setIntakeOpen(true); setIntakeStep('category'); setSelectedCategory(null); setSelectedDetail(''); setSelectedLocation(intake.location); setSelectedPeople(intake.peopleCount); setIntakeNote(''); setMessages([]); setInput(''); setOriginalBody(''); setContextBody(''); setPreview(null); setFaqDecision(false); setShowFaqCard(false); setShowSupplementSheet(false); setSupplementValues({}); setReadyToSubmit(false); setQuestionId(null); setCheckUrl(''); setStatus('');
     try { localStorage.removeItem('kikumae-shelter-draft'); } catch { /* 下書きは利用できる場合だけ消去 */ }
   }
