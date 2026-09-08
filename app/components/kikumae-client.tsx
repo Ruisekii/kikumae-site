@@ -138,7 +138,7 @@ function ReceptionFlow({ faqs, intakeStep, selectedCategory, selectedDetail, sel
   const stages = ['status.received', 'status.reviewing', 'status.fieldChecking', 'status.inProgress', 'status.resolved'];
   const detailProgress = intakeStep === 'category' || intakeStep === 'freeText' ? '' : intakeStep === 'confirm' ? 'done' : 'current';
   return <main className="evac-theme reception-app">
-    <UserHeader brand="◌ イセキ避難所" brandHref="#reception-top" faqHref="#reception-faq" brandAria={t('reception.brandAria')} />
+    <UserHeader brand="◌ イセキ避難所" brandHref="/#reception-top" faqHref="#reception-faq" brandAria={t('reception.brandAria')} />
     <section className="reception-shell" id="reception-top">
       {!checkUrl && <button className="reception-emergency-link" type="button" onClick={onOpenEmergency}><span aria-hidden="true">🚨</span> {t('reception.emergency')}</button>}
       {!checkUrl && !emergencyOpen && <div className="reception-progress" aria-label={t('reception.progressAria')}><span className={intakeStep === 'category' ? 'current' : 'done'}>{t('reception.progressIssues')}</span><i>→</i><span className={detailProgress}>{t('reception.progressDetail')}</span><i>→</i><span className={intakeStep === 'confirm' ? 'current' : ''}>{t('reception.progressConfirm')}</span>{intakeStep !== 'category' && <small>{t('reception.progressAlmost')}</small>}</div>}
