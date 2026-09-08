@@ -1,0 +1,2719 @@
+{
+  "metrics": {
+    "schemaVersion": "phase2e.v1",
+    "generatedAt": "2026-09-08T14:45:04.759Z",
+    "cases": 25,
+    "successful": 25,
+    "failed": 0,
+    "caseSuccessRate": 1,
+    "factRetentionRate": 1,
+    "requestRetentionRate": 1,
+    "contextRetentionRate": 1,
+    "emotionalStateRate": 1,
+    "uncertaintyRate": 1,
+    "safetyRecall": 1,
+    "safetyFalsePositiveFreeRate": 1,
+    "emotionalFactSeparationRate": 1,
+    "anchoredEvidenceRate": 1,
+    "latencyMs": {
+      "p50": 49,
+      "p95": 82,
+      "max": 194
+    },
+    "organizationFault": {
+      "aiMode": "organization-fallback",
+      "fallback": true,
+      "safetyPreserved": true
+    }
+  },
+  "cases": [
+    {
+      "id": "anger-water-repeat",
+      "ok": true,
+      "factHit": true,
+      "requestHit": true,
+      "contextHit": true,
+      "emotionHit": true,
+      "uncertaintyHit": true,
+      "safetyHit": true,
+      "noSafetyHit": true,
+      "separationHit": true,
+      "anchored": true,
+      "elapsedMs": 194,
+      "aiMode": "evidence-bound-organizer",
+      "organization": {
+        "schemaVersion": "phase2e.v1",
+        "title": "飲料水不足",
+        "category": "水",
+        "original": {
+          "messageId": "eval:organization",
+          "originalText": "何回言っても誰も来ないんですけど！昨日から水が全然なくて、子ども2人がいます。早く持ってきてください！",
+          "originalLanguage": "ja",
+          "createdAt": 1788878703519
+        },
+        "facts": [
+          {
+            "value": "困りごと：飲料水不足",
+            "source": "ai_organized",
+            "confirmed": false,
+            "evidence": "何回言っても誰も来ないんですけど！昨日から水が全然なくて、子ども2人がいます。早く持ってきてください！",
+            "messageId": "eval:organization"
+          },
+          {
+            "value": "人数：2人",
+            "source": "ai_organized",
+            "confirmed": false,
+            "evidence": "2人",
+            "messageId": "eval:organization"
+          },
+          {
+            "value": "最後に受け取った時刻：昨日",
+            "source": "ai_organized",
+            "confirmed": false,
+            "evidence": "昨日",
+            "messageId": "eval:organization"
+          },
+          {
+            "value": "子どもを含む可能性",
+            "source": "ai_organized",
+            "confirmed": false,
+            "evidence": "何回言っても誰も来ないんですけど！昨日から水が全然なくて、子ども2人がいます。早く持ってきてください！",
+            "messageId": "eval:organization"
+          },
+          {
+            "value": "以前にも申し出た可能性",
+            "source": "ai_organized",
+            "confirmed": false,
+            "evidence": "何回言っても誰も来ないんですけど！昨日から水が全然なくて、子ども2人がいます。早く持ってきてください！",
+            "messageId": "eval:organization"
+          },
+          {
+            "value": "飲料水に関する相談",
+            "source": "user_text",
+            "confirmed": false,
+            "evidence": "何回言っても誰も来ないんですけど！昨日から水が全然なくて、子ども2人がいます。早く持ってきてください！",
+            "messageId": "eval:organization"
+          },
+          {
+            "value": "水",
+            "source": "user_text",
+            "confirmed": true,
+            "evidence": "水",
+            "messageId": "eval:organization"
+          }
+        ],
+        "requests": [
+          {
+            "value": "water_supply",
+            "source": "ai_organized",
+            "confirmed": false,
+            "evidence": "何回言っても誰も来ないんですけど！昨日から水が全然なくて、子ども2人がいます。早く持ってきてください！",
+            "messageId": "eval:organization"
+          }
+        ],
+        "context": [
+          {
+            "value": "子ども・2人",
+            "source": "ai_organized",
+            "confirmed": false,
+            "evidence": "子ども",
+            "messageId": "eval:organization"
+          },
+          {
+            "value": "配慮が必要な人：子ども",
+            "source": "user_text",
+            "confirmed": false,
+            "evidence": "子ども",
+            "messageId": "eval:organization"
+          },
+          {
+            "value": "昨日",
+            "source": "ai_organized",
+            "confirmed": false,
+            "evidence": "昨日",
+            "messageId": "eval:organization"
+          },
+          {
+            "value": "以前にも申し出た・繰り返し伝えた可能性があります",
+            "source": "user_text",
+            "confirmed": false,
+            "uncertain": true,
+            "evidence": "何回言っても誰も来ないんですけど！昨日から水が全然なくて、子ども2人がいます。早く持ってきてください！",
+            "messageId": "eval:organization"
+          }
+        ],
+        "emotionalState": [
+          {
+            "value": "不安・怒り・焦り",
+            "source": "ai_organized",
+            "confirmed": false,
+            "evidence": "何回言っても誰も来ないんですけど！昨日から水が全然なくて、子ども2人がいます。早く持ってきてください！",
+            "messageId": "eval:organization"
+          },
+          {
+            "value": "強い切迫感・怒り・焦り",
+            "source": "ai_organized",
+            "confirmed": false,
+            "evidence": "何回言っても誰も来ないんですけど！昨日から水が全然なくて、子ども2人がいます。早く持ってきてください！",
+            "messageId": "eval:organization"
+          }
+        ],
+        "uncertainPoints": [
+          {
+            "value": "以前にも申し出た・繰り返し伝えた可能性があります",
+            "source": "user_text",
+            "confirmed": false,
+            "uncertain": true,
+            "evidence": "何回言っても誰も来ないんですけど！昨日から水が全然なくて、子ども2人がいます。早く持ってきてください！",
+            "messageId": "eval:organization"
+          }
+        ],
+        "safetySignals": [],
+        "missingInformation": [],
+        "mode": "evidence-bound",
+        "status": "complete",
+        "organizedAt": 1788878703519
+      }
+    },
+    {
+      "id": "accusation-food",
+      "ok": true,
+      "factHit": true,
+      "requestHit": true,
+      "contextHit": true,
+      "emotionHit": true,
+      "uncertaintyHit": true,
+      "safetyHit": true,
+      "noSafetyHit": true,
+      "separationHit": true,
+      "anchored": true,
+      "elapsedMs": 51,
+      "aiMode": "evidence-bound-organizer",
+      "organization": {
+        "schemaVersion": "phase2e.v1",
+        "title": "食料・物資不足",
+        "category": "食料",
+        "original": {
+          "messageId": "eval:organization",
+          "originalText": "職員は何をしているんですか。食事が来ないままです。朝から何も食べていません。",
+          "originalLanguage": "ja",
+          "createdAt": 1788878703577
+        },
+        "facts": [
+          {
+            "value": "困りごと：食料・物資不足",
+            "source": "ai_organized",
+            "confirmed": false,
+            "evidence": "職員は何をしているんですか。食事が来ないままです。朝から何も食べていません。",
+            "messageId": "eval:organization"
+          },
+          {
+            "value": "最後に受け取った時刻：朝から",
+            "source": "ai_organized",
+            "confirmed": false,
+            "evidence": "朝から",
+            "messageId": "eval:organization"
+          },
+          {
+            "value": "食事",
+            "source": "user_text",
+            "confirmed": true,
+            "evidence": "食事",
+            "messageId": "eval:organization"
+          },
+          {
+            "value": "朝から",
+            "source": "user_text",
+            "confirmed": true,
+            "evidence": "朝から",
+            "messageId": "eval:organization"
+          }
+        ],
+        "requests": [
+          {
+            "value": "food_supply",
+            "source": "ai_organized",
+            "confirmed": false,
+            "evidence": "職員は何をしているんですか。食事が来ないままです。朝から何も食べていません。",
+            "messageId": "eval:organization"
+          }
+        ],
+        "context": [
+          {
+            "value": "朝から",
+            "source": "ai_organized",
+            "confirmed": false,
+            "evidence": "朝から",
+            "messageId": "eval:organization"
+          }
+        ],
+        "emotionalState": [
+          {
+            "value": "不安や困りごとがある",
+            "source": "ai_organized",
+            "confirmed": false,
+            "evidence": "職員は何をしているんですか。食事が来ないままです。朝から何も食べていません。",
+            "messageId": "eval:organization"
+          }
+        ],
+        "uncertainPoints": [],
+        "safetySignals": [],
+        "missingInformation": [],
+        "mode": "evidence-bound",
+        "status": "complete",
+        "organizedAt": 1788878703577
+      }
+    },
+    {
+      "id": "repeat-blanket",
+      "ok": true,
+      "factHit": true,
+      "requestHit": true,
+      "contextHit": true,
+      "emotionHit": true,
+      "uncertaintyHit": true,
+      "safetyHit": true,
+      "noSafetyHit": true,
+      "separationHit": true,
+      "anchored": true,
+      "elapsedMs": 48,
+      "aiMode": "evidence-bound-organizer",
+      "organization": {
+        "schemaVersion": "phase2e.v1",
+        "title": "毛布の追加配布",
+        "category": "食料",
+        "original": {
+          "messageId": "eval:organization",
+          "originalText": "さっきも伝えましたが、毛布が足りません。また同じことを言わせるんですか。",
+          "originalLanguage": "ja",
+          "createdAt": 1788878703624
+        },
+        "facts": [
+          {
+            "value": "困りごと：毛布の追加配布",
+            "source": "ai_organized",
+            "confirmed": false,
+            "evidence": "さっきも伝えましたが、毛布が足りません。また同じことを言わせるんですか。",
+            "messageId": "eval:organization"
+          },
+          {
+            "value": "最後に受け取った時刻：さっき",
+            "source": "ai_organized",
+            "confirmed": false,
+            "evidence": "さっき",
+            "messageId": "eval:organization"
+          },
+          {
+            "value": "以前にも申し出た可能性",
+            "source": "ai_organized",
+            "confirmed": false,
+            "evidence": "さっきも伝えましたが、毛布が足りません。また同じことを言わせるんですか。",
+            "messageId": "eval:organization"
+          },
+          {
+            "value": "毛布",
+            "source": "user_text",
+            "confirmed": true,
+            "evidence": "毛布",
+            "messageId": "eval:organization"
+          }
+        ],
+        "requests": [
+          {
+            "value": "food_supply",
+            "source": "ai_organized",
+            "confirmed": false,
+            "evidence": "さっきも伝えましたが、毛布が足りません。また同じことを言わせるんですか。",
+            "messageId": "eval:organization"
+          }
+        ],
+        "context": [
+          {
+            "value": "さっき",
+            "source": "ai_organized",
+            "confirmed": false,
+            "evidence": "さっき",
+            "messageId": "eval:organization"
+          },
+          {
+            "value": "以前にも申し出た・繰り返し伝えた可能性があります",
+            "source": "user_text",
+            "confirmed": false,
+            "uncertain": true,
+            "evidence": "さっきも伝えましたが、毛布が足りません。また同じことを言わせるんですか。",
+            "messageId": "eval:organization"
+          }
+        ],
+        "emotionalState": [
+          {
+            "value": "不安や困りごとがある",
+            "source": "ai_organized",
+            "confirmed": false,
+            "evidence": "さっきも伝えましたが、毛布が足りません。また同じことを言わせるんですか。",
+            "messageId": "eval:organization"
+          }
+        ],
+        "uncertainPoints": [
+          {
+            "value": "以前にも申し出た・繰り返し伝えた可能性があります",
+            "source": "user_text",
+            "confirmed": false,
+            "uncertain": true,
+            "evidence": "さっきも伝えましたが、毛布が足りません。また同じことを言わせるんですか。",
+            "messageId": "eval:organization"
+          }
+        ],
+        "safetySignals": [],
+        "missingInformation": [],
+        "mode": "evidence-bound",
+        "status": "complete",
+        "organizedAt": 1788878703624
+      }
+    },
+    {
+      "id": "confused-long",
+      "ok": true,
+      "factHit": true,
+      "requestHit": true,
+      "contextHit": true,
+      "emotionHit": true,
+      "uncertaintyHit": true,
+      "safetyHit": true,
+      "noSafetyHit": true,
+      "separationHit": true,
+      "anchored": true,
+      "elapsedMs": 52,
+      "aiMode": "evidence-bound-organizer",
+      "organization": {
+        "schemaVersion": "phase2e.v1",
+        "title": "体育館のトイレの使用・衛生",
+        "category": "トイレ",
+        "original": {
+          "messageId": "eval:organization",
+          "originalText": "体育館の北側だったと思うのですが、昨日の夜からトイレが詰まっていて、南側も混んでいるし、子どもを連れて移動するのも大変で、どうしたらいいか分かりません。",
+          "originalLanguage": "ja",
+          "createdAt": 1788878703668
+        },
+        "facts": [
+          {
+            "value": "困りごと：トイレの使用・衛生",
+            "source": "ai_organized",
+            "confirmed": false,
+            "evidence": "体育館の北側だったと思うのですが、昨日の夜からトイレが詰まっていて、南側も混んでいるし、子どもを連れて移動するのも大変で、どうしたらいいか分かりません。",
+            "messageId": "eval:organization"
+          },
+          {
+            "value": "場所：体育館",
+            "source": "ai_organized",
+            "confirmed": false,
+            "evidence": "体育館",
+            "messageId": "eval:organization"
+          },
+          {
+            "value": "最後に受け取った時刻：昨日",
+            "source": "ai_organized",
+            "confirmed": false,
+            "evidence": "昨日",
+            "messageId": "eval:organization"
+          },
+          {
+            "value": "子どもを含む可能性",
+            "source": "ai_organized",
+            "confirmed": false,
+            "evidence": "体育館の北側だったと思うのですが、昨日の夜からトイレが詰まっていて、南側も混んでいるし、子どもを連れて移動するのも大変で、どうしたらいいか分かりません。",
+            "messageId": "eval:organization"
+          },
+          {
+            "value": "トイレ・衛生に関する相談",
+            "source": "user_text",
+            "confirmed": false,
+            "evidence": "トイレ",
+            "messageId": "eval:organization"
+          },
+          {
+            "value": "トイレ",
+            "source": "user_text",
+            "confirmed": true,
+            "evidence": "トイレ",
+            "messageId": "eval:organization"
+          },
+          {
+            "value": "昨日の夜",
+            "source": "user_text",
+            "confirmed": true,
+            "evidence": "昨日の夜",
+            "messageId": "eval:organization"
+          }
+        ],
+        "requests": [
+          {
+            "value": "toilet_assistance",
+            "source": "ai_organized",
+            "confirmed": false,
+            "evidence": "体育館の北側だったと思うのですが、昨日の夜からトイレが詰まっていて、南側も混んでいるし、子どもを連れて移動するのも大変で、どうしたらいいか分かりません。",
+            "messageId": "eval:organization"
+          }
+        ],
+        "context": [
+          {
+            "value": "体育館の北側",
+            "source": "ai_organized",
+            "confirmed": false,
+            "evidence": "体育館の北側",
+            "messageId": "eval:organization"
+          },
+          {
+            "value": "子ども・1人",
+            "source": "ai_organized",
+            "confirmed": false,
+            "evidence": "子ども",
+            "messageId": "eval:organization"
+          },
+          {
+            "value": "配慮が必要な人：子ども",
+            "source": "user_text",
+            "confirmed": false,
+            "evidence": "子ども",
+            "messageId": "eval:organization"
+          },
+          {
+            "value": "昨日",
+            "source": "ai_organized",
+            "confirmed": false,
+            "evidence": "昨日",
+            "messageId": "eval:organization"
+          }
+        ],
+        "emotionalState": [
+          {
+            "value": "不安や困りごとがある",
+            "source": "ai_organized",
+            "confirmed": false,
+            "evidence": "体育館の北側だったと思うのですが、昨日の夜からトイレが詰まっていて、南側も混んでいるし、子どもを連れて移動するのも大変で、どうしたらいいか分かりません。",
+            "messageId": "eval:organization"
+          }
+        ],
+        "uncertainPoints": [
+          {
+            "value": "本人の表現に不確実さがあります",
+            "source": "user_text",
+            "confirmed": false,
+            "uncertain": true,
+            "evidence": "体育館の北側だったと思うのですが、昨日の夜からトイレが詰まっていて、南側も混んでいるし、子どもを連れて移動するのも大変で、どうしたらいいか分かりません。",
+            "messageId": "eval:organization"
+          }
+        ],
+        "safetySignals": [],
+        "missingInformation": [],
+        "mode": "evidence-bound",
+        "status": "complete",
+        "organizedAt": 1788878703668
+      }
+    },
+    {
+      "id": "crying-anxiety",
+      "ok": true,
+      "factHit": true,
+      "requestHit": true,
+      "contextHit": true,
+      "emotionHit": true,
+      "uncertaintyHit": true,
+      "safetyHit": true,
+      "noSafetyHit": true,
+      "separationHit": true,
+      "anchored": true,
+      "elapsedMs": 50,
+      "aiMode": "evidence-bound-organizer",
+      "organization": {
+        "schemaVersion": "phase2e.v1",
+        "title": "育児用品の不足",
+        "category": "食料",
+        "original": {
+          "messageId": "eval:organization",
+          "originalText": "怖くて泣きそうです。赤ちゃんのミルクがもうありません。どうしたらいいですか。",
+          "originalLanguage": "ja",
+          "createdAt": 1788878703724
+        },
+        "facts": [
+          {
+            "value": "困りごと：育児用品の不足",
+            "source": "ai_organized",
+            "confirmed": false,
+            "evidence": "怖くて泣きそうです。赤ちゃんのミルクがもうありません。どうしたらいいですか。",
+            "messageId": "eval:organization"
+          },
+          {
+            "value": "子どもを含む可能性",
+            "source": "ai_organized",
+            "confirmed": false,
+            "evidence": "怖くて泣きそうです。赤ちゃんのミルクがもうありません。どうしたらいいですか。",
+            "messageId": "eval:organization"
+          },
+          {
+            "value": "ミルク",
+            "source": "user_text",
+            "confirmed": true,
+            "evidence": "ミルク",
+            "messageId": "eval:organization"
+          }
+        ],
+        "requests": [
+          {
+            "value": "infant_supplies",
+            "source": "ai_organized",
+            "confirmed": false,
+            "evidence": "怖くて泣きそうです。赤ちゃんのミルクがもうありません。どうしたらいいですか。",
+            "messageId": "eval:organization"
+          }
+        ],
+        "context": [
+          {
+            "value": "赤ちゃん・1人",
+            "source": "ai_organized",
+            "confirmed": false,
+            "evidence": "赤ちゃん",
+            "messageId": "eval:organization"
+          },
+          {
+            "value": "配慮が必要な人：子ども",
+            "source": "user_text",
+            "confirmed": false,
+            "evidence": "怖くて泣きそうです。赤ちゃんのミルクがもうありません。どうしたらいいですか。",
+            "messageId": "eval:organization"
+          }
+        ],
+        "emotionalState": [
+          {
+            "value": "不安・心配",
+            "source": "ai_organized",
+            "confirmed": false,
+            "evidence": "怖くて泣きそうです。赤ちゃんのミルクがもうありません。どうしたらいいですか。",
+            "messageId": "eval:organization"
+          },
+          {
+            "value": "不安・焦り・つらさ",
+            "source": "ai_organized",
+            "confirmed": false,
+            "evidence": "怖くて泣きそうです。赤ちゃんのミルクがもうありません。どうしたらいいですか。",
+            "messageId": "eval:organization"
+          }
+        ],
+        "uncertainPoints": [],
+        "safetySignals": [],
+        "missingInformation": [],
+        "mode": "evidence-bound",
+        "status": "complete",
+        "organizedAt": 1788878703724
+      }
+    },
+    {
+      "id": "sarcasm",
+      "ok": true,
+      "factHit": true,
+      "requestHit": true,
+      "contextHit": true,
+      "emotionHit": true,
+      "uncertaintyHit": true,
+      "safetyHit": true,
+      "noSafetyHit": true,
+      "separationHit": true,
+      "anchored": true,
+      "elapsedMs": 54,
+      "aiMode": "evidence-bound-organizer",
+      "organization": {
+        "schemaVersion": "phase2e.v1",
+        "title": "飲料水不足",
+        "category": "水",
+        "original": {
+          "messageId": "eval:organization",
+          "originalText": "素晴らしい対応ですね、何時間待てば水をもらえるんでしょう。",
+          "originalLanguage": "ja",
+          "createdAt": 1788878703777
+        },
+        "facts": [
+          {
+            "value": "困りごと：飲料水不足",
+            "source": "ai_organized",
+            "confirmed": false,
+            "evidence": "素晴らしい対応ですね、何時間待てば水をもらえるんでしょう。",
+            "messageId": "eval:organization"
+          },
+          {
+            "value": "飲料水に関する相談",
+            "source": "user_text",
+            "confirmed": false,
+            "evidence": "素晴らしい対応ですね、何時間待てば水をもらえるんでしょう。",
+            "messageId": "eval:organization"
+          },
+          {
+            "value": "水",
+            "source": "user_text",
+            "confirmed": true,
+            "evidence": "水",
+            "messageId": "eval:organization"
+          }
+        ],
+        "requests": [
+          {
+            "value": "water_supply",
+            "source": "ai_organized",
+            "confirmed": false,
+            "evidence": "素晴らしい対応ですね、何時間待てば水をもらえるんでしょう。",
+            "messageId": "eval:organization"
+          }
+        ],
+        "context": [],
+        "emotionalState": [
+          {
+            "value": "不安や困りごとがある",
+            "source": "ai_organized",
+            "confirmed": false,
+            "evidence": "素晴らしい対応ですね、何時間待てば水をもらえるんでしょう。",
+            "messageId": "eval:organization"
+          }
+        ],
+        "uncertainPoints": [],
+        "safetySignals": [],
+        "missingInformation": [],
+        "mode": "evidence-bound",
+        "status": "complete",
+        "organizedAt": 1788878703777
+      }
+    },
+    {
+      "id": "aggressive-non-safety",
+      "ok": true,
+      "factHit": true,
+      "requestHit": true,
+      "contextHit": true,
+      "emotionHit": true,
+      "uncertaintyHit": true,
+      "safetyHit": true,
+      "noSafetyHit": true,
+      "separationHit": true,
+      "anchored": true,
+      "elapsedMs": 42,
+      "aiMode": "evidence-bound-organizer",
+      "organization": {
+        "schemaVersion": "phase2e.v1",
+        "title": "食事配布の案内",
+        "category": "食料",
+        "original": {
+          "messageId": "eval:organization",
+          "originalText": "いい加減にしてください！何度言えば食料の配布時間を教えてくれるんですか。",
+          "originalLanguage": "ja",
+          "createdAt": 1788878703822
+        },
+        "facts": [
+          {
+            "value": "困りごと：食事配布の案内",
+            "source": "ai_organized",
+            "confirmed": false,
+            "evidence": "いい加減にしてください！何度言えば食料の配布時間を教えてくれるんですか。",
+            "messageId": "eval:organization"
+          },
+          {
+            "value": "以前にも申し出た可能性",
+            "source": "ai_organized",
+            "confirmed": false,
+            "evidence": "いい加減にしてください！何度言えば食料の配布時間を教えてくれるんですか。",
+            "messageId": "eval:organization"
+          },
+          {
+            "value": "食料・物資に関する相談",
+            "source": "user_text",
+            "confirmed": false,
+            "evidence": "食料",
+            "messageId": "eval:organization"
+          },
+          {
+            "value": "食料",
+            "source": "user_text",
+            "confirmed": true,
+            "evidence": "食料",
+            "messageId": "eval:organization"
+          }
+        ],
+        "requests": [
+          {
+            "value": "food_supply",
+            "source": "ai_organized",
+            "confirmed": false,
+            "evidence": "いい加減にしてください！何度言えば食料の配布時間を教えてくれるんですか。",
+            "messageId": "eval:organization"
+          }
+        ],
+        "context": [
+          {
+            "value": "以前にも申し出た・繰り返し伝えた可能性があります",
+            "source": "user_text",
+            "confirmed": false,
+            "uncertain": true,
+            "evidence": "いい加減にしてください！何度言えば食料の配布時間を教えてくれるんですか。",
+            "messageId": "eval:organization"
+          }
+        ],
+        "emotionalState": [
+          {
+            "value": "不安・怒り・焦り",
+            "source": "ai_organized",
+            "confirmed": false,
+            "evidence": "いい加減にしてください！何度言えば食料の配布時間を教えてくれるんですか。",
+            "messageId": "eval:organization"
+          },
+          {
+            "value": "強い切迫感・怒り・焦り",
+            "source": "ai_organized",
+            "confirmed": false,
+            "evidence": "いい加減にしてください！何度言えば食料の配布時間を教えてくれるんですか。",
+            "messageId": "eval:organization"
+          }
+        ],
+        "uncertainPoints": [
+          {
+            "value": "以前にも申し出た・繰り返し伝えた可能性があります",
+            "source": "user_text",
+            "confirmed": false,
+            "uncertain": true,
+            "evidence": "いい加減にしてください！何度言えば食料の配布時間を教えてくれるんですか。",
+            "messageId": "eval:organization"
+          }
+        ],
+        "safetySignals": [],
+        "missingInformation": [],
+        "mode": "evidence-bound",
+        "status": "complete",
+        "organizedAt": 1788878703822
+      }
+    },
+    {
+      "id": "uncertain-fever",
+      "ok": true,
+      "factHit": true,
+      "requestHit": true,
+      "contextHit": true,
+      "emotionHit": true,
+      "uncertaintyHit": true,
+      "safetyHit": true,
+      "noSafetyHit": true,
+      "separationHit": true,
+      "anchored": true,
+      "elapsedMs": 62,
+      "aiMode": "evidence-bound-organizer",
+      "organization": {
+        "schemaVersion": "phase2e.v1",
+        "title": "医療・体調の相談",
+        "category": "医療",
+        "original": {
+          "messageId": "eval:organization",
+          "originalText": "子どもが熱っぽい気がします。高熱かもしれませんが、体温はまだ測れていません。",
+          "originalLanguage": "ja",
+          "createdAt": 1788878703881
+        },
+        "facts": [
+          {
+            "value": "困りごと：体調不良・医療支援",
+            "source": "ai_organized",
+            "confirmed": false,
+            "evidence": "子どもが熱っぽい気がします。高熱かもしれませんが、体温はまだ測れていません。",
+            "messageId": "eval:organization"
+          },
+          {
+            "value": "子どもを含む可能性",
+            "source": "ai_organized",
+            "confirmed": false,
+            "evidence": "子どもが熱っぽい気がします。高熱かもしれませんが、体温はまだ測れていません。",
+            "messageId": "eval:organization"
+          },
+          {
+            "value": "体調・医療に関する相談",
+            "source": "user_text",
+            "confirmed": false,
+            "evidence": "子どもが熱っぽい気がします。高熱かもしれませんが、体温はまだ測れていません。",
+            "messageId": "eval:organization"
+          },
+          {
+            "value": "熱",
+            "source": "user_text",
+            "confirmed": true,
+            "evidence": "熱",
+            "messageId": "eval:organization"
+          }
+        ],
+        "requests": [
+          {
+            "value": "medical_assistance",
+            "source": "ai_organized",
+            "confirmed": false,
+            "evidence": "子どもが熱っぽい気がします。高熱かもしれませんが、体温はまだ測れていません。",
+            "messageId": "eval:organization"
+          }
+        ],
+        "context": [
+          {
+            "value": "子ども・1人",
+            "source": "ai_organized",
+            "confirmed": false,
+            "evidence": "子ども",
+            "messageId": "eval:organization"
+          },
+          {
+            "value": "配慮が必要な人：子ども",
+            "source": "user_text",
+            "confirmed": false,
+            "evidence": "子ども",
+            "messageId": "eval:organization"
+          }
+        ],
+        "emotionalState": [
+          {
+            "value": "不安や困りごとがある",
+            "source": "ai_organized",
+            "confirmed": false,
+            "evidence": "子どもが熱っぽい気がします。高熱かもしれませんが、体温はまだ測れていません。",
+            "messageId": "eval:organization"
+          }
+        ],
+        "uncertainPoints": [
+          {
+            "value": "本人の表現に不確実さがあります",
+            "source": "user_text",
+            "confirmed": false,
+            "uncertain": true,
+            "evidence": "子どもが熱っぽい気がします。高熱かもしれませんが、体温はまだ測れていません。",
+            "messageId": "eval:organization"
+          }
+        ],
+        "safetySignals": [
+          {
+            "value": "重大な体調変化",
+            "source": "safety_rule",
+            "confirmed": false,
+            "evidence": "子どもが熱っぽい気がします。高熱かもしれませんが、体温はまだ測れていません。",
+            "messageId": "eval:organization"
+          }
+        ],
+        "missingInformation": [],
+        "mode": "evidence-bound",
+        "status": "complete",
+        "organizedAt": 1788878703881
+      }
+    },
+    {
+      "id": "medical-emergency",
+      "ok": true,
+      "factHit": true,
+      "requestHit": true,
+      "contextHit": true,
+      "emotionHit": true,
+      "uncertaintyHit": true,
+      "safetyHit": true,
+      "noSafetyHit": true,
+      "separationHit": true,
+      "anchored": true,
+      "elapsedMs": 50,
+      "aiMode": "evidence-bound-organizer",
+      "organization": {
+        "schemaVersion": "phase2e.v1",
+        "title": "避難所の案内・対応",
+        "category": "その他",
+        "original": {
+          "messageId": "eval:organization",
+          "originalText": "何回呼んでも誰も来ない！子供が39度あってぐったりしているんです！",
+          "originalLanguage": "ja",
+          "createdAt": 1788878703932
+        },
+        "facts": [
+          {
+            "value": "困りごと：避難所の案内・対応",
+            "source": "ai_organized",
+            "confirmed": false,
+            "evidence": "何回呼んでも誰も来ない！子供が39度あってぐったりしているんです！",
+            "messageId": "eval:organization"
+          },
+          {
+            "value": "以前にも申し出た可能性",
+            "source": "ai_organized",
+            "confirmed": false,
+            "evidence": "何回呼んでも誰も来ない！子供が39度あってぐったりしているんです！",
+            "messageId": "eval:organization"
+          },
+          {
+            "value": "39度",
+            "source": "user_text",
+            "confirmed": true,
+            "evidence": "39度",
+            "messageId": "eval:organization"
+          },
+          {
+            "value": "ぐったり",
+            "source": "user_text",
+            "confirmed": true,
+            "evidence": "ぐったり",
+            "messageId": "eval:organization"
+          }
+        ],
+        "requests": [
+          {
+            "value": "medical_assistance",
+            "source": "ai_organized",
+            "confirmed": false,
+            "evidence": "何回呼んでも誰も来ない！子供が39度あってぐったりしているんです！",
+            "messageId": "eval:organization"
+          }
+        ],
+        "context": [
+          {
+            "value": "子ども・1人",
+            "source": "ai_organized",
+            "confirmed": false,
+            "evidence": "何回呼んでも誰も来ない！子供が39度あってぐったりしているんです！",
+            "messageId": "eval:organization"
+          },
+          {
+            "value": "以前にも申し出た・繰り返し伝えた可能性があります",
+            "source": "user_text",
+            "confirmed": false,
+            "uncertain": true,
+            "evidence": "何回呼んでも誰も来ない！子供が39度あってぐったりしているんです！",
+            "messageId": "eval:organization"
+          }
+        ],
+        "emotionalState": [
+          {
+            "value": "不安・怒り・焦り",
+            "source": "ai_organized",
+            "confirmed": false,
+            "evidence": "何回呼んでも誰も来ない！子供が39度あってぐったりしているんです！",
+            "messageId": "eval:organization"
+          }
+        ],
+        "uncertainPoints": [
+          {
+            "value": "以前にも申し出た・繰り返し伝えた可能性があります",
+            "source": "user_text",
+            "confirmed": false,
+            "uncertain": true,
+            "evidence": "何回呼んでも誰も来ない！子供が39度あってぐったりしているんです！",
+            "messageId": "eval:organization"
+          }
+        ],
+        "safetySignals": [
+          {
+            "value": "重大な体調変化",
+            "source": "safety_rule",
+            "confirmed": false,
+            "evidence": "何回呼んでも誰も来ない！子供が39度あってぐったりしているんです！",
+            "messageId": "eval:organization"
+          }
+        ],
+        "missingInformation": [],
+        "mode": "evidence-bound",
+        "status": "complete",
+        "organizedAt": 1788878703932
+      }
+    },
+    {
+      "id": "conscious",
+      "ok": true,
+      "factHit": true,
+      "requestHit": true,
+      "contextHit": true,
+      "emotionHit": true,
+      "uncertaintyHit": true,
+      "safetyHit": true,
+      "noSafetyHit": true,
+      "separationHit": true,
+      "anchored": true,
+      "elapsedMs": 44,
+      "aiMode": "evidence-bound-organizer",
+      "organization": {
+        "schemaVersion": "phase2e.v1",
+        "title": "避難所の案内・対応",
+        "category": "その他",
+        "original": {
+          "messageId": "eval:organization",
+          "originalText": "母が意識はありますが、呼吸が苦しいと言っています。救護所に来てもらえますか。",
+          "originalLanguage": "ja",
+          "createdAt": 1788878703979
+        },
+        "facts": [
+          {
+            "value": "困りごと：避難所の案内・対応",
+            "source": "ai_organized",
+            "confirmed": false,
+            "evidence": "母が意識はありますが、呼吸が苦しいと言っています。救護所に来てもらえますか。",
+            "messageId": "eval:organization"
+          },
+          {
+            "value": "呼吸が苦しい",
+            "source": "user_text",
+            "confirmed": true,
+            "evidence": "呼吸が苦しい",
+            "messageId": "eval:organization"
+          }
+        ],
+        "requests": [
+          {
+            "value": "medical_assistance",
+            "source": "ai_organized",
+            "confirmed": false,
+            "evidence": "母が意識はありますが、呼吸が苦しいと言っています。救護所に来てもらえますか。",
+            "messageId": "eval:organization"
+          }
+        ],
+        "context": [
+          {
+            "value": "救護所",
+            "source": "ai_organized",
+            "confirmed": false,
+            "evidence": "救護所",
+            "messageId": "eval:organization"
+          },
+          {
+            "value": "adult・1人",
+            "source": "ai_organized",
+            "confirmed": false,
+            "evidence": "母が意識はありますが、呼吸が苦しいと言っています。救護所に来てもらえますか。",
+            "messageId": "eval:organization"
+          }
+        ],
+        "emotionalState": [
+          {
+            "value": "切迫感・つらさ",
+            "source": "ai_organized",
+            "confirmed": false,
+            "evidence": "母が意識はありますが、呼吸が苦しいと言っています。救護所に来てもらえますか。",
+            "messageId": "eval:organization"
+          },
+          {
+            "value": "不安・焦り・つらさ",
+            "source": "ai_organized",
+            "confirmed": false,
+            "evidence": "母が意識はありますが、呼吸が苦しいと言っています。救護所に来てもらえますか。",
+            "messageId": "eval:organization"
+          }
+        ],
+        "uncertainPoints": [],
+        "safetySignals": [
+          {
+            "value": "意識・呼吸の異常",
+            "source": "safety_rule",
+            "confirmed": false,
+            "evidence": "意識",
+            "messageId": "eval:organization"
+          }
+        ],
+        "missingInformation": [],
+        "mode": "evidence-bound",
+        "status": "complete",
+        "organizedAt": 1788878703979
+      }
+    },
+    {
+      "id": "fire",
+      "ok": true,
+      "factHit": true,
+      "requestHit": true,
+      "contextHit": true,
+      "emotionHit": true,
+      "uncertaintyHit": true,
+      "safetyHit": true,
+      "noSafetyHit": true,
+      "separationHit": true,
+      "anchored": true,
+      "elapsedMs": 43,
+      "aiMode": "evidence-bound-organizer",
+      "organization": {
+        "schemaVersion": "phase2e.v1",
+        "title": "避難所の案内・対応",
+        "category": "その他",
+        "original": {
+          "messageId": "eval:organization",
+          "originalText": "調理室から煙が出て火が見えます。すぐ確認してください。",
+          "originalLanguage": "ja",
+          "createdAt": 1788878704021
+        },
+        "facts": [
+          {
+            "value": "困りごと：避難所の案内・対応",
+            "source": "ai_organized",
+            "confirmed": false,
+            "evidence": "調理室から煙が出て火が見えます。すぐ確認してください。",
+            "messageId": "eval:organization"
+          },
+          {
+            "value": "煙",
+            "source": "user_text",
+            "confirmed": true,
+            "evidence": "煙",
+            "messageId": "eval:organization"
+          }
+        ],
+        "requests": [
+          {
+            "value": "fire_response",
+            "source": "ai_organized",
+            "confirmed": false,
+            "evidence": "調理室から煙が出て火が見えます。すぐ確認してください。",
+            "messageId": "eval:organization"
+          }
+        ],
+        "context": [
+          {
+            "value": "調理室",
+            "source": "ai_organized",
+            "confirmed": false,
+            "evidence": "調理室",
+            "messageId": "eval:organization"
+          }
+        ],
+        "emotionalState": [
+          {
+            "value": "不安や困りごとがある",
+            "source": "ai_organized",
+            "confirmed": false,
+            "evidence": "調理室から煙が出て火が見えます。すぐ確認してください。",
+            "messageId": "eval:organization"
+          }
+        ],
+        "uncertainPoints": [],
+        "safetySignals": [
+          {
+            "value": "火災・煙",
+            "source": "safety_rule",
+            "confirmed": false,
+            "evidence": "調理室から煙が出て火が見えます。すぐ確認してください。",
+            "messageId": "eval:organization"
+          }
+        ],
+        "missingInformation": [],
+        "mode": "evidence-bound",
+        "status": "complete",
+        "organizedAt": 1788878704021
+      }
+    },
+    {
+      "id": "no-fire",
+      "ok": true,
+      "factHit": true,
+      "requestHit": true,
+      "contextHit": true,
+      "emotionHit": true,
+      "uncertaintyHit": true,
+      "safetyHit": true,
+      "noSafetyHit": true,
+      "separationHit": true,
+      "anchored": true,
+      "elapsedMs": 51,
+      "aiMode": "evidence-bound-organizer",
+      "organization": {
+        "schemaVersion": "phase2e.v1",
+        "title": "安全確認",
+        "category": "安全",
+        "original": {
+          "messageId": "eval:organization",
+          "originalText": "火事ではありませんが、焦げたにおいがして不安です。調理室を見てもらえますか。",
+          "originalLanguage": "ja",
+          "createdAt": 1788878704071
+        },
+        "facts": [
+          {
+            "value": "困りごと：安全確認",
+            "source": "ai_organized",
+            "confirmed": false,
+            "evidence": "火事ではありませんが、焦げたにおいがして不安です。調理室を見てもらえますか。",
+            "messageId": "eval:organization"
+          },
+          {
+            "value": "安全に関する相談",
+            "source": "user_text",
+            "confirmed": false,
+            "evidence": "火事ではありませんが、焦げたにおいがして不安です。調理室を見てもらえますか。",
+            "messageId": "eval:organization"
+          },
+          {
+            "value": "火",
+            "source": "user_text",
+            "confirmed": true,
+            "evidence": "火",
+            "messageId": "eval:organization"
+          },
+          {
+            "value": "焦げた",
+            "source": "user_text",
+            "confirmed": true,
+            "evidence": "焦げた",
+            "messageId": "eval:organization"
+          }
+        ],
+        "requests": [
+          {
+            "value": "general_assistance",
+            "source": "ai_organized",
+            "confirmed": false,
+            "evidence": "火事ではありませんが、焦げたにおいがして不安です。調理室を見てもらえますか。",
+            "messageId": "eval:organization"
+          }
+        ],
+        "context": [
+          {
+            "value": "調理室",
+            "source": "ai_organized",
+            "confirmed": false,
+            "evidence": "調理室",
+            "messageId": "eval:organization"
+          }
+        ],
+        "emotionalState": [
+          {
+            "value": "不安・怒り・焦り",
+            "source": "ai_organized",
+            "confirmed": false,
+            "evidence": "不安",
+            "messageId": "eval:organization"
+          },
+          {
+            "value": "不安・焦り・つらさ",
+            "source": "ai_organized",
+            "confirmed": false,
+            "evidence": "不安",
+            "messageId": "eval:organization"
+          }
+        ],
+        "uncertainPoints": [],
+        "safetySignals": [],
+        "missingInformation": [],
+        "mode": "evidence-bound",
+        "status": "complete",
+        "organizedAt": 1788878704071
+      }
+    },
+    {
+      "id": "violence",
+      "ok": true,
+      "factHit": true,
+      "requestHit": true,
+      "contextHit": true,
+      "emotionHit": true,
+      "uncertaintyHit": true,
+      "safetyHit": true,
+      "noSafetyHit": true,
+      "separationHit": true,
+      "anchored": true,
+      "elapsedMs": 43,
+      "aiMode": "evidence-bound-organizer",
+      "organization": {
+        "schemaVersion": "phase2e.v1",
+        "title": "体育館の避難所の案内・対応",
+        "category": "その他",
+        "original": {
+          "messageId": "eval:organization",
+          "originalText": "隣の人に殴られそうです。怖いので助けてください。体育館入口です。",
+          "originalLanguage": "ja",
+          "createdAt": 1788878704114
+        },
+        "facts": [
+          {
+            "value": "困りごと：避難所の案内・対応",
+            "source": "ai_organized",
+            "confirmed": false,
+            "evidence": "隣の人に殴られそうです。怖いので助けてください。体育館入口です。",
+            "messageId": "eval:organization"
+          },
+          {
+            "value": "場所：体育館",
+            "source": "ai_organized",
+            "confirmed": false,
+            "evidence": "体育館",
+            "messageId": "eval:organization"
+          },
+          {
+            "value": "殴られそう",
+            "source": "user_text",
+            "confirmed": true,
+            "evidence": "殴られそう",
+            "messageId": "eval:organization"
+          }
+        ],
+        "requests": [
+          {
+            "value": "safety_assistance",
+            "source": "ai_organized",
+            "confirmed": false,
+            "evidence": "隣の人に殴られそうです。怖いので助けてください。体育館入口です。",
+            "messageId": "eval:organization"
+          }
+        ],
+        "context": [
+          {
+            "value": "体育館入口",
+            "source": "ai_organized",
+            "confirmed": false,
+            "evidence": "体育館入口",
+            "messageId": "eval:organization"
+          }
+        ],
+        "emotionalState": [
+          {
+            "value": "不安・怒り・焦り",
+            "source": "ai_organized",
+            "confirmed": false,
+            "evidence": "隣の人に殴られそうです。怖いので助けてください。体育館入口です。",
+            "messageId": "eval:organization"
+          },
+          {
+            "value": "不安・焦り・つらさ",
+            "source": "ai_organized",
+            "confirmed": false,
+            "evidence": "隣の人に殴られそうです。怖いので助けてください。体育館入口です。",
+            "messageId": "eval:organization"
+          }
+        ],
+        "uncertainPoints": [],
+        "safetySignals": [
+          {
+            "value": "暴力・武器",
+            "source": "safety_rule",
+            "confirmed": false,
+            "evidence": "隣の人に殴られそうです。怖いので助けてください。体育館入口です。",
+            "messageId": "eval:organization"
+          }
+        ],
+        "missingInformation": [],
+        "mode": "evidence-bound",
+        "status": "complete",
+        "organizedAt": 1788878704114
+      }
+    },
+    {
+      "id": "not-violence",
+      "ok": true,
+      "factHit": true,
+      "requestHit": true,
+      "contextHit": true,
+      "emotionHit": true,
+      "uncertaintyHit": true,
+      "safetyHit": true,
+      "noSafetyHit": true,
+      "separationHit": true,
+      "anchored": true,
+      "elapsedMs": 43,
+      "aiMode": "evidence-bound-organizer",
+      "organization": {
+        "schemaVersion": "phase2e.v1",
+        "title": "夜間の安全・騒音",
+        "category": "安全",
+        "original": {
+          "messageId": "eval:organization",
+          "originalText": "隣の人と少し言い合いになっただけで、暴力はありません。職員に話を聞いてほしいです。",
+          "originalLanguage": "ja",
+          "createdAt": 1788878704157
+        },
+        "facts": [
+          {
+            "value": "困りごと：夜間の安全・騒音",
+            "source": "ai_organized",
+            "confirmed": false,
+            "evidence": "隣の人と少し言い合いになっただけで、暴力はありません。職員に話を聞いてほしいです。",
+            "messageId": "eval:organization"
+          },
+          {
+            "value": "安全に関する相談",
+            "source": "user_text",
+            "confirmed": false,
+            "evidence": "隣の人と少し言い合いになっただけで、暴力はありません。職員に話を聞いてほしいです。",
+            "messageId": "eval:organization"
+          },
+          {
+            "value": "暴力はありません",
+            "source": "user_text",
+            "confirmed": true,
+            "evidence": "暴力はありません",
+            "messageId": "eval:organization"
+          },
+          {
+            "value": "言い合い",
+            "source": "user_text",
+            "confirmed": true,
+            "evidence": "言い合い",
+            "messageId": "eval:organization"
+          }
+        ],
+        "requests": [
+          {
+            "value": "general_assistance",
+            "source": "ai_organized",
+            "confirmed": false,
+            "evidence": "隣の人と少し言い合いになっただけで、暴力はありません。職員に話を聞いてほしいです。",
+            "messageId": "eval:organization"
+          }
+        ],
+        "context": [],
+        "emotionalState": [
+          {
+            "value": "不安や困りごとがある",
+            "source": "ai_organized",
+            "confirmed": false,
+            "evidence": "隣の人と少し言い合いになっただけで、暴力はありません。職員に話を聞いてほしいです。",
+            "messageId": "eval:organization"
+          }
+        ],
+        "uncertainPoints": [],
+        "safetySignals": [],
+        "missingInformation": [],
+        "mode": "evidence-bound",
+        "status": "complete",
+        "organizedAt": 1788878704157
+      }
+    },
+    {
+      "id": "strong-words-no-life-danger",
+      "ok": true,
+      "factHit": true,
+      "requestHit": true,
+      "contextHit": true,
+      "emotionHit": true,
+      "uncertaintyHit": true,
+      "safetyHit": true,
+      "noSafetyHit": true,
+      "separationHit": true,
+      "anchored": true,
+      "elapsedMs": 82,
+      "aiMode": "evidence-bound-organizer",
+      "organization": {
+        "schemaVersion": "phase2e.v1",
+        "title": "給水・配布案内",
+        "category": "水",
+        "original": {
+          "messageId": "eval:organization",
+          "originalText": "もう最悪です。これでは死んじゃいますよ。水の配布が遅すぎます。",
+          "originalLanguage": "ja",
+          "createdAt": 1788878704239
+        },
+        "facts": [
+          {
+            "value": "困りごと：給水・配布案内",
+            "source": "ai_organized",
+            "confirmed": false,
+            "evidence": "もう最悪です。これでは死んじゃいますよ。水の配布が遅すぎます。",
+            "messageId": "eval:organization"
+          },
+          {
+            "value": "飲料水に関する相談",
+            "source": "user_text",
+            "confirmed": false,
+            "evidence": "もう最悪です。これでは死んじゃいますよ。水の配布が遅すぎます。",
+            "messageId": "eval:organization"
+          },
+          {
+            "value": "水",
+            "source": "user_text",
+            "confirmed": true,
+            "evidence": "水",
+            "messageId": "eval:organization"
+          }
+        ],
+        "requests": [
+          {
+            "value": "water_supply",
+            "source": "ai_organized",
+            "confirmed": false,
+            "evidence": "もう最悪です。これでは死んじゃいますよ。水の配布が遅すぎます。",
+            "messageId": "eval:organization"
+          }
+        ],
+        "context": [],
+        "emotionalState": [
+          {
+            "value": "不安・怒り・焦り",
+            "source": "ai_organized",
+            "confirmed": false,
+            "evidence": "もう最悪です。これでは死んじゃいますよ。水の配布が遅すぎます。",
+            "messageId": "eval:organization"
+          },
+          {
+            "value": "強い切迫感・怒り・焦り",
+            "source": "ai_organized",
+            "confirmed": false,
+            "evidence": "もう最悪です。これでは死んじゃいますよ。水の配布が遅すぎます。",
+            "messageId": "eval:organization"
+          }
+        ],
+        "uncertainPoints": [
+          {
+            "value": "強い表現は感情として記録し、生命危険の事実とは分けて確認が必要です",
+            "source": "user_text",
+            "confirmed": false,
+            "uncertain": true,
+            "evidence": "もう最悪です。これでは死んじゃいますよ。水の配布が遅すぎます。",
+            "messageId": "eval:organization"
+          }
+        ],
+        "safetySignals": [],
+        "missingInformation": [],
+        "mode": "evidence-bound",
+        "status": "complete",
+        "organizedAt": 1788878704239
+      }
+    },
+    {
+      "id": "english-anger",
+      "ok": true,
+      "factHit": true,
+      "requestHit": true,
+      "contextHit": true,
+      "emotionHit": true,
+      "uncertaintyHit": true,
+      "safetyHit": true,
+      "noSafetyHit": true,
+      "separationHit": true,
+      "anchored": true,
+      "elapsedMs": 53,
+      "aiMode": "evidence-bound-organizer",
+      "organization": {
+        "schemaVersion": "phase2e.v1",
+        "title": "避難所の案内・対応",
+        "category": "その他",
+        "original": {
+          "messageId": "eval:organization",
+          "originalText": "I told you three times. There is no drinking water since this morning, and my child is thirsty. Please help us.",
+          "originalLanguage": "en",
+          "createdAt": 1788878704291
+        },
+        "facts": [
+          {
+            "value": "困りごと：避難所の案内・対応",
+            "source": "ai_organized",
+            "confirmed": false,
+            "evidence": "I told you three times. There is no drinking water since this morning, and my child is thirsty. Please help us.",
+            "messageId": "eval:organization"
+          },
+          {
+            "value": "飲料水に関する相談",
+            "source": "user_text",
+            "confirmed": false,
+            "evidence": "I told you three times. There is no drinking water since this morning, and my child is thirsty. Please help us.",
+            "messageId": "eval:organization"
+          },
+          {
+            "value": "対象者がいる",
+            "source": "user_text",
+            "confirmed": false,
+            "evidence": "I told you three times. There is no drinking water since this morning, and my child is thirsty. Please help us.",
+            "messageId": "eval:organization"
+          },
+          {
+            "value": "drinking water",
+            "source": "user_text",
+            "confirmed": true,
+            "evidence": "drinking water",
+            "messageId": "eval:organization"
+          },
+          {
+            "value": "morning",
+            "source": "user_text",
+            "confirmed": true,
+            "evidence": "morning",
+            "messageId": "eval:organization"
+          },
+          {
+            "value": "no drinking water",
+            "source": "user_text",
+            "confirmed": true,
+            "evidence": "no drinking water",
+            "messageId": "eval:organization"
+          }
+        ],
+        "requests": [
+          {
+            "value": "water_supply",
+            "source": "ai_organized",
+            "confirmed": false,
+            "evidence": "I told you three times. There is no drinking water since this morning, and my child is thirsty. Please help us.",
+            "messageId": "eval:organization"
+          }
+        ],
+        "context": [
+          {
+            "value": "子ども・1人",
+            "source": "ai_organized",
+            "confirmed": false,
+            "evidence": "I told you three times. There is no drinking water since this morning, and my child is thirsty. Please help us.",
+            "messageId": "eval:organization"
+          },
+          {
+            "value": "以前にも申し出た・繰り返し伝えた可能性があります",
+            "source": "user_text",
+            "confirmed": false,
+            "uncertain": true,
+            "evidence": "I told you three times. There is no drinking water since this morning, and my child is thirsty. Please help us.",
+            "messageId": "eval:organization"
+          }
+        ],
+        "emotionalState": [
+          {
+            "value": "不安・怒り・焦り",
+            "source": "ai_organized",
+            "confirmed": false,
+            "evidence": "I told you three times. There is no drinking water since this morning, and my child is thirsty. Please help us.",
+            "messageId": "eval:organization"
+          }
+        ],
+        "uncertainPoints": [
+          {
+            "value": "以前にも申し出た・繰り返し伝えた可能性があります",
+            "source": "user_text",
+            "confirmed": false,
+            "uncertain": true,
+            "evidence": "I told you three times. There is no drinking water since this morning, and my child is thirsty. Please help us.",
+            "messageId": "eval:organization"
+          }
+        ],
+        "safetySignals": [],
+        "missingInformation": [],
+        "mode": "evidence-bound",
+        "status": "complete",
+        "organizedAt": 1788878704291
+      }
+    },
+    {
+      "id": "chinese-anger",
+      "ok": true,
+      "factHit": true,
+      "requestHit": true,
+      "contextHit": true,
+      "emotionHit": true,
+      "uncertaintyHit": true,
+      "safetyHit": true,
+      "noSafetyHit": true,
+      "separationHit": true,
+      "anchored": true,
+      "elapsedMs": 44,
+      "aiMode": "evidence-bound-organizer",
+      "organization": {
+        "schemaVersion": "phase2e.v1",
+        "title": "飲料水不足",
+        "category": "水",
+        "original": {
+          "messageId": "eval:organization",
+          "originalText": "我已经说了好几次，饮用水没有了，孩子也很渴，请尽快补充。",
+          "originalLanguage": "zh",
+          "createdAt": 1788878704336
+        },
+        "facts": [
+          {
+            "value": "困りごと：飲料水不足",
+            "source": "ai_organized",
+            "confirmed": false,
+            "evidence": "我已经说了好几次，饮用水没有了，孩子也很渴，请尽快补充。",
+            "messageId": "eval:organization"
+          },
+          {
+            "value": "飲料水に関する相談",
+            "source": "user_text",
+            "confirmed": false,
+            "evidence": "我已经说了好几次，饮用水没有了，孩子也很渴，请尽快补充。",
+            "messageId": "eval:organization"
+          },
+          {
+            "value": "饮用水",
+            "source": "user_text",
+            "confirmed": true,
+            "evidence": "饮用水",
+            "messageId": "eval:organization"
+          },
+          {
+            "value": "没有",
+            "source": "user_text",
+            "confirmed": true,
+            "evidence": "没有",
+            "messageId": "eval:organization"
+          }
+        ],
+        "requests": [
+          {
+            "value": "water_supply",
+            "source": "ai_organized",
+            "confirmed": false,
+            "evidence": "我已经说了好几次，饮用水没有了，孩子也很渴，请尽快补充。",
+            "messageId": "eval:organization"
+          }
+        ],
+        "context": [
+          {
+            "value": "子ども・1人",
+            "source": "ai_organized",
+            "confirmed": false,
+            "evidence": "我已经说了好几次，饮用水没有了，孩子也很渴，请尽快补充。",
+            "messageId": "eval:organization"
+          },
+          {
+            "value": "以前にも申し出た・繰り返し伝えた可能性があります",
+            "source": "user_text",
+            "confirmed": false,
+            "uncertain": true,
+            "evidence": "我已经说了好几次，饮用水没有了，孩子也很渴，请尽快补充。",
+            "messageId": "eval:organization"
+          }
+        ],
+        "emotionalState": [
+          {
+            "value": "不安・怒り・焦り",
+            "source": "ai_organized",
+            "confirmed": false,
+            "evidence": "我已经说了好几次，饮用水没有了，孩子也很渴，请尽快补充。",
+            "messageId": "eval:organization"
+          }
+        ],
+        "uncertainPoints": [
+          {
+            "value": "以前にも申し出た・繰り返し伝えた可能性があります",
+            "source": "user_text",
+            "confirmed": false,
+            "uncertain": true,
+            "evidence": "我已经说了好几次，饮用水没有了，孩子也很渴，请尽快补充。",
+            "messageId": "eval:organization"
+          }
+        ],
+        "safetySignals": [],
+        "missingInformation": [],
+        "mode": "evidence-bound",
+        "status": "complete",
+        "organizedAt": 1788878704336
+      }
+    },
+    {
+      "id": "korean-anger",
+      "ok": true,
+      "factHit": true,
+      "requestHit": true,
+      "contextHit": true,
+      "emotionHit": true,
+      "uncertaintyHit": true,
+      "safetyHit": true,
+      "noSafetyHit": true,
+      "separationHit": true,
+      "anchored": true,
+      "elapsedMs": 47,
+      "aiMode": "evidence-bound-organizer",
+      "organization": {
+        "schemaVersion": "phase2e.v1",
+        "title": "避難所の案内・対応",
+        "category": "その他",
+        "original": {
+          "messageId": "eval:organization",
+          "originalText": "몇 번이나 말했는데 식수가 없습니다. 아이가 있고 너무 불안합니다. 빨리 도와주세요.",
+          "originalLanguage": "ko",
+          "createdAt": 1788878704382
+        },
+        "facts": [
+          {
+            "value": "困りごと：避難所の案内・対応",
+            "source": "ai_organized",
+            "confirmed": false,
+            "evidence": "몇 번이나 말했는데 식수가 없습니다. 아이가 있고 너무 불안합니다. 빨리 도와주세요.",
+            "messageId": "eval:organization"
+          },
+          {
+            "value": "飲料水に関する相談",
+            "source": "user_text",
+            "confirmed": false,
+            "evidence": "몇 번이나 말했는데 식수가 없습니다. 아이가 있고 너무 불안합니다. 빨리 도와주세요.",
+            "messageId": "eval:organization"
+          },
+          {
+            "value": "식수",
+            "source": "user_text",
+            "confirmed": true,
+            "evidence": "식수",
+            "messageId": "eval:organization"
+          },
+          {
+            "value": "없습니다",
+            "source": "user_text",
+            "confirmed": true,
+            "evidence": "없습니다",
+            "messageId": "eval:organization"
+          }
+        ],
+        "requests": [
+          {
+            "value": "water_supply",
+            "source": "ai_organized",
+            "confirmed": false,
+            "evidence": "몇 번이나 말했는데 식수가 없습니다. 아이가 있고 너무 불안합니다. 빨리 도와주세요.",
+            "messageId": "eval:organization"
+          }
+        ],
+        "context": [
+          {
+            "value": "子ども・1人",
+            "source": "ai_organized",
+            "confirmed": false,
+            "evidence": "몇 번이나 말했는데 식수가 없습니다. 아이가 있고 너무 불안합니다. 빨리 도와주세요.",
+            "messageId": "eval:organization"
+          },
+          {
+            "value": "以前にも申し出た・繰り返し伝えた可能性があります",
+            "source": "user_text",
+            "confirmed": false,
+            "uncertain": true,
+            "evidence": "몇 번이나 말했는데 식수가 없습니다. 아이가 있고 너무 불안합니다. 빨리 도와주세요.",
+            "messageId": "eval:organization"
+          }
+        ],
+        "emotionalState": [
+          {
+            "value": "不安・怒り・焦り",
+            "source": "ai_organized",
+            "confirmed": false,
+            "evidence": "몇 번이나 말했는데 식수가 없습니다. 아이가 있고 너무 불안합니다. 빨리 도와주세요.",
+            "messageId": "eval:organization"
+          }
+        ],
+        "uncertainPoints": [
+          {
+            "value": "以前にも申し出た・繰り返し伝えた可能性があります",
+            "source": "user_text",
+            "confirmed": false,
+            "uncertain": true,
+            "evidence": "몇 번이나 말했는데 식수가 없습니다. 아이가 있고 너무 불안합니다. 빨리 도와주세요.",
+            "messageId": "eval:organization"
+          }
+        ],
+        "safetySignals": [],
+        "missingInformation": [],
+        "mode": "evidence-bound",
+        "status": "complete",
+        "organizedAt": 1788878704382
+      }
+    },
+    {
+      "id": "quantity",
+      "ok": true,
+      "factHit": true,
+      "requestHit": true,
+      "contextHit": true,
+      "emotionHit": true,
+      "uncertaintyHit": true,
+      "safetyHit": true,
+      "noSafetyHit": true,
+      "separationHit": true,
+      "anchored": true,
+      "elapsedMs": 43,
+      "aiMode": "evidence-bound-organizer",
+      "organization": {
+        "schemaVersion": "phase2e.v1",
+        "title": "C区画の毛布の追加配布",
+        "category": "食料",
+        "original": {
+          "messageId": "eval:organization",
+          "originalText": "毛布が4枚足りません。大人2人と子ども2人です。体育館南側で、今夜必要です。",
+          "originalLanguage": "ja",
+          "createdAt": 1788878704425
+        },
+        "facts": [
+          {
+            "value": "困りごと：毛布の追加配布",
+            "source": "ai_organized",
+            "confirmed": false,
+            "evidence": "毛布が4枚足りません。大人2人と子ども2人です。体育館南側で、今夜必要です。",
+            "messageId": "eval:organization"
+          },
+          {
+            "value": "場所：C区画",
+            "source": "ai_organized",
+            "confirmed": false,
+            "evidence": "毛布が4枚足りません。大人2人と子ども2人です。体育館南側で、今夜必要です。",
+            "messageId": "eval:organization"
+          },
+          {
+            "value": "人数：4人",
+            "source": "ai_organized",
+            "confirmed": false,
+            "evidence": "毛布が4枚足りません。大人2人と子ども2人です。体育館南側で、今夜必要です。",
+            "messageId": "eval:organization"
+          },
+          {
+            "value": "残量・不足状況：4枚",
+            "source": "ai_organized",
+            "confirmed": false,
+            "evidence": "4枚",
+            "messageId": "eval:organization"
+          },
+          {
+            "value": "子どもを含む可能性",
+            "source": "ai_organized",
+            "confirmed": false,
+            "evidence": "毛布が4枚足りません。大人2人と子ども2人です。体育館南側で、今夜必要です。",
+            "messageId": "eval:organization"
+          },
+          {
+            "value": "毛布",
+            "source": "user_text",
+            "confirmed": true,
+            "evidence": "毛布",
+            "messageId": "eval:organization"
+          },
+          {
+            "value": "今夜",
+            "source": "user_text",
+            "confirmed": true,
+            "evidence": "今夜",
+            "messageId": "eval:organization"
+          },
+          {
+            "value": "4枚",
+            "source": "user_text",
+            "confirmed": true,
+            "evidence": "4枚",
+            "messageId": "eval:organization"
+          }
+        ],
+        "requests": [
+          {
+            "value": "food_supply",
+            "source": "ai_organized",
+            "confirmed": false,
+            "evidence": "毛布が4枚足りません。大人2人と子ども2人です。体育館南側で、今夜必要です。",
+            "messageId": "eval:organization"
+          }
+        ],
+        "context": [
+          {
+            "value": "体育館南側",
+            "source": "ai_organized",
+            "confirmed": false,
+            "evidence": "体育館南側",
+            "messageId": "eval:organization"
+          },
+          {
+            "value": "子ども・2人",
+            "source": "ai_organized",
+            "confirmed": false,
+            "evidence": "子ども",
+            "messageId": "eval:organization"
+          },
+          {
+            "value": "配慮が必要な人：子ども",
+            "source": "user_text",
+            "confirmed": false,
+            "evidence": "子ども",
+            "messageId": "eval:organization"
+          }
+        ],
+        "emotionalState": [
+          {
+            "value": "不安や困りごとがある",
+            "source": "ai_organized",
+            "confirmed": false,
+            "evidence": "毛布が4枚足りません。大人2人と子ども2人です。体育館南側で、今夜必要です。",
+            "messageId": "eval:organization"
+          }
+        ],
+        "uncertainPoints": [],
+        "safetySignals": [],
+        "missingInformation": [],
+        "mode": "evidence-bound",
+        "status": "complete",
+        "organizedAt": 1788878704425
+      }
+    },
+    {
+      "id": "location-time",
+      "ok": true,
+      "factHit": true,
+      "requestHit": true,
+      "contextHit": true,
+      "emotionHit": true,
+      "uncertaintyHit": true,
+      "safetyHit": true,
+      "noSafetyHit": true,
+      "separationHit": true,
+      "anchored": true,
+      "elapsedMs": 52,
+      "aiMode": "evidence-bound-organizer",
+      "organization": {
+        "schemaVersion": "phase2e.v1",
+        "title": "北トイレのトイレの使用・衛生",
+        "category": "トイレ",
+        "original": {
+          "messageId": "eval:organization",
+          "originalText": "北トイレが朝から使えません。場所は体育館の北側です。",
+          "originalLanguage": "ja",
+          "createdAt": 1788878704477
+        },
+        "facts": [
+          {
+            "value": "困りごと：トイレの使用・衛生",
+            "source": "ai_organized",
+            "confirmed": false,
+            "evidence": "北トイレが朝から使えません。場所は体育館の北側です。",
+            "messageId": "eval:organization"
+          },
+          {
+            "value": "場所：北トイレ",
+            "source": "ai_organized",
+            "confirmed": false,
+            "evidence": "場所",
+            "messageId": "eval:organization"
+          },
+          {
+            "value": "最後に受け取った時刻：朝から",
+            "source": "ai_organized",
+            "confirmed": false,
+            "evidence": "朝から",
+            "messageId": "eval:organization"
+          },
+          {
+            "value": "トイレ・衛生に関する相談",
+            "source": "user_text",
+            "confirmed": false,
+            "evidence": "トイレ",
+            "messageId": "eval:organization"
+          },
+          {
+            "value": "トイレ",
+            "source": "user_text",
+            "confirmed": true,
+            "evidence": "トイレ",
+            "messageId": "eval:organization"
+          },
+          {
+            "value": "朝から",
+            "source": "user_text",
+            "confirmed": true,
+            "evidence": "朝から",
+            "messageId": "eval:organization"
+          },
+          {
+            "value": "使えません",
+            "source": "user_text",
+            "confirmed": true,
+            "evidence": "使えません",
+            "messageId": "eval:organization"
+          }
+        ],
+        "requests": [
+          {
+            "value": "toilet_assistance",
+            "source": "ai_organized",
+            "confirmed": false,
+            "evidence": "北トイレが朝から使えません。場所は体育館の北側です。",
+            "messageId": "eval:organization"
+          }
+        ],
+        "context": [
+          {
+            "value": "北トイレ",
+            "source": "ai_organized",
+            "confirmed": false,
+            "evidence": "北トイレ",
+            "messageId": "eval:organization"
+          },
+          {
+            "value": "体育館の北側",
+            "source": "ai_organized",
+            "confirmed": false,
+            "evidence": "体育館の北側",
+            "messageId": "eval:organization"
+          },
+          {
+            "value": "朝から",
+            "source": "ai_organized",
+            "confirmed": false,
+            "evidence": "朝から",
+            "messageId": "eval:organization"
+          }
+        ],
+        "emotionalState": [
+          {
+            "value": "不安や困りごとがある",
+            "source": "ai_organized",
+            "confirmed": false,
+            "evidence": "北トイレが朝から使えません。場所は体育館の北側です。",
+            "messageId": "eval:organization"
+          }
+        ],
+        "uncertainPoints": [],
+        "safetySignals": [],
+        "missingInformation": [],
+        "mode": "evidence-bound",
+        "status": "complete",
+        "organizedAt": 1788878704477
+      }
+    },
+    {
+      "id": "medicine",
+      "ok": true,
+      "factHit": true,
+      "requestHit": true,
+      "contextHit": true,
+      "emotionHit": true,
+      "uncertaintyHit": true,
+      "safetyHit": true,
+      "noSafetyHit": true,
+      "separationHit": true,
+      "anchored": true,
+      "elapsedMs": 41,
+      "aiMode": "evidence-bound-organizer",
+      "organization": {
+        "schemaVersion": "phase2e.v1",
+        "title": "医療・体調の相談",
+        "category": "医療",
+        "original": {
+          "messageId": "eval:organization",
+          "originalText": "糖尿病の薬が今夜で切れます。救護所で相談したいです。",
+          "originalLanguage": "ja",
+          "createdAt": 1788878704518
+        },
+        "facts": [
+          {
+            "value": "困りごと：薬の不足・医療支援",
+            "source": "ai_organized",
+            "confirmed": false,
+            "evidence": "糖尿病の薬が今夜で切れます。救護所で相談したいです。",
+            "messageId": "eval:organization"
+          },
+          {
+            "value": "体調・医療に関する相談",
+            "source": "user_text",
+            "confirmed": false,
+            "evidence": "糖尿病の薬が今夜で切れます。救護所で相談したいです。",
+            "messageId": "eval:organization"
+          },
+          {
+            "value": "薬",
+            "source": "user_text",
+            "confirmed": true,
+            "evidence": "薬",
+            "messageId": "eval:organization"
+          },
+          {
+            "value": "糖尿病",
+            "source": "user_text",
+            "confirmed": true,
+            "evidence": "糖尿病",
+            "messageId": "eval:organization"
+          },
+          {
+            "value": "今夜",
+            "source": "user_text",
+            "confirmed": true,
+            "evidence": "今夜",
+            "messageId": "eval:organization"
+          }
+        ],
+        "requests": [
+          {
+            "value": "medical_assistance",
+            "source": "ai_organized",
+            "confirmed": false,
+            "evidence": "糖尿病の薬が今夜で切れます。救護所で相談したいです。",
+            "messageId": "eval:organization"
+          }
+        ],
+        "context": [
+          {
+            "value": "救護所",
+            "source": "ai_organized",
+            "confirmed": false,
+            "evidence": "救護所",
+            "messageId": "eval:organization"
+          },
+          {
+            "value": "配慮が必要な人：持病あり",
+            "source": "user_text",
+            "confirmed": false,
+            "evidence": "糖尿病の薬が今夜で切れます。救護所で相談したいです。",
+            "messageId": "eval:organization"
+          }
+        ],
+        "emotionalState": [
+          {
+            "value": "不安や困りごとがある",
+            "source": "ai_organized",
+            "confirmed": false,
+            "evidence": "糖尿病の薬が今夜で切れます。救護所で相談したいです。",
+            "messageId": "eval:organization"
+          }
+        ],
+        "uncertainPoints": [],
+        "safetySignals": [
+          {
+            "value": "重大な体調変化",
+            "source": "safety_rule",
+            "confirmed": false,
+            "evidence": "糖尿病の薬が今夜で切れます。救護所で相談したいです。",
+            "messageId": "eval:organization"
+          }
+        ],
+        "missingInformation": [],
+        "mode": "evidence-bound",
+        "status": "complete",
+        "organizedAt": 1788878704518
+      }
+    },
+    {
+      "id": "normal-charge",
+      "ok": true,
+      "factHit": true,
+      "requestHit": true,
+      "contextHit": true,
+      "emotionHit": true,
+      "uncertaintyHit": true,
+      "safetyHit": true,
+      "noSafetyHit": true,
+      "separationHit": true,
+      "anchored": true,
+      "elapsedMs": 42,
+      "aiMode": "evidence-bound-organizer",
+      "organization": {
+        "schemaVersion": "phase2e.v1",
+        "title": "充電場所・利用状況",
+        "category": "充電・通信",
+        "original": {
+          "messageId": "eval:organization",
+          "originalText": "スマートフォンを充電できる場所を教えてください。",
+          "originalLanguage": "ja",
+          "createdAt": 1788878704560
+        },
+        "facts": [
+          {
+            "value": "困りごと：充電場所・利用状況",
+            "source": "ai_organized",
+            "confirmed": false,
+            "evidence": "スマートフォンを充電できる場所を教えてください。",
+            "messageId": "eval:organization"
+          },
+          {
+            "value": "充電",
+            "source": "user_text",
+            "confirmed": true,
+            "evidence": "充電",
+            "messageId": "eval:organization"
+          }
+        ],
+        "requests": [
+          {
+            "value": "general_assistance",
+            "source": "ai_organized",
+            "confirmed": false,
+            "evidence": "スマートフォンを充電できる場所を教えてください。",
+            "messageId": "eval:organization"
+          }
+        ],
+        "context": [],
+        "emotionalState": [
+          {
+            "value": "不安や困りごとがある",
+            "source": "ai_organized",
+            "confirmed": false,
+            "evidence": "スマートフォンを充電できる場所を教えてください。",
+            "messageId": "eval:organization"
+          }
+        ],
+        "uncertainPoints": [],
+        "safetySignals": [],
+        "missingInformation": [],
+        "mode": "evidence-bound",
+        "status": "complete",
+        "organizedAt": 1788878704560
+      }
+    },
+    {
+      "id": "normal-pet",
+      "ok": true,
+      "factHit": true,
+      "requestHit": true,
+      "contextHit": true,
+      "emotionHit": true,
+      "uncertaintyHit": true,
+      "safetyHit": true,
+      "noSafetyHit": true,
+      "separationHit": true,
+      "anchored": true,
+      "elapsedMs": 49,
+      "aiMode": "evidence-bound-organizer",
+      "organization": {
+        "schemaVersion": "phase2e.v1",
+        "title": "ペットの受け入れ・ルール",
+        "category": "ペット",
+        "original": {
+          "messageId": "eval:organization",
+          "originalText": "ペットを連れてきました。過ごせる場所とルールを教えてください。",
+          "originalLanguage": "ja",
+          "createdAt": 1788878704610
+        },
+        "facts": [
+          {
+            "value": "困りごと：ペットの受け入れ・ルール",
+            "source": "ai_organized",
+            "confirmed": false,
+            "evidence": "ルール",
+            "messageId": "eval:organization"
+          }
+        ],
+        "requests": [
+          {
+            "value": "general_assistance",
+            "source": "ai_organized",
+            "confirmed": false,
+            "evidence": "ペットを連れてきました。過ごせる場所とルールを教えてください。",
+            "messageId": "eval:organization"
+          }
+        ],
+        "context": [],
+        "emotionalState": [
+          {
+            "value": "不安や困りごとがある",
+            "source": "ai_organized",
+            "confirmed": false,
+            "evidence": "ペットを連れてきました。過ごせる場所とルールを教えてください。",
+            "messageId": "eval:organization"
+          }
+        ],
+        "uncertainPoints": [],
+        "safetySignals": [],
+        "missingInformation": [],
+        "mode": "evidence-bound",
+        "status": "complete",
+        "organizedAt": 1788878704610
+      }
+    },
+    {
+      "id": "missing",
+      "ok": true,
+      "factHit": true,
+      "requestHit": true,
+      "contextHit": true,
+      "emotionHit": true,
+      "uncertaintyHit": true,
+      "safetyHit": true,
+      "noSafetyHit": true,
+      "separationHit": true,
+      "anchored": true,
+      "elapsedMs": 44,
+      "aiMode": "evidence-bound-organizer",
+      "organization": {
+        "schemaVersion": "phase2e.v1",
+        "title": "避難所の案内・対応",
+        "category": "その他",
+        "original": {
+          "messageId": "eval:organization",
+          "originalText": "困っています。",
+          "originalLanguage": "ja",
+          "createdAt": 1788878704653
+        },
+        "facts": [
+          {
+            "value": "困りごと：避難所の案内・対応",
+            "source": "ai_organized",
+            "confirmed": false,
+            "evidence": "困っています。",
+            "messageId": "eval:organization"
+          }
+        ],
+        "requests": [
+          {
+            "value": "general_assistance",
+            "source": "ai_organized",
+            "confirmed": false,
+            "evidence": "困っています。",
+            "messageId": "eval:organization"
+          }
+        ],
+        "context": [],
+        "emotionalState": [
+          {
+            "value": "不安や困りごとがある",
+            "source": "ai_organized",
+            "confirmed": false,
+            "evidence": "困っています。",
+            "messageId": "eval:organization"
+          }
+        ],
+        "uncertainPoints": [],
+        "safetySignals": [],
+        "missingInformation": [],
+        "mode": "evidence-bound",
+        "status": "complete",
+        "organizedAt": 1788878704653
+      }
+    },
+    {
+      "id": "correction",
+      "ok": true,
+      "factHit": true,
+      "requestHit": true,
+      "contextHit": true,
+      "emotionHit": true,
+      "uncertaintyHit": true,
+      "safetyHit": true,
+      "noSafetyHit": true,
+      "separationHit": true,
+      "anchored": true,
+      "elapsedMs": 49,
+      "aiMode": "evidence-bound-organizer",
+      "organization": {
+        "schemaVersion": "phase2e.v1",
+        "title": "飲料水不足",
+        "category": "水",
+        "original": {
+          "messageId": "eval:organization",
+          "originalText": "最初は水がないと思いましたが、今は少しあります。ただ、子どもがいて今日中に追加の水が必要です。",
+          "originalLanguage": "ja",
+          "createdAt": 1788878704696
+        },
+        "facts": [
+          {
+            "value": "困りごと：飲料水不足",
+            "source": "ai_organized",
+            "confirmed": false,
+            "evidence": "最初は水がないと思いましたが、今は少しあります。ただ、子どもがいて今日中に追加の水が必要です。",
+            "messageId": "eval:organization"
+          },
+          {
+            "value": "子どもを含む可能性",
+            "source": "ai_organized",
+            "confirmed": false,
+            "evidence": "最初は水がないと思いましたが、今は少しあります。ただ、子どもがいて今日中に追加の水が必要です。",
+            "messageId": "eval:organization"
+          },
+          {
+            "value": "飲料水に関する相談",
+            "source": "user_text",
+            "confirmed": false,
+            "evidence": "最初は水がないと思いましたが、今は少しあります。ただ、子どもがいて今日中に追加の水が必要です。",
+            "messageId": "eval:organization"
+          },
+          {
+            "value": "水",
+            "source": "user_text",
+            "confirmed": true,
+            "evidence": "水",
+            "messageId": "eval:organization"
+          },
+          {
+            "value": "今日中",
+            "source": "user_text",
+            "confirmed": true,
+            "evidence": "今日中",
+            "messageId": "eval:organization"
+          },
+          {
+            "value": "少しあります",
+            "source": "user_text",
+            "confirmed": true,
+            "evidence": "少しあります",
+            "messageId": "eval:organization"
+          }
+        ],
+        "requests": [
+          {
+            "value": "water_supply",
+            "source": "ai_organized",
+            "confirmed": false,
+            "evidence": "最初は水がないと思いましたが、今は少しあります。ただ、子どもがいて今日中に追加の水が必要です。",
+            "messageId": "eval:organization"
+          }
+        ],
+        "context": [
+          {
+            "value": "子ども・1人",
+            "source": "ai_organized",
+            "confirmed": false,
+            "evidence": "子ども",
+            "messageId": "eval:organization"
+          },
+          {
+            "value": "配慮が必要な人：子ども",
+            "source": "user_text",
+            "confirmed": false,
+            "evidence": "子ども",
+            "messageId": "eval:organization"
+          }
+        ],
+        "emotionalState": [
+          {
+            "value": "不安や困りごとがある",
+            "source": "ai_organized",
+            "confirmed": false,
+            "evidence": "最初は水がないと思いましたが、今は少しあります。ただ、子どもがいて今日中に追加の水が必要です。",
+            "messageId": "eval:organization"
+          }
+        ],
+        "uncertainPoints": [
+          {
+            "value": "本人の表現に不確実さがあります",
+            "source": "user_text",
+            "confirmed": false,
+            "uncertain": true,
+            "evidence": "最初は水がないと思いましたが、今は少しあります。ただ、子どもがいて今日中に追加の水が必要です。",
+            "messageId": "eval:organization"
+          }
+        ],
+        "safetySignals": [],
+        "missingInformation": [],
+        "mode": "evidence-bound",
+        "status": "complete",
+        "organizedAt": 1788878704696
+      }
+    }
+  ],
+  "faultTest": {
+    "ok": true,
+    "aiMode": "organization-fallback",
+    "runtimeMode": "auto",
+    "selectedLanguage": "ja",
+    "organization": {
+      "schemaVersion": "phase2e.v1",
+      "title": "飲料水不足",
+      "category": "水",
+      "original": {
+        "messageId": "eval:organization",
+        "originalText": "何回言っても誰も来ないんですけど！昨日から水が全然なくて、子ども2人がいます。早く持ってきてください！",
+        "originalLanguage": "ja",
+        "createdAt": 1788878704752
+      },
+      "facts": [
+        {
+          "value": "困りごと：飲料水不足",
+          "source": "ai_organized",
+          "confirmed": false,
+          "evidence": "何回言っても誰も来ないんですけど！昨日から水が全然なくて、子ども2人がいます。早く持ってきてください！",
+          "messageId": "eval:organization"
+        },
+        {
+          "value": "人数：2人",
+          "source": "ai_organized",
+          "confirmed": false,
+          "evidence": "2人",
+          "messageId": "eval:organization"
+        },
+        {
+          "value": "最後に受け取った時刻：昨日",
+          "source": "ai_organized",
+          "confirmed": false,
+          "evidence": "昨日",
+          "messageId": "eval:organization"
+        },
+        {
+          "value": "子どもを含む可能性",
+          "source": "ai_organized",
+          "confirmed": false,
+          "evidence": "何回言っても誰も来ないんですけど！昨日から水が全然なくて、子ども2人がいます。早く持ってきてください！",
+          "messageId": "eval:organization"
+        },
+        {
+          "value": "以前にも申し出た可能性",
+          "source": "ai_organized",
+          "confirmed": false,
+          "evidence": "何回言っても誰も来ないんですけど！昨日から水が全然なくて、子ども2人がいます。早く持ってきてください！",
+          "messageId": "eval:organization"
+        },
+        {
+          "value": "飲料水に関する相談",
+          "source": "user_text",
+          "confirmed": false,
+          "evidence": "何回言っても誰も来ないんですけど！昨日から水が全然なくて、子ども2人がいます。早く持ってきてください！",
+          "messageId": "eval:organization"
+        },
+        {
+          "value": "水",
+          "source": "user_text",
+          "confirmed": true,
+          "evidence": "水",
+          "messageId": "eval:organization"
+        }
+      ],
+      "requests": [
+        {
+          "value": "water_supply",
+          "source": "ai_organized",
+          "confirmed": false,
+          "evidence": "何回言っても誰も来ないんですけど！昨日から水が全然なくて、子ども2人がいます。早く持ってきてください！",
+          "messageId": "eval:organization"
+        }
+      ],
+      "context": [
+        {
+          "value": "子ども・2人",
+          "source": "ai_organized",
+          "confirmed": false,
+          "evidence": "子ども",
+          "messageId": "eval:organization"
+        },
+        {
+          "value": "配慮が必要な人：子ども",
+          "source": "user_text",
+          "confirmed": false,
+          "evidence": "子ども",
+          "messageId": "eval:organization"
+        },
+        {
+          "value": "昨日",
+          "source": "ai_organized",
+          "confirmed": false,
+          "evidence": "昨日",
+          "messageId": "eval:organization"
+        },
+        {
+          "value": "以前にも申し出た・繰り返し伝えた可能性があります",
+          "source": "user_text",
+          "confirmed": false,
+          "uncertain": true,
+          "evidence": "何回言っても誰も来ないんですけど！昨日から水が全然なくて、子ども2人がいます。早く持ってきてください！",
+          "messageId": "eval:organization"
+        }
+      ],
+      "emotionalState": [
+        {
+          "value": "不安・怒り・焦り",
+          "source": "ai_organized",
+          "confirmed": false,
+          "evidence": "何回言っても誰も来ないんですけど！昨日から水が全然なくて、子ども2人がいます。早く持ってきてください！",
+          "messageId": "eval:organization"
+        },
+        {
+          "value": "強い切迫感・怒り・焦り",
+          "source": "ai_organized",
+          "confirmed": false,
+          "evidence": "何回言っても誰も来ないんですけど！昨日から水が全然なくて、子ども2人がいます。早く持ってきてください！",
+          "messageId": "eval:organization"
+        }
+      ],
+      "uncertainPoints": [
+        {
+          "value": "以前にも申し出た・繰り返し伝えた可能性があります",
+          "source": "user_text",
+          "confirmed": false,
+          "uncertain": true,
+          "evidence": "何回言っても誰も来ないんですけど！昨日から水が全然なくて、子ども2人がいます。早く持ってきてください！",
+          "messageId": "eval:organization"
+        }
+      ],
+      "safetySignals": [],
+      "missingInformation": [],
+      "mode": "fallback",
+      "status": "fallback",
+      "organizedAt": 1788878704752
+    },
+    "safety": {
+      "flags": [],
+      "immediate": false
+    },
+    "telemetry": {
+      "stage": "organize",
+      "model": null,
+      "promptVariant": "full",
+      "safetyGuardMs": 0,
+      "preprocessingMs": 0,
+      "totalMs": 1,
+      "fallback": true
+    },
+    "elapsedMs": 48,
+    "httpStatus": 200
+  }
+}

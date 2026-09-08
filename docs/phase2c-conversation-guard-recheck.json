@@ -1,0 +1,23 @@
+{
+  "generatedAt": "2026-09-08T11:34:57.178Z",
+  "caseCount": 2,
+  "passed": 2,
+  "rows": [
+    {
+      "id": "multiple-symptoms",
+      "text": "子どもが熱っぽくて、息も苦しそうです",
+      "status": 200,
+      "reply": "状況を確認します。必要な情報を一つだけ教えてください。",
+      "forbidden": false,
+      "aiMode": "model-gateway"
+    },
+    {
+      "id": "mixed",
+      "text": "Waterがありません、体育館Aです",
+      "status": 200,
+      "reply": "体育館Aで水がないとのこと、お困りですね。",
+      "forbidden": false,
+      "aiMode": "model-gateway"
+    }
+  ]
+}

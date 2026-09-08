@@ -53,6 +53,9 @@ export default defineConfig(async ({ mode }) => {
       AI_CONVERSATION_MODEL: localEnv.AI_CONVERSATION_MODEL ?? '',
       AI_EXTRACTION_MODEL: localEnv.AI_EXTRACTION_MODEL ?? '',
       AI_MODEL_MAX_TOKENS: localEnv.AI_MODEL_MAX_TOKENS ?? '',
+      AI_MODEL_STREAMING: localEnv.AI_MODEL_STREAMING ?? '',
+      AI_EXTRACTION_PROMPT_VARIANT: localEnv.AI_EXTRACTION_PROMPT_VARIANT ?? '',
+      AI_ALLOW_EVAL_MODEL_OVERRIDE: localEnv.AI_ALLOW_EVAL_MODEL_OVERRIDE ?? '',
     } : {},
   };
 

@@ -1,0 +1,5130 @@
+{
+  "generatedAt": "2026-09-08T11:12:52.954Z",
+  "baseUrl": "http://localhost:3000",
+  "casesPerLanguage": 10,
+  "languages": [
+    "ja",
+    "en",
+    "zh",
+    "ko"
+  ],
+  "rows": [
+    {
+      "id": "ja-water",
+      "language": "ja",
+      "label": "飲料水不足",
+      "input": "体育館Aで飲み水がなく、4人が昨日から待っています。",
+      "expected": {
+        "location": "体育館A",
+        "target": {
+          "count": 4
+        },
+        "request": "water_supply",
+        "urgency": "medium",
+        "safetyFlags": [],
+        "missingFields": [],
+        "facts": [
+          "飲み水",
+          "4人",
+          "昨日"
+        ]
+      },
+      "critical": false,
+      "safety": {
+        "status": 200,
+        "actual": false,
+        "flags": []
+      },
+      "extraction": {
+        "status": 200,
+        "elapsedMs": 25658,
+        "incident": {
+          "language": "ja",
+          "location": "体育館A",
+          "target": {
+            "type": null,
+            "count": 4,
+            "ageGroup": null
+          },
+          "facts": [
+            "飲み水が不足している",
+            "水",
+            "飲料水・給水の不足または案内",
+            "昨日"
+          ],
+          "request": "water_supply",
+          "urgency": "medium",
+          "safetyFlags": [],
+          "missingFields": [],
+          "askedFields": [
+            "場所",
+            "人数",
+            "残量",
+            "最後に受け取った時刻",
+            "追加確認"
+          ],
+          "originalText": [
+            "体育館Aで飲み水がなく、4人が昨日から待っています。"
+          ],
+          "confidence": 0.95,
+          "category": null
+        },
+        "data": {
+          "ok": true,
+          "aiMode": "model-gateway",
+          "runtimeMode": "auto",
+          "provider": "openai-compatible",
+          "incident": {
+            "language": "ja",
+            "location": "体育館A",
+            "target": {
+              "type": null,
+              "count": 4,
+              "ageGroup": null
+            },
+            "facts": [
+              "飲み水が不足している",
+              "水",
+              "飲料水・給水の不足または案内",
+              "昨日"
+            ],
+            "request": "water_supply",
+            "urgency": "medium",
+            "safetyFlags": [],
+            "missingFields": [],
+            "askedFields": [
+              "場所",
+              "人数",
+              "残量",
+              "最後に受け取った時刻",
+              "追加確認"
+            ],
+            "originalText": [
+              "体育館Aで飲み水がなく、4人が昨日から待っています。"
+            ],
+            "confidence": 0.95,
+            "category": null
+          },
+          "safety": {
+            "flags": [],
+            "immediate": false
+          },
+          "telemetry": {
+            "stage": "extract",
+            "model": "qwen3.5:4b",
+            "promptVariant": "full",
+            "safetyGuardMs": 0,
+            "preprocessingMs": 0,
+            "modelTimings": {
+              "requestBuildMs": 0,
+              "httpHeadersMs": 7018,
+              "firstTokenMs": 7019,
+              "promptUntilFirstTokenMs": 1,
+              "generationMs": 18497,
+              "bodyReadMs": 18498,
+              "jsonParseMs": 0,
+              "totalMs": 25516,
+              "stream": true,
+              "promptEvalMs": null,
+              "generationEvalMs": null,
+              "serverTotalMs": null,
+              "modelLoadMs": null,
+              "queueMs": null,
+              "promptTokens": null,
+              "completionTokens": null
+            },
+            "normalizationMs": 1,
+            "totalMs": 25517,
+            "fallback": false
+          }
+        }
+      },
+      "conversation": {
+        "status": 200,
+        "elapsedMs": 8905,
+        "reply": "体育館Aで飲み水がないとのこと、4人全員が待っている状況ですね。",
+        "nextField": "場所",
+        "valid": true,
+        "languageLeak": false
+      }
+    },
+    {
+      "id": "ja-toilet",
+      "language": "ja",
+      "label": "トイレ故障",
+      "input": "北トイレが詰まっていて使えません。",
+      "expected": {
+        "location": "北トイレ",
+        "target": null,
+        "request": "toilet_assistance",
+        "urgency": "medium",
+        "safetyFlags": [],
+        "missingFields": [],
+        "facts": [
+          "北トイレ",
+          "詰ま",
+          "使えません"
+        ]
+      },
+      "critical": false,
+      "safety": {
+        "status": 200,
+        "actual": false,
+        "flags": []
+      },
+      "extraction": {
+        "status": 200,
+        "elapsedMs": 23692,
+        "incident": {
+          "language": "ja",
+          "location": "北トイレ",
+          "target": null,
+          "facts": [
+            "トイレ",
+            "詰ま",
+            "トイレに関する相談",
+            "使用できない"
+          ],
+          "request": "toilet_assistance",
+          "urgency": "medium",
+          "safetyFlags": [],
+          "missingFields": [],
+          "askedFields": [
+            "場所",
+            "人数",
+            "残量",
+            "最後に受け取った時刻",
+            "追加確認"
+          ],
+          "originalText": [
+            "北トイレが詰まっていて使えません。"
+          ],
+          "confidence": null,
+          "category": null
+        },
+        "data": {
+          "ok": true,
+          "aiMode": "model-gateway",
+          "runtimeMode": "auto",
+          "provider": "openai-compatible",
+          "incident": {
+            "language": "ja",
+            "location": "北トイレ",
+            "target": null,
+            "facts": [
+              "トイレ",
+              "詰ま",
+              "トイレに関する相談",
+              "使用できない"
+            ],
+            "request": "toilet_assistance",
+            "urgency": "medium",
+            "safetyFlags": [],
+            "missingFields": [],
+            "askedFields": [
+              "場所",
+              "人数",
+              "残量",
+              "最後に受け取った時刻",
+              "追加確認"
+            ],
+            "originalText": [
+              "北トイレが詰まっていて使えません。"
+            ],
+            "confidence": null,
+            "category": null
+          },
+          "safety": {
+            "flags": [],
+            "immediate": false
+          },
+          "telemetry": {
+            "stage": "extract",
+            "model": "qwen3.5:4b",
+            "promptVariant": "full",
+            "safetyGuardMs": 0,
+            "preprocessingMs": 0,
+            "modelTimings": {
+              "requestBuildMs": 0,
+              "httpHeadersMs": 7092,
+              "firstTokenMs": 7094,
+              "promptUntilFirstTokenMs": 2,
+              "generationMs": 16292,
+              "bodyReadMs": 16294,
+              "jsonParseMs": 0,
+              "totalMs": 23386,
+              "stream": true,
+              "promptEvalMs": null,
+              "generationEvalMs": null,
+              "serverTotalMs": null,
+              "modelLoadMs": null,
+              "queueMs": null,
+              "promptTokens": null,
+              "completionTokens": null
+            },
+            "normalizationMs": 28,
+            "totalMs": 23414,
+            "fallback": false
+          }
+        }
+      },
+      "conversation": {
+        "status": 200,
+        "elapsedMs": 5603,
+        "reply": "北トイレが詰まって使えません。",
+        "nextField": "場所",
+        "valid": true,
+        "languageLeak": false
+      }
+    },
+    {
+      "id": "ja-infant",
+      "language": "ja",
+      "label": "乳児用品",
+      "input": "受付の近くで赤ちゃん1人のおむつが足りません。",
+      "expected": {
+        "location": "受付",
+        "target": {
+          "count": 1,
+          "type": "infant"
+        },
+        "request": "infant_supplies",
+        "urgency": "medium",
+        "safetyFlags": [],
+        "missingFields": [],
+        "facts": [
+          "赤ちゃん",
+          "おむつ"
+        ]
+      },
+      "critical": false,
+      "safety": {
+        "status": 200,
+        "actual": false,
+        "flags": []
+      },
+      "extraction": {
+        "status": 200,
+        "elapsedMs": 27450,
+        "incident": {
+          "language": "ja",
+          "location": null,
+          "target": {
+            "type": "infant",
+            "count": 1,
+            "ageGroup": null
+          },
+          "facts": [
+            "受付の近くで",
+            "赤ちゃん 1 人",
+            "おむつが足りません",
+            "おむつ",
+            "育児用品が不足",
+            "赤ちゃんがいる"
+          ],
+          "request": "infant_supplies",
+          "urgency": "medium",
+          "safetyFlags": [],
+          "missingFields": [
+            "場所"
+          ],
+          "askedFields": [
+            "場所",
+            "人数",
+            "残量",
+            "最後に受け取った時刻",
+            "追加確認"
+          ],
+          "originalText": [
+            "受付の近くで赤ちゃん1人のおむつが足りません。"
+          ],
+          "confidence": null,
+          "category": null
+        },
+        "data": {
+          "ok": true,
+          "aiMode": "model-gateway",
+          "runtimeMode": "auto",
+          "provider": "openai-compatible",
+          "incident": {
+            "language": "ja",
+            "location": null,
+            "target": {
+              "type": "infant",
+              "count": 1,
+              "ageGroup": null
+            },
+            "facts": [
+              "受付の近くで",
+              "赤ちゃん 1 人",
+              "おむつが足りません",
+              "おむつ",
+              "育児用品が不足",
+              "赤ちゃんがいる"
+            ],
+            "request": "infant_supplies",
+            "urgency": "medium",
+            "safetyFlags": [],
+            "missingFields": [
+              "場所"
+            ],
+            "askedFields": [
+              "場所",
+              "人数",
+              "残量",
+              "最後に受け取った時刻",
+              "追加確認"
+            ],
+            "originalText": [
+              "受付の近くで赤ちゃん1人のおむつが足りません。"
+            ],
+            "confidence": null,
+            "category": null
+          },
+          "safety": {
+            "flags": [],
+            "immediate": false
+          },
+          "telemetry": {
+            "stage": "extract",
+            "model": "qwen3.5:4b",
+            "promptVariant": "full",
+            "safetyGuardMs": 0,
+            "preprocessingMs": 0,
+            "modelTimings": {
+              "requestBuildMs": 0,
+              "httpHeadersMs": 7100,
+              "firstTokenMs": 7101,
+              "promptUntilFirstTokenMs": 1,
+              "generationMs": 19808,
+              "bodyReadMs": 19809,
+              "jsonParseMs": 0,
+              "totalMs": 26909,
+              "stream": true,
+              "promptEvalMs": null,
+              "generationEvalMs": null,
+              "serverTotalMs": null,
+              "modelLoadMs": null,
+              "queueMs": null,
+              "promptTokens": null,
+              "completionTokens": null
+            },
+            "normalizationMs": 254,
+            "totalMs": 27163,
+            "fallback": false
+          }
+        }
+      },
+      "conversation": {
+        "status": 200,
+        "elapsedMs": 6190,
+        "reply": "おむつ不足の相談ありがとうございます。",
+        "nextField": "場所",
+        "valid": true,
+        "languageLeak": false
+      }
+    },
+    {
+      "id": "ja-fever",
+      "language": "ja",
+      "label": "高熱",
+      "input": "1階の救護所で子どもが39℃あって、ぐったりしています。",
+      "expected": {
+        "location": "1階の救護所",
+        "target": {
+          "count": 1,
+          "type": "child"
+        },
+        "request": "medical_assistance",
+        "urgency": "high",
+        "safetyFlags": [
+          "possible_medical_emergency"
+        ],
+        "missingFields": [],
+        "facts": [
+          "39℃",
+          "ぐったり"
+        ]
+      },
+      "critical": true,
+      "safety": {
+        "status": 200,
+        "actual": true,
+        "flags": [
+          "重大な体調変化"
+        ]
+      },
+      "extraction": {
+        "status": 200,
+        "elapsedMs": 24344,
+        "incident": {
+          "language": "ja",
+          "location": null,
+          "target": {
+            "type": "child",
+            "count": 1,
+            "ageGroup": null
+          },
+          "facts": [
+            "39℃の高熱がある",
+            "ぐったりしている（意識・体力の低下）",
+            "子どもがいる",
+            "39度の発熱",
+            "ぐったりしている"
+          ],
+          "request": "medical_assistance",
+          "urgency": "high",
+          "safetyFlags": [
+            "possible_medical_emergency"
+          ],
+          "missingFields": [
+            "場所"
+          ],
+          "askedFields": [],
+          "originalText": [
+            "1階の救護所で子どもが39℃あって、ぐったりしています。"
+          ],
+          "confidence": 0.85,
+          "category": null
+        },
+        "data": {
+          "ok": true,
+          "aiMode": "model-gateway",
+          "runtimeMode": "auto",
+          "provider": "openai-compatible",
+          "incident": {
+            "language": "ja",
+            "location": null,
+            "target": {
+              "type": "child",
+              "count": 1,
+              "ageGroup": null
+            },
+            "facts": [
+              "39℃の高熱がある",
+              "ぐったりしている（意識・体力の低下）",
+              "子どもがいる",
+              "39度の発熱",
+              "ぐったりしている"
+            ],
+            "request": "medical_assistance",
+            "urgency": "high",
+            "safetyFlags": [
+              "possible_medical_emergency"
+            ],
+            "missingFields": [
+              "場所"
+            ],
+            "askedFields": [],
+            "originalText": [
+              "1階の救護所で子どもが39℃あって、ぐったりしています。"
+            ],
+            "confidence": 0.85,
+            "category": null
+          },
+          "safety": {
+            "flags": [
+              "重大な体調変化"
+            ],
+            "immediate": true
+          },
+          "telemetry": {
+            "stage": "extract",
+            "model": "qwen3.5:4b",
+            "promptVariant": "full",
+            "safetyGuardMs": 1,
+            "preprocessingMs": 0,
+            "modelTimings": {
+              "requestBuildMs": 0,
+              "httpHeadersMs": 7488,
+              "firstTokenMs": 7489,
+              "promptUntilFirstTokenMs": 1,
+              "generationMs": 15966,
+              "bodyReadMs": 15967,
+              "jsonParseMs": 0,
+              "totalMs": 23455,
+              "stream": true,
+              "promptEvalMs": null,
+              "generationEvalMs": null,
+              "serverTotalMs": null,
+              "modelLoadMs": null,
+              "queueMs": null,
+              "promptTokens": null,
+              "completionTokens": null
+            },
+            "normalizationMs": 1,
+            "totalMs": 23457,
+            "fallback": false
+          }
+        }
+      },
+      "conversation": {
+        "status": 200,
+        "elapsedMs": 6434,
+        "reply": "緊急の可能性がある内容として、先に職員へ知らせます。今いる場所を教えてください。",
+        "nextField": "場所",
+        "valid": true,
+        "languageLeak": false
+      }
+    },
+    {
+      "id": "ja-unconscious",
+      "language": "ja",
+      "label": "意識異常",
+      "input": "入口の近くで人が倒れて、意識がありません。",
+      "expected": {
+        "location": "入口",
+        "target": null,
+        "request": "medical_assistance",
+        "urgency": "high",
+        "safetyFlags": [
+          "possible_medical_emergency"
+        ],
+        "missingFields": [],
+        "facts": [
+          "倒れ",
+          "意識がありません"
+        ]
+      },
+      "critical": true,
+      "safety": {
+        "status": 200,
+        "actual": true,
+        "flags": [
+          "意識・呼吸の異常"
+        ]
+      },
+      "extraction": {
+        "status": 200,
+        "elapsedMs": 22455,
+        "incident": {
+          "language": "ja",
+          "location": null,
+          "target": null,
+          "facts": [
+            "意識がない",
+            "意識・反応の異常"
+          ],
+          "request": "medical_assistance",
+          "urgency": "high",
+          "safetyFlags": [
+            "possible_medical_emergency"
+          ],
+          "missingFields": [
+            "場所"
+          ],
+          "askedFields": [],
+          "originalText": [
+            "入口の近くで人が倒れて、意識がありません。"
+          ],
+          "confidence": 0.85,
+          "category": null
+        },
+        "data": {
+          "ok": true,
+          "aiMode": "model-gateway",
+          "runtimeMode": "auto",
+          "provider": "openai-compatible",
+          "incident": {
+            "language": "ja",
+            "location": null,
+            "target": null,
+            "facts": [
+              "意識がない",
+              "意識・反応の異常"
+            ],
+            "request": "medical_assistance",
+            "urgency": "high",
+            "safetyFlags": [
+              "possible_medical_emergency"
+            ],
+            "missingFields": [
+              "場所"
+            ],
+            "askedFields": [],
+            "originalText": [
+              "入口の近くで人が倒れて、意識がありません。"
+            ],
+            "confidence": 0.85,
+            "category": null
+          },
+          "safety": {
+            "flags": [
+              "意識・呼吸の異常"
+            ],
+            "immediate": true
+          },
+          "telemetry": {
+            "stage": "extract",
+            "model": "qwen3.5:4b",
+            "promptVariant": "full",
+            "safetyGuardMs": 0,
+            "preprocessingMs": 0,
+            "modelTimings": {
+              "requestBuildMs": 0,
+              "httpHeadersMs": 7183,
+              "firstTokenMs": 7184,
+              "promptUntilFirstTokenMs": 1,
+              "generationMs": 15216,
+              "bodyReadMs": 15217,
+              "jsonParseMs": 1,
+              "totalMs": 22401,
+              "stream": true,
+              "promptEvalMs": null,
+              "generationEvalMs": null,
+              "serverTotalMs": null,
+              "modelLoadMs": null,
+              "queueMs": null,
+              "promptTokens": null,
+              "completionTokens": null
+            },
+            "normalizationMs": 0,
+            "totalMs": 22401,
+            "fallback": false
+          }
+        }
+      },
+      "conversation": {
+        "status": 200,
+        "elapsedMs": 1573,
+        "reply": "緊急の可能性がある内容として、先に職員へ知らせます。今いる場所を教えてください。",
+        "nextField": "場所",
+        "valid": true,
+        "languageLeak": false
+      }
+    },
+    {
+      "id": "ja-breathing",
+      "language": "ja",
+      "label": "呼吸異常",
+      "input": "B区画の人が息ができないと言っています。",
+      "expected": {
+        "location": "B区画",
+        "target": null,
+        "request": "medical_assistance",
+        "urgency": "high",
+        "safetyFlags": [
+          "possible_medical_emergency"
+        ],
+        "missingFields": [],
+        "facts": [
+          "息ができない"
+        ]
+      },
+      "critical": true,
+      "safety": {
+        "status": 200,
+        "actual": true,
+        "flags": [
+          "意識・呼吸の異常"
+        ]
+      },
+      "extraction": {
+        "status": 200,
+        "elapsedMs": 21345,
+        "incident": {
+          "language": "ja",
+          "location": "B区画",
+          "target": null,
+          "facts": [
+            "B 区画の人が息ができないと言っています。",
+            "呼吸・会話の異常"
+          ],
+          "request": "medical_assistance",
+          "urgency": "high",
+          "safetyFlags": [
+            "possible_medical_emergency"
+          ],
+          "missingFields": [],
+          "askedFields": [],
+          "originalText": [
+            "B区画の人が息ができないと言っています。"
+          ],
+          "confidence": 0.85,
+          "category": null
+        },
+        "data": {
+          "ok": true,
+          "aiMode": "model-gateway",
+          "runtimeMode": "auto",
+          "provider": "openai-compatible",
+          "incident": {
+            "language": "ja",
+            "location": "B区画",
+            "target": null,
+            "facts": [
+              "B 区画の人が息ができないと言っています。",
+              "呼吸・会話の異常"
+            ],
+            "request": "medical_assistance",
+            "urgency": "high",
+            "safetyFlags": [
+              "possible_medical_emergency"
+            ],
+            "missingFields": [],
+            "askedFields": [],
+            "originalText": [
+              "B区画の人が息ができないと言っています。"
+            ],
+            "confidence": 0.85,
+            "category": null
+          },
+          "safety": {
+            "flags": [
+              "意識・呼吸の異常"
+            ],
+            "immediate": true
+          },
+          "telemetry": {
+            "stage": "extract",
+            "model": "qwen3.5:4b",
+            "promptVariant": "full",
+            "safetyGuardMs": 0,
+            "preprocessingMs": 0,
+            "modelTimings": {
+              "requestBuildMs": 0,
+              "httpHeadersMs": 6757,
+              "firstTokenMs": 6757,
+              "promptUntilFirstTokenMs": 0,
+              "generationMs": 14524,
+              "bodyReadMs": 14524,
+              "jsonParseMs": 0,
+              "totalMs": 21281,
+              "stream": true,
+              "promptEvalMs": null,
+              "generationEvalMs": null,
+              "serverTotalMs": null,
+              "modelLoadMs": null,
+              "queueMs": null,
+              "promptTokens": null,
+              "completionTokens": null
+            },
+            "normalizationMs": 0,
+            "totalMs": 21281,
+            "fallback": false
+          }
+        }
+      },
+      "conversation": {
+        "status": 200,
+        "elapsedMs": 5948,
+        "reply": "緊急の可能性がある内容として、先に職員へ知らせます。今いる場所を教えてください。",
+        "nextField": "場所",
+        "valid": true,
+        "languageLeak": false
+      }
+    },
+    {
+      "id": "ja-fire",
+      "language": "ja",
+      "label": "火災",
+      "input": "調理室から煙が出て、火が見えます。",
+      "expected": {
+        "location": "調理室",
+        "target": null,
+        "request": "fire_response",
+        "urgency": "high",
+        "safetyFlags": [
+          "possible_fire"
+        ],
+        "missingFields": [],
+        "facts": [
+          "煙",
+          "火"
+        ]
+      },
+      "critical": true,
+      "safety": {
+        "status": 200,
+        "actual": true,
+        "flags": [
+          "火災・煙"
+        ]
+      },
+      "extraction": {
+        "status": 200,
+        "elapsedMs": 19638,
+        "incident": {
+          "language": "ja",
+          "location": "調理室",
+          "target": null,
+          "facts": [
+            "調理室から煙が出ている",
+            "煙または火"
+          ],
+          "request": "fire_response",
+          "urgency": "high",
+          "safetyFlags": [
+            "possible_fire"
+          ],
+          "missingFields": [],
+          "askedFields": [],
+          "originalText": [
+            "調理室から煙が出て、火が見えます。"
+          ],
+          "confidence": 0.95,
+          "category": null
+        },
+        "data": {
+          "ok": true,
+          "aiMode": "model-gateway",
+          "runtimeMode": "auto",
+          "provider": "openai-compatible",
+          "incident": {
+            "language": "ja",
+            "location": "調理室",
+            "target": null,
+            "facts": [
+              "調理室から煙が出ている",
+              "煙または火"
+            ],
+            "request": "fire_response",
+            "urgency": "high",
+            "safetyFlags": [
+              "possible_fire"
+            ],
+            "missingFields": [],
+            "askedFields": [],
+            "originalText": [
+              "調理室から煙が出て、火が見えます。"
+            ],
+            "confidence": 0.95,
+            "category": null
+          },
+          "safety": {
+            "flags": [
+              "火災・煙"
+            ],
+            "immediate": true
+          },
+          "telemetry": {
+            "stage": "extract",
+            "model": "qwen3.5:4b",
+            "promptVariant": "full",
+            "safetyGuardMs": 0,
+            "preprocessingMs": 0,
+            "modelTimings": {
+              "requestBuildMs": 0,
+              "httpHeadersMs": 7010,
+              "firstTokenMs": 7011,
+              "promptUntilFirstTokenMs": 1,
+              "generationMs": 12145,
+              "bodyReadMs": 12146,
+              "jsonParseMs": 0,
+              "totalMs": 19156,
+              "stream": true,
+              "promptEvalMs": null,
+              "generationEvalMs": null,
+              "serverTotalMs": null,
+              "modelLoadMs": null,
+              "queueMs": null,
+              "promptTokens": null,
+              "completionTokens": null
+            },
+            "normalizationMs": 0,
+            "totalMs": 19156,
+            "fallback": false
+          }
+        }
+      },
+      "conversation": {
+        "status": 200,
+        "elapsedMs": 5452,
+        "reply": "緊急の可能性がある内容として、先に職員へ知らせます。今いる場所を教えてください。",
+        "nextField": "場所",
+        "valid": true,
+        "languageLeak": false
+      }
+    },
+    {
+      "id": "ja-violence",
+      "language": "ja",
+      "label": "暴力",
+      "input": "入口付近で刃物を持った人が周りを脅しています。",
+      "expected": {
+        "location": "入口付近",
+        "target": null,
+        "request": "safety_assistance",
+        "urgency": "high",
+        "safetyFlags": [
+          "possible_violence"
+        ],
+        "missingFields": [],
+        "facts": [
+          "刃物",
+          "脅"
+        ]
+      },
+      "critical": true,
+      "safety": {
+        "status": 200,
+        "actual": true,
+        "flags": [
+          "暴力・武器"
+        ]
+      },
+      "extraction": {
+        "status": 200,
+        "elapsedMs": 21712,
+        "incident": {
+          "language": "ja",
+          "location": "入口付近",
+          "target": null,
+          "facts": [
+            "安全上の危険"
+          ],
+          "request": "safety_assistance",
+          "urgency": "high",
+          "safetyFlags": [
+            "possible_violence"
+          ],
+          "missingFields": [],
+          "askedFields": [],
+          "originalText": [
+            "入口付近で刃物を持った人が周りを脅しています。"
+          ],
+          "confidence": null,
+          "category": null
+        },
+        "data": {
+          "ok": true,
+          "aiMode": "model-gateway",
+          "runtimeMode": "auto",
+          "provider": "openai-compatible",
+          "incident": {
+            "language": "ja",
+            "location": "入口付近",
+            "target": null,
+            "facts": [
+              "安全上の危険"
+            ],
+            "request": "safety_assistance",
+            "urgency": "high",
+            "safetyFlags": [
+              "possible_violence"
+            ],
+            "missingFields": [],
+            "askedFields": [],
+            "originalText": [
+              "入口付近で刃物を持った人が周りを脅しています。"
+            ],
+            "confidence": null,
+            "category": null
+          },
+          "safety": {
+            "flags": [
+              "暴力・武器"
+            ],
+            "immediate": true
+          },
+          "telemetry": {
+            "stage": "extract",
+            "model": "qwen3.5:4b",
+            "promptVariant": "full",
+            "safetyGuardMs": 0,
+            "preprocessingMs": 0,
+            "modelTimings": {
+              "requestBuildMs": 0,
+              "httpHeadersMs": 7254,
+              "firstTokenMs": 7255,
+              "promptUntilFirstTokenMs": 1,
+              "generationMs": 14399,
+              "bodyReadMs": 14400,
+              "jsonParseMs": 0,
+              "totalMs": 21654,
+              "stream": true,
+              "promptEvalMs": null,
+              "generationEvalMs": null,
+              "serverTotalMs": null,
+              "modelLoadMs": null,
+              "queueMs": null,
+              "promptTokens": null,
+              "completionTokens": null
+            },
+            "normalizationMs": 0,
+            "totalMs": 21654,
+            "fallback": false
+          }
+        }
+      },
+      "conversation": {
+        "status": 200,
+        "elapsedMs": 5649,
+        "reply": "緊急の可能性がある内容として、先に職員へ知らせます。今いる場所を教えてください。",
+        "nextField": "場所",
+        "valid": true,
+        "languageLeak": false
+      }
+    },
+    {
+      "id": "ja-angry",
+      "language": "ja",
+      "label": "強い怒り・非緊急",
+      "input": "何回言えばいいんですか。A区画の毛布がまだ来ません。",
+      "expected": {
+        "location": "A区画",
+        "target": null,
+        "request": "general_assistance",
+        "urgency": "medium",
+        "safetyFlags": [],
+        "missingFields": [],
+        "facts": [
+          "毛布",
+          "まだ来ません"
+        ]
+      },
+      "critical": false,
+      "safety": {
+        "status": 200,
+        "actual": false,
+        "flags": []
+      },
+      "extraction": {
+        "status": 200,
+        "elapsedMs": 21949,
+        "incident": {
+          "language": "ja",
+          "location": "A区画",
+          "target": null,
+          "facts": [
+            "A 区画の毛布がまだ来ません",
+            "毛布"
+          ],
+          "request": "food_supply",
+          "urgency": "medium",
+          "safetyFlags": [],
+          "missingFields": [
+            "人数"
+          ],
+          "askedFields": [
+            "追加確認"
+          ],
+          "originalText": [
+            "何回言えばいいんですか。A区画の毛布がまだ来ません。"
+          ],
+          "confidence": null,
+          "category": null
+        },
+        "data": {
+          "ok": true,
+          "aiMode": "model-gateway",
+          "runtimeMode": "auto",
+          "provider": "openai-compatible",
+          "incident": {
+            "language": "ja",
+            "location": "A区画",
+            "target": null,
+            "facts": [
+              "A 区画の毛布がまだ来ません",
+              "毛布"
+            ],
+            "request": "food_supply",
+            "urgency": "medium",
+            "safetyFlags": [],
+            "missingFields": [
+              "人数"
+            ],
+            "askedFields": [
+              "追加確認"
+            ],
+            "originalText": [
+              "何回言えばいいんですか。A区画の毛布がまだ来ません。"
+            ],
+            "confidence": null,
+            "category": null
+          },
+          "safety": {
+            "flags": [],
+            "immediate": false
+          },
+          "telemetry": {
+            "stage": "extract",
+            "model": "qwen3.5:4b",
+            "promptVariant": "full",
+            "safetyGuardMs": 0,
+            "preprocessingMs": 0,
+            "modelTimings": {
+              "requestBuildMs": 0,
+              "httpHeadersMs": 7013,
+              "firstTokenMs": 7014,
+              "promptUntilFirstTokenMs": 1,
+              "generationMs": 14631,
+              "bodyReadMs": 14632,
+              "jsonParseMs": 0,
+              "totalMs": 21645,
+              "stream": true,
+              "promptEvalMs": null,
+              "generationEvalMs": null,
+              "serverTotalMs": null,
+              "modelLoadMs": null,
+              "queueMs": null,
+              "promptTokens": null,
+              "completionTokens": null
+            },
+            "normalizationMs": 9,
+            "totalMs": 21654,
+            "fallback": false
+          }
+        }
+      },
+      "conversation": {
+        "status": 200,
+        "elapsedMs": 7421,
+        "reply": "毛布が来ないのは困りますね。",
+        "nextField": "場所",
+        "valid": true,
+        "languageLeak": false
+      }
+    },
+    {
+      "id": "ja-uncertain",
+      "language": "ja",
+      "label": "情報不足・不確実",
+      "input": "たぶん多目的室の充電器が壊れているかもしれません。",
+      "expected": {
+        "location": "多目的室",
+        "target": null,
+        "request": "general_assistance",
+        "urgency": "unknown",
+        "safetyFlags": [],
+        "missingFields": [
+          "追加確認"
+        ],
+        "facts": [
+          "充電器",
+          "かもしれません"
+        ]
+      },
+      "critical": false,
+      "safety": {
+        "status": 200,
+        "actual": false,
+        "flags": []
+      },
+      "extraction": {
+        "status": 200,
+        "elapsedMs": 20160,
+        "incident": {
+          "language": "ja",
+          "location": null,
+          "target": null,
+          "facts": [
+            "充電"
+          ],
+          "request": "general_assistance",
+          "urgency": "unknown",
+          "safetyFlags": [],
+          "missingFields": [
+            "場所",
+            "追加確認"
+          ],
+          "askedFields": [],
+          "originalText": [
+            "たぶん多目的室の充電器が壊れているかもしれません。"
+          ],
+          "confidence": null,
+          "category": null
+        },
+        "data": {
+          "ok": true,
+          "aiMode": "model-gateway",
+          "runtimeMode": "auto",
+          "provider": "openai-compatible",
+          "incident": {
+            "language": "ja",
+            "location": null,
+            "target": null,
+            "facts": [
+              "充電"
+            ],
+            "request": "general_assistance",
+            "urgency": "unknown",
+            "safetyFlags": [],
+            "missingFields": [
+              "場所",
+              "追加確認"
+            ],
+            "askedFields": [],
+            "originalText": [
+              "たぶん多目的室の充電器が壊れているかもしれません。"
+            ],
+            "confidence": null,
+            "category": null
+          },
+          "safety": {
+            "flags": [],
+            "immediate": false
+          },
+          "telemetry": {
+            "stage": "extract",
+            "model": "qwen3.5:4b",
+            "promptVariant": "full",
+            "safetyGuardMs": 0,
+            "preprocessingMs": 0,
+            "modelTimings": {
+              "requestBuildMs": 0,
+              "httpHeadersMs": 6972,
+              "firstTokenMs": 6972,
+              "promptUntilFirstTokenMs": 0,
+              "generationMs": 13121,
+              "bodyReadMs": 13121,
+              "jsonParseMs": 0,
+              "totalMs": 20093,
+              "stream": true,
+              "promptEvalMs": null,
+              "generationEvalMs": null,
+              "serverTotalMs": null,
+              "modelLoadMs": null,
+              "queueMs": null,
+              "promptTokens": null,
+              "completionTokens": null
+            },
+            "normalizationMs": 0,
+            "totalMs": 20093,
+            "fallback": false
+          }
+        }
+      },
+      "conversation": {
+        "status": 200,
+        "elapsedMs": 8967,
+        "reply": "充電器の故障が避難所の安全を脅かす恐れがある場合は、すぐ対応してください。",
+        "nextField": "場所",
+        "valid": true,
+        "languageLeak": false
+      }
+    },
+    {
+      "id": "en-water",
+      "language": "en",
+      "label": "drinking water",
+      "input": "There is no drinking water left in Gymnasium A. Four people have been waiting since yesterday.",
+      "expected": {
+        "location": "Gymnasium A",
+        "target": {
+          "count": 4
+        },
+        "request": "water_supply",
+        "urgency": "medium",
+        "safetyFlags": [],
+        "missingFields": [],
+        "facts": [
+          "drinking water",
+          "Four",
+          "yesterday"
+        ]
+      },
+      "critical": false,
+      "safety": {
+        "status": 200,
+        "actual": false,
+        "flags": []
+      },
+      "extraction": {
+        "status": 200,
+        "elapsedMs": 23536,
+        "incident": {
+          "language": "en",
+          "location": "Gymnasium A",
+          "target": null,
+          "facts": [
+            "Four people have been waiting since yesterday"
+          ],
+          "request": "water_supply",
+          "urgency": "medium",
+          "safetyFlags": [],
+          "missingFields": [
+            "人数"
+          ],
+          "askedFields": [
+            "場所",
+            "残量",
+            "追加確認"
+          ],
+          "originalText": [
+            "There is no drinking water left in Gymnasium A. Four people have been waiting since yesterday."
+          ],
+          "confidence": 0.95,
+          "category": null
+        },
+        "data": {
+          "ok": true,
+          "aiMode": "model-gateway",
+          "runtimeMode": "auto",
+          "provider": "openai-compatible",
+          "incident": {
+            "language": "en",
+            "location": "Gymnasium A",
+            "target": null,
+            "facts": [
+              "Four people have been waiting since yesterday"
+            ],
+            "request": "water_supply",
+            "urgency": "medium",
+            "safetyFlags": [],
+            "missingFields": [
+              "人数"
+            ],
+            "askedFields": [
+              "場所",
+              "残量",
+              "追加確認"
+            ],
+            "originalText": [
+              "There is no drinking water left in Gymnasium A. Four people have been waiting since yesterday."
+            ],
+            "confidence": 0.95,
+            "category": null
+          },
+          "safety": {
+            "flags": [],
+            "immediate": false
+          },
+          "telemetry": {
+            "stage": "extract",
+            "model": "qwen3.5:4b",
+            "promptVariant": "full",
+            "safetyGuardMs": 0,
+            "preprocessingMs": 0,
+            "modelTimings": {
+              "requestBuildMs": 0,
+              "httpHeadersMs": 7072,
+              "firstTokenMs": 7073,
+              "promptUntilFirstTokenMs": 1,
+              "generationMs": 15894,
+              "bodyReadMs": 15895,
+              "jsonParseMs": 0,
+              "totalMs": 22967,
+              "stream": true,
+              "promptEvalMs": null,
+              "generationEvalMs": null,
+              "serverTotalMs": null,
+              "modelLoadMs": null,
+              "queueMs": null,
+              "promptTokens": null,
+              "completionTokens": null
+            },
+            "normalizationMs": 0,
+            "totalMs": 22967,
+            "fallback": false
+          }
+        }
+      },
+      "conversation": {
+        "status": 200,
+        "elapsedMs": 6530,
+        "reply": "I hear you. Four people have been waiting since yesterday without water.",
+        "nextField": "場所",
+        "valid": true,
+        "languageLeak": false
+      }
+    },
+    {
+      "id": "en-toilet",
+      "language": "en",
+      "label": "toilet",
+      "input": "The north toilet is blocked and cannot be used.",
+      "expected": {
+        "location": "north toilet",
+        "target": null,
+        "request": "toilet_assistance",
+        "urgency": "medium",
+        "safetyFlags": [],
+        "missingFields": [],
+        "facts": [
+          "north toilet",
+          "blocked",
+          "cannot be used"
+        ]
+      },
+      "critical": false,
+      "safety": {
+        "status": 200,
+        "actual": false,
+        "flags": []
+      },
+      "extraction": {
+        "status": 200,
+        "elapsedMs": 23073,
+        "incident": {
+          "language": "en",
+          "location": "north toilet",
+          "target": null,
+          "facts": [
+            "The north toilet is blocked and cannot be used."
+          ],
+          "request": "toilet_assistance",
+          "urgency": "medium",
+          "safetyFlags": [],
+          "missingFields": [],
+          "askedFields": [
+            "場所",
+            "人数",
+            "残量",
+            "最後に受け取った時刻",
+            "追加確認"
+          ],
+          "originalText": [
+            "The north toilet is blocked and cannot be used."
+          ],
+          "confidence": null,
+          "category": null
+        },
+        "data": {
+          "ok": true,
+          "aiMode": "model-gateway",
+          "runtimeMode": "auto",
+          "provider": "openai-compatible",
+          "incident": {
+            "language": "en",
+            "location": "north toilet",
+            "target": null,
+            "facts": [
+              "The north toilet is blocked and cannot be used."
+            ],
+            "request": "toilet_assistance",
+            "urgency": "medium",
+            "safetyFlags": [],
+            "missingFields": [],
+            "askedFields": [
+              "場所",
+              "人数",
+              "残量",
+              "最後に受け取った時刻",
+              "追加確認"
+            ],
+            "originalText": [
+              "The north toilet is blocked and cannot be used."
+            ],
+            "confidence": null,
+            "category": null
+          },
+          "safety": {
+            "flags": [],
+            "immediate": false
+          },
+          "telemetry": {
+            "stage": "extract",
+            "model": "qwen3.5:4b",
+            "promptVariant": "full",
+            "safetyGuardMs": 0,
+            "preprocessingMs": 0,
+            "modelTimings": {
+              "requestBuildMs": 0,
+              "httpHeadersMs": 7017,
+              "firstTokenMs": 7021,
+              "promptUntilFirstTokenMs": 4,
+              "generationMs": 15991,
+              "bodyReadMs": 15995,
+              "jsonParseMs": 0,
+              "totalMs": 23012,
+              "stream": true,
+              "promptEvalMs": null,
+              "generationEvalMs": null,
+              "serverTotalMs": null,
+              "modelLoadMs": null,
+              "queueMs": null,
+              "promptTokens": null,
+              "completionTokens": null
+            },
+            "normalizationMs": 0,
+            "totalMs": 23012,
+            "fallback": false
+          }
+        }
+      },
+      "conversation": {
+        "status": 200,
+        "elapsedMs": 5899,
+        "reply": "The north toilet is blocked and cannot be used.",
+        "nextField": "場所",
+        "valid": true,
+        "languageLeak": false
+      }
+    },
+    {
+      "id": "en-infant",
+      "language": "en",
+      "label": "infant supplies",
+      "input": "We need diapers for one baby near the reception desk.",
+      "expected": {
+        "location": "reception desk",
+        "target": {
+          "count": 1,
+          "type": "infant"
+        },
+        "request": "infant_supplies",
+        "urgency": "medium",
+        "safetyFlags": [],
+        "missingFields": [],
+        "facts": [
+          "diapers",
+          "one baby"
+        ]
+      },
+      "critical": false,
+      "safety": {
+        "status": 200,
+        "actual": false,
+        "flags": []
+      },
+      "extraction": {
+        "status": 200,
+        "elapsedMs": 26205,
+        "incident": {
+          "language": "en",
+          "location": null,
+          "target": {
+            "type": "infant",
+            "count": 1,
+            "ageGroup": null
+          },
+          "facts": [],
+          "request": "infant_supplies",
+          "urgency": "medium",
+          "safetyFlags": [],
+          "missingFields": [
+            "場所"
+          ],
+          "askedFields": [
+            "場所",
+            "人数",
+            "残量",
+            "最後に受け取った時刻",
+            "追加確認"
+          ],
+          "originalText": [
+            "We need diapers for one baby near the reception desk."
+          ],
+          "confidence": 0.95,
+          "category": null
+        },
+        "data": {
+          "ok": true,
+          "aiMode": "model-gateway",
+          "runtimeMode": "auto",
+          "provider": "openai-compatible",
+          "incident": {
+            "language": "en",
+            "location": null,
+            "target": {
+              "type": "infant",
+              "count": 1,
+              "ageGroup": null
+            },
+            "facts": [],
+            "request": "infant_supplies",
+            "urgency": "medium",
+            "safetyFlags": [],
+            "missingFields": [
+              "場所"
+            ],
+            "askedFields": [
+              "場所",
+              "人数",
+              "残量",
+              "最後に受け取った時刻",
+              "追加確認"
+            ],
+            "originalText": [
+              "We need diapers for one baby near the reception desk."
+            ],
+            "confidence": 0.95,
+            "category": null
+          },
+          "safety": {
+            "flags": [],
+            "immediate": false
+          },
+          "telemetry": {
+            "stage": "extract",
+            "model": "qwen3.5:4b",
+            "promptVariant": "full",
+            "safetyGuardMs": 0,
+            "preprocessingMs": 0,
+            "modelTimings": {
+              "requestBuildMs": 0,
+              "httpHeadersMs": 6886,
+              "firstTokenMs": 6888,
+              "promptUntilFirstTokenMs": 2,
+              "generationMs": 19248,
+              "bodyReadMs": 19250,
+              "jsonParseMs": 0,
+              "totalMs": 26136,
+              "stream": true,
+              "promptEvalMs": null,
+              "generationEvalMs": null,
+              "serverTotalMs": null,
+              "modelLoadMs": null,
+              "queueMs": null,
+              "promptTokens": null,
+              "completionTokens": null
+            },
+            "normalizationMs": 0,
+            "totalMs": 26136,
+            "fallback": false
+          }
+        }
+      },
+      "conversation": {
+        "status": 200,
+        "elapsedMs": 5817,
+        "reply": "We will help you find diapers for the baby.",
+        "nextField": "場所",
+        "valid": true,
+        "languageLeak": false
+      }
+    },
+    {
+      "id": "en-fever",
+      "language": "en",
+      "label": "high fever",
+      "input": "My child has a fever of 39°C and is very weak in the first-floor medical room.",
+      "expected": {
+        "location": "first-floor medical room",
+        "target": {
+          "count": 1,
+          "type": "child"
+        },
+        "request": "medical_assistance",
+        "urgency": "high",
+        "safetyFlags": [
+          "possible_medical_emergency"
+        ],
+        "missingFields": [],
+        "facts": [
+          "39°C",
+          "very weak"
+        ]
+      },
+      "critical": true,
+      "safety": {
+        "status": 200,
+        "actual": true,
+        "flags": [
+          "重大な体調変化"
+        ]
+      },
+      "extraction": {
+        "status": 200,
+        "elapsedMs": 23306,
+        "incident": {
+          "language": "en",
+          "location": null,
+          "target": {
+            "type": "child",
+            "count": 1,
+            "ageGroup": null
+          },
+          "facts": [
+            "Fever of 39°C"
+          ],
+          "request": "medical_assistance",
+          "urgency": "high",
+          "safetyFlags": [
+            "possible_medical_emergency"
+          ],
+          "missingFields": [
+            "場所"
+          ],
+          "askedFields": [],
+          "originalText": [
+            "My child has a fever of 39°C and is very weak in the first-floor medical room."
+          ],
+          "confidence": 0.95,
+          "category": null
+        },
+        "data": {
+          "ok": true,
+          "aiMode": "model-gateway",
+          "runtimeMode": "auto",
+          "provider": "openai-compatible",
+          "incident": {
+            "language": "en",
+            "location": null,
+            "target": {
+              "type": "child",
+              "count": 1,
+              "ageGroup": null
+            },
+            "facts": [
+              "Fever of 39°C"
+            ],
+            "request": "medical_assistance",
+            "urgency": "high",
+            "safetyFlags": [
+              "possible_medical_emergency"
+            ],
+            "missingFields": [
+              "場所"
+            ],
+            "askedFields": [],
+            "originalText": [
+              "My child has a fever of 39°C and is very weak in the first-floor medical room."
+            ],
+            "confidence": 0.95,
+            "category": null
+          },
+          "safety": {
+            "flags": [],
+            "immediate": false
+          },
+          "telemetry": {
+            "stage": "extract",
+            "model": "qwen3.5:4b",
+            "promptVariant": "full",
+            "safetyGuardMs": 0,
+            "preprocessingMs": 0,
+            "modelTimings": {
+              "requestBuildMs": 1,
+              "httpHeadersMs": 6988,
+              "firstTokenMs": 6989,
+              "promptUntilFirstTokenMs": 1,
+              "generationMs": 16097,
+              "bodyReadMs": 16098,
+              "jsonParseMs": 0,
+              "totalMs": 23086,
+              "stream": true,
+              "promptEvalMs": null,
+              "generationEvalMs": null,
+              "serverTotalMs": null,
+              "modelLoadMs": null,
+              "queueMs": null,
+              "promptTokens": null,
+              "completionTokens": null
+            },
+            "normalizationMs": 0,
+            "totalMs": 23086,
+            "fallback": false
+          }
+        }
+      },
+      "conversation": {
+        "status": 200,
+        "elapsedMs": 6818,
+        "reply": "I am sorry to hear about your child's illness. Please stay calm and follow the medical staff's instructions.",
+        "nextField": "場所",
+        "valid": true,
+        "languageLeak": false
+      }
+    },
+    {
+      "id": "en-unconscious",
+      "language": "en",
+      "label": "unconscious",
+      "input": "A person is unconscious near the entrance.",
+      "expected": {
+        "location": "entrance",
+        "target": null,
+        "request": "medical_assistance",
+        "urgency": "high",
+        "safetyFlags": [
+          "possible_medical_emergency"
+        ],
+        "missingFields": [],
+        "facts": [
+          "unconscious"
+        ]
+      },
+      "critical": true,
+      "safety": {
+        "status": 200,
+        "actual": true,
+        "flags": [
+          "意識・呼吸の異常"
+        ]
+      },
+      "extraction": {
+        "status": 200,
+        "elapsedMs": 21437,
+        "incident": {
+          "language": "en",
+          "location": null,
+          "target": {
+            "type": "person",
+            "count": 1,
+            "ageGroup": null
+          },
+          "facts": [
+            "A person is unconscious near the entrance."
+          ],
+          "request": "medical_assistance",
+          "urgency": "high",
+          "safetyFlags": [
+            "possible_medical_emergency"
+          ],
+          "missingFields": [
+            "場所"
+          ],
+          "askedFields": [],
+          "originalText": [
+            "A person is unconscious near the entrance."
+          ],
+          "confidence": 0.85,
+          "category": null
+        },
+        "data": {
+          "ok": true,
+          "aiMode": "model-gateway",
+          "runtimeMode": "auto",
+          "provider": "openai-compatible",
+          "incident": {
+            "language": "en",
+            "location": null,
+            "target": {
+              "type": "person",
+              "count": 1,
+              "ageGroup": null
+            },
+            "facts": [
+              "A person is unconscious near the entrance."
+            ],
+            "request": "medical_assistance",
+            "urgency": "high",
+            "safetyFlags": [
+              "possible_medical_emergency"
+            ],
+            "missingFields": [
+              "場所"
+            ],
+            "askedFields": [],
+            "originalText": [
+              "A person is unconscious near the entrance."
+            ],
+            "confidence": 0.85,
+            "category": null
+          },
+          "safety": {
+            "flags": [
+              "意識・呼吸の異常"
+            ],
+            "immediate": true
+          },
+          "telemetry": {
+            "stage": "extract",
+            "model": "qwen3.5:4b",
+            "promptVariant": "full",
+            "safetyGuardMs": 0,
+            "preprocessingMs": 0,
+            "modelTimings": {
+              "requestBuildMs": 0,
+              "httpHeadersMs": 7069,
+              "firstTokenMs": 7070,
+              "promptUntilFirstTokenMs": 1,
+              "generationMs": 14316,
+              "bodyReadMs": 14317,
+              "jsonParseMs": 0,
+              "totalMs": 21386,
+              "stream": true,
+              "promptEvalMs": null,
+              "generationEvalMs": null,
+              "serverTotalMs": null,
+              "modelLoadMs": null,
+              "queueMs": null,
+              "promptTokens": null,
+              "completionTokens": null
+            },
+            "normalizationMs": 1,
+            "totalMs": 21387,
+            "fallback": false
+          }
+        }
+      },
+      "conversation": {
+        "status": 200,
+        "elapsedMs": 6067,
+        "reply": "We will notify staff first because this may be urgent. Please tell us where you are now.",
+        "nextField": "場所",
+        "valid": true,
+        "languageLeak": false
+      }
+    },
+    {
+      "id": "en-breathing",
+      "language": "en",
+      "label": "breathing",
+      "input": "Someone cannot breathe in Zone B.",
+      "expected": {
+        "location": "Zone B",
+        "target": null,
+        "request": "medical_assistance",
+        "urgency": "high",
+        "safetyFlags": [
+          "possible_medical_emergency"
+        ],
+        "missingFields": [],
+        "facts": [
+          "cannot breathe"
+        ]
+      },
+      "critical": true,
+      "safety": {
+        "status": 200,
+        "actual": true,
+        "flags": [
+          "意識・呼吸の異常"
+        ]
+      },
+      "extraction": {
+        "status": 200,
+        "elapsedMs": 18365,
+        "incident": {
+          "language": "en",
+          "location": null,
+          "target": null,
+          "facts": [],
+          "request": "medical_assistance",
+          "urgency": "high",
+          "safetyFlags": [
+            "possible_medical_emergency"
+          ],
+          "missingFields": [
+            "場所"
+          ],
+          "askedFields": [
+            "追加確認"
+          ],
+          "originalText": [
+            "Someone cannot breathe in Zone B."
+          ],
+          "confidence": null,
+          "category": null
+        },
+        "data": {
+          "ok": true,
+          "aiMode": "model-gateway",
+          "runtimeMode": "auto",
+          "provider": "openai-compatible",
+          "incident": {
+            "language": "en",
+            "location": null,
+            "target": null,
+            "facts": [],
+            "request": "medical_assistance",
+            "urgency": "high",
+            "safetyFlags": [
+              "possible_medical_emergency"
+            ],
+            "missingFields": [
+              "場所"
+            ],
+            "askedFields": [
+              "追加確認"
+            ],
+            "originalText": [
+              "Someone cannot breathe in Zone B."
+            ],
+            "confidence": null,
+            "category": null
+          },
+          "safety": {
+            "flags": [
+              "意識・呼吸の異常"
+            ],
+            "immediate": true
+          },
+          "telemetry": {
+            "stage": "extract",
+            "model": "qwen3.5:4b",
+            "promptVariant": "full",
+            "safetyGuardMs": 0,
+            "preprocessingMs": 0,
+            "modelTimings": {
+              "requestBuildMs": 0,
+              "httpHeadersMs": 6999,
+              "firstTokenMs": 7000,
+              "promptUntilFirstTokenMs": 1,
+              "generationMs": 11297,
+              "bodyReadMs": 11298,
+              "jsonParseMs": 0,
+              "totalMs": 18297,
+              "stream": true,
+              "promptEvalMs": null,
+              "generationEvalMs": null,
+              "serverTotalMs": null,
+              "modelLoadMs": null,
+              "queueMs": null,
+              "promptTokens": null,
+              "completionTokens": null
+            },
+            "normalizationMs": 1,
+            "totalMs": 18298,
+            "fallback": false
+          }
+        }
+      },
+      "conversation": {
+        "status": 200,
+        "elapsedMs": 5633,
+        "reply": "We will notify staff first because this may be urgent. Please tell us where you are now.",
+        "nextField": "場所",
+        "valid": true,
+        "languageLeak": false
+      }
+    },
+    {
+      "id": "en-fire",
+      "language": "en",
+      "label": "fire",
+      "input": "There is smoke and a fire in the kitchen.",
+      "expected": {
+        "location": "kitchen",
+        "target": null,
+        "request": "fire_response",
+        "urgency": "high",
+        "safetyFlags": [
+          "possible_fire"
+        ],
+        "missingFields": [],
+        "facts": [
+          "smoke",
+          "fire"
+        ]
+      },
+      "critical": true,
+      "safety": {
+        "status": 200,
+        "actual": true,
+        "flags": [
+          "火災・煙"
+        ]
+      },
+      "extraction": {
+        "status": 200,
+        "elapsedMs": 19355,
+        "incident": {
+          "language": "en",
+          "location": "kitchen",
+          "target": null,
+          "facts": [],
+          "request": "fire_response",
+          "urgency": "high",
+          "safetyFlags": [
+            "possible_fire"
+          ],
+          "missingFields": [],
+          "askedFields": [],
+          "originalText": [
+            "There is smoke and a fire in the kitchen."
+          ],
+          "confidence": 0.95,
+          "category": null
+        },
+        "data": {
+          "ok": true,
+          "aiMode": "model-gateway",
+          "runtimeMode": "auto",
+          "provider": "openai-compatible",
+          "incident": {
+            "language": "en",
+            "location": "kitchen",
+            "target": null,
+            "facts": [],
+            "request": "fire_response",
+            "urgency": "high",
+            "safetyFlags": [
+              "possible_fire"
+            ],
+            "missingFields": [],
+            "askedFields": [],
+            "originalText": [
+              "There is smoke and a fire in the kitchen."
+            ],
+            "confidence": 0.95,
+            "category": null
+          },
+          "safety": {
+            "flags": [
+              "火災・煙"
+            ],
+            "immediate": true
+          },
+          "telemetry": {
+            "stage": "extract",
+            "model": "qwen3.5:4b",
+            "promptVariant": "full",
+            "safetyGuardMs": 0,
+            "preprocessingMs": 0,
+            "modelTimings": {
+              "requestBuildMs": 0,
+              "httpHeadersMs": 7128,
+              "firstTokenMs": 7129,
+              "promptUntilFirstTokenMs": 1,
+              "generationMs": 12161,
+              "bodyReadMs": 12162,
+              "jsonParseMs": 0,
+              "totalMs": 19290,
+              "stream": true,
+              "promptEvalMs": null,
+              "generationEvalMs": null,
+              "serverTotalMs": null,
+              "modelLoadMs": null,
+              "queueMs": null,
+              "promptTokens": null,
+              "completionTokens": null
+            },
+            "normalizationMs": 0,
+            "totalMs": 19290,
+            "fallback": false
+          }
+        }
+      },
+      "conversation": {
+        "status": 200,
+        "elapsedMs": 7153,
+        "reply": "We will notify staff first because this may be urgent. Please tell us where you are now.",
+        "nextField": "場所",
+        "valid": true,
+        "languageLeak": false
+      }
+    },
+    {
+      "id": "en-violence",
+      "language": "en",
+      "label": "violence",
+      "input": "A person is threatening people with a knife near the entrance.",
+      "expected": {
+        "location": "entrance",
+        "target": null,
+        "request": "safety_assistance",
+        "urgency": "high",
+        "safetyFlags": [
+          "possible_violence"
+        ],
+        "missingFields": [],
+        "facts": [
+          "knife",
+          "threatening"
+        ]
+      },
+      "critical": true,
+      "safety": {
+        "status": 200,
+        "actual": true,
+        "flags": [
+          "暴力・武器"
+        ]
+      },
+      "extraction": {
+        "status": 200,
+        "elapsedMs": 21186,
+        "incident": {
+          "language": "en",
+          "location": null,
+          "target": null,
+          "facts": [
+            "A person is threatening people with a knife near the entrance."
+          ],
+          "request": "safety_assistance",
+          "urgency": "high",
+          "safetyFlags": [
+            "possible_violence"
+          ],
+          "missingFields": [
+            "場所"
+          ],
+          "askedFields": [],
+          "originalText": [
+            "A person is threatening people with a knife near the entrance."
+          ],
+          "confidence": 0.95,
+          "category": null
+        },
+        "data": {
+          "ok": true,
+          "aiMode": "model-gateway",
+          "runtimeMode": "auto",
+          "provider": "openai-compatible",
+          "incident": {
+            "language": "en",
+            "location": null,
+            "target": null,
+            "facts": [
+              "A person is threatening people with a knife near the entrance."
+            ],
+            "request": "safety_assistance",
+            "urgency": "high",
+            "safetyFlags": [
+              "possible_violence"
+            ],
+            "missingFields": [
+              "場所"
+            ],
+            "askedFields": [],
+            "originalText": [
+              "A person is threatening people with a knife near the entrance."
+            ],
+            "confidence": 0.95,
+            "category": null
+          },
+          "safety": {
+            "flags": [
+              "暴力・武器"
+            ],
+            "immediate": true
+          },
+          "telemetry": {
+            "stage": "extract",
+            "model": "qwen3.5:4b",
+            "promptVariant": "full",
+            "safetyGuardMs": 0,
+            "preprocessingMs": 0,
+            "modelTimings": {
+              "requestBuildMs": 0,
+              "httpHeadersMs": 7623,
+              "firstTokenMs": 7624,
+              "promptUntilFirstTokenMs": 1,
+              "generationMs": 12624,
+              "bodyReadMs": 12625,
+              "jsonParseMs": 0,
+              "totalMs": 20248,
+              "stream": true,
+              "promptEvalMs": null,
+              "generationEvalMs": null,
+              "serverTotalMs": null,
+              "modelLoadMs": null,
+              "queueMs": null,
+              "promptTokens": null,
+              "completionTokens": null
+            },
+            "normalizationMs": 0,
+            "totalMs": 20248,
+            "fallback": false
+          }
+        }
+      },
+      "conversation": {
+        "status": 200,
+        "elapsedMs": 6263,
+        "reply": "We will notify staff first because this may be urgent. Please tell us where you are now.",
+        "nextField": "場所",
+        "valid": true,
+        "languageLeak": false
+      }
+    },
+    {
+      "id": "en-angry",
+      "language": "en",
+      "label": "angry non-urgent",
+      "input": "How many times do I have to ask? The blankets still have not arrived in Zone A.",
+      "expected": {
+        "location": "Zone A",
+        "target": null,
+        "request": "general_assistance",
+        "urgency": "medium",
+        "safetyFlags": [],
+        "missingFields": [],
+        "facts": [
+          "blankets",
+          "not arrived"
+        ]
+      },
+      "critical": false,
+      "safety": {
+        "status": 200,
+        "actual": false,
+        "flags": []
+      },
+      "extraction": {
+        "status": 200,
+        "elapsedMs": 21173,
+        "incident": {
+          "language": "en",
+          "location": "Zone A",
+          "target": null,
+          "facts": [],
+          "request": "general_assistance",
+          "urgency": "unknown",
+          "safetyFlags": [],
+          "missingFields": [
+            "追加確認"
+          ],
+          "askedFields": [
+            "追加確認"
+          ],
+          "originalText": [
+            "How many times do I have to ask? The blankets still have not arrived in Zone A."
+          ],
+          "confidence": null,
+          "category": null
+        },
+        "data": {
+          "ok": true,
+          "aiMode": "model-gateway",
+          "runtimeMode": "auto",
+          "provider": "openai-compatible",
+          "incident": {
+            "language": "en",
+            "location": "Zone A",
+            "target": null,
+            "facts": [],
+            "request": "general_assistance",
+            "urgency": "unknown",
+            "safetyFlags": [],
+            "missingFields": [
+              "追加確認"
+            ],
+            "askedFields": [
+              "追加確認"
+            ],
+            "originalText": [
+              "How many times do I have to ask? The blankets still have not arrived in Zone A."
+            ],
+            "confidence": null,
+            "category": null
+          },
+          "safety": {
+            "flags": [],
+            "immediate": false
+          },
+          "telemetry": {
+            "stage": "extract",
+            "model": "qwen3.5:4b",
+            "promptVariant": "full",
+            "safetyGuardMs": 0,
+            "preprocessingMs": 0,
+            "modelTimings": {
+              "requestBuildMs": 0,
+              "httpHeadersMs": 6745,
+              "firstTokenMs": 6746,
+              "promptUntilFirstTokenMs": 1,
+              "generationMs": 14125,
+              "bodyReadMs": 14126,
+              "jsonParseMs": 0,
+              "totalMs": 20871,
+              "stream": true,
+              "promptEvalMs": null,
+              "generationEvalMs": null,
+              "serverTotalMs": null,
+              "modelLoadMs": null,
+              "queueMs": null,
+              "promptTokens": null,
+              "completionTokens": null
+            },
+            "normalizationMs": 0,
+            "totalMs": 20871,
+            "fallback": false
+          }
+        }
+      },
+      "conversation": {
+        "status": 200,
+        "elapsedMs": 6094,
+        "reply": "I understand you are frustrated about the blankets not arriving in Zone A.",
+        "nextField": "場所",
+        "valid": true,
+        "languageLeak": false
+      }
+    },
+    {
+      "id": "en-uncertain",
+      "language": "en",
+      "label": "uncertain",
+      "input": "The charger may be broken, perhaps in the multipurpose room.",
+      "expected": {
+        "location": "multipurpose room",
+        "target": null,
+        "request": "general_assistance",
+        "urgency": "unknown",
+        "safetyFlags": [],
+        "missingFields": [
+          "追加確認"
+        ],
+        "facts": [
+          "charger",
+          "may be broken"
+        ]
+      },
+      "critical": false,
+      "safety": {
+        "status": 200,
+        "actual": false,
+        "flags": []
+      },
+      "extraction": {
+        "status": 200,
+        "elapsedMs": 21229,
+        "incident": {
+          "language": "en",
+          "location": null,
+          "target": null,
+          "facts": [
+            "The charger may be broken"
+          ],
+          "request": "general_assistance",
+          "urgency": "unknown",
+          "safetyFlags": [],
+          "missingFields": [
+            "場所",
+            "追加確認"
+          ],
+          "askedFields": [],
+          "originalText": [
+            "The charger may be broken, perhaps in the multipurpose room."
+          ],
+          "confidence": null,
+          "category": null
+        },
+        "data": {
+          "ok": true,
+          "aiMode": "model-gateway",
+          "runtimeMode": "auto",
+          "provider": "openai-compatible",
+          "incident": {
+            "language": "en",
+            "location": null,
+            "target": null,
+            "facts": [
+              "The charger may be broken"
+            ],
+            "request": "general_assistance",
+            "urgency": "unknown",
+            "safetyFlags": [],
+            "missingFields": [
+              "場所",
+              "追加確認"
+            ],
+            "askedFields": [],
+            "originalText": [
+              "The charger may be broken, perhaps in the multipurpose room."
+            ],
+            "confidence": null,
+            "category": null
+          },
+          "safety": {
+            "flags": [],
+            "immediate": false
+          },
+          "telemetry": {
+            "stage": "extract",
+            "model": "qwen3.5:4b",
+            "promptVariant": "full",
+            "safetyGuardMs": 0,
+            "preprocessingMs": 0,
+            "modelTimings": {
+              "requestBuildMs": 0,
+              "httpHeadersMs": 7145,
+              "firstTokenMs": 7146,
+              "promptUntilFirstTokenMs": 1,
+              "generationMs": 13445,
+              "bodyReadMs": 13446,
+              "jsonParseMs": 0,
+              "totalMs": 20591,
+              "stream": true,
+              "promptEvalMs": null,
+              "generationEvalMs": null,
+              "serverTotalMs": null,
+              "modelLoadMs": null,
+              "queueMs": null,
+              "promptTokens": null,
+              "completionTokens": null
+            },
+            "normalizationMs": 1,
+            "totalMs": 20592,
+            "fallback": false
+          }
+        }
+      },
+      "conversation": {
+        "status": 200,
+        "elapsedMs": 6060,
+        "reply": "I understand the charger might be broken in the multipurpose room.",
+        "nextField": "場所",
+        "valid": true,
+        "languageLeak": false
+      }
+    },
+    {
+      "id": "zh-water",
+      "language": "zh",
+      "label": "饮用水不足",
+      "input": "体育馆A没有饮用水了，4个人从昨天一直在等。",
+      "expected": {
+        "location": "体育馆A",
+        "target": {
+          "count": 4
+        },
+        "request": "water_supply",
+        "urgency": "medium",
+        "safetyFlags": [],
+        "missingFields": [],
+        "facts": [
+          "饮用水",
+          "4个人",
+          "昨天"
+        ]
+      },
+      "critical": false,
+      "safety": {
+        "status": 200,
+        "actual": false,
+        "flags": []
+      },
+      "extraction": {
+        "status": 200,
+        "elapsedMs": 24579,
+        "incident": {
+          "language": "zh",
+          "location": "体育馆 A",
+          "target": null,
+          "facts": [
+            "饮用水耗尽",
+            "水",
+            "飲料水・給水の不足または案内"
+          ],
+          "request": "water_supply",
+          "urgency": "medium",
+          "safetyFlags": [],
+          "missingFields": [
+            "人数"
+          ],
+          "askedFields": [
+            "人数",
+            "残量",
+            "最後に受け取った時刻",
+            "追加確認"
+          ],
+          "originalText": [
+            "体育馆A没有饮用水了，4个人从昨天一直在等。"
+          ],
+          "confidence": 0.95,
+          "category": null
+        },
+        "data": {
+          "ok": true,
+          "aiMode": "model-gateway",
+          "runtimeMode": "auto",
+          "provider": "openai-compatible",
+          "incident": {
+            "language": "zh",
+            "location": "体育馆 A",
+            "target": null,
+            "facts": [
+              "饮用水耗尽",
+              "水",
+              "飲料水・給水の不足または案内"
+            ],
+            "request": "water_supply",
+            "urgency": "medium",
+            "safetyFlags": [],
+            "missingFields": [
+              "人数"
+            ],
+            "askedFields": [
+              "人数",
+              "残量",
+              "最後に受け取った時刻",
+              "追加確認"
+            ],
+            "originalText": [
+              "体育馆A没有饮用水了，4个人从昨天一直在等。"
+            ],
+            "confidence": 0.95,
+            "category": null
+          },
+          "safety": {
+            "flags": [],
+            "immediate": false
+          },
+          "telemetry": {
+            "stage": "extract",
+            "model": "qwen3.5:4b",
+            "promptVariant": "full",
+            "safetyGuardMs": 0,
+            "preprocessingMs": 0,
+            "modelTimings": {
+              "requestBuildMs": 0,
+              "httpHeadersMs": 7512,
+              "firstTokenMs": 7513,
+              "promptUntilFirstTokenMs": 1,
+              "generationMs": 16987,
+              "bodyReadMs": 16988,
+              "jsonParseMs": 0,
+              "totalMs": 24500,
+              "stream": true,
+              "promptEvalMs": null,
+              "generationEvalMs": null,
+              "serverTotalMs": null,
+              "modelLoadMs": null,
+              "queueMs": null,
+              "promptTokens": null,
+              "completionTokens": null
+            },
+            "normalizationMs": 0,
+            "totalMs": 24501,
+            "fallback": false
+          }
+        }
+      },
+      "conversation": {
+        "status": 200,
+        "elapsedMs": 6432,
+        "reply": "体育馆A没有饮用水了，4个人从昨天一直在等。",
+        "nextField": "場所",
+        "valid": true,
+        "languageLeak": false
+      }
+    },
+    {
+      "id": "zh-toilet",
+      "language": "zh",
+      "label": "厕所故障",
+      "input": "北侧厕所堵了，不能使用。",
+      "expected": {
+        "location": "北侧厕所",
+        "target": null,
+        "request": "toilet_assistance",
+        "urgency": "medium",
+        "safetyFlags": [],
+        "missingFields": [],
+        "facts": [
+          "北侧厕所",
+          "堵",
+          "不能使用"
+        ]
+      },
+      "critical": false,
+      "safety": {
+        "status": 200,
+        "actual": false,
+        "flags": []
+      },
+      "extraction": {
+        "status": 200,
+        "elapsedMs": 20626,
+        "incident": {
+          "language": "zh",
+          "location": "北侧厕所",
+          "target": null,
+          "facts": [],
+          "request": "general_assistance",
+          "urgency": "unknown",
+          "safetyFlags": [],
+          "missingFields": [
+            "追加確認"
+          ],
+          "askedFields": [
+            "場所",
+            "人数",
+            "最後に受け取った時刻"
+          ],
+          "originalText": [
+            "北侧厕所堵了，不能使用。"
+          ],
+          "confidence": null,
+          "category": null
+        },
+        "data": {
+          "ok": true,
+          "aiMode": "model-gateway",
+          "runtimeMode": "auto",
+          "provider": "openai-compatible",
+          "incident": {
+            "language": "zh",
+            "location": "北侧厕所",
+            "target": null,
+            "facts": [],
+            "request": "general_assistance",
+            "urgency": "unknown",
+            "safetyFlags": [],
+            "missingFields": [
+              "追加確認"
+            ],
+            "askedFields": [
+              "場所",
+              "人数",
+              "最後に受け取った時刻"
+            ],
+            "originalText": [
+              "北侧厕所堵了，不能使用。"
+            ],
+            "confidence": null,
+            "category": null
+          },
+          "safety": {
+            "flags": [],
+            "immediate": false
+          },
+          "telemetry": {
+            "stage": "extract",
+            "model": "qwen3.5:4b",
+            "promptVariant": "full",
+            "safetyGuardMs": 0,
+            "preprocessingMs": 0,
+            "modelTimings": {
+              "requestBuildMs": 0,
+              "httpHeadersMs": 6931,
+              "firstTokenMs": 6933,
+              "promptUntilFirstTokenMs": 2,
+              "generationMs": 13275,
+              "bodyReadMs": 13277,
+              "jsonParseMs": 0,
+              "totalMs": 20208,
+              "stream": true,
+              "promptEvalMs": null,
+              "generationEvalMs": null,
+              "serverTotalMs": null,
+              "modelLoadMs": null,
+              "queueMs": null,
+              "promptTokens": null,
+              "completionTokens": null
+            },
+            "normalizationMs": 0,
+            "totalMs": 20208,
+            "fallback": false
+          }
+        }
+      },
+      "conversation": {
+        "status": 200,
+        "elapsedMs": 5682,
+        "reply": "北侧厕所堵了，不能使用。",
+        "nextField": "場所",
+        "valid": true,
+        "languageLeak": false
+      }
+    },
+    {
+      "id": "zh-infant",
+      "language": "zh",
+      "label": "婴儿用品",
+      "input": "接待处附近有一个婴儿，尿布不够了。",
+      "expected": {
+        "location": "接待处附近",
+        "target": {
+          "count": 1,
+          "type": "infant"
+        },
+        "request": "infant_supplies",
+        "urgency": "medium",
+        "safetyFlags": [],
+        "missingFields": [],
+        "facts": [
+          "婴儿",
+          "尿布"
+        ]
+      },
+      "critical": false,
+      "safety": {
+        "status": 200,
+        "actual": false,
+        "flags": []
+      },
+      "extraction": {
+        "status": 200,
+        "elapsedMs": 24944,
+        "incident": {
+          "language": "zh",
+          "location": null,
+          "target": {
+            "type": "infant",
+            "count": 1,
+            "ageGroup": null
+          },
+          "facts": [],
+          "request": "infant_supplies",
+          "urgency": "medium",
+          "safetyFlags": [],
+          "missingFields": [
+            "場所"
+          ],
+          "askedFields": [
+            "場所",
+            "人数",
+            "残量",
+            "最後に受け取った時刻",
+            "追加確認"
+          ],
+          "originalText": [
+            "接待处附近有一个婴儿，尿布不够了。"
+          ],
+          "confidence": null,
+          "category": null
+        },
+        "data": {
+          "ok": true,
+          "aiMode": "model-gateway",
+          "runtimeMode": "auto",
+          "provider": "openai-compatible",
+          "incident": {
+            "language": "zh",
+            "location": null,
+            "target": {
+              "type": "infant",
+              "count": 1,
+              "ageGroup": null
+            },
+            "facts": [],
+            "request": "infant_supplies",
+            "urgency": "medium",
+            "safetyFlags": [],
+            "missingFields": [
+              "場所"
+            ],
+            "askedFields": [
+              "場所",
+              "人数",
+              "残量",
+              "最後に受け取った時刻",
+              "追加確認"
+            ],
+            "originalText": [
+              "接待处附近有一个婴儿，尿布不够了。"
+            ],
+            "confidence": null,
+            "category": null
+          },
+          "safety": {
+            "flags": [],
+            "immediate": false
+          },
+          "telemetry": {
+            "stage": "extract",
+            "model": "qwen3.5:4b",
+            "promptVariant": "full",
+            "safetyGuardMs": 0,
+            "preprocessingMs": 0,
+            "modelTimings": {
+              "requestBuildMs": 0,
+              "httpHeadersMs": 6926,
+              "firstTokenMs": 6927,
+              "promptUntilFirstTokenMs": 1,
+              "generationMs": 17959,
+              "bodyReadMs": 17960,
+              "jsonParseMs": 0,
+              "totalMs": 24886,
+              "stream": true,
+              "promptEvalMs": null,
+              "generationEvalMs": null,
+              "serverTotalMs": null,
+              "modelLoadMs": null,
+              "queueMs": null,
+              "promptTokens": null,
+              "completionTokens": null
+            },
+            "normalizationMs": 0,
+            "totalMs": 24887,
+            "fallback": false
+          }
+        }
+      },
+      "conversation": {
+        "status": 200,
+        "elapsedMs": 5741,
+        "reply": "婴儿尿布不够了，需要立即补充吗？",
+        "nextField": "場所",
+        "valid": true,
+        "languageLeak": false
+      }
+    },
+    {
+      "id": "zh-fever",
+      "language": "zh",
+      "label": "高热",
+      "input": "一楼救护处有一个孩子39度发烧，身体很虚弱。",
+      "expected": {
+        "location": "一楼救护处",
+        "target": {
+          "count": 1,
+          "type": "child"
+        },
+        "request": "medical_assistance",
+        "urgency": "high",
+        "safetyFlags": [
+          "possible_medical_emergency"
+        ],
+        "missingFields": [],
+        "facts": [
+          "39度",
+          "虚弱"
+        ]
+      },
+      "critical": true,
+      "safety": {
+        "status": 200,
+        "actual": true,
+        "flags": [
+          "重大な体調変化"
+        ]
+      },
+      "extraction": {
+        "status": 200,
+        "elapsedMs": 22659,
+        "incident": {
+          "language": "zh",
+          "location": null,
+          "target": {
+            "type": "child",
+            "count": 1,
+            "ageGroup": null
+          },
+          "facts": [
+            "39 度发烧",
+            "身体很虚弱",
+            "39度の発熱"
+          ],
+          "request": "medical_assistance",
+          "urgency": "high",
+          "safetyFlags": [
+            "possible_medical_emergency"
+          ],
+          "missingFields": [
+            "場所"
+          ],
+          "askedFields": [],
+          "originalText": [
+            "一楼救护处有一个孩子39度发烧，身体很虚弱。"
+          ],
+          "confidence": 0.85,
+          "category": null
+        },
+        "data": {
+          "ok": true,
+          "aiMode": "model-gateway",
+          "runtimeMode": "auto",
+          "provider": "openai-compatible",
+          "incident": {
+            "language": "zh",
+            "location": null,
+            "target": {
+              "type": "child",
+              "count": 1,
+              "ageGroup": null
+            },
+            "facts": [
+              "39 度发烧",
+              "身体很虚弱",
+              "39度の発熱"
+            ],
+            "request": "medical_assistance",
+            "urgency": "high",
+            "safetyFlags": [
+              "possible_medical_emergency"
+            ],
+            "missingFields": [
+              "場所"
+            ],
+            "askedFields": [],
+            "originalText": [
+              "一楼救护处有一个孩子39度发烧，身体很虚弱。"
+            ],
+            "confidence": 0.85,
+            "category": null
+          },
+          "safety": {
+            "flags": [
+              "重大な体調変化"
+            ],
+            "immediate": true
+          },
+          "telemetry": {
+            "stage": "extract",
+            "model": "qwen3.5:4b",
+            "promptVariant": "full",
+            "safetyGuardMs": 0,
+            "preprocessingMs": 0,
+            "modelTimings": {
+              "requestBuildMs": 0,
+              "httpHeadersMs": 7228,
+              "firstTokenMs": 7229,
+              "promptUntilFirstTokenMs": 1,
+              "generationMs": 15327,
+              "bodyReadMs": 15328,
+              "jsonParseMs": 0,
+              "totalMs": 22556,
+              "stream": true,
+              "promptEvalMs": null,
+              "generationEvalMs": null,
+              "serverTotalMs": null,
+              "modelLoadMs": null,
+              "queueMs": null,
+              "promptTokens": null,
+              "completionTokens": null
+            },
+            "normalizationMs": 0,
+            "totalMs": 22556,
+            "fallback": false
+          }
+        }
+      },
+      "conversation": {
+        "status": 200,
+        "elapsedMs": 6290,
+        "reply": "这可能是紧急情况，我们会先通知工作人员。请告诉我们您现在的位置。",
+        "nextField": "場所",
+        "valid": true,
+        "languageLeak": false
+      }
+    },
+    {
+      "id": "zh-unconscious",
+      "language": "zh",
+      "label": "意识异常",
+      "input": "入口附近有人昏倒，没有意识。",
+      "expected": {
+        "location": "入口附近",
+        "target": null,
+        "request": "medical_assistance",
+        "urgency": "high",
+        "safetyFlags": [
+          "possible_medical_emergency"
+        ],
+        "missingFields": [],
+        "facts": [
+          "昏倒",
+          "没有意识"
+        ]
+      },
+      "critical": true,
+      "safety": {
+        "status": 200,
+        "actual": true,
+        "flags": [
+          "意識・呼吸の異常"
+        ]
+      },
+      "extraction": {
+        "status": 200,
+        "elapsedMs": 24769,
+        "incident": {
+          "language": "zh",
+          "location": null,
+          "target": null,
+          "facts": [
+            "入口附近有人昏倒",
+            "没有意识"
+          ],
+          "request": "medical_assistance",
+          "urgency": "high",
+          "safetyFlags": [
+            "possible_medical_emergency"
+          ],
+          "missingFields": [
+            "場所"
+          ],
+          "askedFields": [],
+          "originalText": [
+            "入口附近有人昏倒，没有意识。"
+          ],
+          "confidence": 0.95,
+          "category": null
+        },
+        "data": {
+          "ok": true,
+          "aiMode": "model-gateway",
+          "runtimeMode": "auto",
+          "provider": "openai-compatible",
+          "incident": {
+            "language": "zh",
+            "location": null,
+            "target": null,
+            "facts": [
+              "入口附近有人昏倒",
+              "没有意识"
+            ],
+            "request": "medical_assistance",
+            "urgency": "high",
+            "safetyFlags": [
+              "possible_medical_emergency"
+            ],
+            "missingFields": [
+              "場所"
+            ],
+            "askedFields": [],
+            "originalText": [
+              "入口附近有人昏倒，没有意识。"
+            ],
+            "confidence": 0.95,
+            "category": null
+          },
+          "safety": {
+            "flags": [
+              "意識・呼吸の異常"
+            ],
+            "immediate": true
+          },
+          "telemetry": {
+            "stage": "extract",
+            "model": "qwen3.5:4b",
+            "promptVariant": "full",
+            "safetyGuardMs": 0,
+            "preprocessingMs": 0,
+            "modelTimings": {
+              "requestBuildMs": 0,
+              "httpHeadersMs": 7127,
+              "firstTokenMs": 7128,
+              "promptUntilFirstTokenMs": 1,
+              "generationMs": 17099,
+              "bodyReadMs": 17100,
+              "jsonParseMs": 0,
+              "totalMs": 24227,
+              "stream": true,
+              "promptEvalMs": null,
+              "generationEvalMs": null,
+              "serverTotalMs": null,
+              "modelLoadMs": null,
+              "queueMs": null,
+              "promptTokens": null,
+              "completionTokens": null
+            },
+            "normalizationMs": 5,
+            "totalMs": 24232,
+            "fallback": false
+          }
+        }
+      },
+      "conversation": {
+        "status": 200,
+        "elapsedMs": 6077,
+        "reply": "这可能是紧急情况，我们会先通知工作人员。请告诉我们您现在的位置。",
+        "nextField": "場所",
+        "valid": true,
+        "languageLeak": false
+      }
+    },
+    {
+      "id": "zh-breathing",
+      "language": "zh",
+      "label": "呼吸异常",
+      "input": "B区有人无法呼吸。",
+      "expected": {
+        "location": "B区",
+        "target": null,
+        "request": "medical_assistance",
+        "urgency": "high",
+        "safetyFlags": [
+          "possible_medical_emergency"
+        ],
+        "missingFields": [],
+        "facts": [
+          "无法呼吸"
+        ]
+      },
+      "critical": true,
+      "safety": {
+        "status": 200,
+        "actual": true,
+        "flags": [
+          "意識・呼吸の異常"
+        ]
+      },
+      "extraction": {
+        "status": 200,
+        "elapsedMs": 19057,
+        "incident": {
+          "language": "zh",
+          "location": null,
+          "target": null,
+          "facts": [
+            "B 区有人无法呼吸",
+            "呼吸・会話の異常"
+          ],
+          "request": "general_assistance",
+          "urgency": "unknown",
+          "safetyFlags": [],
+          "missingFields": [
+            "場所",
+            "追加確認"
+          ],
+          "askedFields": [],
+          "originalText": [
+            "B区有人无法呼吸。"
+          ],
+          "confidence": null,
+          "category": null
+        },
+        "data": {
+          "ok": true,
+          "aiMode": "model-gateway",
+          "runtimeMode": "auto",
+          "provider": "openai-compatible",
+          "incident": {
+            "language": "zh",
+            "location": null,
+            "target": null,
+            "facts": [
+              "B 区有人无法呼吸",
+              "呼吸・会話の異常"
+            ],
+            "request": "general_assistance",
+            "urgency": "unknown",
+            "safetyFlags": [],
+            "missingFields": [
+              "場所",
+              "追加確認"
+            ],
+            "askedFields": [],
+            "originalText": [
+              "B区有人无法呼吸。"
+            ],
+            "confidence": null,
+            "category": null
+          },
+          "safety": {
+            "flags": [],
+            "immediate": false
+          },
+          "telemetry": {
+            "stage": "extract",
+            "model": "qwen3.5:4b",
+            "promptVariant": "full",
+            "safetyGuardMs": 0,
+            "preprocessingMs": 0,
+            "modelTimings": {
+              "requestBuildMs": 0,
+              "httpHeadersMs": 6828,
+              "firstTokenMs": 6829,
+              "promptUntilFirstTokenMs": 1,
+              "generationMs": 12171,
+              "bodyReadMs": 12172,
+              "jsonParseMs": 0,
+              "totalMs": 19000,
+              "stream": true,
+              "promptEvalMs": null,
+              "generationEvalMs": null,
+              "serverTotalMs": null,
+              "modelLoadMs": null,
+              "queueMs": null,
+              "promptTokens": null,
+              "completionTokens": null
+            },
+            "normalizationMs": 0,
+            "totalMs": 19000,
+            "fallback": false
+          }
+        }
+      },
+      "conversation": {
+        "status": 200,
+        "elapsedMs": 5573,
+        "reply": "B 区有人无法呼吸。",
+        "nextField": "場所",
+        "valid": true,
+        "languageLeak": false
+      }
+    },
+    {
+      "id": "zh-fire",
+      "language": "zh",
+      "label": "火灾",
+      "input": "厨房冒烟，而且看到了火。",
+      "expected": {
+        "location": "厨房",
+        "target": null,
+        "request": "fire_response",
+        "urgency": "high",
+        "safetyFlags": [
+          "possible_fire"
+        ],
+        "missingFields": [],
+        "facts": [
+          "冒烟",
+          "火"
+        ]
+      },
+      "critical": true,
+      "safety": {
+        "status": 200,
+        "actual": true,
+        "flags": [
+          "火災・煙"
+        ]
+      },
+      "extraction": {
+        "status": 200,
+        "elapsedMs": 18310,
+        "incident": {
+          "language": "zh",
+          "location": "厨房",
+          "target": null,
+          "facts": [
+            "厨房冒烟",
+            "看到了火"
+          ],
+          "request": "fire_response",
+          "urgency": "high",
+          "safetyFlags": [
+            "possible_fire"
+          ],
+          "missingFields": [],
+          "askedFields": [],
+          "originalText": [
+            "厨房冒烟，而且看到了火。"
+          ],
+          "confidence": 0.95,
+          "category": null
+        },
+        "data": {
+          "ok": true,
+          "aiMode": "model-gateway",
+          "runtimeMode": "auto",
+          "provider": "openai-compatible",
+          "incident": {
+            "language": "zh",
+            "location": "厨房",
+            "target": null,
+            "facts": [
+              "厨房冒烟",
+              "看到了火"
+            ],
+            "request": "fire_response",
+            "urgency": "high",
+            "safetyFlags": [
+              "possible_fire"
+            ],
+            "missingFields": [],
+            "askedFields": [],
+            "originalText": [
+              "厨房冒烟，而且看到了火。"
+            ],
+            "confidence": 0.95,
+            "category": null
+          },
+          "safety": {
+            "flags": [],
+            "immediate": false
+          },
+          "telemetry": {
+            "stage": "extract",
+            "model": "qwen3.5:4b",
+            "promptVariant": "full",
+            "safetyGuardMs": 0,
+            "preprocessingMs": 0,
+            "modelTimings": {
+              "requestBuildMs": 1,
+              "httpHeadersMs": 6887,
+              "firstTokenMs": 6889,
+              "promptUntilFirstTokenMs": 2,
+              "generationMs": 11348,
+              "bodyReadMs": 11350,
+              "jsonParseMs": 0,
+              "totalMs": 18237,
+              "stream": true,
+              "promptEvalMs": null,
+              "generationEvalMs": null,
+              "serverTotalMs": null,
+              "modelLoadMs": null,
+              "queueMs": null,
+              "promptTokens": null,
+              "completionTokens": null
+            },
+            "normalizationMs": 1,
+            "totalMs": 18238,
+            "fallback": false
+          }
+        }
+      },
+      "conversation": {
+        "status": 200,
+        "elapsedMs": 6077,
+        "reply": "厨房冒烟且看到火，请立即撤离到安全区域。",
+        "nextField": "場所",
+        "valid": true,
+        "languageLeak": false
+      }
+    },
+    {
+      "id": "zh-violence",
+      "language": "zh",
+      "label": "暴力",
+      "input": "入口附近有人拿着刀威胁周围的人。",
+      "expected": {
+        "location": "入口附近",
+        "target": null,
+        "request": "safety_assistance",
+        "urgency": "high",
+        "safetyFlags": [
+          "possible_violence"
+        ],
+        "missingFields": [],
+        "facts": [
+          "刀",
+          "威胁"
+        ]
+      },
+      "critical": true,
+      "safety": {
+        "status": 200,
+        "actual": true,
+        "flags": [
+          "暴力・武器"
+        ]
+      },
+      "extraction": {
+        "status": 200,
+        "elapsedMs": 20944,
+        "incident": {
+          "language": "zh",
+          "location": null,
+          "target": null,
+          "facts": [
+            "入口附近有人拿着刀威胁周围的人。"
+          ],
+          "request": "safety_assistance",
+          "urgency": "high",
+          "safetyFlags": [
+            "possible_violence"
+          ],
+          "missingFields": [
+            "場所"
+          ],
+          "askedFields": [],
+          "originalText": [
+            "入口附近有人拿着刀威胁周围的人。"
+          ],
+          "confidence": null,
+          "category": null
+        },
+        "data": {
+          "ok": true,
+          "aiMode": "model-gateway",
+          "runtimeMode": "auto",
+          "provider": "openai-compatible",
+          "incident": {
+            "language": "zh",
+            "location": null,
+            "target": null,
+            "facts": [
+              "入口附近有人拿着刀威胁周围的人。"
+            ],
+            "request": "safety_assistance",
+            "urgency": "high",
+            "safetyFlags": [
+              "possible_violence"
+            ],
+            "missingFields": [
+              "場所"
+            ],
+            "askedFields": [],
+            "originalText": [
+              "入口附近有人拿着刀威胁周围的人。"
+            ],
+            "confidence": null,
+            "category": null
+          },
+          "safety": {
+            "flags": [
+              "暴力・武器"
+            ],
+            "immediate": true
+          },
+          "telemetry": {
+            "stage": "extract",
+            "model": "qwen3.5:4b",
+            "promptVariant": "full",
+            "safetyGuardMs": 0,
+            "preprocessingMs": 0,
+            "modelTimings": {
+              "requestBuildMs": 0,
+              "httpHeadersMs": 7178,
+              "firstTokenMs": 7179,
+              "promptUntilFirstTokenMs": 1,
+              "generationMs": 13655,
+              "bodyReadMs": 13656,
+              "jsonParseMs": 0,
+              "totalMs": 20834,
+              "stream": true,
+              "promptEvalMs": null,
+              "generationEvalMs": null,
+              "serverTotalMs": null,
+              "modelLoadMs": null,
+              "queueMs": null,
+              "promptTokens": null,
+              "completionTokens": null
+            },
+            "normalizationMs": 0,
+            "totalMs": 20834,
+            "fallback": false
+          }
+        }
+      },
+      "conversation": {
+        "status": 200,
+        "elapsedMs": 5725,
+        "reply": "这可能是紧急情况，我们会先通知工作人员。请告诉我们您现在的位置。",
+        "nextField": "場所",
+        "valid": true,
+        "languageLeak": false
+      }
+    },
+    {
+      "id": "zh-angry",
+      "language": "zh",
+      "label": "愤怒但非紧急",
+      "input": "我已经说了多少次？A区的毛毯还没有送来。",
+      "expected": {
+        "location": "A区",
+        "target": null,
+        "request": "general_assistance",
+        "urgency": "medium",
+        "safetyFlags": [],
+        "missingFields": [],
+        "facts": [
+          "毛毯",
+          "还没有"
+        ]
+      },
+      "critical": false,
+      "safety": {
+        "status": 200,
+        "actual": false,
+        "flags": []
+      },
+      "extraction": {
+        "status": 200,
+        "elapsedMs": 20272,
+        "incident": {
+          "language": "zh",
+          "location": null,
+          "target": null,
+          "facts": [],
+          "request": "general_assistance",
+          "urgency": "unknown",
+          "safetyFlags": [],
+          "missingFields": [
+            "場所",
+            "追加確認"
+          ],
+          "askedFields": [],
+          "originalText": [
+            "我已经说了多少次？A区的毛毯还没有送来。"
+          ],
+          "confidence": null,
+          "category": null
+        },
+        "data": {
+          "ok": true,
+          "aiMode": "model-gateway",
+          "runtimeMode": "auto",
+          "provider": "openai-compatible",
+          "incident": {
+            "language": "zh",
+            "location": null,
+            "target": null,
+            "facts": [],
+            "request": "general_assistance",
+            "urgency": "unknown",
+            "safetyFlags": [],
+            "missingFields": [
+              "場所",
+              "追加確認"
+            ],
+            "askedFields": [],
+            "originalText": [
+              "我已经说了多少次？A区的毛毯还没有送来。"
+            ],
+            "confidence": null,
+            "category": null
+          },
+          "safety": {
+            "flags": [],
+            "immediate": false
+          },
+          "telemetry": {
+            "stage": "extract",
+            "model": "qwen3.5:4b",
+            "promptVariant": "full",
+            "safetyGuardMs": 0,
+            "preprocessingMs": 0,
+            "modelTimings": {
+              "requestBuildMs": 1,
+              "httpHeadersMs": 7040,
+              "firstTokenMs": 7040,
+              "promptUntilFirstTokenMs": 0,
+              "generationMs": 13151,
+              "bodyReadMs": 13151,
+              "jsonParseMs": 0,
+              "totalMs": 20191,
+              "stream": true,
+              "promptEvalMs": null,
+              "generationEvalMs": null,
+              "serverTotalMs": null,
+              "modelLoadMs": null,
+              "queueMs": null,
+              "promptTokens": null,
+              "completionTokens": null
+            },
+            "normalizationMs": 1,
+            "totalMs": 20192,
+            "fallback": false
+          }
+        }
+      },
+      "conversation": {
+        "status": 200,
+        "elapsedMs": 6140,
+        "reply": "A 区的毛毯还没送来，您现在需要做什么？",
+        "nextField": "場所",
+        "valid": true,
+        "languageLeak": false
+      }
+    },
+    {
+      "id": "zh-uncertain",
+      "language": "zh",
+      "label": "不确定",
+      "input": "充电器可能坏了，也许在多功能室。",
+      "expected": {
+        "location": "多功能室",
+        "target": null,
+        "request": "general_assistance",
+        "urgency": "unknown",
+        "safetyFlags": [],
+        "missingFields": [
+          "追加確認"
+        ],
+        "facts": [
+          "充电器",
+          "可能"
+        ]
+      },
+      "critical": false,
+      "safety": {
+        "status": 200,
+        "actual": false,
+        "flags": []
+      },
+      "extraction": {
+        "status": 200,
+        "elapsedMs": 20386,
+        "incident": {
+          "language": "zh",
+          "location": null,
+          "target": null,
+          "facts": [],
+          "request": "general_assistance",
+          "urgency": "unknown",
+          "safetyFlags": [],
+          "missingFields": [
+            "場所",
+            "追加確認"
+          ],
+          "askedFields": [],
+          "originalText": [
+            "充电器可能坏了，也许在多功能室。"
+          ],
+          "confidence": null,
+          "category": null
+        },
+        "data": {
+          "ok": true,
+          "aiMode": "model-gateway",
+          "runtimeMode": "auto",
+          "provider": "openai-compatible",
+          "incident": {
+            "language": "zh",
+            "location": null,
+            "target": null,
+            "facts": [],
+            "request": "general_assistance",
+            "urgency": "unknown",
+            "safetyFlags": [],
+            "missingFields": [
+              "場所",
+              "追加確認"
+            ],
+            "askedFields": [],
+            "originalText": [
+              "充电器可能坏了，也许在多功能室。"
+            ],
+            "confidence": null,
+            "category": null
+          },
+          "safety": {
+            "flags": [],
+            "immediate": false
+          },
+          "telemetry": {
+            "stage": "extract",
+            "model": "qwen3.5:4b",
+            "promptVariant": "full",
+            "safetyGuardMs": 0,
+            "preprocessingMs": 0,
+            "modelTimings": {
+              "requestBuildMs": 0,
+              "httpHeadersMs": 7090,
+              "firstTokenMs": 7091,
+              "promptUntilFirstTokenMs": 1,
+              "generationMs": 12978,
+              "bodyReadMs": 12979,
+              "jsonParseMs": 0,
+              "totalMs": 20069,
+              "stream": true,
+              "promptEvalMs": null,
+              "generationEvalMs": null,
+              "serverTotalMs": null,
+              "modelLoadMs": null,
+              "queueMs": null,
+              "promptTokens": null,
+              "completionTokens": null
+            },
+            "normalizationMs": 12,
+            "totalMs": 20081,
+            "fallback": false
+          }
+        }
+      },
+      "conversation": {
+        "status": 200,
+        "elapsedMs": 7397,
+        "reply": "充电器坏了，在多功能室。",
+        "nextField": "場所",
+        "valid": true,
+        "languageLeak": false
+      }
+    },
+    {
+      "id": "ko-water",
+      "language": "ko",
+      "label": "식수 부족",
+      "input": "체육관 A에 식수가 없고, 네 명이 어제부터 기다리고 있습니다.",
+      "expected": {
+        "location": "체육관 A",
+        "target": {
+          "count": 4
+        },
+        "request": "water_supply",
+        "urgency": "medium",
+        "safetyFlags": [],
+        "missingFields": [],
+        "facts": [
+          "식수",
+          "네 명",
+          "어제"
+        ]
+      },
+      "critical": false,
+      "safety": {
+        "status": 200,
+        "actual": false,
+        "flags": []
+      },
+      "extraction": {
+        "status": 200,
+        "elapsedMs": 24391,
+        "incident": {
+          "language": "ko",
+          "location": "체육관 A",
+          "target": null,
+          "facts": [],
+          "request": "water_supply",
+          "urgency": "medium",
+          "safetyFlags": [],
+          "missingFields": [
+            "人数"
+          ],
+          "askedFields": [
+            "場所",
+            "人数",
+            "残量",
+            "最後に受け取った時刻",
+            "追加確認"
+          ],
+          "originalText": [
+            "체육관 A에 식수가 없고, 네 명이 어제부터 기다리고 있습니다."
+          ],
+          "confidence": 0.95,
+          "category": null
+        },
+        "data": {
+          "ok": true,
+          "aiMode": "model-gateway",
+          "runtimeMode": "auto",
+          "provider": "openai-compatible",
+          "incident": {
+            "language": "ko",
+            "location": "체육관 A",
+            "target": null,
+            "facts": [],
+            "request": "water_supply",
+            "urgency": "medium",
+            "safetyFlags": [],
+            "missingFields": [
+              "人数"
+            ],
+            "askedFields": [
+              "場所",
+              "人数",
+              "残量",
+              "最後に受け取った時刻",
+              "追加確認"
+            ],
+            "originalText": [
+              "체육관 A에 식수가 없고, 네 명이 어제부터 기다리고 있습니다."
+            ],
+            "confidence": 0.95,
+            "category": null
+          },
+          "safety": {
+            "flags": [],
+            "immediate": false
+          },
+          "telemetry": {
+            "stage": "extract",
+            "model": "qwen3.5:4b",
+            "promptVariant": "full",
+            "safetyGuardMs": 0,
+            "preprocessingMs": 0,
+            "modelTimings": {
+              "requestBuildMs": 0,
+              "httpHeadersMs": 7077,
+              "firstTokenMs": 7077,
+              "promptUntilFirstTokenMs": 0,
+              "generationMs": 17220,
+              "bodyReadMs": 17220,
+              "jsonParseMs": 0,
+              "totalMs": 24297,
+              "stream": true,
+              "promptEvalMs": null,
+              "generationEvalMs": null,
+              "serverTotalMs": null,
+              "modelLoadMs": null,
+              "queueMs": null,
+              "promptTokens": null,
+              "completionTokens": null
+            },
+            "normalizationMs": 1,
+            "totalMs": 24298,
+            "fallback": false
+          }
+        }
+      },
+      "conversation": {
+        "status": 200,
+        "elapsedMs": 7682,
+        "reply": "안녕하세요. 체육관 A 에 식수가 없네요.",
+        "nextField": "場所",
+        "valid": true,
+        "languageLeak": false
+      }
+    },
+    {
+      "id": "ko-toilet",
+      "language": "ko",
+      "label": "화장실 고장",
+      "input": "북쪽 화장실이 막혀서 사용할 수 없습니다.",
+      "expected": {
+        "location": "북쪽 화장실",
+        "target": null,
+        "request": "toilet_assistance",
+        "urgency": "medium",
+        "safetyFlags": [],
+        "missingFields": [],
+        "facts": [
+          "북쪽 화장실",
+          "막혀",
+          "사용할 수 없습니다"
+        ]
+      },
+      "critical": false,
+      "safety": {
+        "status": 200,
+        "actual": false,
+        "flags": []
+      },
+      "extraction": {
+        "status": 200,
+        "elapsedMs": 18442,
+        "incident": {
+          "language": "ko",
+          "location": null,
+          "target": null,
+          "facts": [],
+          "request": "toilet_assistance",
+          "urgency": "medium",
+          "safetyFlags": [],
+          "missingFields": [
+            "場所"
+          ],
+          "askedFields": [],
+          "originalText": [
+            "북쪽 화장실이 막혀서 사용할 수 없습니다."
+          ],
+          "confidence": null,
+          "category": null
+        },
+        "data": {
+          "ok": true,
+          "aiMode": "model-gateway",
+          "runtimeMode": "auto",
+          "provider": "openai-compatible",
+          "incident": {
+            "language": "ko",
+            "location": null,
+            "target": null,
+            "facts": [],
+            "request": "toilet_assistance",
+            "urgency": "medium",
+            "safetyFlags": [],
+            "missingFields": [
+              "場所"
+            ],
+            "askedFields": [],
+            "originalText": [
+              "북쪽 화장실이 막혀서 사용할 수 없습니다."
+            ],
+            "confidence": null,
+            "category": null
+          },
+          "safety": {
+            "flags": [],
+            "immediate": false
+          },
+          "telemetry": {
+            "stage": "extract",
+            "model": "qwen3.5:4b",
+            "promptVariant": "full",
+            "safetyGuardMs": 0,
+            "preprocessingMs": 0,
+            "modelTimings": {
+              "requestBuildMs": 0,
+              "httpHeadersMs": 6925,
+              "firstTokenMs": 6926,
+              "promptUntilFirstTokenMs": 1,
+              "generationMs": 10989,
+              "bodyReadMs": 10990,
+              "jsonParseMs": 0,
+              "totalMs": 17915,
+              "stream": true,
+              "promptEvalMs": null,
+              "generationEvalMs": null,
+              "serverTotalMs": null,
+              "modelLoadMs": null,
+              "queueMs": null,
+              "promptTokens": null,
+              "completionTokens": null
+            },
+            "normalizationMs": 0,
+            "totalMs": 17915,
+            "fallback": false
+          }
+        }
+      },
+      "conversation": {
+        "status": 200,
+        "elapsedMs": 5867,
+        "reply": "북쪽 화장실 사용 불가입니다.",
+        "nextField": "場所",
+        "valid": true,
+        "languageLeak": false
+      }
+    },
+    {
+      "id": "ko-infant",
+      "language": "ko",
+      "label": "영아 용품",
+      "input": "접수처 근처에 아기 한 명이 있고 기저귀가 부족합니다.",
+      "expected": {
+        "location": "접수처 근처",
+        "target": {
+          "count": 1,
+          "type": "infant"
+        },
+        "request": "infant_supplies",
+        "urgency": "medium",
+        "safetyFlags": [],
+        "missingFields": [],
+        "facts": [
+          "아기",
+          "기저귀"
+        ]
+      },
+      "critical": false,
+      "safety": {
+        "status": 200,
+        "actual": false,
+        "flags": []
+      },
+      "extraction": {
+        "status": 200,
+        "elapsedMs": 23382,
+        "incident": {
+          "language": "ko",
+          "location": null,
+          "target": {
+            "type": "infant",
+            "count": 1,
+            "ageGroup": null
+          },
+          "facts": [],
+          "request": "infant_supplies",
+          "urgency": "medium",
+          "safetyFlags": [],
+          "missingFields": [
+            "場所"
+          ],
+          "askedFields": [],
+          "originalText": [
+            "접수처 근처에 아기 한 명이 있고 기저귀가 부족합니다."
+          ],
+          "confidence": 0.95,
+          "category": null
+        },
+        "data": {
+          "ok": true,
+          "aiMode": "model-gateway",
+          "runtimeMode": "auto",
+          "provider": "openai-compatible",
+          "incident": {
+            "language": "ko",
+            "location": null,
+            "target": {
+              "type": "infant",
+              "count": 1,
+              "ageGroup": null
+            },
+            "facts": [],
+            "request": "infant_supplies",
+            "urgency": "medium",
+            "safetyFlags": [],
+            "missingFields": [
+              "場所"
+            ],
+            "askedFields": [],
+            "originalText": [
+              "접수처 근처에 아기 한 명이 있고 기저귀가 부족합니다."
+            ],
+            "confidence": 0.95,
+            "category": null
+          },
+          "safety": {
+            "flags": [],
+            "immediate": false
+          },
+          "telemetry": {
+            "stage": "extract",
+            "model": "qwen3.5:4b",
+            "promptVariant": "full",
+            "safetyGuardMs": 0,
+            "preprocessingMs": 0,
+            "modelTimings": {
+              "requestBuildMs": 0,
+              "httpHeadersMs": 7205,
+              "firstTokenMs": 7206,
+              "promptUntilFirstTokenMs": 1,
+              "generationMs": 16119,
+              "bodyReadMs": 16120,
+              "jsonParseMs": 0,
+              "totalMs": 23325,
+              "stream": true,
+              "promptEvalMs": null,
+              "generationEvalMs": null,
+              "serverTotalMs": null,
+              "modelLoadMs": null,
+              "queueMs": null,
+              "promptTokens": null,
+              "completionTokens": null
+            },
+            "normalizationMs": 1,
+            "totalMs": 23326,
+            "fallback": false
+          }
+        }
+      },
+      "conversation": {
+        "status": 200,
+        "elapsedMs": 6616,
+        "reply": "아기 한 명과 기저귀 부족이 걱정되시군요.",
+        "nextField": "場所",
+        "valid": true,
+        "languageLeak": false
+      }
+    },
+    {
+      "id": "ko-fever",
+      "language": "ko",
+      "label": "고열",
+      "input": "1층 구호소에서 아이가 39도 열이 나고 매우 축 처져 있습니다.",
+      "expected": {
+        "location": "1층 구호소",
+        "target": {
+          "count": 1,
+          "type": "child"
+        },
+        "request": "medical_assistance",
+        "urgency": "high",
+        "safetyFlags": [
+          "possible_medical_emergency"
+        ],
+        "missingFields": [],
+        "facts": [
+          "39도",
+          "축 처져"
+        ]
+      },
+      "critical": true,
+      "safety": {
+        "status": 200,
+        "actual": true,
+        "flags": [
+          "重大な体調変化"
+        ]
+      },
+      "extraction": {
+        "status": 200,
+        "elapsedMs": 22710,
+        "incident": {
+          "language": "ko",
+          "location": null,
+          "target": {
+            "type": "child",
+            "count": 1,
+            "ageGroup": null
+          },
+          "facts": [
+            "39 도 열이 나고 매우 축 처져 있습니다."
+          ],
+          "request": "medical_assistance",
+          "urgency": "high",
+          "safetyFlags": [
+            "possible_medical_emergency"
+          ],
+          "missingFields": [
+            "場所"
+          ],
+          "askedFields": [],
+          "originalText": [
+            "1층 구호소에서 아이가 39도 열이 나고 매우 축 처져 있습니다."
+          ],
+          "confidence": 0.85,
+          "category": null
+        },
+        "data": {
+          "ok": true,
+          "aiMode": "model-gateway",
+          "runtimeMode": "auto",
+          "provider": "openai-compatible",
+          "incident": {
+            "language": "ko",
+            "location": null,
+            "target": {
+              "type": "child",
+              "count": 1,
+              "ageGroup": null
+            },
+            "facts": [
+              "39 도 열이 나고 매우 축 처져 있습니다."
+            ],
+            "request": "medical_assistance",
+            "urgency": "high",
+            "safetyFlags": [
+              "possible_medical_emergency"
+            ],
+            "missingFields": [
+              "場所"
+            ],
+            "askedFields": [],
+            "originalText": [
+              "1층 구호소에서 아이가 39도 열이 나고 매우 축 처져 있습니다."
+            ],
+            "confidence": 0.85,
+            "category": null
+          },
+          "safety": {
+            "flags": [],
+            "immediate": false
+          },
+          "telemetry": {
+            "stage": "extract",
+            "model": "qwen3.5:4b",
+            "promptVariant": "full",
+            "safetyGuardMs": 0,
+            "preprocessingMs": 0,
+            "modelTimings": {
+              "requestBuildMs": 0,
+              "httpHeadersMs": 7138,
+              "firstTokenMs": 7140,
+              "promptUntilFirstTokenMs": 2,
+              "generationMs": 15513,
+              "bodyReadMs": 15515,
+              "jsonParseMs": 0,
+              "totalMs": 22653,
+              "stream": true,
+              "promptEvalMs": null,
+              "generationEvalMs": null,
+              "serverTotalMs": null,
+              "modelLoadMs": null,
+              "queueMs": null,
+              "promptTokens": null,
+              "completionTokens": null
+            },
+            "normalizationMs": 0,
+            "totalMs": 22653,
+            "fallback": false
+          }
+        }
+      },
+      "conversation": {
+        "status": 200,
+        "elapsedMs": 6304,
+        "reply": "39 도 열이 나고 매우 축 처져 있습니다.",
+        "nextField": "場所",
+        "valid": true,
+        "languageLeak": false
+      }
+    },
+    {
+      "id": "ko-unconscious",
+      "language": "ko",
+      "label": "의식 이상",
+      "input": "입구 근처에서 사람이 쓰러졌고 의식이 없습니다.",
+      "expected": {
+        "location": "입구 근처",
+        "target": null,
+        "request": "medical_assistance",
+        "urgency": "high",
+        "safetyFlags": [
+          "possible_medical_emergency"
+        ],
+        "missingFields": [],
+        "facts": [
+          "쓰러졌",
+          "의식이 없습니다"
+        ]
+      },
+      "critical": true,
+      "safety": {
+        "status": 200,
+        "actual": true,
+        "flags": [
+          "意識・呼吸の異常"
+        ]
+      },
+      "extraction": {
+        "status": 200,
+        "elapsedMs": 22515,
+        "incident": {
+          "language": "ko",
+          "location": null,
+          "target": null,
+          "facts": [
+            "입구 근처에서 사람이 쓰러졌고 의식이 없습니다."
+          ],
+          "request": "medical_assistance",
+          "urgency": "high",
+          "safetyFlags": [
+            "possible_medical_emergency"
+          ],
+          "missingFields": [
+            "場所"
+          ],
+          "askedFields": [],
+          "originalText": [
+            "입구 근처에서 사람이 쓰러졌고 의식이 없습니다."
+          ],
+          "confidence": 0.95,
+          "category": null
+        },
+        "data": {
+          "ok": true,
+          "aiMode": "model-gateway",
+          "runtimeMode": "auto",
+          "provider": "openai-compatible",
+          "incident": {
+            "language": "ko",
+            "location": null,
+            "target": null,
+            "facts": [
+              "입구 근처에서 사람이 쓰러졌고 의식이 없습니다."
+            ],
+            "request": "medical_assistance",
+            "urgency": "high",
+            "safetyFlags": [
+              "possible_medical_emergency"
+            ],
+            "missingFields": [
+              "場所"
+            ],
+            "askedFields": [],
+            "originalText": [
+              "입구 근처에서 사람이 쓰러졌고 의식이 없습니다."
+            ],
+            "confidence": 0.95,
+            "category": null
+          },
+          "safety": {
+            "flags": [
+              "意識・呼吸の異常"
+            ],
+            "immediate": true
+          },
+          "telemetry": {
+            "stage": "extract",
+            "model": "qwen3.5:4b",
+            "promptVariant": "full",
+            "safetyGuardMs": 0,
+            "preprocessingMs": 0,
+            "modelTimings": {
+              "requestBuildMs": 0,
+              "httpHeadersMs": 7047,
+              "firstTokenMs": 7049,
+              "promptUntilFirstTokenMs": 2,
+              "generationMs": 15066,
+              "bodyReadMs": 15068,
+              "jsonParseMs": 0,
+              "totalMs": 22115,
+              "stream": true,
+              "promptEvalMs": null,
+              "generationEvalMs": null,
+              "serverTotalMs": null,
+              "modelLoadMs": null,
+              "queueMs": null,
+              "promptTokens": null,
+              "completionTokens": null
+            },
+            "normalizationMs": 1,
+            "totalMs": 22116,
+            "fallback": false
+          }
+        }
+      },
+      "conversation": {
+        "status": 200,
+        "elapsedMs": 6526,
+        "reply": "긴급한 내용일 수 있어 먼저 직원에게 알리겠습니다.현재 위치를 알려주세요.",
+        "nextField": "場所",
+        "valid": true,
+        "languageLeak": false
+      }
+    },
+    {
+      "id": "ko-breathing",
+      "language": "ko",
+      "label": "호흡 이상",
+      "input": "B구역에 있는 사람이 숨을 쉴 수 없다고 합니다.",
+      "expected": {
+        "location": "B구역",
+        "target": null,
+        "request": "medical_assistance",
+        "urgency": "high",
+        "safetyFlags": [
+          "possible_medical_emergency"
+        ],
+        "missingFields": [],
+        "facts": [
+          "숨을 쉴 수 없"
+        ]
+      },
+      "critical": true,
+      "safety": {
+        "status": 200,
+        "actual": true,
+        "flags": [
+          "意識・呼吸の異常"
+        ]
+      },
+      "extraction": {
+        "status": 200,
+        "elapsedMs": 20322,
+        "incident": {
+          "language": "ko",
+          "location": null,
+          "target": null,
+          "facts": [
+            "B구역에 있는 사람이 숨을 쉴 수 없다고 합니다."
+          ],
+          "request": "general_assistance",
+          "urgency": "unknown",
+          "safetyFlags": [],
+          "missingFields": [
+            "場所",
+            "追加確認"
+          ],
+          "askedFields": [],
+          "originalText": [
+            "B구역에 있는 사람이 숨을 쉴 수 없다고 합니다."
+          ],
+          "confidence": null,
+          "category": null
+        },
+        "data": {
+          "ok": true,
+          "aiMode": "model-gateway",
+          "runtimeMode": "auto",
+          "provider": "openai-compatible",
+          "incident": {
+            "language": "ko",
+            "location": null,
+            "target": null,
+            "facts": [
+              "B구역에 있는 사람이 숨을 쉴 수 없다고 합니다."
+            ],
+            "request": "general_assistance",
+            "urgency": "unknown",
+            "safetyFlags": [],
+            "missingFields": [
+              "場所",
+              "追加確認"
+            ],
+            "askedFields": [],
+            "originalText": [
+              "B구역에 있는 사람이 숨을 쉴 수 없다고 합니다."
+            ],
+            "confidence": null,
+            "category": null
+          },
+          "safety": {
+            "flags": [],
+            "immediate": false
+          },
+          "telemetry": {
+            "stage": "extract",
+            "model": "qwen3.5:4b",
+            "promptVariant": "full",
+            "safetyGuardMs": 0,
+            "preprocessingMs": 0,
+            "modelTimings": {
+              "requestBuildMs": 0,
+              "httpHeadersMs": 7050,
+              "firstTokenMs": 7051,
+              "promptUntilFirstTokenMs": 1,
+              "generationMs": 13202,
+              "bodyReadMs": 13203,
+              "jsonParseMs": 0,
+              "totalMs": 20253,
+              "stream": true,
+              "promptEvalMs": null,
+              "generationEvalMs": null,
+              "serverTotalMs": null,
+              "modelLoadMs": null,
+              "queueMs": null,
+              "promptTokens": null,
+              "completionTokens": null
+            },
+            "normalizationMs": 0,
+            "totalMs": 20253,
+            "fallback": false
+          }
+        }
+      },
+      "conversation": {
+        "status": 200,
+        "elapsedMs": 6114,
+        "reply": "B구역 사람이 숨을 쉴 수 없다고 합니다. 확인 부탁드립니다.",
+        "nextField": "場所",
+        "valid": true,
+        "languageLeak": false
+      }
+    },
+    {
+      "id": "ko-fire",
+      "language": "ko",
+      "label": "화재",
+      "input": "주방에서 연기가 나고 불이 보입니다.",
+      "expected": {
+        "location": "주방",
+        "target": null,
+        "request": "fire_response",
+        "urgency": "high",
+        "safetyFlags": [
+          "possible_fire"
+        ],
+        "missingFields": [],
+        "facts": [
+          "연기",
+          "불"
+        ]
+      },
+      "critical": true,
+      "safety": {
+        "status": 200,
+        "actual": true,
+        "flags": [
+          "火災・煙"
+        ]
+      },
+      "extraction": {
+        "status": 200,
+        "elapsedMs": 21942,
+        "incident": {
+          "language": "ko",
+          "location": "주방",
+          "target": null,
+          "facts": [],
+          "request": "fire_response",
+          "urgency": "high",
+          "safetyFlags": [
+            "possible_fire"
+          ],
+          "missingFields": [],
+          "askedFields": [],
+          "originalText": [
+            "주방에서 연기가 나고 불이 보입니다."
+          ],
+          "confidence": 0.95,
+          "category": null
+        },
+        "data": {
+          "ok": true,
+          "aiMode": "model-gateway",
+          "runtimeMode": "auto",
+          "provider": "openai-compatible",
+          "incident": {
+            "language": "ko",
+            "location": "주방",
+            "target": null,
+            "facts": [],
+            "request": "fire_response",
+            "urgency": "high",
+            "safetyFlags": [
+              "possible_fire"
+            ],
+            "missingFields": [],
+            "askedFields": [],
+            "originalText": [
+              "주방에서 연기가 나고 불이 보입니다."
+            ],
+            "confidence": 0.95,
+            "category": null
+          },
+          "safety": {
+            "flags": [
+              "火災・煙"
+            ],
+            "immediate": true
+          },
+          "telemetry": {
+            "stage": "extract",
+            "model": "qwen3.5:4b",
+            "promptVariant": "full",
+            "safetyGuardMs": 0,
+            "preprocessingMs": 0,
+            "modelTimings": {
+              "requestBuildMs": 0,
+              "httpHeadersMs": 7038,
+              "firstTokenMs": 7039,
+              "promptUntilFirstTokenMs": 1,
+              "generationMs": 14576,
+              "bodyReadMs": 14577,
+              "jsonParseMs": 0,
+              "totalMs": 21615,
+              "stream": true,
+              "promptEvalMs": null,
+              "generationEvalMs": null,
+              "serverTotalMs": null,
+              "modelLoadMs": null,
+              "queueMs": null,
+              "promptTokens": null,
+              "completionTokens": null
+            },
+            "normalizationMs": 76,
+            "totalMs": 21691,
+            "fallback": false
+          }
+        }
+      },
+      "conversation": {
+        "status": 200,
+        "elapsedMs": 7941,
+        "reply": "긴급한 내용일 수 있어 먼저 직원에게 알리겠습니다.현재 위치를 알려주세요.",
+        "nextField": "場所",
+        "valid": true,
+        "languageLeak": false
+      }
+    },
+    {
+      "id": "ko-violence",
+      "language": "ko",
+      "label": "폭력",
+      "input": "입구 근처에서 칼을 든 사람이 주변 사람들을 위협하고 있습니다.",
+      "expected": {
+        "location": "입구 근처",
+        "target": null,
+        "request": "safety_assistance",
+        "urgency": "high",
+        "safetyFlags": [
+          "possible_violence"
+        ],
+        "missingFields": [],
+        "facts": [
+          "칼",
+          "위협"
+        ]
+      },
+      "critical": true,
+      "safety": {
+        "status": 200,
+        "actual": true,
+        "flags": [
+          "暴力・武器"
+        ]
+      },
+      "extraction": {
+        "status": 200,
+        "elapsedMs": 21904,
+        "incident": {
+          "language": "ko",
+          "location": null,
+          "target": null,
+          "facts": [],
+          "request": "safety_assistance",
+          "urgency": "high",
+          "safetyFlags": [
+            "possible_violence"
+          ],
+          "missingFields": [
+            "場所"
+          ],
+          "askedFields": [],
+          "originalText": [
+            "입구 근처에서 칼을 든 사람이 주변 사람들을 위협하고 있습니다."
+          ],
+          "confidence": null,
+          "category": null
+        },
+        "data": {
+          "ok": true,
+          "aiMode": "model-gateway",
+          "runtimeMode": "auto",
+          "provider": "openai-compatible",
+          "incident": {
+            "language": "ko",
+            "location": null,
+            "target": null,
+            "facts": [],
+            "request": "safety_assistance",
+            "urgency": "high",
+            "safetyFlags": [
+              "possible_violence"
+            ],
+            "missingFields": [
+              "場所"
+            ],
+            "askedFields": [],
+            "originalText": [
+              "입구 근처에서 칼을 든 사람이 주변 사람들을 위협하고 있습니다."
+            ],
+            "confidence": null,
+            "category": null
+          },
+          "safety": {
+            "flags": [
+              "暴力・武器"
+            ],
+            "immediate": true
+          },
+          "telemetry": {
+            "stage": "extract",
+            "model": "qwen3.5:4b",
+            "promptVariant": "full",
+            "safetyGuardMs": 0,
+            "preprocessingMs": 0,
+            "modelTimings": {
+              "requestBuildMs": 0,
+              "httpHeadersMs": 7013,
+              "firstTokenMs": 7014,
+              "promptUntilFirstTokenMs": 1,
+              "generationMs": 14826,
+              "bodyReadMs": 14827,
+              "jsonParseMs": 0,
+              "totalMs": 21840,
+              "stream": true,
+              "promptEvalMs": null,
+              "generationEvalMs": null,
+              "serverTotalMs": null,
+              "modelLoadMs": null,
+              "queueMs": null,
+              "promptTokens": null,
+              "completionTokens": null
+            },
+            "normalizationMs": 2,
+            "totalMs": 21842,
+            "fallback": false
+          }
+        }
+      },
+      "conversation": {
+        "status": 200,
+        "elapsedMs": 6304,
+        "reply": "긴급한 내용일 수 있어 먼저 직원에게 알리겠습니다.현재 위치를 알려주세요.",
+        "nextField": "場所",
+        "valid": true,
+        "languageLeak": false
+      }
+    },
+    {
+      "id": "ko-angry",
+      "language": "ko",
+      "label": "화났지만 비긴급",
+      "input": "몇 번이나 말해야 합니까? A구역에 담요가 아직 오지 않았습니다.",
+      "expected": {
+        "location": "A구역",
+        "target": null,
+        "request": "general_assistance",
+        "urgency": "medium",
+        "safetyFlags": [],
+        "missingFields": [],
+        "facts": [
+          "담요",
+          "아직 오지"
+        ]
+      },
+      "critical": false,
+      "safety": {
+        "status": 200,
+        "actual": false,
+        "flags": []
+      },
+      "extraction": {
+        "status": 200,
+        "elapsedMs": 21725,
+        "incident": {
+          "language": "ko",
+          "location": null,
+          "target": null,
+          "facts": [
+            "A구역에 담요가 아직 오지 않았습니다."
+          ],
+          "request": "general_assistance",
+          "urgency": "unknown",
+          "safetyFlags": [],
+          "missingFields": [
+            "場所",
+            "追加確認"
+          ],
+          "askedFields": [
+            "追加確認"
+          ],
+          "originalText": [
+            "몇 번이나 말해야 합니까? A구역에 담요가 아직 오지 않았습니다."
+          ],
+          "confidence": null,
+          "category": null
+        },
+        "data": {
+          "ok": true,
+          "aiMode": "model-gateway",
+          "runtimeMode": "auto",
+          "provider": "openai-compatible",
+          "incident": {
+            "language": "ko",
+            "location": null,
+            "target": null,
+            "facts": [
+              "A구역에 담요가 아직 오지 않았습니다."
+            ],
+            "request": "general_assistance",
+            "urgency": "unknown",
+            "safetyFlags": [],
+            "missingFields": [
+              "場所",
+              "追加確認"
+            ],
+            "askedFields": [
+              "追加確認"
+            ],
+            "originalText": [
+              "몇 번이나 말해야 합니까? A구역에 담요가 아직 오지 않았습니다."
+            ],
+            "confidence": null,
+            "category": null
+          },
+          "safety": {
+            "flags": [],
+            "immediate": false
+          },
+          "telemetry": {
+            "stage": "extract",
+            "model": "qwen3.5:4b",
+            "promptVariant": "full",
+            "safetyGuardMs": 0,
+            "preprocessingMs": 0,
+            "modelTimings": {
+              "requestBuildMs": 0,
+              "httpHeadersMs": 7054,
+              "firstTokenMs": 7056,
+              "promptUntilFirstTokenMs": 2,
+              "generationMs": 14568,
+              "bodyReadMs": 14570,
+              "jsonParseMs": 0,
+              "totalMs": 21624,
+              "stream": true,
+              "promptEvalMs": null,
+              "generationEvalMs": null,
+              "serverTotalMs": null,
+              "modelLoadMs": null,
+              "queueMs": null,
+              "promptTokens": null,
+              "completionTokens": null
+            },
+            "normalizationMs": 1,
+            "totalMs": 21625,
+            "fallback": false
+          }
+        }
+      },
+      "conversation": {
+        "status": 200,
+        "elapsedMs": 5948,
+        "reply": "A구역에 담요가 오지 않았나요?",
+        "nextField": "場所",
+        "valid": true,
+        "languageLeak": false
+      }
+    },
+    {
+      "id": "ko-uncertain",
+      "language": "ko",
+      "label": "불확실",
+      "input": "충전기가 고장 난 것 같고, 아마 다목적실에 있을 겁니다.",
+      "expected": {
+        "location": "다목적실",
+        "target": null,
+        "request": "general_assistance",
+        "urgency": "unknown",
+        "safetyFlags": [],
+        "missingFields": [
+          "追加確認"
+        ],
+        "facts": [
+          "충전기",
+          "것 같"
+        ]
+      },
+      "critical": false,
+      "safety": {
+        "status": 200,
+        "actual": false,
+        "flags": []
+      },
+      "extraction": {
+        "status": 200,
+        "elapsedMs": 21234,
+        "incident": {
+          "language": "ko",
+          "location": null,
+          "target": null,
+          "facts": [],
+          "request": "general_assistance",
+          "urgency": "unknown",
+          "safetyFlags": [],
+          "missingFields": [
+            "場所",
+            "追加確認"
+          ],
+          "askedFields": [],
+          "originalText": [
+            "충전기가 고장 난 것 같고, 아마 다목적실에 있을 겁니다."
+          ],
+          "confidence": null,
+          "category": null
+        },
+        "data": {
+          "ok": true,
+          "aiMode": "model-gateway",
+          "runtimeMode": "auto",
+          "provider": "openai-compatible",
+          "incident": {
+            "language": "ko",
+            "location": null,
+            "target": null,
+            "facts": [],
+            "request": "general_assistance",
+            "urgency": "unknown",
+            "safetyFlags": [],
+            "missingFields": [
+              "場所",
+              "追加確認"
+            ],
+            "askedFields": [],
+            "originalText": [
+              "충전기가 고장 난 것 같고, 아마 다목적실에 있을 겁니다."
+            ],
+            "confidence": null,
+            "category": null
+          },
+          "safety": {
+            "flags": [],
+            "immediate": false
+          },
+          "telemetry": {
+            "stage": "extract",
+            "model": "qwen3.5:4b",
+            "promptVariant": "full",
+            "safetyGuardMs": 0,
+            "preprocessingMs": 0,
+            "modelTimings": {
+              "requestBuildMs": 1,
+              "httpHeadersMs": 6809,
+              "firstTokenMs": 6810,
+              "promptUntilFirstTokenMs": 1,
+              "generationMs": 14362,
+              "bodyReadMs": 14363,
+              "jsonParseMs": 0,
+              "totalMs": 21172,
+              "stream": true,
+              "promptEvalMs": null,
+              "generationEvalMs": null,
+              "serverTotalMs": null,
+              "modelLoadMs": null,
+              "queueMs": null,
+              "promptTokens": null,
+              "completionTokens": null
+            },
+            "normalizationMs": 0,
+            "totalMs": 21172,
+            "fallback": false
+          }
+        }
+      },
+      "conversation": {
+        "status": 200,
+        "elapsedMs": 5722,
+        "reply": "다목적실인지 확인 부탁드립니다.",
+        "nextField": "場所",
+        "valid": true,
+        "languageLeak": false
+      }
+    }
+  ],
+  "byLanguage": {
+    "ja": {
+      "cases": 10,
+      "safety": {
+        "truePositive": 5,
+        "falsePositive": 0,
+        "falseNegative": 0,
+        "recall": 1,
+        "precision": 1
+      },
+      "conversation": {
+        "valid": 10,
+        "languageLeak": 0,
+        "latency": {
+          "p50": 5948,
+          "p95": 8967,
+          "max": 8967
+        }
+      },
+      "extraction": {
+        "schema": 10,
+        "fieldAccuracy": {
+          "schema": 1,
+          "location": 0.6,
+          "target": 1,
+          "request": 0.9,
+          "urgency": 1,
+          "safetyFlags": 1,
+          "missingFields": 1,
+          "facts": 0.5
+        },
+        "latency": {
+          "p50": 21654,
+          "p95": 27163,
+          "max": 27163
+        }
+      }
+    },
+    "en": {
+      "cases": 10,
+      "safety": {
+        "truePositive": 5,
+        "falsePositive": 0,
+        "falseNegative": 0,
+        "recall": 1,
+        "precision": 1
+      },
+      "conversation": {
+        "valid": 10,
+        "languageLeak": 0,
+        "latency": {
+          "p50": 6067,
+          "p95": 7153,
+          "max": 7153
+        }
+      },
+      "extraction": {
+        "schema": 10,
+        "fieldAccuracy": {
+          "schema": 1,
+          "location": 0.4,
+          "target": 0.8,
+          "request": 1,
+          "urgency": 0.9,
+          "safetyFlags": 1,
+          "missingFields": 1,
+          "facts": 0.4
+        },
+        "latency": {
+          "p50": 20871,
+          "p95": 26136,
+          "max": 26136
+        }
+      }
+    },
+    "zh": {
+      "cases": 10,
+      "safety": {
+        "truePositive": 5,
+        "falsePositive": 0,
+        "falseNegative": 0,
+        "recall": 1,
+        "precision": 1
+      },
+      "conversation": {
+        "valid": 10,
+        "languageLeak": 0,
+        "latency": {
+          "p50": 6077,
+          "p95": 7397,
+          "max": 7397
+        }
+      },
+      "extraction": {
+        "schema": 10,
+        "fieldAccuracy": {
+          "schema": 1,
+          "location": 0.3,
+          "target": 0.9,
+          "request": 0.8,
+          "urgency": 0.7,
+          "safetyFlags": 0.9,
+          "missingFields": 1,
+          "facts": 0.5
+        },
+        "latency": {
+          "p50": 20208,
+          "p95": 24887,
+          "max": 24887
+        }
+      }
+    },
+    "ko": {
+      "cases": 10,
+      "safety": {
+        "truePositive": 5,
+        "falsePositive": 0,
+        "falseNegative": 0,
+        "recall": 1,
+        "precision": 1
+      },
+      "conversation": {
+        "valid": 10,
+        "languageLeak": 0,
+        "latency": {
+          "p50": 6304,
+          "p95": 7941,
+          "max": 7941
+        }
+      },
+      "extraction": {
+        "schema": 10,
+        "fieldAccuracy": {
+          "schema": 1,
+          "location": 0.2,
+          "target": 0.9,
+          "request": 0.9,
+          "urgency": 0.8,
+          "safetyFlags": 0.9,
+          "missingFields": 1,
+          "facts": 0.4
+        },
+        "latency": {
+          "p50": 21691,
+          "p95": 24298,
+          "max": 24298
+        }
+      }
+    }
+  }
+}

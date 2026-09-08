@@ -1,0 +1,345 @@
+{
+  "generatedAt": "2026-09-08T11:30:13.208Z",
+  "baseUrl": "http://localhost:3000",
+  "rows": [
+    {
+      "fault": "ollama-down",
+      "mode": "conversation",
+      "status": 200,
+      "fallback": true,
+      "safetyPreserved": true,
+      "data": {
+        "ok": false,
+        "aiMode": "local-rules",
+        "runtimeMode": "auto",
+        "safety": {
+          "flags": [],
+          "immediate": false
+        },
+        "telemetry": {
+          "stage": "conversation",
+          "model": null,
+          "promptVariant": "full",
+          "safetyGuardMs": 0,
+          "preprocessingMs": 0,
+          "totalMs": 0,
+          "fallback": true,
+          "fault": "ollama-down"
+        },
+        "reason": "EVAL_FAULT_ollama-down"
+      }
+    },
+    {
+      "fault": "ollama-down",
+      "mode": "extract",
+      "status": 200,
+      "fallback": true,
+      "safetyPreserved": true,
+      "data": {
+        "ok": false,
+        "aiMode": "local-rules",
+        "runtimeMode": "auto",
+        "safety": {
+          "flags": [],
+          "immediate": false
+        },
+        "telemetry": {
+          "stage": "extract",
+          "model": null,
+          "promptVariant": "full",
+          "safetyGuardMs": 0,
+          "preprocessingMs": 0,
+          "totalMs": 0,
+          "fallback": true,
+          "fault": "ollama-down"
+        },
+        "reason": "EVAL_FAULT_ollama-down"
+      }
+    },
+    {
+      "fault": "conversation-down",
+      "mode": "conversation",
+      "status": 200,
+      "fallback": true,
+      "safetyPreserved": true,
+      "data": {
+        "ok": false,
+        "aiMode": "local-rules",
+        "runtimeMode": "auto",
+        "safety": {
+          "flags": [],
+          "immediate": false
+        },
+        "telemetry": {
+          "stage": "conversation",
+          "model": null,
+          "promptVariant": "full",
+          "safetyGuardMs": 0,
+          "preprocessingMs": 0,
+          "totalMs": 0,
+          "fallback": true,
+          "fault": "conversation-down"
+        },
+        "reason": "EVAL_FAULT_conversation-down"
+      }
+    },
+    {
+      "fault": "conversation-down",
+      "mode": "extract",
+      "status": 200,
+      "fallback": true,
+      "safetyPreserved": true,
+      "data": {
+        "ok": false,
+        "aiMode": "local-rules",
+        "runtimeMode": "auto",
+        "safety": {
+          "flags": [],
+          "immediate": false
+        },
+        "telemetry": {
+          "stage": "extract",
+          "model": null,
+          "promptVariant": "full",
+          "safetyGuardMs": 0,
+          "preprocessingMs": 0,
+          "totalMs": 0,
+          "fallback": true,
+          "fault": "conversation-down"
+        },
+        "reason": "EVAL_FAULT_conversation-down"
+      }
+    },
+    {
+      "fault": "extraction-down",
+      "mode": "conversation",
+      "status": 200,
+      "fallback": true,
+      "safetyPreserved": true,
+      "data": {
+        "ok": false,
+        "aiMode": "local-rules",
+        "runtimeMode": "auto",
+        "safety": {
+          "flags": [],
+          "immediate": false
+        },
+        "telemetry": {
+          "stage": "conversation",
+          "model": null,
+          "promptVariant": "full",
+          "safetyGuardMs": 0,
+          "preprocessingMs": 0,
+          "totalMs": 0,
+          "fallback": true,
+          "fault": "extraction-down"
+        },
+        "reason": "EVAL_FAULT_extraction-down"
+      }
+    },
+    {
+      "fault": "extraction-down",
+      "mode": "extract",
+      "status": 200,
+      "fallback": true,
+      "safetyPreserved": true,
+      "data": {
+        "ok": false,
+        "aiMode": "local-rules",
+        "runtimeMode": "auto",
+        "safety": {
+          "flags": [],
+          "immediate": false
+        },
+        "telemetry": {
+          "stage": "extract",
+          "model": null,
+          "promptVariant": "full",
+          "safetyGuardMs": 0,
+          "preprocessingMs": 0,
+          "totalMs": 0,
+          "fallback": true,
+          "fault": "extraction-down"
+        },
+        "reason": "EVAL_FAULT_extraction-down"
+      }
+    },
+    {
+      "fault": "timeout",
+      "mode": "conversation",
+      "status": 200,
+      "fallback": true,
+      "safetyPreserved": true,
+      "data": {
+        "ok": false,
+        "aiMode": "local-rules",
+        "runtimeMode": "auto",
+        "safety": {
+          "flags": [],
+          "immediate": false
+        },
+        "telemetry": {
+          "stage": "conversation",
+          "model": null,
+          "promptVariant": "full",
+          "safetyGuardMs": 0,
+          "preprocessingMs": 0,
+          "totalMs": 0,
+          "fallback": true,
+          "fault": "timeout"
+        },
+        "reason": "EVAL_FAULT_timeout"
+      }
+    },
+    {
+      "fault": "timeout",
+      "mode": "extract",
+      "status": 200,
+      "fallback": true,
+      "safetyPreserved": true,
+      "data": {
+        "ok": false,
+        "aiMode": "local-rules",
+        "runtimeMode": "auto",
+        "safety": {
+          "flags": [],
+          "immediate": false
+        },
+        "telemetry": {
+          "stage": "extract",
+          "model": null,
+          "promptVariant": "full",
+          "safetyGuardMs": 0,
+          "preprocessingMs": 0,
+          "totalMs": 0,
+          "fallback": true,
+          "fault": "timeout"
+        },
+        "reason": "EVAL_FAULT_timeout"
+      }
+    },
+    {
+      "fault": "invalid-json",
+      "mode": "conversation",
+      "status": 200,
+      "fallback": true,
+      "safetyPreserved": true,
+      "data": {
+        "ok": false,
+        "aiMode": "local-rules",
+        "runtimeMode": "auto",
+        "safety": {
+          "flags": [],
+          "immediate": false
+        },
+        "telemetry": {
+          "stage": "conversation",
+          "model": null,
+          "promptVariant": "full",
+          "safetyGuardMs": 0,
+          "preprocessingMs": 0,
+          "totalMs": 0,
+          "fallback": true,
+          "fault": "invalid-json"
+        },
+        "reason": "EVAL_FAULT_invalid-json"
+      }
+    },
+    {
+      "fault": "invalid-json",
+      "mode": "extract",
+      "status": 200,
+      "fallback": true,
+      "safetyPreserved": true,
+      "data": {
+        "ok": false,
+        "aiMode": "local-rules",
+        "runtimeMode": "auto",
+        "safety": {
+          "flags": [],
+          "immediate": false
+        },
+        "telemetry": {
+          "stage": "extract",
+          "model": null,
+          "promptVariant": "full",
+          "safetyGuardMs": 0,
+          "preprocessingMs": 0,
+          "totalMs": 0,
+          "fallback": true,
+          "fault": "invalid-json"
+        },
+        "reason": "EVAL_FAULT_invalid-json"
+      }
+    },
+    {
+      "fault": "network-disconnect",
+      "mode": "conversation",
+      "status": 200,
+      "fallback": true,
+      "safetyPreserved": true,
+      "data": {
+        "ok": false,
+        "aiMode": "local-rules",
+        "runtimeMode": "auto",
+        "safety": {
+          "flags": [],
+          "immediate": false
+        },
+        "telemetry": {
+          "stage": "conversation",
+          "model": null,
+          "promptVariant": "full",
+          "safetyGuardMs": 0,
+          "preprocessingMs": 0,
+          "totalMs": 0,
+          "fallback": true,
+          "fault": "network-disconnect"
+        },
+        "reason": "EVAL_FAULT_network-disconnect"
+      }
+    },
+    {
+      "fault": "network-disconnect",
+      "mode": "extract",
+      "status": 200,
+      "fallback": true,
+      "safetyPreserved": true,
+      "data": {
+        "ok": false,
+        "aiMode": "local-rules",
+        "runtimeMode": "auto",
+        "safety": {
+          "flags": [],
+          "immediate": false
+        },
+        "telemetry": {
+          "stage": "extract",
+          "model": null,
+          "promptVariant": "full",
+          "safetyGuardMs": 0,
+          "preprocessingMs": 0,
+          "totalMs": 0,
+          "fallback": true,
+          "fault": "network-disconnect"
+        },
+        "reason": "EVAL_FAULT_network-disconnect"
+      }
+    }
+  ],
+  "translation": {
+    "status": 200,
+    "data": {
+      "originalText": "She may have a fever.",
+      "originalLanguage": "en",
+      "translatedTextJa": "",
+      "translationStatus": "failed"
+    },
+    "sourcePreserved": true
+  },
+  "nonServerFaults": {
+    "asrFailure": "BrowserASRProvider reports onError and returns to the text path; requires device-level manual test.",
+    "ttsFailure": "BrowserTTSProvider reports onError and returns to IDLE; requires device-level manual test.",
+    "networkDisconnect": "server-side eval fault covers model lane; literal network switch-off is documented in offline audit."
+  }
+}

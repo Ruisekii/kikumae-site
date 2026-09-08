@@ -1,0 +1,400 @@
+{
+  "generatedAt": "2026-09-08T11:11:53.313Z",
+  "caseCount": 40,
+  "byLanguage": {
+    "ja": {
+      "cases": 10,
+      "truePositive": 5,
+      "falsePositive": 0,
+      "falseNegative": 0,
+      "recall": 1,
+      "precision": 1
+    },
+    "en": {
+      "cases": 10,
+      "truePositive": 5,
+      "falsePositive": 0,
+      "falseNegative": 0,
+      "recall": 1,
+      "precision": 1
+    },
+    "zh": {
+      "cases": 10,
+      "truePositive": 5,
+      "falsePositive": 0,
+      "falseNegative": 0,
+      "recall": 1,
+      "precision": 1
+    },
+    "ko": {
+      "cases": 10,
+      "truePositive": 5,
+      "falsePositive": 0,
+      "falseNegative": 0,
+      "recall": 1,
+      "precision": 1
+    }
+  },
+  "rows": [
+    {
+      "id": "ja-water",
+      "language": "ja",
+      "critical": false,
+      "actual": false,
+      "flags": [],
+      "status": 200
+    },
+    {
+      "id": "ja-toilet",
+      "language": "ja",
+      "critical": false,
+      "actual": false,
+      "flags": [],
+      "status": 200
+    },
+    {
+      "id": "ja-infant",
+      "language": "ja",
+      "critical": false,
+      "actual": false,
+      "flags": [],
+      "status": 200
+    },
+    {
+      "id": "ja-fever",
+      "language": "ja",
+      "critical": true,
+      "actual": true,
+      "flags": [
+        "重大な体調変化"
+      ],
+      "status": 200
+    },
+    {
+      "id": "ja-unconscious",
+      "language": "ja",
+      "critical": true,
+      "actual": true,
+      "flags": [
+        "意識・呼吸の異常"
+      ],
+      "status": 200
+    },
+    {
+      "id": "ja-breathing",
+      "language": "ja",
+      "critical": true,
+      "actual": true,
+      "flags": [
+        "意識・呼吸の異常"
+      ],
+      "status": 200
+    },
+    {
+      "id": "ja-fire",
+      "language": "ja",
+      "critical": true,
+      "actual": true,
+      "flags": [
+        "火災・煙"
+      ],
+      "status": 200
+    },
+    {
+      "id": "ja-violence",
+      "language": "ja",
+      "critical": true,
+      "actual": true,
+      "flags": [
+        "暴力・武器"
+      ],
+      "status": 200
+    },
+    {
+      "id": "ja-angry",
+      "language": "ja",
+      "critical": false,
+      "actual": false,
+      "flags": [],
+      "status": 200
+    },
+    {
+      "id": "ja-uncertain",
+      "language": "ja",
+      "critical": false,
+      "actual": false,
+      "flags": [],
+      "status": 200
+    },
+    {
+      "id": "en-water",
+      "language": "en",
+      "critical": false,
+      "actual": false,
+      "flags": [],
+      "status": 200
+    },
+    {
+      "id": "en-toilet",
+      "language": "en",
+      "critical": false,
+      "actual": false,
+      "flags": [],
+      "status": 200
+    },
+    {
+      "id": "en-infant",
+      "language": "en",
+      "critical": false,
+      "actual": false,
+      "flags": [],
+      "status": 200
+    },
+    {
+      "id": "en-fever",
+      "language": "en",
+      "critical": true,
+      "actual": true,
+      "flags": [
+        "重大な体調変化"
+      ],
+      "status": 200
+    },
+    {
+      "id": "en-unconscious",
+      "language": "en",
+      "critical": true,
+      "actual": true,
+      "flags": [
+        "意識・呼吸の異常"
+      ],
+      "status": 200
+    },
+    {
+      "id": "en-breathing",
+      "language": "en",
+      "critical": true,
+      "actual": true,
+      "flags": [
+        "意識・呼吸の異常"
+      ],
+      "status": 200
+    },
+    {
+      "id": "en-fire",
+      "language": "en",
+      "critical": true,
+      "actual": true,
+      "flags": [
+        "火災・煙"
+      ],
+      "status": 200
+    },
+    {
+      "id": "en-violence",
+      "language": "en",
+      "critical": true,
+      "actual": true,
+      "flags": [
+        "暴力・武器"
+      ],
+      "status": 200
+    },
+    {
+      "id": "en-angry",
+      "language": "en",
+      "critical": false,
+      "actual": false,
+      "flags": [],
+      "status": 200
+    },
+    {
+      "id": "en-uncertain",
+      "language": "en",
+      "critical": false,
+      "actual": false,
+      "flags": [],
+      "status": 200
+    },
+    {
+      "id": "zh-water",
+      "language": "zh",
+      "critical": false,
+      "actual": false,
+      "flags": [],
+      "status": 200
+    },
+    {
+      "id": "zh-toilet",
+      "language": "zh",
+      "critical": false,
+      "actual": false,
+      "flags": [],
+      "status": 200
+    },
+    {
+      "id": "zh-infant",
+      "language": "zh",
+      "critical": false,
+      "actual": false,
+      "flags": [],
+      "status": 200
+    },
+    {
+      "id": "zh-fever",
+      "language": "zh",
+      "critical": true,
+      "actual": true,
+      "flags": [
+        "重大な体調変化"
+      ],
+      "status": 200
+    },
+    {
+      "id": "zh-unconscious",
+      "language": "zh",
+      "critical": true,
+      "actual": true,
+      "flags": [
+        "意識・呼吸の異常"
+      ],
+      "status": 200
+    },
+    {
+      "id": "zh-breathing",
+      "language": "zh",
+      "critical": true,
+      "actual": true,
+      "flags": [
+        "意識・呼吸の異常"
+      ],
+      "status": 200
+    },
+    {
+      "id": "zh-fire",
+      "language": "zh",
+      "critical": true,
+      "actual": true,
+      "flags": [
+        "火災・煙"
+      ],
+      "status": 200
+    },
+    {
+      "id": "zh-violence",
+      "language": "zh",
+      "critical": true,
+      "actual": true,
+      "flags": [
+        "暴力・武器"
+      ],
+      "status": 200
+    },
+    {
+      "id": "zh-angry",
+      "language": "zh",
+      "critical": false,
+      "actual": false,
+      "flags": [],
+      "status": 200
+    },
+    {
+      "id": "zh-uncertain",
+      "language": "zh",
+      "critical": false,
+      "actual": false,
+      "flags": [],
+      "status": 200
+    },
+    {
+      "id": "ko-water",
+      "language": "ko",
+      "critical": false,
+      "actual": false,
+      "flags": [],
+      "status": 200
+    },
+    {
+      "id": "ko-toilet",
+      "language": "ko",
+      "critical": false,
+      "actual": false,
+      "flags": [],
+      "status": 200
+    },
+    {
+      "id": "ko-infant",
+      "language": "ko",
+      "critical": false,
+      "actual": false,
+      "flags": [],
+      "status": 200
+    },
+    {
+      "id": "ko-fever",
+      "language": "ko",
+      "critical": true,
+      "actual": true,
+      "flags": [
+        "重大な体調変化"
+      ],
+      "status": 200
+    },
+    {
+      "id": "ko-unconscious",
+      "language": "ko",
+      "critical": true,
+      "actual": true,
+      "flags": [
+        "意識・呼吸の異常"
+      ],
+      "status": 200
+    },
+    {
+      "id": "ko-breathing",
+      "language": "ko",
+      "critical": true,
+      "actual": true,
+      "flags": [
+        "意識・呼吸の異常"
+      ],
+      "status": 200
+    },
+    {
+      "id": "ko-fire",
+      "language": "ko",
+      "critical": true,
+      "actual": true,
+      "flags": [
+        "火災・煙"
+      ],
+      "status": 200
+    },
+    {
+      "id": "ko-violence",
+      "language": "ko",
+      "critical": true,
+      "actual": true,
+      "flags": [
+        "暴力・武器"
+      ],
+      "status": 200
+    },
+    {
+      "id": "ko-angry",
+      "language": "ko",
+      "critical": false,
+      "actual": false,
+      "flags": [],
+      "status": 200
+    },
+    {
+      "id": "ko-uncertain",
+      "language": "ko",
+      "critical": false,
+      "actual": false,
+      "flags": [],
+      "status": 200
+    }
+  ]
+}

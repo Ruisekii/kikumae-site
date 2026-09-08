@@ -1,0 +1,3127 @@
+{
+  "generatedAt": "2026-09-08T13:12:40.924Z",
+  "baseUrl": "http://localhost:3000",
+  "levels": [
+    10,
+    20
+  ],
+  "note": "Phase2D負荷試験は4B不要の構造化案件を使用。4Bの同時実行は避難所運用の必須経路から外し、別ジョブとして評価する。",
+  "runs": [
+    {
+      "level": 10,
+      "triage": {
+        "count": 10,
+        "httpSuccess": 10,
+        "timeout": 0,
+        "fallback": 0,
+        "elapsedMs": {
+          "p50": 596,
+          "p95": 633,
+          "max": 633
+        },
+        "queueMs": {
+          "p50": null,
+          "p95": null,
+          "max": null,
+          "measured": false
+        }
+      },
+      "conversation": {
+        "count": 10,
+        "httpSuccess": 10,
+        "timeout": 0,
+        "fallback": 0,
+        "elapsedMs": {
+          "p50": 13358,
+          "p95": 20686,
+          "max": 20686
+        },
+        "queueMs": {
+          "p50": null,
+          "p95": null,
+          "max": null,
+          "measured": false
+        }
+      },
+      "rows": {
+        "triage": [
+          {
+            "status": 200,
+            "elapsedMs": 633,
+            "payload": {
+              "ok": true,
+              "aiMode": "deterministic-triage",
+              "runtimeMode": "auto",
+              "selectedLanguage": "ja",
+              "incident": {
+                "language": "ja",
+                "location": "体育館A",
+                "target": {
+                  "type": null,
+                  "count": 4,
+                  "ageGroup": null
+                },
+                "facts": [
+                  "水",
+                  "飲料水・給水の不足または案内"
+                ],
+                "request": "water_supply",
+                "urgency": "medium",
+                "safetyFlags": [],
+                "missingFields": [],
+                "askedFields": [],
+                "originalText": [
+                  "飲料水が足りません。体育館Aで4人が困っています。"
+                ],
+                "confidence": null,
+                "category": null,
+                "structuredComplete": true,
+                "fourBRequested": false,
+                "fourBStatus": "not_needed"
+              },
+              "safety": {
+                "flags": [],
+                "immediate": false
+              },
+              "extraction": {
+                "useExtraction": false,
+                "structuredComplete": true,
+                "reasons": []
+              },
+              "telemetry": {
+                "stage": "triage",
+                "model": null,
+                "promptVariant": "full",
+                "safetyGuardMs": 0,
+                "preprocessingMs": 0,
+                "totalMs": 1,
+                "fallback": false
+              }
+            },
+            "timeout": false
+          },
+          {
+            "status": 200,
+            "elapsedMs": 594,
+            "payload": {
+              "ok": true,
+              "aiMode": "deterministic-triage",
+              "runtimeMode": "auto",
+              "selectedLanguage": "ja",
+              "incident": {
+                "language": "ja",
+                "location": "体育館A",
+                "target": {
+                  "type": null,
+                  "count": 4,
+                  "ageGroup": null
+                },
+                "facts": [
+                  "水",
+                  "飲料水・給水の不足または案内"
+                ],
+                "request": "water_supply",
+                "urgency": "medium",
+                "safetyFlags": [],
+                "missingFields": [],
+                "askedFields": [],
+                "originalText": [
+                  "飲料水が足りません。体育館Aで4人が困っています。"
+                ],
+                "confidence": null,
+                "category": null,
+                "structuredComplete": true,
+                "fourBRequested": false,
+                "fourBStatus": "not_needed"
+              },
+              "safety": {
+                "flags": [],
+                "immediate": false
+              },
+              "extraction": {
+                "useExtraction": false,
+                "structuredComplete": true,
+                "reasons": []
+              },
+              "telemetry": {
+                "stage": "triage",
+                "model": null,
+                "promptVariant": "full",
+                "safetyGuardMs": 0,
+                "preprocessingMs": 0,
+                "totalMs": 0,
+                "fallback": false
+              }
+            },
+            "timeout": false
+          },
+          {
+            "status": 200,
+            "elapsedMs": 597,
+            "payload": {
+              "ok": true,
+              "aiMode": "deterministic-triage",
+              "runtimeMode": "auto",
+              "selectedLanguage": "ja",
+              "incident": {
+                "language": "ja",
+                "location": "体育館A",
+                "target": {
+                  "type": null,
+                  "count": 4,
+                  "ageGroup": null
+                },
+                "facts": [
+                  "水",
+                  "飲料水・給水の不足または案内"
+                ],
+                "request": "water_supply",
+                "urgency": "medium",
+                "safetyFlags": [],
+                "missingFields": [],
+                "askedFields": [],
+                "originalText": [
+                  "飲料水が足りません。体育館Aで4人が困っています。"
+                ],
+                "confidence": null,
+                "category": null,
+                "structuredComplete": true,
+                "fourBRequested": false,
+                "fourBStatus": "not_needed"
+              },
+              "safety": {
+                "flags": [],
+                "immediate": false
+              },
+              "extraction": {
+                "useExtraction": false,
+                "structuredComplete": true,
+                "reasons": []
+              },
+              "telemetry": {
+                "stage": "triage",
+                "model": null,
+                "promptVariant": "full",
+                "safetyGuardMs": 0,
+                "preprocessingMs": 0,
+                "totalMs": 0,
+                "fallback": false
+              }
+            },
+            "timeout": false
+          },
+          {
+            "status": 200,
+            "elapsedMs": 595,
+            "payload": {
+              "ok": true,
+              "aiMode": "deterministic-triage",
+              "runtimeMode": "auto",
+              "selectedLanguage": "ja",
+              "incident": {
+                "language": "ja",
+                "location": "体育館A",
+                "target": {
+                  "type": null,
+                  "count": 4,
+                  "ageGroup": null
+                },
+                "facts": [
+                  "水",
+                  "飲料水・給水の不足または案内"
+                ],
+                "request": "water_supply",
+                "urgency": "medium",
+                "safetyFlags": [],
+                "missingFields": [],
+                "askedFields": [],
+                "originalText": [
+                  "飲料水が足りません。体育館Aで4人が困っています。"
+                ],
+                "confidence": null,
+                "category": null,
+                "structuredComplete": true,
+                "fourBRequested": false,
+                "fourBStatus": "not_needed"
+              },
+              "safety": {
+                "flags": [],
+                "immediate": false
+              },
+              "extraction": {
+                "useExtraction": false,
+                "structuredComplete": true,
+                "reasons": []
+              },
+              "telemetry": {
+                "stage": "triage",
+                "model": null,
+                "promptVariant": "full",
+                "safetyGuardMs": 0,
+                "preprocessingMs": 0,
+                "totalMs": 0,
+                "fallback": false
+              }
+            },
+            "timeout": false
+          },
+          {
+            "status": 200,
+            "elapsedMs": 596,
+            "payload": {
+              "ok": true,
+              "aiMode": "deterministic-triage",
+              "runtimeMode": "auto",
+              "selectedLanguage": "ja",
+              "incident": {
+                "language": "ja",
+                "location": "体育館A",
+                "target": {
+                  "type": null,
+                  "count": 4,
+                  "ageGroup": null
+                },
+                "facts": [
+                  "水",
+                  "飲料水・給水の不足または案内"
+                ],
+                "request": "water_supply",
+                "urgency": "medium",
+                "safetyFlags": [],
+                "missingFields": [],
+                "askedFields": [],
+                "originalText": [
+                  "飲料水が足りません。体育館Aで4人が困っています。"
+                ],
+                "confidence": null,
+                "category": null,
+                "structuredComplete": true,
+                "fourBRequested": false,
+                "fourBStatus": "not_needed"
+              },
+              "safety": {
+                "flags": [],
+                "immediate": false
+              },
+              "extraction": {
+                "useExtraction": false,
+                "structuredComplete": true,
+                "reasons": []
+              },
+              "telemetry": {
+                "stage": "triage",
+                "model": null,
+                "promptVariant": "full",
+                "safetyGuardMs": 0,
+                "preprocessingMs": 0,
+                "totalMs": 0,
+                "fallback": false
+              }
+            },
+            "timeout": false
+          },
+          {
+            "status": 200,
+            "elapsedMs": 589,
+            "payload": {
+              "ok": true,
+              "aiMode": "deterministic-triage",
+              "runtimeMode": "auto",
+              "selectedLanguage": "ja",
+              "incident": {
+                "language": "ja",
+                "location": "体育館A",
+                "target": {
+                  "type": null,
+                  "count": 4,
+                  "ageGroup": null
+                },
+                "facts": [
+                  "水",
+                  "飲料水・給水の不足または案内"
+                ],
+                "request": "water_supply",
+                "urgency": "medium",
+                "safetyFlags": [],
+                "missingFields": [],
+                "askedFields": [],
+                "originalText": [
+                  "飲料水が足りません。体育館Aで4人が困っています。"
+                ],
+                "confidence": null,
+                "category": null,
+                "structuredComplete": true,
+                "fourBRequested": false,
+                "fourBStatus": "not_needed"
+              },
+              "safety": {
+                "flags": [],
+                "immediate": false
+              },
+              "extraction": {
+                "useExtraction": false,
+                "structuredComplete": true,
+                "reasons": []
+              },
+              "telemetry": {
+                "stage": "triage",
+                "model": null,
+                "promptVariant": "full",
+                "safetyGuardMs": 0,
+                "preprocessingMs": 0,
+                "totalMs": 0,
+                "fallback": false
+              }
+            },
+            "timeout": false
+          },
+          {
+            "status": 200,
+            "elapsedMs": 598,
+            "payload": {
+              "ok": true,
+              "aiMode": "deterministic-triage",
+              "runtimeMode": "auto",
+              "selectedLanguage": "ja",
+              "incident": {
+                "language": "ja",
+                "location": "体育館A",
+                "target": {
+                  "type": null,
+                  "count": 4,
+                  "ageGroup": null
+                },
+                "facts": [
+                  "水",
+                  "飲料水・給水の不足または案内"
+                ],
+                "request": "water_supply",
+                "urgency": "medium",
+                "safetyFlags": [],
+                "missingFields": [],
+                "askedFields": [],
+                "originalText": [
+                  "飲料水が足りません。体育館Aで4人が困っています。"
+                ],
+                "confidence": null,
+                "category": null,
+                "structuredComplete": true,
+                "fourBRequested": false,
+                "fourBStatus": "not_needed"
+              },
+              "safety": {
+                "flags": [],
+                "immediate": false
+              },
+              "extraction": {
+                "useExtraction": false,
+                "structuredComplete": true,
+                "reasons": []
+              },
+              "telemetry": {
+                "stage": "triage",
+                "model": null,
+                "promptVariant": "full",
+                "safetyGuardMs": 0,
+                "preprocessingMs": 0,
+                "totalMs": 0,
+                "fallback": false
+              }
+            },
+            "timeout": false
+          },
+          {
+            "status": 200,
+            "elapsedMs": 596,
+            "payload": {
+              "ok": true,
+              "aiMode": "deterministic-triage",
+              "runtimeMode": "auto",
+              "selectedLanguage": "ja",
+              "incident": {
+                "language": "ja",
+                "location": "体育館A",
+                "target": {
+                  "type": null,
+                  "count": 4,
+                  "ageGroup": null
+                },
+                "facts": [
+                  "水",
+                  "飲料水・給水の不足または案内"
+                ],
+                "request": "water_supply",
+                "urgency": "medium",
+                "safetyFlags": [],
+                "missingFields": [],
+                "askedFields": [],
+                "originalText": [
+                  "飲料水が足りません。体育館Aで4人が困っています。"
+                ],
+                "confidence": null,
+                "category": null,
+                "structuredComplete": true,
+                "fourBRequested": false,
+                "fourBStatus": "not_needed"
+              },
+              "safety": {
+                "flags": [],
+                "immediate": false
+              },
+              "extraction": {
+                "useExtraction": false,
+                "structuredComplete": true,
+                "reasons": []
+              },
+              "telemetry": {
+                "stage": "triage",
+                "model": null,
+                "promptVariant": "full",
+                "safetyGuardMs": 0,
+                "preprocessingMs": 0,
+                "totalMs": 0,
+                "fallback": false
+              }
+            },
+            "timeout": false
+          },
+          {
+            "status": 200,
+            "elapsedMs": 596,
+            "payload": {
+              "ok": true,
+              "aiMode": "deterministic-triage",
+              "runtimeMode": "auto",
+              "selectedLanguage": "ja",
+              "incident": {
+                "language": "ja",
+                "location": "体育館A",
+                "target": {
+                  "type": null,
+                  "count": 4,
+                  "ageGroup": null
+                },
+                "facts": [
+                  "水",
+                  "飲料水・給水の不足または案内"
+                ],
+                "request": "water_supply",
+                "urgency": "medium",
+                "safetyFlags": [],
+                "missingFields": [],
+                "askedFields": [],
+                "originalText": [
+                  "飲料水が足りません。体育館Aで4人が困っています。"
+                ],
+                "confidence": null,
+                "category": null,
+                "structuredComplete": true,
+                "fourBRequested": false,
+                "fourBStatus": "not_needed"
+              },
+              "safety": {
+                "flags": [],
+                "immediate": false
+              },
+              "extraction": {
+                "useExtraction": false,
+                "structuredComplete": true,
+                "reasons": []
+              },
+              "telemetry": {
+                "stage": "triage",
+                "model": null,
+                "promptVariant": "full",
+                "safetyGuardMs": 0,
+                "preprocessingMs": 0,
+                "totalMs": 0,
+                "fallback": false
+              }
+            },
+            "timeout": false
+          },
+          {
+            "status": 200,
+            "elapsedMs": 592,
+            "payload": {
+              "ok": true,
+              "aiMode": "deterministic-triage",
+              "runtimeMode": "auto",
+              "selectedLanguage": "ja",
+              "incident": {
+                "language": "ja",
+                "location": "体育館A",
+                "target": {
+                  "type": null,
+                  "count": 4,
+                  "ageGroup": null
+                },
+                "facts": [
+                  "水",
+                  "飲料水・給水の不足または案内"
+                ],
+                "request": "water_supply",
+                "urgency": "medium",
+                "safetyFlags": [],
+                "missingFields": [],
+                "askedFields": [],
+                "originalText": [
+                  "飲料水が足りません。体育館Aで4人が困っています。"
+                ],
+                "confidence": null,
+                "category": null,
+                "structuredComplete": true,
+                "fourBRequested": false,
+                "fourBStatus": "not_needed"
+              },
+              "safety": {
+                "flags": [],
+                "immediate": false
+              },
+              "extraction": {
+                "useExtraction": false,
+                "structuredComplete": true,
+                "reasons": []
+              },
+              "telemetry": {
+                "stage": "triage",
+                "model": null,
+                "promptVariant": "full",
+                "safetyGuardMs": 0,
+                "preprocessingMs": 0,
+                "totalMs": 0,
+                "fallback": false
+              }
+            },
+            "timeout": false
+          }
+        ],
+        "conversation": [
+          {
+            "status": 200,
+            "elapsedMs": 7484,
+            "payload": {
+              "ok": true,
+              "aiMode": "model-gateway",
+              "runtimeMode": "auto",
+              "provider": "openai-compatible",
+              "selectedLanguage": "ja",
+              "reply": "体育館Aで4人が困っています。",
+              "nextField": null,
+              "requiresConfirmation": true,
+              "safety": {
+                "flags": [],
+                "immediate": false
+              },
+              "telemetry": {
+                "stage": "conversation",
+                "model": "qwen3.5:2b",
+                "promptVariant": "full",
+                "safetyGuardMs": 0,
+                "preprocessingMs": 0,
+                "modelTimings": {
+                  "requestBuildMs": 0,
+                  "httpHeadersMs": 5732,
+                  "firstTokenMs": 5734,
+                  "promptUntilFirstTokenMs": 2,
+                  "generationMs": 1365,
+                  "bodyReadMs": 1367,
+                  "jsonParseMs": 0,
+                  "totalMs": 7099,
+                  "stream": true,
+                  "promptEvalMs": null,
+                  "generationEvalMs": null,
+                  "serverTotalMs": null,
+                  "modelLoadMs": null,
+                  "queueMs": null,
+                  "promptTokens": null,
+                  "completionTokens": null
+                },
+                "totalMs": 7099,
+                "fallback": false
+              }
+            },
+            "timeout": false
+          },
+          {
+            "status": 200,
+            "elapsedMs": 17767,
+            "payload": {
+              "ok": true,
+              "aiMode": "model-gateway",
+              "runtimeMode": "auto",
+              "provider": "openai-compatible",
+              "selectedLanguage": "ja",
+              "reply": "4人の人が困っているのは大変です。",
+              "nextField": null,
+              "requiresConfirmation": true,
+              "safety": {
+                "flags": [],
+                "immediate": false
+              },
+              "telemetry": {
+                "stage": "conversation",
+                "model": "qwen3.5:2b",
+                "promptVariant": "full",
+                "safetyGuardMs": 0,
+                "preprocessingMs": 0,
+                "modelTimings": {
+                  "requestBuildMs": 0,
+                  "httpHeadersMs": 15984,
+                  "firstTokenMs": 15986,
+                  "promptUntilFirstTokenMs": 2,
+                  "generationMs": 1390,
+                  "bodyReadMs": 1392,
+                  "jsonParseMs": 0,
+                  "totalMs": 17376,
+                  "stream": true,
+                  "promptEvalMs": null,
+                  "generationEvalMs": null,
+                  "serverTotalMs": null,
+                  "modelLoadMs": null,
+                  "queueMs": null,
+                  "promptTokens": null,
+                  "completionTokens": null
+                },
+                "totalMs": 17376,
+                "fallback": false
+              }
+            },
+            "timeout": false
+          },
+          {
+            "status": 200,
+            "elapsedMs": 8962,
+            "payload": {
+              "ok": true,
+              "aiMode": "model-gateway",
+              "runtimeMode": "auto",
+              "provider": "openai-compatible",
+              "selectedLanguage": "ja",
+              "reply": "体育館Aで4人が困っています。",
+              "nextField": null,
+              "requiresConfirmation": true,
+              "safety": {
+                "flags": [],
+                "immediate": false
+              },
+              "telemetry": {
+                "stage": "conversation",
+                "model": "qwen3.5:2b",
+                "promptVariant": "full",
+                "safetyGuardMs": 0,
+                "preprocessingMs": 0,
+                "modelTimings": {
+                  "requestBuildMs": 0,
+                  "httpHeadersMs": 7199,
+                  "firstTokenMs": 7200,
+                  "promptUntilFirstTokenMs": 1,
+                  "generationMs": 1371,
+                  "bodyReadMs": 1372,
+                  "jsonParseMs": 0,
+                  "totalMs": 8571,
+                  "stream": true,
+                  "promptEvalMs": null,
+                  "generationEvalMs": null,
+                  "serverTotalMs": null,
+                  "modelLoadMs": null,
+                  "queueMs": null,
+                  "promptTokens": null,
+                  "completionTokens": null
+                },
+                "totalMs": 8572,
+                "fallback": false
+              }
+            },
+            "timeout": false
+          },
+          {
+            "status": 200,
+            "elapsedMs": 14831,
+            "payload": {
+              "ok": true,
+              "aiMode": "model-gateway",
+              "runtimeMode": "auto",
+              "provider": "openai-compatible",
+              "selectedLanguage": "ja",
+              "reply": "4人の人が困っているのは大変です。",
+              "nextField": null,
+              "requiresConfirmation": true,
+              "safety": {
+                "flags": [],
+                "immediate": false
+              },
+              "telemetry": {
+                "stage": "conversation",
+                "model": "qwen3.5:2b",
+                "promptVariant": "full",
+                "safetyGuardMs": 0,
+                "preprocessingMs": 0,
+                "modelTimings": {
+                  "requestBuildMs": 0,
+                  "httpHeadersMs": 13078,
+                  "firstTokenMs": 13079,
+                  "promptUntilFirstTokenMs": 1,
+                  "generationMs": 1340,
+                  "bodyReadMs": 1341,
+                  "jsonParseMs": 0,
+                  "totalMs": 14419,
+                  "stream": true,
+                  "promptEvalMs": null,
+                  "generationEvalMs": null,
+                  "serverTotalMs": null,
+                  "modelLoadMs": null,
+                  "queueMs": null,
+                  "promptTokens": null,
+                  "completionTokens": null
+                },
+                "totalMs": 14419,
+                "fallback": false
+              }
+            },
+            "timeout": false
+          },
+          {
+            "status": 200,
+            "elapsedMs": 13358,
+            "payload": {
+              "ok": true,
+              "aiMode": "model-gateway",
+              "runtimeMode": "auto",
+              "provider": "openai-compatible",
+              "selectedLanguage": "ja",
+              "reply": "4人の人が困っているのは大変ですね。",
+              "nextField": null,
+              "requiresConfirmation": true,
+              "safety": {
+                "flags": [],
+                "immediate": false
+              },
+              "telemetry": {
+                "stage": "conversation",
+                "model": "qwen3.5:2b",
+                "promptVariant": "full",
+                "safetyGuardMs": 0,
+                "preprocessingMs": 0,
+                "modelTimings": {
+                  "requestBuildMs": 0,
+                  "httpHeadersMs": 11596,
+                  "firstTokenMs": 11598,
+                  "promptUntilFirstTokenMs": 2,
+                  "generationMs": 1369,
+                  "bodyReadMs": 1371,
+                  "jsonParseMs": 0,
+                  "totalMs": 12967,
+                  "stream": true,
+                  "promptEvalMs": null,
+                  "generationEvalMs": null,
+                  "serverTotalMs": null,
+                  "modelLoadMs": null,
+                  "queueMs": null,
+                  "promptTokens": null,
+                  "completionTokens": null
+                },
+                "totalMs": 12967,
+                "fallback": false
+              }
+            },
+            "timeout": false
+          },
+          {
+            "status": 200,
+            "elapsedMs": 11884,
+            "payload": {
+              "ok": true,
+              "aiMode": "model-gateway",
+              "runtimeMode": "auto",
+              "provider": "openai-compatible",
+              "selectedLanguage": "ja",
+              "reply": "4人の人が困っているのは大変ですね。",
+              "nextField": null,
+              "requiresConfirmation": true,
+              "safety": {
+                "flags": [],
+                "immediate": false
+              },
+              "telemetry": {
+                "stage": "conversation",
+                "model": "qwen3.5:2b",
+                "promptVariant": "full",
+                "safetyGuardMs": 0,
+                "preprocessingMs": 0,
+                "modelTimings": {
+                  "requestBuildMs": 0,
+                  "httpHeadersMs": 10147,
+                  "firstTokenMs": 10148,
+                  "promptUntilFirstTokenMs": 1,
+                  "generationMs": 1349,
+                  "bodyReadMs": 1350,
+                  "jsonParseMs": 0,
+                  "totalMs": 11497,
+                  "stream": true,
+                  "promptEvalMs": null,
+                  "generationEvalMs": null,
+                  "serverTotalMs": null,
+                  "modelLoadMs": null,
+                  "queueMs": null,
+                  "promptTokens": null,
+                  "completionTokens": null
+                },
+                "totalMs": 11497,
+                "fallback": false
+              }
+            },
+            "timeout": false
+          },
+          {
+            "status": 200,
+            "elapsedMs": 19227,
+            "payload": {
+              "ok": true,
+              "aiMode": "model-gateway",
+              "runtimeMode": "auto",
+              "provider": "openai-compatible",
+              "selectedLanguage": "ja",
+              "reply": "4人の人が困っているのは大変です。",
+              "nextField": null,
+              "requiresConfirmation": true,
+              "safety": {
+                "flags": [],
+                "immediate": false
+              },
+              "telemetry": {
+                "stage": "conversation",
+                "model": "qwen3.5:2b",
+                "promptVariant": "full",
+                "safetyGuardMs": 1,
+                "preprocessingMs": 0,
+                "modelTimings": {
+                  "requestBuildMs": 0,
+                  "httpHeadersMs": 17473,
+                  "firstTokenMs": 17474,
+                  "promptUntilFirstTokenMs": 1,
+                  "generationMs": 1363,
+                  "bodyReadMs": 1364,
+                  "jsonParseMs": 0,
+                  "totalMs": 18837,
+                  "stream": true,
+                  "promptEvalMs": null,
+                  "generationEvalMs": null,
+                  "serverTotalMs": null,
+                  "modelLoadMs": null,
+                  "queueMs": null,
+                  "promptTokens": null,
+                  "completionTokens": null
+                },
+                "totalMs": 18838,
+                "fallback": false
+              }
+            },
+            "timeout": false
+          },
+          {
+            "status": 200,
+            "elapsedMs": 20686,
+            "payload": {
+              "ok": true,
+              "aiMode": "model-gateway",
+              "runtimeMode": "auto",
+              "provider": "openai-compatible",
+              "selectedLanguage": "ja",
+              "reply": "4人の人が困っているのは大変です。",
+              "nextField": null,
+              "requiresConfirmation": true,
+              "safety": {
+                "flags": [],
+                "immediate": false
+              },
+              "telemetry": {
+                "stage": "conversation",
+                "model": "qwen3.5:2b",
+                "promptVariant": "full",
+                "safetyGuardMs": 0,
+                "preprocessingMs": 0,
+                "modelTimings": {
+                  "requestBuildMs": 0,
+                  "httpHeadersMs": 18941,
+                  "firstTokenMs": 18943,
+                  "promptUntilFirstTokenMs": 2,
+                  "generationMs": 1362,
+                  "bodyReadMs": 1364,
+                  "jsonParseMs": 0,
+                  "totalMs": 20305,
+                  "stream": true,
+                  "promptEvalMs": null,
+                  "generationEvalMs": null,
+                  "serverTotalMs": null,
+                  "modelLoadMs": null,
+                  "queueMs": null,
+                  "promptTokens": null,
+                  "completionTokens": null
+                },
+                "totalMs": 20305,
+                "fallback": false
+              }
+            },
+            "timeout": false
+          },
+          {
+            "status": 200,
+            "elapsedMs": 10440,
+            "payload": {
+              "ok": true,
+              "aiMode": "model-gateway",
+              "runtimeMode": "auto",
+              "provider": "openai-compatible",
+              "selectedLanguage": "ja",
+              "reply": "4人の人が困っているのは大変ですね。",
+              "nextField": null,
+              "requiresConfirmation": true,
+              "safety": {
+                "flags": [],
+                "immediate": false
+              },
+              "telemetry": {
+                "stage": "conversation",
+                "model": "qwen3.5:2b",
+                "promptVariant": "full",
+                "safetyGuardMs": 0,
+                "preprocessingMs": 0,
+                "modelTimings": {
+                  "requestBuildMs": 0,
+                  "httpHeadersMs": 8674,
+                  "firstTokenMs": 8675,
+                  "promptUntilFirstTokenMs": 1,
+                  "generationMs": 1371,
+                  "bodyReadMs": 1372,
+                  "jsonParseMs": 0,
+                  "totalMs": 10046,
+                  "stream": true,
+                  "promptEvalMs": null,
+                  "generationEvalMs": null,
+                  "serverTotalMs": null,
+                  "modelLoadMs": null,
+                  "queueMs": null,
+                  "promptTokens": null,
+                  "completionTokens": null
+                },
+                "totalMs": 10046,
+                "fallback": false
+              }
+            },
+            "timeout": false
+          },
+          {
+            "status": 200,
+            "elapsedMs": 16272,
+            "payload": {
+              "ok": true,
+              "aiMode": "model-gateway",
+              "runtimeMode": "auto",
+              "provider": "openai-compatible",
+              "selectedLanguage": "ja",
+              "reply": "4人の人が困っているのは大変ですね。",
+              "nextField": null,
+              "requiresConfirmation": true,
+              "safety": {
+                "flags": [],
+                "immediate": false
+              },
+              "telemetry": {
+                "stage": "conversation",
+                "model": "qwen3.5:2b",
+                "promptVariant": "full",
+                "safetyGuardMs": 0,
+                "preprocessingMs": 0,
+                "modelTimings": {
+                  "requestBuildMs": 0,
+                  "httpHeadersMs": 14522,
+                  "firstTokenMs": 14523,
+                  "promptUntilFirstTokenMs": 1,
+                  "generationMs": 1361,
+                  "bodyReadMs": 1362,
+                  "jsonParseMs": 0,
+                  "totalMs": 15884,
+                  "stream": true,
+                  "promptEvalMs": null,
+                  "generationEvalMs": null,
+                  "serverTotalMs": null,
+                  "modelLoadMs": null,
+                  "queueMs": null,
+                  "promptTokens": null,
+                  "completionTokens": null
+                },
+                "totalMs": 15884,
+                "fallback": false
+              }
+            },
+            "timeout": false
+          }
+        ]
+      }
+    },
+    {
+      "level": 20,
+      "triage": {
+        "count": 20,
+        "httpSuccess": 20,
+        "timeout": 0,
+        "fallback": 0,
+        "elapsedMs": {
+          "p50": 1123,
+          "p95": 1129,
+          "max": 1129
+        },
+        "queueMs": {
+          "p50": null,
+          "p95": null,
+          "max": null,
+          "measured": false
+        }
+      },
+      "conversation": {
+        "count": 20,
+        "httpSuccess": 20,
+        "timeout": 0,
+        "fallback": 0,
+        "elapsedMs": {
+          "p50": 16883,
+          "p95": 30618,
+          "max": 32071
+        },
+        "queueMs": {
+          "p50": null,
+          "p95": null,
+          "max": null,
+          "measured": false
+        }
+      },
+      "rows": {
+        "triage": [
+          {
+            "status": 200,
+            "elapsedMs": 1125,
+            "payload": {
+              "ok": true,
+              "aiMode": "deterministic-triage",
+              "runtimeMode": "auto",
+              "selectedLanguage": "ja",
+              "incident": {
+                "language": "ja",
+                "location": "体育館A",
+                "target": {
+                  "type": null,
+                  "count": 4,
+                  "ageGroup": null
+                },
+                "facts": [
+                  "水",
+                  "飲料水・給水の不足または案内"
+                ],
+                "request": "water_supply",
+                "urgency": "medium",
+                "safetyFlags": [],
+                "missingFields": [],
+                "askedFields": [],
+                "originalText": [
+                  "飲料水が足りません。体育館Aで4人が困っています。"
+                ],
+                "confidence": null,
+                "category": null,
+                "structuredComplete": true,
+                "fourBRequested": false,
+                "fourBStatus": "not_needed"
+              },
+              "safety": {
+                "flags": [],
+                "immediate": false
+              },
+              "extraction": {
+                "useExtraction": false,
+                "structuredComplete": true,
+                "reasons": []
+              },
+              "telemetry": {
+                "stage": "triage",
+                "model": null,
+                "promptVariant": "full",
+                "safetyGuardMs": 0,
+                "preprocessingMs": 0,
+                "totalMs": 0,
+                "fallback": false
+              }
+            },
+            "timeout": false
+          },
+          {
+            "status": 200,
+            "elapsedMs": 1123,
+            "payload": {
+              "ok": true,
+              "aiMode": "deterministic-triage",
+              "runtimeMode": "auto",
+              "selectedLanguage": "ja",
+              "incident": {
+                "language": "ja",
+                "location": "体育館A",
+                "target": {
+                  "type": null,
+                  "count": 4,
+                  "ageGroup": null
+                },
+                "facts": [
+                  "水",
+                  "飲料水・給水の不足または案内"
+                ],
+                "request": "water_supply",
+                "urgency": "medium",
+                "safetyFlags": [],
+                "missingFields": [],
+                "askedFields": [],
+                "originalText": [
+                  "飲料水が足りません。体育館Aで4人が困っています。"
+                ],
+                "confidence": null,
+                "category": null,
+                "structuredComplete": true,
+                "fourBRequested": false,
+                "fourBStatus": "not_needed"
+              },
+              "safety": {
+                "flags": [],
+                "immediate": false
+              },
+              "extraction": {
+                "useExtraction": false,
+                "structuredComplete": true,
+                "reasons": []
+              },
+              "telemetry": {
+                "stage": "triage",
+                "model": null,
+                "promptVariant": "full",
+                "safetyGuardMs": 0,
+                "preprocessingMs": 0,
+                "totalMs": 0,
+                "fallback": false
+              }
+            },
+            "timeout": false
+          },
+          {
+            "status": 200,
+            "elapsedMs": 1124,
+            "payload": {
+              "ok": true,
+              "aiMode": "deterministic-triage",
+              "runtimeMode": "auto",
+              "selectedLanguage": "ja",
+              "incident": {
+                "language": "ja",
+                "location": "体育館A",
+                "target": {
+                  "type": null,
+                  "count": 4,
+                  "ageGroup": null
+                },
+                "facts": [
+                  "水",
+                  "飲料水・給水の不足または案内"
+                ],
+                "request": "water_supply",
+                "urgency": "medium",
+                "safetyFlags": [],
+                "missingFields": [],
+                "askedFields": [],
+                "originalText": [
+                  "飲料水が足りません。体育館Aで4人が困っています。"
+                ],
+                "confidence": null,
+                "category": null,
+                "structuredComplete": true,
+                "fourBRequested": false,
+                "fourBStatus": "not_needed"
+              },
+              "safety": {
+                "flags": [],
+                "immediate": false
+              },
+              "extraction": {
+                "useExtraction": false,
+                "structuredComplete": true,
+                "reasons": []
+              },
+              "telemetry": {
+                "stage": "triage",
+                "model": null,
+                "promptVariant": "full",
+                "safetyGuardMs": 0,
+                "preprocessingMs": 0,
+                "totalMs": 0,
+                "fallback": false
+              }
+            },
+            "timeout": false
+          },
+          {
+            "status": 200,
+            "elapsedMs": 1125,
+            "payload": {
+              "ok": true,
+              "aiMode": "deterministic-triage",
+              "runtimeMode": "auto",
+              "selectedLanguage": "ja",
+              "incident": {
+                "language": "ja",
+                "location": "体育館A",
+                "target": {
+                  "type": null,
+                  "count": 4,
+                  "ageGroup": null
+                },
+                "facts": [
+                  "水",
+                  "飲料水・給水の不足または案内"
+                ],
+                "request": "water_supply",
+                "urgency": "medium",
+                "safetyFlags": [],
+                "missingFields": [],
+                "askedFields": [],
+                "originalText": [
+                  "飲料水が足りません。体育館Aで4人が困っています。"
+                ],
+                "confidence": null,
+                "category": null,
+                "structuredComplete": true,
+                "fourBRequested": false,
+                "fourBStatus": "not_needed"
+              },
+              "safety": {
+                "flags": [],
+                "immediate": false
+              },
+              "extraction": {
+                "useExtraction": false,
+                "structuredComplete": true,
+                "reasons": []
+              },
+              "telemetry": {
+                "stage": "triage",
+                "model": null,
+                "promptVariant": "full",
+                "safetyGuardMs": 0,
+                "preprocessingMs": 0,
+                "totalMs": 0,
+                "fallback": false
+              }
+            },
+            "timeout": false
+          },
+          {
+            "status": 200,
+            "elapsedMs": 1123,
+            "payload": {
+              "ok": true,
+              "aiMode": "deterministic-triage",
+              "runtimeMode": "auto",
+              "selectedLanguage": "ja",
+              "incident": {
+                "language": "ja",
+                "location": "体育館A",
+                "target": {
+                  "type": null,
+                  "count": 4,
+                  "ageGroup": null
+                },
+                "facts": [
+                  "水",
+                  "飲料水・給水の不足または案内"
+                ],
+                "request": "water_supply",
+                "urgency": "medium",
+                "safetyFlags": [],
+                "missingFields": [],
+                "askedFields": [],
+                "originalText": [
+                  "飲料水が足りません。体育館Aで4人が困っています。"
+                ],
+                "confidence": null,
+                "category": null,
+                "structuredComplete": true,
+                "fourBRequested": false,
+                "fourBStatus": "not_needed"
+              },
+              "safety": {
+                "flags": [],
+                "immediate": false
+              },
+              "extraction": {
+                "useExtraction": false,
+                "structuredComplete": true,
+                "reasons": []
+              },
+              "telemetry": {
+                "stage": "triage",
+                "model": null,
+                "promptVariant": "full",
+                "safetyGuardMs": 0,
+                "preprocessingMs": 0,
+                "totalMs": 0,
+                "fallback": false
+              }
+            },
+            "timeout": false
+          },
+          {
+            "status": 200,
+            "elapsedMs": 1127,
+            "payload": {
+              "ok": true,
+              "aiMode": "deterministic-triage",
+              "runtimeMode": "auto",
+              "selectedLanguage": "ja",
+              "incident": {
+                "language": "ja",
+                "location": "体育館A",
+                "target": {
+                  "type": null,
+                  "count": 4,
+                  "ageGroup": null
+                },
+                "facts": [
+                  "水",
+                  "飲料水・給水の不足または案内"
+                ],
+                "request": "water_supply",
+                "urgency": "medium",
+                "safetyFlags": [],
+                "missingFields": [],
+                "askedFields": [],
+                "originalText": [
+                  "飲料水が足りません。体育館Aで4人が困っています。"
+                ],
+                "confidence": null,
+                "category": null,
+                "structuredComplete": true,
+                "fourBRequested": false,
+                "fourBStatus": "not_needed"
+              },
+              "safety": {
+                "flags": [],
+                "immediate": false
+              },
+              "extraction": {
+                "useExtraction": false,
+                "structuredComplete": true,
+                "reasons": []
+              },
+              "telemetry": {
+                "stage": "triage",
+                "model": null,
+                "promptVariant": "full",
+                "safetyGuardMs": 0,
+                "preprocessingMs": 0,
+                "totalMs": 0,
+                "fallback": false
+              }
+            },
+            "timeout": false
+          },
+          {
+            "status": 200,
+            "elapsedMs": 1121,
+            "payload": {
+              "ok": true,
+              "aiMode": "deterministic-triage",
+              "runtimeMode": "auto",
+              "selectedLanguage": "ja",
+              "incident": {
+                "language": "ja",
+                "location": "体育館A",
+                "target": {
+                  "type": null,
+                  "count": 4,
+                  "ageGroup": null
+                },
+                "facts": [
+                  "水",
+                  "飲料水・給水の不足または案内"
+                ],
+                "request": "water_supply",
+                "urgency": "medium",
+                "safetyFlags": [],
+                "missingFields": [],
+                "askedFields": [],
+                "originalText": [
+                  "飲料水が足りません。体育館Aで4人が困っています。"
+                ],
+                "confidence": null,
+                "category": null,
+                "structuredComplete": true,
+                "fourBRequested": false,
+                "fourBStatus": "not_needed"
+              },
+              "safety": {
+                "flags": [],
+                "immediate": false
+              },
+              "extraction": {
+                "useExtraction": false,
+                "structuredComplete": true,
+                "reasons": []
+              },
+              "telemetry": {
+                "stage": "triage",
+                "model": null,
+                "promptVariant": "full",
+                "safetyGuardMs": 0,
+                "preprocessingMs": 0,
+                "totalMs": 0,
+                "fallback": false
+              }
+            },
+            "timeout": false
+          },
+          {
+            "status": 200,
+            "elapsedMs": 1129,
+            "payload": {
+              "ok": true,
+              "aiMode": "deterministic-triage",
+              "runtimeMode": "auto",
+              "selectedLanguage": "ja",
+              "incident": {
+                "language": "ja",
+                "location": "体育館A",
+                "target": {
+                  "type": null,
+                  "count": 4,
+                  "ageGroup": null
+                },
+                "facts": [
+                  "水",
+                  "飲料水・給水の不足または案内"
+                ],
+                "request": "water_supply",
+                "urgency": "medium",
+                "safetyFlags": [],
+                "missingFields": [],
+                "askedFields": [],
+                "originalText": [
+                  "飲料水が足りません。体育館Aで4人が困っています。"
+                ],
+                "confidence": null,
+                "category": null,
+                "structuredComplete": true,
+                "fourBRequested": false,
+                "fourBStatus": "not_needed"
+              },
+              "safety": {
+                "flags": [],
+                "immediate": false
+              },
+              "extraction": {
+                "useExtraction": false,
+                "structuredComplete": true,
+                "reasons": []
+              },
+              "telemetry": {
+                "stage": "triage",
+                "model": null,
+                "promptVariant": "full",
+                "safetyGuardMs": 0,
+                "preprocessingMs": 0,
+                "totalMs": 0,
+                "fallback": false
+              }
+            },
+            "timeout": false
+          },
+          {
+            "status": 200,
+            "elapsedMs": 1128,
+            "payload": {
+              "ok": true,
+              "aiMode": "deterministic-triage",
+              "runtimeMode": "auto",
+              "selectedLanguage": "ja",
+              "incident": {
+                "language": "ja",
+                "location": "体育館A",
+                "target": {
+                  "type": null,
+                  "count": 4,
+                  "ageGroup": null
+                },
+                "facts": [
+                  "水",
+                  "飲料水・給水の不足または案内"
+                ],
+                "request": "water_supply",
+                "urgency": "medium",
+                "safetyFlags": [],
+                "missingFields": [],
+                "askedFields": [],
+                "originalText": [
+                  "飲料水が足りません。体育館Aで4人が困っています。"
+                ],
+                "confidence": null,
+                "category": null,
+                "structuredComplete": true,
+                "fourBRequested": false,
+                "fourBStatus": "not_needed"
+              },
+              "safety": {
+                "flags": [],
+                "immediate": false
+              },
+              "extraction": {
+                "useExtraction": false,
+                "structuredComplete": true,
+                "reasons": []
+              },
+              "telemetry": {
+                "stage": "triage",
+                "model": null,
+                "promptVariant": "full",
+                "safetyGuardMs": 0,
+                "preprocessingMs": 0,
+                "totalMs": 0,
+                "fallback": false
+              }
+            },
+            "timeout": false
+          },
+          {
+            "status": 200,
+            "elapsedMs": 1129,
+            "payload": {
+              "ok": true,
+              "aiMode": "deterministic-triage",
+              "runtimeMode": "auto",
+              "selectedLanguage": "ja",
+              "incident": {
+                "language": "ja",
+                "location": "体育館A",
+                "target": {
+                  "type": null,
+                  "count": 4,
+                  "ageGroup": null
+                },
+                "facts": [
+                  "水",
+                  "飲料水・給水の不足または案内"
+                ],
+                "request": "water_supply",
+                "urgency": "medium",
+                "safetyFlags": [],
+                "missingFields": [],
+                "askedFields": [],
+                "originalText": [
+                  "飲料水が足りません。体育館Aで4人が困っています。"
+                ],
+                "confidence": null,
+                "category": null,
+                "structuredComplete": true,
+                "fourBRequested": false,
+                "fourBStatus": "not_needed"
+              },
+              "safety": {
+                "flags": [],
+                "immediate": false
+              },
+              "extraction": {
+                "useExtraction": false,
+                "structuredComplete": true,
+                "reasons": []
+              },
+              "telemetry": {
+                "stage": "triage",
+                "model": null,
+                "promptVariant": "full",
+                "safetyGuardMs": 0,
+                "preprocessingMs": 0,
+                "totalMs": 0,
+                "fallback": false
+              }
+            },
+            "timeout": false
+          },
+          {
+            "status": 200,
+            "elapsedMs": 1129,
+            "payload": {
+              "ok": true,
+              "aiMode": "deterministic-triage",
+              "runtimeMode": "auto",
+              "selectedLanguage": "ja",
+              "incident": {
+                "language": "ja",
+                "location": "体育館A",
+                "target": {
+                  "type": null,
+                  "count": 4,
+                  "ageGroup": null
+                },
+                "facts": [
+                  "水",
+                  "飲料水・給水の不足または案内"
+                ],
+                "request": "water_supply",
+                "urgency": "medium",
+                "safetyFlags": [],
+                "missingFields": [],
+                "askedFields": [],
+                "originalText": [
+                  "飲料水が足りません。体育館Aで4人が困っています。"
+                ],
+                "confidence": null,
+                "category": null,
+                "structuredComplete": true,
+                "fourBRequested": false,
+                "fourBStatus": "not_needed"
+              },
+              "safety": {
+                "flags": [],
+                "immediate": false
+              },
+              "extraction": {
+                "useExtraction": false,
+                "structuredComplete": true,
+                "reasons": []
+              },
+              "telemetry": {
+                "stage": "triage",
+                "model": null,
+                "promptVariant": "full",
+                "safetyGuardMs": 0,
+                "preprocessingMs": 0,
+                "totalMs": 0,
+                "fallback": false
+              }
+            },
+            "timeout": false
+          },
+          {
+            "status": 200,
+            "elapsedMs": 1129,
+            "payload": {
+              "ok": true,
+              "aiMode": "deterministic-triage",
+              "runtimeMode": "auto",
+              "selectedLanguage": "ja",
+              "incident": {
+                "language": "ja",
+                "location": "体育館A",
+                "target": {
+                  "type": null,
+                  "count": 4,
+                  "ageGroup": null
+                },
+                "facts": [
+                  "水",
+                  "飲料水・給水の不足または案内"
+                ],
+                "request": "water_supply",
+                "urgency": "medium",
+                "safetyFlags": [],
+                "missingFields": [],
+                "askedFields": [],
+                "originalText": [
+                  "飲料水が足りません。体育館Aで4人が困っています。"
+                ],
+                "confidence": null,
+                "category": null,
+                "structuredComplete": true,
+                "fourBRequested": false,
+                "fourBStatus": "not_needed"
+              },
+              "safety": {
+                "flags": [],
+                "immediate": false
+              },
+              "extraction": {
+                "useExtraction": false,
+                "structuredComplete": true,
+                "reasons": []
+              },
+              "telemetry": {
+                "stage": "triage",
+                "model": null,
+                "promptVariant": "full",
+                "safetyGuardMs": 0,
+                "preprocessingMs": 0,
+                "totalMs": 0,
+                "fallback": false
+              }
+            },
+            "timeout": false
+          },
+          {
+            "status": 200,
+            "elapsedMs": 1120,
+            "payload": {
+              "ok": true,
+              "aiMode": "deterministic-triage",
+              "runtimeMode": "auto",
+              "selectedLanguage": "ja",
+              "incident": {
+                "language": "ja",
+                "location": "体育館A",
+                "target": {
+                  "type": null,
+                  "count": 4,
+                  "ageGroup": null
+                },
+                "facts": [
+                  "水",
+                  "飲料水・給水の不足または案内"
+                ],
+                "request": "water_supply",
+                "urgency": "medium",
+                "safetyFlags": [],
+                "missingFields": [],
+                "askedFields": [],
+                "originalText": [
+                  "飲料水が足りません。体育館Aで4人が困っています。"
+                ],
+                "confidence": null,
+                "category": null,
+                "structuredComplete": true,
+                "fourBRequested": false,
+                "fourBStatus": "not_needed"
+              },
+              "safety": {
+                "flags": [],
+                "immediate": false
+              },
+              "extraction": {
+                "useExtraction": false,
+                "structuredComplete": true,
+                "reasons": []
+              },
+              "telemetry": {
+                "stage": "triage",
+                "model": null,
+                "promptVariant": "full",
+                "safetyGuardMs": 0,
+                "preprocessingMs": 0,
+                "totalMs": 0,
+                "fallback": false
+              }
+            },
+            "timeout": false
+          },
+          {
+            "status": 200,
+            "elapsedMs": 1121,
+            "payload": {
+              "ok": true,
+              "aiMode": "deterministic-triage",
+              "runtimeMode": "auto",
+              "selectedLanguage": "ja",
+              "incident": {
+                "language": "ja",
+                "location": "体育館A",
+                "target": {
+                  "type": null,
+                  "count": 4,
+                  "ageGroup": null
+                },
+                "facts": [
+                  "水",
+                  "飲料水・給水の不足または案内"
+                ],
+                "request": "water_supply",
+                "urgency": "medium",
+                "safetyFlags": [],
+                "missingFields": [],
+                "askedFields": [],
+                "originalText": [
+                  "飲料水が足りません。体育館Aで4人が困っています。"
+                ],
+                "confidence": null,
+                "category": null,
+                "structuredComplete": true,
+                "fourBRequested": false,
+                "fourBStatus": "not_needed"
+              },
+              "safety": {
+                "flags": [],
+                "immediate": false
+              },
+              "extraction": {
+                "useExtraction": false,
+                "structuredComplete": true,
+                "reasons": []
+              },
+              "telemetry": {
+                "stage": "triage",
+                "model": null,
+                "promptVariant": "full",
+                "safetyGuardMs": 0,
+                "preprocessingMs": 0,
+                "totalMs": 0,
+                "fallback": false
+              }
+            },
+            "timeout": false
+          },
+          {
+            "status": 200,
+            "elapsedMs": 1121,
+            "payload": {
+              "ok": true,
+              "aiMode": "deterministic-triage",
+              "runtimeMode": "auto",
+              "selectedLanguage": "ja",
+              "incident": {
+                "language": "ja",
+                "location": "体育館A",
+                "target": {
+                  "type": null,
+                  "count": 4,
+                  "ageGroup": null
+                },
+                "facts": [
+                  "水",
+                  "飲料水・給水の不足または案内"
+                ],
+                "request": "water_supply",
+                "urgency": "medium",
+                "safetyFlags": [],
+                "missingFields": [],
+                "askedFields": [],
+                "originalText": [
+                  "飲料水が足りません。体育館Aで4人が困っています。"
+                ],
+                "confidence": null,
+                "category": null,
+                "structuredComplete": true,
+                "fourBRequested": false,
+                "fourBStatus": "not_needed"
+              },
+              "safety": {
+                "flags": [],
+                "immediate": false
+              },
+              "extraction": {
+                "useExtraction": false,
+                "structuredComplete": true,
+                "reasons": []
+              },
+              "telemetry": {
+                "stage": "triage",
+                "model": null,
+                "promptVariant": "full",
+                "safetyGuardMs": 0,
+                "preprocessingMs": 0,
+                "totalMs": 0,
+                "fallback": false
+              }
+            },
+            "timeout": false
+          },
+          {
+            "status": 200,
+            "elapsedMs": 1122,
+            "payload": {
+              "ok": true,
+              "aiMode": "deterministic-triage",
+              "runtimeMode": "auto",
+              "selectedLanguage": "ja",
+              "incident": {
+                "language": "ja",
+                "location": "体育館A",
+                "target": {
+                  "type": null,
+                  "count": 4,
+                  "ageGroup": null
+                },
+                "facts": [
+                  "水",
+                  "飲料水・給水の不足または案内"
+                ],
+                "request": "water_supply",
+                "urgency": "medium",
+                "safetyFlags": [],
+                "missingFields": [],
+                "askedFields": [],
+                "originalText": [
+                  "飲料水が足りません。体育館Aで4人が困っています。"
+                ],
+                "confidence": null,
+                "category": null,
+                "structuredComplete": true,
+                "fourBRequested": false,
+                "fourBStatus": "not_needed"
+              },
+              "safety": {
+                "flags": [],
+                "immediate": false
+              },
+              "extraction": {
+                "useExtraction": false,
+                "structuredComplete": true,
+                "reasons": []
+              },
+              "telemetry": {
+                "stage": "triage",
+                "model": null,
+                "promptVariant": "full",
+                "safetyGuardMs": 0,
+                "preprocessingMs": 0,
+                "totalMs": 0,
+                "fallback": false
+              }
+            },
+            "timeout": false
+          },
+          {
+            "status": 200,
+            "elapsedMs": 1121,
+            "payload": {
+              "ok": true,
+              "aiMode": "deterministic-triage",
+              "runtimeMode": "auto",
+              "selectedLanguage": "ja",
+              "incident": {
+                "language": "ja",
+                "location": "体育館A",
+                "target": {
+                  "type": null,
+                  "count": 4,
+                  "ageGroup": null
+                },
+                "facts": [
+                  "水",
+                  "飲料水・給水の不足または案内"
+                ],
+                "request": "water_supply",
+                "urgency": "medium",
+                "safetyFlags": [],
+                "missingFields": [],
+                "askedFields": [],
+                "originalText": [
+                  "飲料水が足りません。体育館Aで4人が困っています。"
+                ],
+                "confidence": null,
+                "category": null,
+                "structuredComplete": true,
+                "fourBRequested": false,
+                "fourBStatus": "not_needed"
+              },
+              "safety": {
+                "flags": [],
+                "immediate": false
+              },
+              "extraction": {
+                "useExtraction": false,
+                "structuredComplete": true,
+                "reasons": []
+              },
+              "telemetry": {
+                "stage": "triage",
+                "model": null,
+                "promptVariant": "full",
+                "safetyGuardMs": 0,
+                "preprocessingMs": 0,
+                "totalMs": 0,
+                "fallback": false
+              }
+            },
+            "timeout": false
+          },
+          {
+            "status": 200,
+            "elapsedMs": 1122,
+            "payload": {
+              "ok": true,
+              "aiMode": "deterministic-triage",
+              "runtimeMode": "auto",
+              "selectedLanguage": "ja",
+              "incident": {
+                "language": "ja",
+                "location": "体育館A",
+                "target": {
+                  "type": null,
+                  "count": 4,
+                  "ageGroup": null
+                },
+                "facts": [
+                  "水",
+                  "飲料水・給水の不足または案内"
+                ],
+                "request": "water_supply",
+                "urgency": "medium",
+                "safetyFlags": [],
+                "missingFields": [],
+                "askedFields": [],
+                "originalText": [
+                  "飲料水が足りません。体育館Aで4人が困っています。"
+                ],
+                "confidence": null,
+                "category": null,
+                "structuredComplete": true,
+                "fourBRequested": false,
+                "fourBStatus": "not_needed"
+              },
+              "safety": {
+                "flags": [],
+                "immediate": false
+              },
+              "extraction": {
+                "useExtraction": false,
+                "structuredComplete": true,
+                "reasons": []
+              },
+              "telemetry": {
+                "stage": "triage",
+                "model": null,
+                "promptVariant": "full",
+                "safetyGuardMs": 0,
+                "preprocessingMs": 0,
+                "totalMs": 0,
+                "fallback": false
+              }
+            },
+            "timeout": false
+          },
+          {
+            "status": 200,
+            "elapsedMs": 1122,
+            "payload": {
+              "ok": true,
+              "aiMode": "deterministic-triage",
+              "runtimeMode": "auto",
+              "selectedLanguage": "ja",
+              "incident": {
+                "language": "ja",
+                "location": "体育館A",
+                "target": {
+                  "type": null,
+                  "count": 4,
+                  "ageGroup": null
+                },
+                "facts": [
+                  "水",
+                  "飲料水・給水の不足または案内"
+                ],
+                "request": "water_supply",
+                "urgency": "medium",
+                "safetyFlags": [],
+                "missingFields": [],
+                "askedFields": [],
+                "originalText": [
+                  "飲料水が足りません。体育館Aで4人が困っています。"
+                ],
+                "confidence": null,
+                "category": null,
+                "structuredComplete": true,
+                "fourBRequested": false,
+                "fourBStatus": "not_needed"
+              },
+              "safety": {
+                "flags": [],
+                "immediate": false
+              },
+              "extraction": {
+                "useExtraction": false,
+                "structuredComplete": true,
+                "reasons": []
+              },
+              "telemetry": {
+                "stage": "triage",
+                "model": null,
+                "promptVariant": "full",
+                "safetyGuardMs": 0,
+                "preprocessingMs": 0,
+                "totalMs": 0,
+                "fallback": false
+              }
+            },
+            "timeout": false
+          },
+          {
+            "status": 200,
+            "elapsedMs": 1122,
+            "payload": {
+              "ok": true,
+              "aiMode": "deterministic-triage",
+              "runtimeMode": "auto",
+              "selectedLanguage": "ja",
+              "incident": {
+                "language": "ja",
+                "location": "体育館A",
+                "target": {
+                  "type": null,
+                  "count": 4,
+                  "ageGroup": null
+                },
+                "facts": [
+                  "水",
+                  "飲料水・給水の不足または案内"
+                ],
+                "request": "water_supply",
+                "urgency": "medium",
+                "safetyFlags": [],
+                "missingFields": [],
+                "askedFields": [],
+                "originalText": [
+                  "飲料水が足りません。体育館Aで4人が困っています。"
+                ],
+                "confidence": null,
+                "category": null,
+                "structuredComplete": true,
+                "fourBRequested": false,
+                "fourBStatus": "not_needed"
+              },
+              "safety": {
+                "flags": [],
+                "immediate": false
+              },
+              "extraction": {
+                "useExtraction": false,
+                "structuredComplete": true,
+                "reasons": []
+              },
+              "telemetry": {
+                "stage": "triage",
+                "model": null,
+                "promptVariant": "full",
+                "safetyGuardMs": 0,
+                "preprocessingMs": 0,
+                "totalMs": 0,
+                "fallback": false
+              }
+            },
+            "timeout": false
+          }
+        ],
+        "conversation": [
+          {
+            "status": 200,
+            "elapsedMs": 27697,
+            "payload": {
+              "ok": true,
+              "aiMode": "model-gateway",
+              "runtimeMode": "auto",
+              "provider": "openai-compatible",
+              "selectedLanguage": "ja",
+              "reply": "4人の人が困っているのは大変です。",
+              "nextField": null,
+              "requiresConfirmation": true,
+              "safety": {
+                "flags": [],
+                "immediate": false
+              },
+              "telemetry": {
+                "stage": "conversation",
+                "model": "qwen3.5:2b",
+                "promptVariant": "full",
+                "safetyGuardMs": 1,
+                "preprocessingMs": 0,
+                "modelTimings": {
+                  "requestBuildMs": 0,
+                  "httpHeadersMs": 25292,
+                  "firstTokenMs": 25293,
+                  "promptUntilFirstTokenMs": 1,
+                  "generationMs": 1468,
+                  "bodyReadMs": 1469,
+                  "jsonParseMs": 0,
+                  "totalMs": 26761,
+                  "stream": true,
+                  "promptEvalMs": null,
+                  "generationEvalMs": null,
+                  "serverTotalMs": null,
+                  "modelLoadMs": null,
+                  "queueMs": null,
+                  "promptTokens": null,
+                  "completionTokens": null
+                },
+                "totalMs": 26762,
+                "fallback": false
+              }
+            },
+            "timeout": false
+          },
+          {
+            "status": 200,
+            "elapsedMs": 26128,
+            "payload": {
+              "ok": true,
+              "aiMode": "model-gateway",
+              "runtimeMode": "auto",
+              "provider": "openai-compatible",
+              "selectedLanguage": "ja",
+              "reply": "4人の人が困っているのは大変です。",
+              "nextField": null,
+              "requiresConfirmation": true,
+              "safety": {
+                "flags": [],
+                "immediate": false
+              },
+              "telemetry": {
+                "stage": "conversation",
+                "model": "qwen3.5:2b",
+                "promptVariant": "full",
+                "safetyGuardMs": 0,
+                "preprocessingMs": 0,
+                "modelTimings": {
+                  "requestBuildMs": 0,
+                  "httpHeadersMs": 23851,
+                  "firstTokenMs": 23853,
+                  "promptUntilFirstTokenMs": 2,
+                  "generationMs": 1341,
+                  "bodyReadMs": 1343,
+                  "jsonParseMs": 0,
+                  "totalMs": 25194,
+                  "stream": true,
+                  "promptEvalMs": null,
+                  "generationEvalMs": null,
+                  "serverTotalMs": null,
+                  "modelLoadMs": null,
+                  "queueMs": null,
+                  "promptTokens": null,
+                  "completionTokens": null
+                },
+                "totalMs": 25194,
+                "fallback": false
+              }
+            },
+            "timeout": false
+          },
+          {
+            "status": 200,
+            "elapsedMs": 24702,
+            "payload": {
+              "ok": true,
+              "aiMode": "model-gateway",
+              "runtimeMode": "auto",
+              "provider": "openai-compatible",
+              "selectedLanguage": "ja",
+              "reply": "4人の人が困っているのは大変です。",
+              "nextField": null,
+              "requiresConfirmation": true,
+              "safety": {
+                "flags": [],
+                "immediate": false
+              },
+              "telemetry": {
+                "stage": "conversation",
+                "model": "qwen3.5:2b",
+                "promptVariant": "full",
+                "safetyGuardMs": 0,
+                "preprocessingMs": 0,
+                "modelTimings": {
+                  "requestBuildMs": 0,
+                  "httpHeadersMs": 22374,
+                  "firstTokenMs": 22375,
+                  "promptUntilFirstTokenMs": 1,
+                  "generationMs": 1373,
+                  "bodyReadMs": 1374,
+                  "jsonParseMs": 0,
+                  "totalMs": 23748,
+                  "stream": true,
+                  "promptEvalMs": null,
+                  "generationEvalMs": null,
+                  "serverTotalMs": null,
+                  "modelLoadMs": null,
+                  "queueMs": null,
+                  "promptTokens": null,
+                  "completionTokens": null
+                },
+                "totalMs": 23748,
+                "fallback": false
+              }
+            },
+            "timeout": false
+          },
+          {
+            "status": 200,
+            "elapsedMs": 5501,
+            "payload": {
+              "ok": true,
+              "aiMode": "model-gateway",
+              "runtimeMode": "auto",
+              "provider": "openai-compatible",
+              "selectedLanguage": "ja",
+              "reply": "4人の人が困っています。",
+              "nextField": null,
+              "requiresConfirmation": true,
+              "safety": {
+                "flags": [],
+                "immediate": false
+              },
+              "telemetry": {
+                "stage": "conversation",
+                "model": "qwen3.5:2b",
+                "promptVariant": "full",
+                "safetyGuardMs": 0,
+                "preprocessingMs": 0,
+                "modelTimings": {
+                  "requestBuildMs": 0,
+                  "httpHeadersMs": 3355,
+                  "firstTokenMs": 3356,
+                  "promptUntilFirstTokenMs": 1,
+                  "generationMs": 1205,
+                  "bodyReadMs": 1206,
+                  "jsonParseMs": 0,
+                  "totalMs": 4561,
+                  "stream": true,
+                  "promptEvalMs": null,
+                  "generationEvalMs": null,
+                  "serverTotalMs": null,
+                  "modelLoadMs": null,
+                  "queueMs": null,
+                  "promptTokens": null,
+                  "completionTokens": null
+                },
+                "totalMs": 4561,
+                "fallback": false
+              }
+            },
+            "timeout": false
+          },
+          {
+            "status": 200,
+            "elapsedMs": 13649,
+            "payload": {
+              "ok": true,
+              "aiMode": "model-gateway",
+              "runtimeMode": "auto",
+              "provider": "openai-compatible",
+              "selectedLanguage": "ja",
+              "reply": "体育館Aで4人が困っているのは大変です。",
+              "nextField": null,
+              "requiresConfirmation": true,
+              "safety": {
+                "flags": [],
+                "immediate": false
+              },
+              "telemetry": {
+                "stage": "conversation",
+                "model": "qwen3.5:2b",
+                "promptVariant": "full",
+                "safetyGuardMs": 0,
+                "preprocessingMs": 0,
+                "modelTimings": {
+                  "requestBuildMs": 0,
+                  "httpHeadersMs": 11083,
+                  "firstTokenMs": 11084,
+                  "promptUntilFirstTokenMs": 1,
+                  "generationMs": 1626,
+                  "bodyReadMs": 1627,
+                  "jsonParseMs": 0,
+                  "totalMs": 12710,
+                  "stream": true,
+                  "promptEvalMs": null,
+                  "generationEvalMs": null,
+                  "serverTotalMs": null,
+                  "modelLoadMs": null,
+                  "queueMs": null,
+                  "promptTokens": null,
+                  "completionTokens": null
+                },
+                "totalMs": 12710,
+                "fallback": false
+              }
+            },
+            "timeout": false
+          },
+          {
+            "status": 200,
+            "elapsedMs": 23210,
+            "payload": {
+              "ok": true,
+              "aiMode": "model-gateway",
+              "runtimeMode": "auto",
+              "provider": "openai-compatible",
+              "selectedLanguage": "ja",
+              "reply": "体育館Aで4人が困っています。",
+              "nextField": null,
+              "requiresConfirmation": true,
+              "safety": {
+                "flags": [],
+                "immediate": false
+              },
+              "telemetry": {
+                "stage": "conversation",
+                "model": "qwen3.5:2b",
+                "promptVariant": "full",
+                "safetyGuardMs": 0,
+                "preprocessingMs": 0,
+                "modelTimings": {
+                  "requestBuildMs": 0,
+                  "httpHeadersMs": 20896,
+                  "firstTokenMs": 20897,
+                  "promptUntilFirstTokenMs": 1,
+                  "generationMs": 1377,
+                  "bodyReadMs": 1378,
+                  "jsonParseMs": 0,
+                  "totalMs": 22274,
+                  "stream": true,
+                  "promptEvalMs": null,
+                  "generationEvalMs": null,
+                  "serverTotalMs": null,
+                  "modelLoadMs": null,
+                  "queueMs": null,
+                  "promptTokens": null,
+                  "completionTokens": null
+                },
+                "totalMs": 22274,
+                "fallback": false
+              }
+            },
+            "timeout": false
+          },
+          {
+            "status": 200,
+            "elapsedMs": 21733,
+            "payload": {
+              "ok": true,
+              "aiMode": "model-gateway",
+              "runtimeMode": "auto",
+              "provider": "openai-compatible",
+              "selectedLanguage": "ja",
+              "reply": "4人の人が困っているのは大変ですね。",
+              "nextField": null,
+              "requiresConfirmation": true,
+              "safety": {
+                "flags": [],
+                "immediate": false
+              },
+              "telemetry": {
+                "stage": "conversation",
+                "model": "qwen3.5:2b",
+                "promptVariant": "full",
+                "safetyGuardMs": 0,
+                "preprocessingMs": 0,
+                "modelTimings": {
+                  "requestBuildMs": 1,
+                  "httpHeadersMs": 19399,
+                  "firstTokenMs": 19400,
+                  "promptUntilFirstTokenMs": 1,
+                  "generationMs": 1395,
+                  "bodyReadMs": 1396,
+                  "jsonParseMs": 0,
+                  "totalMs": 20795,
+                  "stream": true,
+                  "promptEvalMs": null,
+                  "generationEvalMs": null,
+                  "serverTotalMs": null,
+                  "modelLoadMs": null,
+                  "queueMs": null,
+                  "promptTokens": null,
+                  "completionTokens": null
+                },
+                "totalMs": 20795,
+                "fallback": false
+              }
+            },
+            "timeout": false
+          },
+          {
+            "status": 200,
+            "elapsedMs": 2644,
+            "payload": {
+              "ok": true,
+              "aiMode": "model-gateway",
+              "runtimeMode": "auto",
+              "provider": "openai-compatible",
+              "selectedLanguage": "ja",
+              "reply": "困っている人数と場所を再確認します。",
+              "nextField": null,
+              "requiresConfirmation": true,
+              "safety": {
+                "flags": [],
+                "immediate": false
+              },
+              "telemetry": {
+                "stage": "conversation",
+                "model": "qwen3.5:2b",
+                "promptVariant": "full",
+                "safetyGuardMs": 0,
+                "preprocessingMs": 0,
+                "modelTimings": {
+                  "requestBuildMs": 0,
+                  "httpHeadersMs": 181,
+                  "firstTokenMs": 182,
+                  "promptUntilFirstTokenMs": 1,
+                  "generationMs": 1525,
+                  "bodyReadMs": 1526,
+                  "jsonParseMs": 0,
+                  "totalMs": 1707,
+                  "stream": true,
+                  "promptEvalMs": null,
+                  "generationEvalMs": null,
+                  "serverTotalMs": null,
+                  "modelLoadMs": null,
+                  "queueMs": null,
+                  "promptTokens": null,
+                  "completionTokens": null
+                },
+                "totalMs": 1707,
+                "fallback": false
+              }
+            },
+            "timeout": false
+          },
+          {
+            "status": 200,
+            "elapsedMs": 30618,
+            "payload": {
+              "ok": true,
+              "aiMode": "model-gateway",
+              "runtimeMode": "auto",
+              "provider": "openai-compatible",
+              "selectedLanguage": "ja",
+              "reply": "4人の人が困っているのは大変です。",
+              "nextField": null,
+              "requiresConfirmation": true,
+              "safety": {
+                "flags": [],
+                "immediate": false
+              },
+              "telemetry": {
+                "stage": "conversation",
+                "model": "qwen3.5:2b",
+                "promptVariant": "full",
+                "safetyGuardMs": 0,
+                "preprocessingMs": 0,
+                "modelTimings": {
+                  "requestBuildMs": 0,
+                  "httpHeadersMs": 28305,
+                  "firstTokenMs": 28306,
+                  "promptUntilFirstTokenMs": 1,
+                  "generationMs": 1376,
+                  "bodyReadMs": 1377,
+                  "jsonParseMs": 0,
+                  "totalMs": 29682,
+                  "stream": true,
+                  "promptEvalMs": null,
+                  "generationEvalMs": null,
+                  "serverTotalMs": null,
+                  "modelLoadMs": null,
+                  "queueMs": null,
+                  "promptTokens": null,
+                  "completionTokens": null
+                },
+                "totalMs": 29682,
+                "fallback": false
+              }
+            },
+            "timeout": false
+          },
+          {
+            "status": 200,
+            "elapsedMs": 7170,
+            "payload": {
+              "ok": true,
+              "aiMode": "model-gateway",
+              "runtimeMode": "auto",
+              "provider": "openai-compatible",
+              "selectedLanguage": "ja",
+              "reply": "体育館Aで4人が困っているのは大変です。",
+              "nextField": null,
+              "requiresConfirmation": true,
+              "safety": {
+                "flags": [],
+                "immediate": false
+              },
+              "telemetry": {
+                "stage": "conversation",
+                "model": "qwen3.5:2b",
+                "promptVariant": "full",
+                "safetyGuardMs": 0,
+                "preprocessingMs": 0,
+                "modelTimings": {
+                  "requestBuildMs": 0,
+                  "httpHeadersMs": 4662,
+                  "firstTokenMs": 4663,
+                  "promptUntilFirstTokenMs": 1,
+                  "generationMs": 1570,
+                  "bodyReadMs": 1571,
+                  "jsonParseMs": 0,
+                  "totalMs": 6233,
+                  "stream": true,
+                  "promptEvalMs": null,
+                  "generationEvalMs": null,
+                  "serverTotalMs": null,
+                  "modelLoadMs": null,
+                  "queueMs": null,
+                  "promptTokens": null,
+                  "completionTokens": null
+                },
+                "totalMs": 6233,
+                "fallback": false
+              }
+            },
+            "timeout": false
+          },
+          {
+            "status": 200,
+            "elapsedMs": 16883,
+            "payload": {
+              "ok": true,
+              "aiMode": "model-gateway",
+              "runtimeMode": "auto",
+              "provider": "openai-compatible",
+              "selectedLanguage": "ja",
+              "reply": "体育館Aで4人が困っています。",
+              "nextField": null,
+              "requiresConfirmation": true,
+              "safety": {
+                "flags": [],
+                "immediate": false
+              },
+              "telemetry": {
+                "stage": "conversation",
+                "model": "qwen3.5:2b",
+                "promptVariant": "full",
+                "safetyGuardMs": 0,
+                "preprocessingMs": 0,
+                "modelTimings": {
+                  "requestBuildMs": 0,
+                  "httpHeadersMs": 14372,
+                  "firstTokenMs": 14373,
+                  "promptUntilFirstTokenMs": 1,
+                  "generationMs": 1573,
+                  "bodyReadMs": 1574,
+                  "jsonParseMs": 0,
+                  "totalMs": 15946,
+                  "stream": true,
+                  "promptEvalMs": null,
+                  "generationEvalMs": null,
+                  "serverTotalMs": null,
+                  "modelLoadMs": null,
+                  "queueMs": null,
+                  "promptTokens": null,
+                  "completionTokens": null
+                },
+                "totalMs": 15946,
+                "fallback": false
+              }
+            },
+            "timeout": false
+          },
+          {
+            "status": 200,
+            "elapsedMs": 4188,
+            "payload": {
+              "ok": true,
+              "aiMode": "model-gateway",
+              "runtimeMode": "auto",
+              "provider": "openai-compatible",
+              "selectedLanguage": "ja",
+              "reply": "体育館Aで4人が困っています。",
+              "nextField": null,
+              "requiresConfirmation": true,
+              "safety": {
+                "flags": [],
+                "immediate": false
+              },
+              "telemetry": {
+                "stage": "conversation",
+                "model": "qwen3.5:2b",
+                "promptVariant": "full",
+                "safetyGuardMs": 0,
+                "preprocessingMs": 0,
+                "modelTimings": {
+                  "requestBuildMs": 0,
+                  "httpHeadersMs": 1809,
+                  "firstTokenMs": 1810,
+                  "promptUntilFirstTokenMs": 1,
+                  "generationMs": 1438,
+                  "bodyReadMs": 1439,
+                  "jsonParseMs": 0,
+                  "totalMs": 3248,
+                  "stream": true,
+                  "promptEvalMs": null,
+                  "generationEvalMs": null,
+                  "serverTotalMs": null,
+                  "modelLoadMs": null,
+                  "queueMs": null,
+                  "promptTokens": null,
+                  "completionTokens": null
+                },
+                "totalMs": 3248,
+                "fallback": false
+              }
+            },
+            "timeout": false
+          },
+          {
+            "status": 200,
+            "elapsedMs": 8921,
+            "payload": {
+              "ok": true,
+              "aiMode": "model-gateway",
+              "runtimeMode": "auto",
+              "provider": "openai-compatible",
+              "selectedLanguage": "ja",
+              "reply": "体育館Aで4人が困っていることを承知しました。",
+              "nextField": null,
+              "requiresConfirmation": true,
+              "safety": {
+                "flags": [],
+                "immediate": false
+              },
+              "telemetry": {
+                "stage": "conversation",
+                "model": "qwen3.5:2b",
+                "promptVariant": "full",
+                "safetyGuardMs": 0,
+                "preprocessingMs": 0,
+                "modelTimings": {
+                  "requestBuildMs": 0,
+                  "httpHeadersMs": 6336,
+                  "firstTokenMs": 6337,
+                  "promptUntilFirstTokenMs": 1,
+                  "generationMs": 1650,
+                  "bodyReadMs": 1651,
+                  "jsonParseMs": 0,
+                  "totalMs": 7987,
+                  "stream": true,
+                  "promptEvalMs": null,
+                  "generationEvalMs": null,
+                  "serverTotalMs": null,
+                  "modelLoadMs": null,
+                  "queueMs": null,
+                  "promptTokens": null,
+                  "completionTokens": null
+                },
+                "totalMs": 7987,
+                "fallback": false
+              }
+            },
+            "timeout": false
+          },
+          {
+            "status": 200,
+            "elapsedMs": 15199,
+            "payload": {
+              "ok": true,
+              "aiMode": "model-gateway",
+              "runtimeMode": "auto",
+              "provider": "openai-compatible",
+              "selectedLanguage": "ja",
+              "reply": "体育館Aで4人が困っています。",
+              "nextField": null,
+              "requiresConfirmation": true,
+              "safety": {
+                "flags": [],
+                "immediate": false
+              },
+              "telemetry": {
+                "stage": "conversation",
+                "model": "qwen3.5:2b",
+                "promptVariant": "full",
+                "safetyGuardMs": 0,
+                "preprocessingMs": 0,
+                "modelTimings": {
+                  "requestBuildMs": 0,
+                  "httpHeadersMs": 12811,
+                  "firstTokenMs": 12812,
+                  "promptUntilFirstTokenMs": 1,
+                  "generationMs": 1448,
+                  "bodyReadMs": 1449,
+                  "jsonParseMs": 0,
+                  "totalMs": 14260,
+                  "stream": true,
+                  "promptEvalMs": null,
+                  "generationEvalMs": null,
+                  "serverTotalMs": null,
+                  "modelLoadMs": null,
+                  "queueMs": null,
+                  "promptTokens": null,
+                  "completionTokens": null
+                },
+                "totalMs": 14260,
+                "fallback": false
+              }
+            },
+            "timeout": false
+          },
+          {
+            "status": 200,
+            "elapsedMs": 10415,
+            "payload": {
+              "ok": true,
+              "aiMode": "model-gateway",
+              "runtimeMode": "auto",
+              "provider": "openai-compatible",
+              "selectedLanguage": "ja",
+              "reply": "4人の人が困っているのは大変です。",
+              "nextField": null,
+              "requiresConfirmation": true,
+              "safety": {
+                "flags": [],
+                "immediate": false
+              },
+              "telemetry": {
+                "stage": "conversation",
+                "model": "qwen3.5:2b",
+                "promptVariant": "full",
+                "safetyGuardMs": 0,
+                "preprocessingMs": 0,
+                "modelTimings": {
+                  "requestBuildMs": 0,
+                  "httpHeadersMs": 8088,
+                  "firstTokenMs": 8089,
+                  "promptUntilFirstTokenMs": 1,
+                  "generationMs": 1394,
+                  "bodyReadMs": 1395,
+                  "jsonParseMs": 0,
+                  "totalMs": 9483,
+                  "stream": true,
+                  "promptEvalMs": null,
+                  "generationEvalMs": null,
+                  "serverTotalMs": null,
+                  "modelLoadMs": null,
+                  "queueMs": null,
+                  "promptTokens": null,
+                  "completionTokens": null
+                },
+                "totalMs": 9483,
+                "fallback": false
+              }
+            },
+            "timeout": false
+          },
+          {
+            "status": 200,
+            "elapsedMs": 32071,
+            "payload": {
+              "ok": true,
+              "aiMode": "model-gateway",
+              "runtimeMode": "auto",
+              "provider": "openai-compatible",
+              "selectedLanguage": "ja",
+              "reply": "4人の人が困っているのは大変です。",
+              "nextField": null,
+              "requiresConfirmation": true,
+              "safety": {
+                "flags": [],
+                "immediate": false
+              },
+              "telemetry": {
+                "stage": "conversation",
+                "model": "qwen3.5:2b",
+                "promptVariant": "full",
+                "safetyGuardMs": 0,
+                "preprocessingMs": 0,
+                "modelTimings": {
+                  "requestBuildMs": 0,
+                  "httpHeadersMs": 29785,
+                  "firstTokenMs": 29786,
+                  "promptUntilFirstTokenMs": 1,
+                  "generationMs": 1355,
+                  "bodyReadMs": 1356,
+                  "jsonParseMs": 0,
+                  "totalMs": 31141,
+                  "stream": true,
+                  "promptEvalMs": null,
+                  "generationEvalMs": null,
+                  "serverTotalMs": null,
+                  "modelLoadMs": null,
+                  "queueMs": null,
+                  "promptTokens": null,
+                  "completionTokens": null
+                },
+                "totalMs": 31141,
+                "fallback": false
+              }
+            },
+            "timeout": false
+          },
+          {
+            "status": 200,
+            "elapsedMs": 18446,
+            "payload": {
+              "ok": true,
+              "aiMode": "model-gateway",
+              "runtimeMode": "auto",
+              "provider": "openai-compatible",
+              "selectedLanguage": "ja",
+              "reply": "体育館Aで4人が困っています。",
+              "nextField": null,
+              "requiresConfirmation": true,
+              "safety": {
+                "flags": [],
+                "immediate": false
+              },
+              "telemetry": {
+                "stage": "conversation",
+                "model": "qwen3.5:2b",
+                "promptVariant": "full",
+                "safetyGuardMs": 0,
+                "preprocessingMs": 0,
+                "modelTimings": {
+                  "requestBuildMs": 0,
+                  "httpHeadersMs": 16049,
+                  "firstTokenMs": 16051,
+                  "promptUntilFirstTokenMs": 2,
+                  "generationMs": 1453,
+                  "bodyReadMs": 1455,
+                  "jsonParseMs": 0,
+                  "totalMs": 17504,
+                  "stream": true,
+                  "promptEvalMs": null,
+                  "generationEvalMs": null,
+                  "serverTotalMs": null,
+                  "modelLoadMs": null,
+                  "queueMs": null,
+                  "promptTokens": null,
+                  "completionTokens": null
+                },
+                "totalMs": 17504,
+                "fallback": false
+              }
+            },
+            "timeout": false
+          },
+          {
+            "status": 200,
+            "elapsedMs": 11911,
+            "payload": {
+              "ok": true,
+              "aiMode": "model-gateway",
+              "runtimeMode": "auto",
+              "provider": "openai-compatible",
+              "selectedLanguage": "ja",
+              "reply": "体育館Aで4人が困っています。",
+              "nextField": null,
+              "requiresConfirmation": true,
+              "safety": {
+                "flags": [],
+                "immediate": false
+              },
+              "telemetry": {
+                "stage": "conversation",
+                "model": "qwen3.5:2b",
+                "promptVariant": "full",
+                "safetyGuardMs": 0,
+                "preprocessingMs": 0,
+                "modelTimings": {
+                  "requestBuildMs": 0,
+                  "httpHeadersMs": 9584,
+                  "firstTokenMs": 9585,
+                  "promptUntilFirstTokenMs": 1,
+                  "generationMs": 1392,
+                  "bodyReadMs": 1393,
+                  "jsonParseMs": 0,
+                  "totalMs": 10977,
+                  "stream": true,
+                  "promptEvalMs": null,
+                  "generationEvalMs": null,
+                  "serverTotalMs": null,
+                  "modelLoadMs": null,
+                  "queueMs": null,
+                  "promptTokens": null,
+                  "completionTokens": null
+                },
+                "totalMs": 10977,
+                "fallback": false
+              }
+            },
+            "timeout": false
+          },
+          {
+            "status": 200,
+            "elapsedMs": 29138,
+            "payload": {
+              "ok": true,
+              "aiMode": "model-gateway",
+              "runtimeMode": "auto",
+              "provider": "openai-compatible",
+              "selectedLanguage": "ja",
+              "reply": "4人の人が困っているのは大変です。",
+              "nextField": null,
+              "requiresConfirmation": true,
+              "safety": {
+                "flags": [],
+                "immediate": false
+              },
+              "telemetry": {
+                "stage": "conversation",
+                "model": "qwen3.5:2b",
+                "promptVariant": "full",
+                "safetyGuardMs": 0,
+                "preprocessingMs": 0,
+                "modelTimings": {
+                  "requestBuildMs": 0,
+                  "httpHeadersMs": 26861,
+                  "firstTokenMs": 26862,
+                  "promptUntilFirstTokenMs": 1,
+                  "generationMs": 1342,
+                  "bodyReadMs": 1343,
+                  "jsonParseMs": 0,
+                  "totalMs": 28204,
+                  "stream": true,
+                  "promptEvalMs": null,
+                  "generationEvalMs": null,
+                  "serverTotalMs": null,
+                  "modelLoadMs": null,
+                  "queueMs": null,
+                  "promptTokens": null,
+                  "completionTokens": null
+                },
+                "totalMs": 28204,
+                "fallback": false
+              }
+            },
+            "timeout": false
+          },
+          {
+            "status": 200,
+            "elapsedMs": 20224,
+            "payload": {
+              "ok": true,
+              "aiMode": "model-gateway",
+              "runtimeMode": "auto",
+              "provider": "openai-compatible",
+              "selectedLanguage": "ja",
+              "reply": "体育館Aで4人が困っていることを承知しました。",
+              "nextField": null,
+              "requiresConfirmation": true,
+              "safety": {
+                "flags": [],
+                "immediate": false
+              },
+              "telemetry": {
+                "stage": "conversation",
+                "model": "qwen3.5:2b",
+                "promptVariant": "full",
+                "safetyGuardMs": 0,
+                "preprocessingMs": 0,
+                "modelTimings": {
+                  "requestBuildMs": 0,
+                  "httpHeadersMs": 17625,
+                  "firstTokenMs": 17626,
+                  "promptUntilFirstTokenMs": 1,
+                  "generationMs": 1665,
+                  "bodyReadMs": 1666,
+                  "jsonParseMs": 0,
+                  "totalMs": 19291,
+                  "stream": true,
+                  "promptEvalMs": null,
+                  "generationEvalMs": null,
+                  "serverTotalMs": null,
+                  "modelLoadMs": null,
+                  "queueMs": null,
+                  "promptTokens": null,
+                  "completionTokens": null
+                },
+                "totalMs": 19291,
+                "fallback": false
+              }
+            },
+            "timeout": false
+          }
+        ]
+      }
+    }
+  ]
+}

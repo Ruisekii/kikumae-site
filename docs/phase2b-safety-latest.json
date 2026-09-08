@@ -1,0 +1,171 @@
+{
+  "generatedAt": "2026-09-08T07:45:28.499Z",
+  "caseCount": 16,
+  "correct": 16,
+  "falsePositive": 0,
+  "falseNegative": 0,
+  "recall": 1,
+  "precision": 1,
+  "rows": [
+    {
+      "text": "息ができない",
+      "expected": true,
+      "actual": true,
+      "correct": true,
+      "status": 200,
+      "flags": [
+        "意識・呼吸の異常"
+      ],
+      "elapsedMs": 173
+    },
+    {
+      "text": "さっき息苦しかったが今は大丈夫です",
+      "expected": false,
+      "actual": false,
+      "correct": true,
+      "status": 200,
+      "flags": [],
+      "elapsedMs": 43
+    },
+    {
+      "text": "火事です。調理室から煙が出ています",
+      "expected": true,
+      "actual": true,
+      "correct": true,
+      "status": 200,
+      "flags": [
+        "火災・煙"
+      ],
+      "elapsedMs": 45
+    },
+    {
+      "text": "火事ではありません。焦げたにおいもありません",
+      "expected": false,
+      "actual": false,
+      "correct": true,
+      "status": 200,
+      "flags": [],
+      "elapsedMs": 42
+    },
+    {
+      "text": "殴られそうで怖いです",
+      "expected": true,
+      "actual": true,
+      "correct": true,
+      "status": 200,
+      "flags": [
+        "暴力・武器"
+      ],
+      "elapsedMs": 48
+    },
+    {
+      "text": "暴力ではありません。大きな声で相談しています",
+      "expected": false,
+      "actual": false,
+      "correct": true,
+      "status": 200,
+      "flags": [],
+      "elapsedMs": 42
+    },
+    {
+      "text": "高熱でぐったりしています",
+      "expected": true,
+      "actual": true,
+      "correct": true,
+      "status": 200,
+      "flags": [
+        "重大な体調変化"
+      ],
+      "elapsedMs": 41
+    },
+    {
+      "text": "高熱ではないですが、少しだるいです",
+      "expected": false,
+      "actual": false,
+      "correct": true,
+      "status": 200,
+      "flags": [],
+      "elapsedMs": 42
+    },
+    {
+      "text": "意識はあります。会話もできます",
+      "expected": false,
+      "actual": false,
+      "correct": true,
+      "status": 200,
+      "flags": [],
+      "elapsedMs": 46
+    },
+    {
+      "text": "呼吸が苦しくありません",
+      "expected": false,
+      "actual": false,
+      "correct": true,
+      "status": 200,
+      "flags": [],
+      "elapsedMs": 46
+    },
+    {
+      "text": "子どもが39度でぐったりしています",
+      "expected": true,
+      "actual": true,
+      "correct": true,
+      "status": 200,
+      "flags": [
+        "重大な体調変化"
+      ],
+      "elapsedMs": 43
+    },
+    {
+      "text": "壁が崩れて近づくと危険です",
+      "expected": true,
+      "actual": true,
+      "correct": true,
+      "status": 200,
+      "flags": [
+        "建物・閉じ込め"
+      ],
+      "elapsedMs": 88
+    },
+    {
+      "text": "トイレが汚れていて困っています",
+      "expected": false,
+      "actual": false,
+      "correct": true,
+      "status": 200,
+      "flags": [],
+      "elapsedMs": 43
+    },
+    {
+      "text": "夜に大声で騒いでいて眠れません",
+      "expected": false,
+      "actual": false,
+      "correct": true,
+      "status": 200,
+      "flags": [],
+      "elapsedMs": 39
+    },
+    {
+      "text": "薬が今夜で切れます",
+      "expected": true,
+      "actual": true,
+      "correct": true,
+      "status": 200,
+      "flags": [
+        "重大な体調変化"
+      ],
+      "elapsedMs": 43
+    },
+    {
+      "text": "煙たいですが火は見えていません",
+      "expected": true,
+      "actual": true,
+      "correct": true,
+      "status": 200,
+      "flags": [
+        "火災・煙"
+      ],
+      "elapsedMs": 40
+    }
+  ]
+}

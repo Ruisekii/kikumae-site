@@ -1,10 +1,10 @@
-import { createQuestion } from '../../../db/repository';
+import { createQuestion, type ConversationMessageInput } from '../../../db/repository';
 import type { ShelterIntake, StructuredIncident } from '../../../db/local-ai';
 import { allowBurstShared, readRequestText } from '../../../db/request-guard';
 
 export const runtime = 'edge';
 
-const MAX_REQUEST_BYTES = 4096;
+const MAX_REQUEST_BYTES = 16000;
 const MAX_QUESTION_CHARS = 500;
 
 function sameOrigin(request: Request): boolean {
@@ -14,6 +14,17 @@ function sameOrigin(request: Request): boolean {
 
 function json(message: string, status: number): Response {
   return Response.json({ message }, { status, headers: { 'Cache-Control': 'no-store' } });
+}
+
+function conversationMessages(value: unknown): ConversationMessageInput[] {
+  if (!Array.isArray(value)) return [];
+  return value.slice(-24).flatMap((item): ConversationMessageInput[] => {
+    if (!item || typeof item !== 'object' || Array.isArray(item)) return [];
+    const source = item as Record<string, unknown>;
+    if ((source.role !== 'user' && source.role !== 'assistant') || typeof source.originalText !== 'string') return [];
+    const originalText = source.originalText.trim().slice(0, 500);
+    return originalText ? [{ role: source.role, originalText, originalLanguage: typeof source.originalLanguage === 'string' ? source.originalLanguage.slice(0, 12) : undefined, messageId: typeof source.messageId === 'string' ? source.messageId.slice(0, 120) : undefined, createdAt: typeof source.createdAt === 'number' ? source.createdAt : undefined }] : [];
+  });
 }
 
 export async function POST(request: Request): Promise<Response> {
@@ -31,9 +42,11 @@ export async function POST(request: Request): Promise<Response> {
   const body = typeof data.body === 'string' ? data.body.trim() : '';
   const summary = typeof data.summary === 'string' ? data.summary.trim() : '';
   const category = typeof data.category === 'string' ? data.category.trim() : '';
+  const selectedLanguage = typeof data.selectedLanguage === 'string' ? data.selectedLanguage.trim().slice(0, 12) : '';
   const submissionKey = typeof data.submissionKey === 'string' ? data.submissionKey.trim().slice(0, 128) : '';
   const rawIntake = (data.intake && typeof data.intake === 'object') ? data.intake as Record<string, unknown> : {};
   const structuredIncident = data.incident && typeof data.incident === 'object' && !Array.isArray(data.incident) ? data.incident as StructuredIncident : undefined;
+  const transcript = conversationMessages(data.conversation);
   const intake: ShelterIntake = {
     location: typeof rawIntake.location === 'string' ? rawIntake.location : '',
     issueLocation: typeof rawIntake.issueLocation === 'string' ? rawIntake.issueLocation : '',
@@ -47,7 +60,7 @@ export async function POST(request: Request): Promise<Response> {
   if (summary.length > 300) return json('要約は300文字以内で入力してください。', 400);
 
   try {
-    const question = await createQuestion(body, summary, category, null, submissionKey, intake, structuredIncident);
+    const question = await createQuestion(body, summary, category, null, submissionKey, intake, structuredIncident, transcript, selectedLanguage);
     return Response.json({ id: question.id, checkUrl: `${new URL(request.url).origin}/questions/${question.checkToken}`, message: '質問を受け付けました。管理者が確認します。' }, { status: 201, headers: { 'Cache-Control': 'no-store' } });
   } catch (error) {
     if (error instanceof Error && error.message === 'QUESTION_DUPLICATE') return json('この質問はすでに受け付けています。回答の確認URLをご確認ください。', 409);

@@ -24,6 +24,8 @@ import {
   type UrgencyLevel,
 } from './local-ai';
 import { resolveShelterZoneId } from '../lib/shelter-map-data';
+import { translateForStaff, type OriginalLanguage, type TranslationStatus } from './translation';
+import { organizeStaffIncident, type StaffOrganization } from '../app/lib/staff-organization';
 
 export type Faq = {
   id: number;
@@ -39,6 +41,24 @@ export type Faq = {
 };
 
 export type RelatedFaq = Faq & { score: number };
+
+export type ConversationMessageInput = {
+  role: 'user' | 'assistant';
+  originalText: string;
+  originalLanguage?: string;
+  messageId?: string;
+  createdAt?: number;
+};
+
+export type ConversationMessage = {
+  role: 'user' | 'assistant';
+  originalText: string;
+  originalLanguage: OriginalLanguage;
+  translatedTextJa: string;
+  translationStatus: TranslationStatus;
+  messageId?: string;
+  createdAt?: number;
+};
 
 export type CaseUpdate = {
   id: number;
@@ -71,6 +91,11 @@ export type SubmittedQuestion = {
   id: number;
   body: string;
   bodyOriginal: string;
+  originalText: string;
+  originalLanguage: OriginalLanguage;
+  translatedTextJa: string;
+  translationStatus: TranslationStatus;
+  conversationMessages: ConversationMessage[];
   aiSummary: string;
   summaryEdited: boolean;
   category: string;
@@ -117,6 +142,9 @@ export type SubmittedQuestion = {
   aiConfidence?: { urgency: number; grouping: number; vulnerablePeople: number };
   displayBody?: string;
   issueId?: number | null;
+  structuredIncident?: StructuredIncident;
+  originalMessageId: string;
+  staffOrganization?: StaffOrganization;
 };
 
 export type IssueReport = {
@@ -130,6 +158,14 @@ export type IssueReport = {
   urgency: UrgencyLevel;
   displayBody: string;
   originalBody?: string;
+  originalLanguage: OriginalLanguage;
+  translatedTextJa: string;
+  translationStatus: TranslationStatus;
+  safetyGuardTriggered: boolean;
+  conversationMessages?: ConversationMessage[];
+  structuredIncident?: StructuredIncident;
+  originalMessageId?: string;
+  staffOrganization?: StaffOrganization;
 };
 
 export type Issue = {
@@ -172,6 +208,7 @@ export type Issue = {
   candidateIssueTitle: string;
   candidateReason: string;
   updates: CaseUpdate[];
+  safetyGuardTriggered: boolean;
 };
 
 export type ShelterDashboardStats = {
@@ -390,6 +427,33 @@ async function initialiseDatabase(db: D1Database): Promise<D1Database> {
     await safeRun(db, "UPDATE issues SET issue_location = location WHERE issue_location = '' AND location <> ''");
     await db.prepare("INSERT OR REPLACE INTO schema_meta (key, value) VALUES ('shelter_map_location_v1', 'ready')").run();
   }
+  const translationSchemaMarker = await db.prepare("SELECT value FROM schema_meta WHERE key = 'question_translation_v1' LIMIT 1").first<{ value: string }>();
+  if (translationSchemaMarker?.value !== 'ready') {
+    for (const migration of [
+      "ALTER TABLE questions ADD COLUMN original_language TEXT NOT NULL DEFAULT 'ja'",
+      "ALTER TABLE questions ADD COLUMN translated_text_ja TEXT NOT NULL DEFAULT ''",
+      "ALTER TABLE questions ADD COLUMN translation_status TEXT NOT NULL DEFAULT 'not_needed'",
+    ]) await safeRun(db, migration);
+    await safeRun(db, "UPDATE questions SET original_language = 'ja', translated_text_ja = COALESCE(body_original, body), translation_status = 'not_needed' WHERE original_language = '' OR original_language IS NULL");
+    await db.prepare("INSERT OR REPLACE INTO schema_meta (key, value) VALUES ('question_translation_v1', 'ready')").run();
+  }
+  const conversationSchemaMarker = await db.prepare("SELECT value FROM schema_meta WHERE key = 'conversation_messages_v1' LIMIT 1").first<{ value: string }>();
+  if (conversationSchemaMarker?.value !== 'ready') {
+    await safeRun(db, "ALTER TABLE questions ADD COLUMN conversation_messages TEXT NOT NULL DEFAULT '[]'");
+    await db.prepare("INSERT OR REPLACE INTO schema_meta (key, value) VALUES ('conversation_messages_v1', 'ready')").run();
+  }
+  const structuredIncidentMarker = await db.prepare("SELECT value FROM schema_meta WHERE key = 'structured_incident_v1' LIMIT 1").first<{ value: string }>();
+  if (structuredIncidentMarker?.value !== 'ready') {
+    await safeRun(db, "ALTER TABLE questions ADD COLUMN structured_incident TEXT NOT NULL DEFAULT ''");
+    await db.prepare("INSERT OR REPLACE INTO schema_meta (key, value) VALUES ('structured_incident_v1', 'ready')").run();
+  }
+  const staffOrganizationMarker = await db.prepare("SELECT value FROM schema_meta WHERE key = 'staff_organization_v1' LIMIT 1").first<{ value: string }>();
+  if (staffOrganizationMarker?.value !== 'ready') {
+    await safeRun(db, "ALTER TABLE questions ADD COLUMN original_message_id TEXT NOT NULL DEFAULT ''");
+    await safeRun(db, "ALTER TABLE questions ADD COLUMN staff_organization TEXT NOT NULL DEFAULT ''");
+    await safeRun(db, "UPDATE questions SET original_message_id = 'question:' || id WHERE original_message_id = '' OR original_message_id IS NULL");
+    await db.prepare("INSERT OR REPLACE INTO schema_meta (key, value) VALUES ('staff_organization_v1', 'ready')").run();
+  }
   await ensureFaqIsolationSchema(db);
   await ensureIssueMigration(db);
   const seedMarker = await db.prepare("SELECT value FROM schema_meta WHERE key = 'shelter_faq_seed_v1' LIMIT 1").first<{ value: string }>();
@@ -587,6 +651,62 @@ function parseStringList(value: string | null): string[] {
   try { const parsed = JSON.parse(value) as unknown; return Array.isArray(parsed) ? parsed.filter((item): item is string => typeof item === 'string').slice(0, 12) : []; } catch { return []; }
 }
 
+function parseConversationMessages(value: unknown): ConversationMessage[] {
+  let parsed: unknown = value;
+  if (typeof value === 'string') {
+    try { parsed = JSON.parse(value); } catch { return []; }
+  }
+  if (!Array.isArray(parsed)) return [];
+  return parsed.slice(-24).flatMap((item): ConversationMessage[] => {
+    if (!item || typeof item !== 'object' || Array.isArray(item)) return [];
+    const source = item as Record<string, unknown>;
+    if (source.role !== 'user' && source.role !== 'assistant') return [];
+    const originalText = typeof source.originalText === 'string' ? source.originalText.trim().slice(0, 500) : '';
+    if (!originalText) return [];
+    const originalLanguage = ['ja', 'en', 'zh', 'ko', 'other', 'unknown'].includes(source.originalLanguage as string)
+      ? source.originalLanguage as OriginalLanguage
+      : 'unknown';
+    const translationStatus = ['not_needed', 'translated', 'failed'].includes(source.translationStatus as string)
+      ? source.translationStatus as TranslationStatus
+      : 'failed';
+    return [{
+      role: source.role,
+      originalText,
+      originalLanguage,
+      translatedTextJa: typeof source.translatedTextJa === 'string' ? source.translatedTextJa.trim().slice(0, 500) : '',
+      translationStatus,
+      messageId: typeof source.messageId === 'string' ? source.messageId.slice(0, 120) : undefined,
+      createdAt: typeof source.createdAt === 'number' ? source.createdAt : undefined,
+    }];
+  });
+}
+
+function parseStructuredIncident(value: unknown): StructuredIncident | undefined {
+  if (typeof value !== 'string' || !value.trim()) return undefined;
+  try {
+    const parsed = JSON.parse(value) as StructuredIncident;
+    return parsed && typeof parsed === 'object' && !Array.isArray(parsed) ? parsed : undefined;
+  } catch { return undefined; }
+}
+
+function parseStaffOrganization(value: unknown): StaffOrganization | undefined {
+  if (typeof value !== 'string' || !value.trim()) return undefined;
+  try {
+    const parsed = JSON.parse(value) as StaffOrganization;
+    return parsed && typeof parsed === 'object' && !Array.isArray(parsed) ? parsed : undefined;
+  } catch { return undefined; }
+}
+
+async function translateConversationMessages(messages: ConversationMessageInput[]): Promise<ConversationMessage[]> {
+  const safeMessages = messages.slice(-24).flatMap((message): ConversationMessageInput[] => {
+    if (!message || (message.role !== 'user' && message.role !== 'assistant')) return [];
+    const originalText = typeof message.originalText === 'string' ? message.originalText.trim().slice(0, 500) : '';
+    return originalText ? [{ ...message, originalText }] : [];
+  });
+  const translated = await Promise.all(safeMessages.map(async (message) => ({ role: message.role, messageId: message.messageId, createdAt: message.createdAt, ...await translateForStaff(message.originalText, message.originalLanguage) })));
+  return translated;
+}
+
 async function hashCheckToken(token: string): Promise<string> {
   const digest = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(token));
   return Array.from(new Uint8Array(digest), (byte) => byte.toString(16).padStart(2, '0')).join('');
@@ -734,7 +854,7 @@ export async function listRelatedFaqs(query: string, limit = 3, portalId: number
   return [...categoryFaqs, ...ranked.filter((faq) => faq.category !== shelterCategory)].slice(0, limit);
 }
 
-export async function createQuestion(body: string, requestedSummary = '', requestedCategory = '', portalId: number | null = null, submissionKey = '', intake: ShelterIntake = {}, structuredIncident?: StructuredIncident): Promise<SubmittedQuestion> {
+export async function createQuestion(body: string, requestedSummary = '', requestedCategory = '', portalId: number | null = null, submissionKey = '', intake: ShelterIntake = {}, structuredIncident?: StructuredIncident, conversationMessages: ConversationMessageInput[] = [], selectedLanguage = ''): Promise<SubmittedQuestion> {
   const db = await initialise();
   const createdAt = Date.now();
   const submissionKeyHash = submissionKey ? await hashCheckToken(submissionKey) : null;
@@ -749,6 +869,11 @@ export async function createQuestion(body: string, requestedSummary = '', reques
   const analysis = structuredIncident && shelterAnalysis
     ? applyStructuredIncident(shelterAnalysis, structuredIncident)
     : shelterAnalysis ?? generateShelterAnalysis(body, intake);
+  // Safety and incident extraction have already run against the original text.
+  // Translation is an independent staff-display aid and must never become the
+  // source of truth for those decisions.
+  const staffTranslation = await translateForStaff(body, selectedLanguage);
+  const storedConversationMessages = await translateConversationMessages(conversationMessages);
   const issueLocation = analysis.issueLocation || resolveShelterZoneId(analysis.location) || analysis.location;
   const reporterLocation = intake.reporterLocation?.trim().slice(0, 120) ?? '';
   const related = await listRelatedFaqs(aiSummary || body, 3, portalId, analysis.category);
@@ -787,15 +912,23 @@ export async function createQuestion(body: string, requestedSummary = '', reques
   // readable so existing users are not broken during migration.
   const checkTokenExpiresAt = createdAt + 30 * 24 * 60 * 60 * 1000;
   const displayBody = redactSensitiveInformation(body);
-  const result = await db.prepare("INSERT INTO questions (body, body_original, ai_summary, summary_edited, category, status, workflow_status, title, location, people_count, resource_remaining, last_received_at, fact_summary, emotion_summary, missing_information, urgency_candidate, urgent_review, request_text, affected_people, vulnerable_people, emotional_intensity, contains_abusive_language, urgency_confidence, grouping_confidence, display_body, contact_type, answer_draft, answer_alternatives, answer_grounds, portal_id, check_token_hash, check_token_expires_at, submission_key_hash, created_at) VALUES (?, ?, ?, ?, ?, 'open', 'received', ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'anonymous', ?, ?, ?, ?, ?, ?, ?, ?)").bind(body, body, aiSummary, aiSummary !== canonicalSummary ? 1 : 0, category, analysis.title, analysis.location, analysis.peopleCount, analysis.resourceRemaining, analysis.lastReceivedAt, JSON.stringify(analysis.facts), analysis.emotion, JSON.stringify(analysis.missingInformation), analysis.urgencyCandidate, analysis.urgentReview ? 1 : 0, analysis.request, analysis.affectedPeople, JSON.stringify(analysis.vulnerablePeople), analysis.emotionalIntensity, analysis.containsAbusiveLanguage ? 1 : 0, analysis.urgencyConfidence, 1, displayBody, draft, JSON.stringify(alternatives), JSON.stringify(answerGrounds), portalId, await hashCheckToken(checkToken), checkTokenExpiresAt, submissionKeyHash, createdAt).run();
+  const result = await db.prepare("INSERT INTO questions (body, body_original, ai_summary, summary_edited, category, status, workflow_status, title, location, people_count, resource_remaining, last_received_at, fact_summary, emotion_summary, missing_information, urgency_candidate, urgent_review, request_text, affected_people, vulnerable_people, emotional_intensity, contains_abusive_language, urgency_confidence, grouping_confidence, display_body, contact_type, answer_draft, answer_alternatives, answer_grounds, portal_id, check_token_hash, check_token_expires_at, submission_key_hash, created_at, conversation_messages) VALUES (?, ?, ?, ?, ?, 'open', 'received', ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'anonymous', ?, ?, ?, ?, ?, ?, ?, ?, ?)").bind(body, body, aiSummary, aiSummary !== canonicalSummary ? 1 : 0, category, analysis.title, analysis.location, analysis.peopleCount, analysis.resourceRemaining, analysis.lastReceivedAt, JSON.stringify(analysis.facts), analysis.emotion, JSON.stringify(analysis.missingInformation), analysis.urgencyCandidate, analysis.urgentReview ? 1 : 0, analysis.request, analysis.affectedPeople, JSON.stringify(analysis.vulnerablePeople), analysis.emotionalIntensity, analysis.containsAbusiveLanguage ? 1 : 0, analysis.urgencyConfidence, 1, displayBody, draft, JSON.stringify(alternatives), JSON.stringify(answerGrounds), portalId, await hashCheckToken(checkToken), checkTokenExpiresAt, submissionKeyHash, createdAt, JSON.stringify(storedConversationMessages)).run();
   const id = Number(result.meta.last_row_id);
+  if (structuredIncident) await db.prepare('UPDATE questions SET structured_incident = ? WHERE id = ?').bind(JSON.stringify(structuredIncident), id).run();
+  await db.prepare('UPDATE questions SET original_language = ?, translated_text_ja = ?, translation_status = ? WHERE id = ?')
+    .bind(staffTranslation.originalLanguage, staffTranslation.translatedTextJa, staffTranslation.translationStatus, id).run();
+  const originalMessageId = `question:${id}`;
+  const staffOrganization = organizeStaffIncident({ body, originalLanguage: staffTranslation.originalLanguage, messageId: originalMessageId, createdAt, intake, structuredIncident, analysis });
+  await db.prepare('UPDATE questions SET original_message_id = ?, staff_organization = ? WHERE id = ?').bind(originalMessageId, JSON.stringify(staffOrganization), id).run();
   await db.prepare('UPDATE questions SET issue_location = ?, reporter_location = ? WHERE id = ?').bind(issueLocation, reporterLocation, id).run();
   await db.prepare("INSERT INTO case_updates (question_id, status, message, is_public, actor_user_id, created_at) VALUES (?, 'received', ?, 1, NULL, ?)").bind(id, '相談を受け付けました。避難所スタッフが内容を確認します。', createdAt).run();
   await recordQuestionEvent(id, 'question_received', null, '相談受付');
   await attachQuestionToIssue(db, id, portalId, analysis, createdAt, reporterLocation);
   if (portalId === null) await assignSimilarGroup(db, id, analysis, createdAt);
   return {
-    id, body, bodyOriginal: body, aiSummary, summaryEdited: aiSummary !== canonicalSummary,
+    id, body, bodyOriginal: body, originalText: body, originalLanguage: staffTranslation.originalLanguage,
+    translatedTextJa: staffTranslation.translatedTextJa, translationStatus: staffTranslation.translationStatus,
+    aiSummary, summaryEdited: aiSummary !== canonicalSummary,
     category, status: 'open', createdAt, answerBody: null, answerDraft: draft, answerAlternatives: alternatives, answerUsedAi: false,
     answerGrounds, answeredAt: null, portalId, workflowStatus: 'received', title: analysis.title,
     location: analysis.location, issueLocation, reporterLocation, peopleCount: analysis.peopleCount, resourceRemaining: analysis.resourceRemaining, lastReceivedAt: analysis.lastReceivedAt,
@@ -803,7 +936,7 @@ export async function createQuestion(body: string, requestedSummary = '', reques
     urgencyConfirmed: null, urgentReview: analysis.urgentReview, faqResolved: null, similarGroupId: null, similarGroupTitle: '', similarCount: 0,
     assigneeName: '', internalNote: '', firstConfirmedAt: null, resolvedAt: null, updates: [{ id: 0, status: 'received', message: '相談を受け付けました。避難所スタッフが内容を確認します。', isPublic: true, createdAt }], similarQuestions: [], candidate: null, checkToken,
     request: analysis.request, affectedPeople: analysis.affectedPeople, vulnerablePeople: analysis.vulnerablePeople, emotionalIntensity: analysis.emotionalIntensity,
-    containsAbusiveLanguage: analysis.containsAbusiveLanguage, aiConfidence: { urgency: analysis.urgencyConfidence, grouping: 1, vulnerablePeople: analysis.vulnerablePeople[0] === '不明' ? 0.42 : 0.76 }, displayBody,
+    containsAbusiveLanguage: analysis.containsAbusiveLanguage, aiConfidence: { urgency: analysis.urgencyConfidence, grouping: 1, vulnerablePeople: analysis.vulnerablePeople[0] === '不明' ? 0.42 : 0.76 }, displayBody, originalMessageId, staffOrganization,
   };
 }
 
@@ -997,7 +1130,12 @@ function mapCandidate(row: Record<string, unknown> | null): FaqCandidate | null 
 function mapQuestion(row: Record<string, unknown>): SubmittedQuestion {
   return {
     id: Number(row.id), body: String(row.body_original ?? row.body ?? ''),
-    bodyOriginal: String(row.body_original ?? row.body ?? ''), aiSummary: String(row.ai_summary ?? ''),
+    bodyOriginal: String(row.body_original ?? row.body ?? ''), originalText: String(row.body_original ?? row.body ?? ''),
+    originalLanguage: String(row.original_language ?? 'ja') as OriginalLanguage,
+    translatedTextJa: String(row.translated_text_ja ?? ''),
+    translationStatus: String(row.translation_status ?? 'not_needed') as TranslationStatus,
+    conversationMessages: parseConversationMessages(row.conversation_messages),
+    aiSummary: String(row.ai_summary ?? ''),
     summaryEdited: Boolean(Number(row.summary_edited ?? 0)), category: String(row.category ?? 'その他'),
     status: String(row.status ?? 'open'), createdAt: Number(row.created_at ?? 0),
     answerBody: row.answer_body == null ? null : String(row.answer_body),
@@ -1023,12 +1161,15 @@ function mapQuestion(row: Record<string, unknown>): SubmittedQuestion {
     aiConfidence: { urgency: Number(row.urgency_confidence ?? 0.5), grouping: Number(row.grouping_confidence ?? 1), vulnerablePeople: parseStringList(row.vulnerable_people == null ? null : String(row.vulnerable_people)).includes('不明') ? 0.42 : 0.76 },
     displayBody: String(row.display_body ?? row.body_original ?? row.body ?? ''),
     issueId: row.issue_id == null ? null : Number(row.issue_id),
+    structuredIncident: parseStructuredIncident(row.structured_incident),
+    originalMessageId: String(row.original_message_id ?? `question:${Number(row.id)}`),
+    staffOrganization: parseStaffOrganization(row.staff_organization),
   };
 }
 
-const QUESTION_SELECT = `SELECT q.id, q.body, q.body_original, q.ai_summary, q.summary_edited, q.category, q.status, q.created_at, q.answer_body, q.answer_draft, q.answer_alternatives, q.answer_used_ai, q.answer_grounds, q.answered_at, q.portal_id,
+const QUESTION_SELECT = `SELECT q.id, q.body, q.body_original, q.original_language, q.translated_text_ja, q.translation_status, q.conversation_messages, q.ai_summary, q.summary_edited, q.category, q.status, q.created_at, q.answer_body, q.answer_draft, q.answer_alternatives, q.answer_used_ai, q.answer_grounds, q.answered_at, q.portal_id,
   q.workflow_status, q.title, q.location, q.issue_location, q.reporter_location, q.people_count, q.resource_remaining, q.last_received_at, q.fact_summary, q.emotion_summary, q.missing_information, q.urgency_candidate, q.urgency_confirmed, q.urgent_review, q.faq_resolved, q.faq_id, q.similar_group_id, q.assignee_name, q.internal_note, q.first_confirmed_at, q.resolved_at,
-  q.request_text, q.affected_people, q.vulnerable_people, q.emotional_intensity, q.contains_abusive_language, q.urgency_confidence, q.grouping_confidence, q.display_body, q.issue_id,
+  q.request_text, q.affected_people, q.vulnerable_people, q.emotional_intensity, q.contains_abusive_language, q.urgency_confidence, q.grouping_confidence, q.display_body, q.issue_id, q.structured_incident, q.original_message_id, q.staff_organization,
   sg.title AS similar_group_title, (SELECT COUNT(*) FROM questions sq WHERE sq.similar_group_id = q.similar_group_id) AS similar_count,
   c.id AS candidate_id, c.question_id, c.q_text, c.a_text, c.category AS candidate_category, c.status AS candidate_status, c.created_at AS candidate_created_at
   FROM questions q LEFT JOIN similar_groups sg ON sg.id = q.similar_group_id LEFT JOIN faq_candidates c ON c.question_id = q.id AND c.status = 'pending'`;
@@ -1101,13 +1242,17 @@ export async function getQuestionByCheckToken(token: string): Promise<SubmittedQ
  * The check token is the same bearer secret used by the private status page, so
  * the resident can add a location or other missing field without logging in.
  */
-export async function updateQuestionFromPublicToken(token: string, body: string, intake: ShelterIntake, structuredIncident?: StructuredIncident): Promise<SubmittedQuestion | null> {
+export async function updateQuestionFromPublicToken(token: string, body: string, intake: ShelterIntake, structuredIncident?: StructuredIncident, conversationMessages: ConversationMessageInput[] = [], selectedLanguage = ''): Promise<SubmittedQuestion | null> {
   if (!/^[0-9a-f-]{32,80}$/i.test(token) || !body.trim() || body.trim().length > 500) return null;
   const current = await getQuestionByCheckToken(token);
   if (!current) return null;
   const db = await initialise();
   const baseAnalysis = generateShelterAnalysis(body, intake);
   const analysis = structuredIncident ? applyStructuredIncident(baseAnalysis, structuredIncident) : baseAnalysis;
+  // Keep follow-up safety/extraction on the original text; translation is only
+  // a separate staff-reading aid.
+  const staffTranslation = await translateForStaff(body, selectedLanguage);
+  const storedConversationMessages = await translateConversationMessages(conversationMessages);
   const faqs = await readPublishedFaqs(db, null);
   const related = searchFaqs(`${analysis.title} ${analysis.request} ${analysis.facts.join(' ')}`, faqs.filter((faq) => faq.category === analysis.category), 3);
   const context = {
@@ -1134,6 +1279,15 @@ export async function updateQuestionFromPublicToken(token: string, body: string,
     analysis.affectedPeople, JSON.stringify(analysis.vulnerablePeople), analysis.emotionalIntensity, analysis.containsAbusiveLanguage ? 1 : 0,
     analysis.urgencyConfidence, redactSensitiveInformation(body), draft, current.id,
   ).run();
+  await db.prepare('UPDATE questions SET original_language = ?, translated_text_ja = ?, translation_status = ? WHERE id = ?')
+    .bind(staffTranslation.originalLanguage, staffTranslation.translatedTextJa, staffTranslation.translationStatus, current.id).run();
+  if (structuredIncident) await db.prepare('UPDATE questions SET structured_incident = ? WHERE id = ?').bind(JSON.stringify(structuredIncident), current.id).run();
+  const originalMessageId = current.originalMessageId || `question:${current.id}`;
+  const staffOrganization = organizeStaffIncident({ body: body.trim(), originalLanguage: staffTranslation.originalLanguage, messageId: originalMessageId, createdAt: current.createdAt, intake, structuredIncident, analysis });
+  await db.prepare('UPDATE questions SET original_message_id = ?, staff_organization = ? WHERE id = ?').bind(originalMessageId, JSON.stringify(staffOrganization), current.id).run();
+  if (storedConversationMessages.length) {
+    await db.prepare('UPDATE questions SET conversation_messages = ? WHERE id = ?').bind(JSON.stringify(storedConversationMessages), current.id).run();
+  }
   if (current.issueId) {
     await db.prepare(`UPDATE issues SET title = ?, summary = ?, request = ?, category = ?, location = ?, issue_location = ?,
       affected_people = ?, vulnerable_people = ?, urgency_candidate = ?, updated_at = ?, version = version + 1 WHERE id = ? AND portal_id IS NULL`)
@@ -1165,17 +1319,18 @@ function mapIssue(row: Record<string, unknown>): Issue {
     responseMessage: String(row.response_message ?? ''), internalNote: String(row.internal_note ?? ''), estimatedResolutionTime: String(row.estimated_resolution_time ?? ''),
     resolvedAt: row.resolved_at == null ? null : Number(row.resolved_at), createdAt: Number(row.created_at ?? 0), updatedAt: Number(row.updated_at ?? 0),
     version: Number(row.version ?? 1), groupingConfidence: Number(row.grouping_confidence ?? 1), groupingMode: String(row.grouping_mode ?? 'single'),
-    facts: [], emotions: [], missingInformation: [], reports: [], representativeReportId: null, candidateId: null, candidateIssueId: null, candidateConfidence: null, candidateIssueTitle: '', candidateReason: '', updates: [],
+    facts: [], emotions: [], missingInformation: [], reports: [], representativeReportId: null, candidateId: null, candidateIssueId: null, candidateConfidence: null, candidateIssueTitle: '', candidateReason: '', updates: [], safetyGuardTriggered: false,
   };
 }
 
 async function hydrateIssue(db: D1Database, issue: Issue, includeReports = true): Promise<Issue> {
-  const reportRows = includeReports ? await db.prepare(`SELECT q.id, q.title, q.created_at, q.workflow_status, q.location, q.issue_location, q.reporter_location, q.urgency_candidate, q.urgency_confidence, q.display_body, q.body_original,
-      q.fact_summary, q.emotion_summary, q.missing_information FROM issue_reports ir JOIN questions q ON q.id = ir.question_id
+  const reportRows = includeReports ? await db.prepare(`SELECT q.id, q.title, q.created_at, q.workflow_status, q.location, q.issue_location, q.reporter_location, q.urgency_candidate, q.urgency_confidence, q.urgent_review, q.display_body, q.body_original,
+      q.original_language, q.translated_text_ja, q.translation_status, q.conversation_messages,
+      q.fact_summary, q.emotion_summary, q.missing_information, q.structured_incident, q.original_message_id, q.staff_organization FROM issue_reports ir JOIN questions q ON q.id = ir.question_id
       WHERE ir.issue_id = ? ORDER BY q.created_at ASC, q.id ASC LIMIT 200`).bind(issue.id).all<Record<string, unknown>>() : { results: [] };
   const reports = (reportRows.results ?? []).map((row) => ({
     id: Number(row.id), title: String(row.title ?? '相談'), createdAt: Number(row.created_at ?? 0), workflowStatus: String(row.workflow_status ?? 'received'),
-    location: String(row.location ?? ''), issueLocation: String(row.issue_location ?? (resolveShelterZoneId(String(row.location ?? '')) || row.location || '')), reporterLocation: String(row.reporter_location ?? ''), urgency: String(row.urgency_candidate ?? 'normal') as UrgencyLevel, displayBody: String(row.display_body ?? ''), originalBody: String(row.body_original ?? row.display_body ?? ''),
+    location: String(row.location ?? ''), issueLocation: String(row.issue_location ?? (resolveShelterZoneId(String(row.location ?? '')) || row.location || '')), reporterLocation: String(row.reporter_location ?? ''), urgency: String(row.urgency_candidate ?? 'normal') as UrgencyLevel, displayBody: String(row.display_body ?? ''), originalBody: String(row.body_original ?? row.display_body ?? ''), originalLanguage: String(row.original_language ?? 'ja') as OriginalLanguage, translatedTextJa: String(row.translated_text_ja ?? ''), translationStatus: String(row.translation_status ?? 'not_needed') as TranslationStatus, safetyGuardTriggered: Boolean(Number(row.urgent_review ?? 0)), conversationMessages: parseConversationMessages(row.conversation_messages), structuredIncident: parseStructuredIncident(row.structured_incident), originalMessageId: String(row.original_message_id ?? `question:${Number(row.id)}`), staffOrganization: parseStaffOrganization(row.staff_organization),
   }));
   const facts: string[] = []; const emotions: string[] = []; const missing: string[] = [];
   const urgencyConfidence = Math.max(issue.urgencyConfidence, ...(reportRows.results ?? []).map((row) => Number(row.urgency_confidence ?? 0)));
@@ -1215,6 +1370,7 @@ async function hydrateIssue(db: D1Database, issue: Issue, includeReports = true)
     candidateIssueTitle: String(candidate?.candidate_issue_title ?? ''),
     candidateReason: String(candidate?.reason ?? ''),
     updates: (updates.results ?? []).map((row) => ({ id: Number(row.id), status: String(row.status ?? 'issue'), message: String(row.message ?? ''), isPublic: Boolean(Number(row.is_public ?? 0)), createdAt: Number(row.created_at ?? 0) })),
+    safetyGuardTriggered: reports.some((report) => report.safetyGuardTriggered),
   };
 }
 

@@ -1,0 +1,949 @@
+{
+  "generatedAt": "2026-09-08T11:12:00.112Z",
+  "caseCount": 110,
+  "truePositive": 29,
+  "falsePositive": 0,
+  "falseNegative": 0,
+  "recall": 1,
+  "precision": 1,
+  "rows": [
+    {
+      "id": "water-1",
+      "input": "体育館の水がもうありません。4人分、すぐに飲み水が必要です。",
+      "expected": false,
+      "actual": false,
+      "flags": [],
+      "status": 200
+    },
+    {
+      "id": "water-2",
+      "input": "昨日から飲料水を受け取れていません。残りはほとんどありません。",
+      "expected": false,
+      "actual": false,
+      "flags": [],
+      "status": 200
+    },
+    {
+      "id": "water-3",
+      "input": "給水所はどこですか。水をもらいたいです。",
+      "expected": false,
+      "actual": false,
+      "flags": [],
+      "status": 200
+    },
+    {
+      "id": "water-4",
+      "input": "水が一滴もなく、赤ちゃんと2人で困っています。",
+      "expected": false,
+      "actual": false,
+      "flags": [],
+      "status": 200
+    },
+    {
+      "id": "water-5",
+      "input": "北側の水道が出ません。",
+      "expected": false,
+      "actual": false,
+      "flags": [],
+      "status": 200
+    },
+    {
+      "id": "water-6",
+      "input": "水の配布は何時からですか？",
+      "expected": false,
+      "actual": false,
+      "flags": [],
+      "status": 200
+    },
+    {
+      "id": "water-7",
+      "input": "水が足りないです。家族6人で待っています。",
+      "expected": false,
+      "actual": false,
+      "flags": [],
+      "status": 200
+    },
+    {
+      "id": "water-8",
+      "input": "子ども2人を含む5人ですが、飲み水がなくなりそうです。",
+      "expected": false,
+      "actual": false,
+      "flags": [],
+      "status": 200
+    },
+    {
+      "id": "water-9",
+      "input": "水のタンクが空です。至急補充をお願いします。",
+      "expected": false,
+      "actual": false,
+      "flags": [],
+      "status": 200
+    },
+    {
+      "id": "water-10",
+      "input": "水はどこでもらえますか。場所が分かりません。",
+      "expected": false,
+      "actual": false,
+      "flags": [],
+      "status": 200
+    },
+    {
+      "id": "toilet-1",
+      "input": "北トイレが詰まっていて使えません。",
+      "expected": false,
+      "actual": false,
+      "flags": [],
+      "status": 200
+    },
+    {
+      "id": "toilet-2",
+      "input": "南側のトイレがとても汚れていて使えません。",
+      "expected": false,
+      "actual": false,
+      "flags": [],
+      "status": 200
+    },
+    {
+      "id": "toilet-3",
+      "input": "トイレの水が流れません。",
+      "expected": false,
+      "actual": false,
+      "flags": [],
+      "status": 200
+    },
+    {
+      "id": "toilet-4",
+      "input": "車いすで使えるトイレはどこですか？",
+      "expected": false,
+      "actual": false,
+      "flags": [],
+      "status": 200
+    },
+    {
+      "id": "toilet-5",
+      "input": "夜中にトイレへ行ける照明がありません。",
+      "expected": false,
+      "actual": false,
+      "flags": [],
+      "status": 200
+    },
+    {
+      "id": "toilet-6",
+      "input": "トイレが全部混んでいて、急いでいます。",
+      "expected": false,
+      "actual": false,
+      "flags": [],
+      "status": 200
+    },
+    {
+      "id": "toilet-7",
+      "input": "受付横のトイレが壊れています。",
+      "expected": false,
+      "actual": false,
+      "flags": [],
+      "status": 200
+    },
+    {
+      "id": "toilet-8",
+      "input": "おむつを替えられる場所を教えてください。",
+      "expected": false,
+      "actual": false,
+      "flags": [],
+      "status": 200
+    },
+    {
+      "id": "toilet-9",
+      "input": "トイレの清掃をお願いしたいです。",
+      "expected": false,
+      "actual": false,
+      "flags": [],
+      "status": 200
+    },
+    {
+      "id": "toilet-10",
+      "input": "トイレの場所が分かりません。",
+      "expected": false,
+      "actual": false,
+      "flags": [],
+      "status": 200
+    },
+    {
+      "id": "supplies-1",
+      "input": "生後3か月の赤ちゃんのおむつがありません。",
+      "expected": false,
+      "actual": false,
+      "flags": [],
+      "status": 200
+    },
+    {
+      "id": "supplies-2",
+      "input": "ミルクが切れました。乳児が1人います。",
+      "expected": false,
+      "actual": false,
+      "flags": [],
+      "status": 200
+    },
+    {
+      "id": "supplies-3",
+      "input": "毛布が足りません。3人分ほしいです。",
+      "expected": false,
+      "actual": false,
+      "flags": [],
+      "status": 200
+    },
+    {
+      "id": "supplies-4",
+      "input": "食事は次にいつ配られますか？",
+      "expected": false,
+      "actual": false,
+      "flags": [],
+      "status": 200
+    },
+    {
+      "id": "supplies-5",
+      "input": "アレルギー対応の食事をお願いします。",
+      "expected": false,
+      "actual": false,
+      "flags": [],
+      "status": 200
+    },
+    {
+      "id": "supplies-6",
+      "input": "生理用品がなくて困っています。",
+      "expected": false,
+      "actual": false,
+      "flags": [],
+      "status": 200
+    },
+    {
+      "id": "supplies-7",
+      "input": "高齢の父の紙おむつがなくなりそうです。",
+      "expected": false,
+      "actual": false,
+      "flags": [],
+      "status": 200
+    },
+    {
+      "id": "supplies-8",
+      "input": "子どもの服が濡れてしまいました。着替えが必要です。",
+      "expected": false,
+      "actual": false,
+      "flags": [],
+      "status": 200
+    },
+    {
+      "id": "supplies-9",
+      "input": "食べ物がなく、昨日から何も食べていません。",
+      "expected": false,
+      "actual": false,
+      "flags": [],
+      "status": 200
+    },
+    {
+      "id": "supplies-10",
+      "input": "避難所の備蓄品の配布場所を知りたいです。",
+      "expected": false,
+      "actual": false,
+      "flags": [],
+      "status": 200
+    },
+    {
+      "id": "medical-1",
+      "input": "何回言っても誰も来ないんですけど！子供が39度あってぐったりしてるんです！",
+      "expected": true,
+      "actual": true,
+      "flags": [
+        "重大な体調変化"
+      ],
+      "status": 200
+    },
+    {
+      "id": "medical-2",
+      "input": "母が意識がぼんやりして、呼びかけても反応が弱いです。",
+      "expected": true,
+      "actual": true,
+      "flags": [
+        "意識・呼吸の異常"
+      ],
+      "status": 200
+    },
+    {
+      "id": "medical-3",
+      "input": "息が苦しくて会話が続きません。救護を呼んでください。",
+      "expected": true,
+      "actual": true,
+      "flags": [
+        "意識・呼吸の異常"
+      ],
+      "status": 200
+    },
+    {
+      "id": "medical-4",
+      "input": "持病の薬が今夜分でなくなります。",
+      "expected": true,
+      "actual": true,
+      "flags": [
+        "重大な体調変化"
+      ],
+      "status": 200
+    },
+    {
+      "id": "medical-5",
+      "input": "インスリンがなく、今日はまだ打てていません。",
+      "expected": true,
+      "actual": true,
+      "flags": [
+        "重大な体調変化"
+      ],
+      "status": 200
+    },
+    {
+      "id": "medical-6",
+      "input": "転んで足を痛めました。歩けません。",
+      "expected": true,
+      "actual": true,
+      "flags": [
+        "重大な体調変化"
+      ],
+      "status": 200
+    },
+    {
+      "id": "medical-7",
+      "input": "子どもが38度の熱です。救護で相談したいです。",
+      "expected": true,
+      "actual": true,
+      "flags": [
+        "重大な体調変化"
+      ],
+      "status": 200
+    },
+    {
+      "id": "medical-8",
+      "input": "高齢の方が胸が痛いと言っています。",
+      "expected": true,
+      "actual": true,
+      "flags": [
+        "強い胸痛"
+      ],
+      "status": 200
+    },
+    {
+      "id": "medical-9",
+      "input": "けがをして血が止まりません。",
+      "expected": true,
+      "actual": true,
+      "flags": [
+        "大量出血"
+      ],
+      "status": 200
+    },
+    {
+      "id": "medical-10",
+      "input": "薬をなくしてしまいました。どこに相談すればよいですか。",
+      "expected": false,
+      "actual": false,
+      "flags": [],
+      "status": 200
+    },
+    {
+      "id": "safety-1",
+      "input": "調理室から煙が出て、火が見えます。",
+      "expected": true,
+      "actual": true,
+      "flags": [
+        "火災・煙"
+      ],
+      "status": 200
+    },
+    {
+      "id": "safety-2",
+      "input": "西側のコンセントから焦げたにおいと煙が出ています。",
+      "expected": true,
+      "actual": true,
+      "flags": [
+        "火災・煙"
+      ],
+      "status": 200
+    },
+    {
+      "id": "safety-3",
+      "input": "隣の人が怒鳴りながら椅子を振り回しています。怖いです。",
+      "expected": true,
+      "actual": true,
+      "flags": [
+        "暴力・武器"
+      ],
+      "status": 200
+    },
+    {
+      "id": "safety-4",
+      "input": "入口で人が殴り合いになっています。",
+      "expected": true,
+      "actual": true,
+      "flags": [
+        "暴力・武器"
+      ],
+      "status": 200
+    },
+    {
+      "id": "safety-5",
+      "input": "包丁を持った人が殺すと言いながら歩いています。",
+      "expected": true,
+      "actual": true,
+      "flags": [
+        "自傷・他害"
+      ],
+      "status": 200
+    },
+    {
+      "id": "safety-6",
+      "input": "誰かが閉じ込められていて、外から返事がありません。",
+      "expected": true,
+      "actual": true,
+      "flags": [
+        "建物・閉じ込め"
+      ],
+      "status": 200
+    },
+    {
+      "id": "safety-7",
+      "input": "建物の壁が崩れて、近づくと危険です。",
+      "expected": true,
+      "actual": true,
+      "flags": [
+        "建物・閉じ込め"
+      ],
+      "status": 200
+    },
+    {
+      "id": "safety-8",
+      "input": "煙たいですが、火は見えていません。確認をお願いします。",
+      "expected": true,
+      "actual": true,
+      "flags": [
+        "火災・煙"
+      ],
+      "status": 200
+    },
+    {
+      "id": "safety-9",
+      "input": "怖い人がいる気がします。見回りをお願いできますか。",
+      "expected": true,
+      "actual": true,
+      "flags": [
+        "暴力・武器"
+      ],
+      "status": 200
+    },
+    {
+      "id": "safety-10",
+      "input": "夜に大声で騒いでいる人がいて眠れません。",
+      "expected": false,
+      "actual": false,
+      "flags": [],
+      "status": 200
+    },
+    {
+      "id": "ordinary-1",
+      "input": "充電できる場所を教えてください。",
+      "expected": false,
+      "actual": false,
+      "flags": [],
+      "status": 200
+    },
+    {
+      "id": "ordinary-2",
+      "input": "携帯電話がつながりません。",
+      "expected": false,
+      "actual": false,
+      "flags": [],
+      "status": 200
+    },
+    {
+      "id": "ordinary-3",
+      "input": "夜、体育館が寒くて眠れません。",
+      "expected": false,
+      "actual": false,
+      "flags": [],
+      "status": 200
+    },
+    {
+      "id": "ordinary-4",
+      "input": "ペットの犬をどこに置けばいいですか。",
+      "expected": false,
+      "actual": false,
+      "flags": [],
+      "status": 200
+    },
+    {
+      "id": "ordinary-5",
+      "input": "車いすで通れる入口が分かりません。",
+      "expected": false,
+      "actual": false,
+      "flags": [],
+      "status": 200
+    },
+    {
+      "id": "ordinary-6",
+      "input": "避難所の受付時間を知りたいです。",
+      "expected": false,
+      "actual": false,
+      "flags": [],
+      "status": 200
+    },
+    {
+      "id": "ordinary-7",
+      "input": "洗濯できる場所はありますか。",
+      "expected": false,
+      "actual": false,
+      "flags": [],
+      "status": 200
+    },
+    {
+      "id": "ordinary-8",
+      "input": "お風呂に入れる時間を教えてください。",
+      "expected": false,
+      "actual": false,
+      "flags": [],
+      "status": 200
+    },
+    {
+      "id": "ordinary-9",
+      "input": "家族とはぐれました。伝言を残したいです。",
+      "expected": false,
+      "actual": false,
+      "flags": [],
+      "status": 200
+    },
+    {
+      "id": "ordinary-10",
+      "input": "避難所のルールを確認したいです。",
+      "expected": false,
+      "actual": false,
+      "flags": [],
+      "status": 200
+    },
+    {
+      "id": "hard-1",
+      "input": "何回言えば水をもらえるんですか！ずっと待たされて腹が立ちます。",
+      "expected": false,
+      "actual": false,
+      "flags": [],
+      "status": 200
+    },
+    {
+      "id": "hard-2",
+      "input": "もう最悪です、子どもを何時間も待たせています。ごはんはまだですか。",
+      "expected": false,
+      "actual": false,
+      "flags": [],
+      "status": 200
+    },
+    {
+      "id": "hard-3",
+      "input": "「死ぬほど腹減った」と言っていますが、今すぐの危険ではありません。食事をお願いします。",
+      "expected": false,
+      "actual": false,
+      "flags": [],
+      "status": 200
+    },
+    {
+      "id": "hard-4",
+      "input": "殺されそうなくらい暑いです。空調か涼しい場所を教えてください。",
+      "expected": false,
+      "actual": false,
+      "flags": [],
+      "status": 200
+    },
+    {
+      "id": "hard-5",
+      "input": "何度頼んでも毛布が来ない。寒くて限界です。",
+      "expected": false,
+      "actual": false,
+      "flags": [],
+      "status": 200
+    },
+    {
+      "id": "hard-6",
+      "input": "水がないんだけど！！子どももいるのにいつまで待たせるの！",
+      "expected": false,
+      "actual": false,
+      "flags": [],
+      "status": 200
+    },
+    {
+      "id": "hard-7",
+      "input": "誰も聞いてくれない、もうどうでもいいです。薬もありません。",
+      "expected": true,
+      "actual": true,
+      "flags": [
+        "重大な体調変化"
+      ],
+      "status": 200
+    },
+    {
+      "id": "hard-8",
+      "input": "怒ってはいませんが、食料の配布が遅れている理由を知りたいです。",
+      "expected": false,
+      "actual": false,
+      "flags": [],
+      "status": 200
+    },
+    {
+      "id": "hard-9",
+      "input": "ここはどこですか、何をすればいいか分かりません。",
+      "expected": false,
+      "actual": false,
+      "flags": [],
+      "status": 200
+    },
+    {
+      "id": "hard-10",
+      "input": "もう何も言いたくないくらい疲れました。水だけお願いできますか。",
+      "expected": false,
+      "actual": false,
+      "flags": [],
+      "status": 200
+    },
+    {
+      "id": "dialect-asr-1",
+      "input": "みずがないっちゃけど、給水どこね？",
+      "expected": false,
+      "actual": false,
+      "flags": [],
+      "status": 200
+    },
+    {
+      "id": "dialect-asr-2",
+      "input": "トイレがつまっとるで使えん。",
+      "expected": false,
+      "actual": false,
+      "flags": [],
+      "status": 200
+    },
+    {
+      "id": "dialect-asr-3",
+      "input": "こどもがさんじゅうきゅうどでぐったりしとる。",
+      "expected": true,
+      "actual": true,
+      "flags": [
+        "重大な体調変化"
+      ],
+      "status": 200
+    },
+    {
+      "id": "dialect-asr-4",
+      "input": "みるくがないです、あかちゃんひとり。",
+      "expected": false,
+      "actual": false,
+      "flags": [],
+      "status": 200
+    },
+    {
+      "id": "dialect-asr-5",
+      "input": "けむりがでとる、かじかもしれん。",
+      "expected": true,
+      "actual": true,
+      "flags": [
+        "火災・煙"
+      ],
+      "status": 200
+    },
+    {
+      "id": "dialect-asr-6",
+      "input": "いまいるとこ、北側の水場。水、あとちょっと。",
+      "expected": false,
+      "actual": false,
+      "flags": [],
+      "status": 200
+    },
+    {
+      "id": "dialect-asr-7",
+      "input": "息がしんどくて、しゃべれん。",
+      "expected": true,
+      "actual": true,
+      "flags": [
+        "意識・呼吸の異常"
+      ],
+      "status": 200
+    },
+    {
+      "id": "dialect-asr-8",
+      "input": "おやじが寝とるみたいで、なにしても起きん。",
+      "expected": true,
+      "actual": true,
+      "flags": [
+        "重大な体調変化"
+      ],
+      "status": 200
+    },
+    {
+      "id": "dialect-asr-9",
+      "input": "おむつ、もうないんよ。",
+      "expected": false,
+      "actual": false,
+      "flags": [],
+      "status": 200
+    },
+    {
+      "id": "dialect-asr-10",
+      "input": "電波がわるくて連絡つかん。",
+      "expected": false,
+      "actual": false,
+      "flags": [],
+      "status": 200
+    },
+    {
+      "id": "insufficient-1",
+      "input": "困っています。",
+      "expected": false,
+      "actual": false,
+      "flags": [],
+      "status": 200
+    },
+    {
+      "id": "insufficient-2",
+      "input": "助けてください。",
+      "expected": false,
+      "actual": false,
+      "flags": [],
+      "status": 200
+    },
+    {
+      "id": "insufficient-3",
+      "input": "どうしたらいいですか。",
+      "expected": false,
+      "actual": false,
+      "flags": [],
+      "status": 200
+    },
+    {
+      "id": "insufficient-4",
+      "input": "相談があります。",
+      "expected": false,
+      "actual": false,
+      "flags": [],
+      "status": 200
+    },
+    {
+      "id": "insufficient-5",
+      "input": "物が足りません。",
+      "expected": false,
+      "actual": false,
+      "flags": [],
+      "status": 200
+    },
+    {
+      "id": "insufficient-6",
+      "input": "具合が悪いです。",
+      "expected": true,
+      "actual": true,
+      "flags": [
+        "重大な体調変化"
+      ],
+      "status": 200
+    },
+    {
+      "id": "insufficient-7",
+      "input": "危ないです。",
+      "expected": true,
+      "actual": true,
+      "flags": [
+        "暴力・武器"
+      ],
+      "status": 200
+    },
+    {
+      "id": "insufficient-8",
+      "input": "今すぐ来てください。",
+      "expected": false,
+      "actual": false,
+      "flags": [],
+      "status": 200
+    },
+    {
+      "id": "insufficient-9",
+      "input": "ここにいます。",
+      "expected": false,
+      "actual": false,
+      "flags": [],
+      "status": 200
+    },
+    {
+      "id": "insufficient-10",
+      "input": "分かりません。",
+      "expected": false,
+      "actual": false,
+      "flags": [],
+      "status": 200
+    },
+    {
+      "id": "composite-1",
+      "input": "体育館東側で水が足りず、子ども3人と大人2人で困っています。",
+      "expected": false,
+      "actual": false,
+      "flags": [],
+      "status": 200
+    },
+    {
+      "id": "composite-2",
+      "input": "北トイレが使えず、車いすの人が困っています。",
+      "expected": false,
+      "actual": false,
+      "flags": [],
+      "status": 200
+    },
+    {
+      "id": "composite-3",
+      "input": "救護スペースで、2歳の子が40度あり呼びかけに反応しません。",
+      "expected": true,
+      "actual": true,
+      "flags": [
+        "重大な体調変化"
+      ],
+      "status": 200
+    },
+    {
+      "id": "composite-4",
+      "input": "調理室の煙と、南側の水不足を同時に伝えます。まず煙を確認してください。",
+      "expected": true,
+      "actual": true,
+      "flags": [
+        "火災・煙"
+      ],
+      "status": 200
+    },
+    {
+      "id": "composite-5",
+      "input": "家族4人、薬を取りに行けず、父の薬が今夜で切れます。",
+      "expected": true,
+      "actual": true,
+      "flags": [
+        "重大な体調変化"
+      ],
+      "status": 200
+    },
+    {
+      "id": "composite-6",
+      "input": "A区画の乳児2人にミルクがありません。",
+      "expected": false,
+      "actual": false,
+      "flags": [],
+      "status": 200
+    },
+    {
+      "id": "composite-7",
+      "input": "入口付近で口論が激しくなり、物を投げています。",
+      "expected": true,
+      "actual": true,
+      "flags": [
+        "暴力・武器"
+      ],
+      "status": 200
+    },
+    {
+      "id": "composite-8",
+      "input": "体育館で食事の配布を待っていますが、昨日の夜から何も食べていません。",
+      "expected": false,
+      "actual": false,
+      "flags": [],
+      "status": 200
+    },
+    {
+      "id": "composite-9",
+      "input": "西側の通路が暗く、転びそうです。照明をつけてください。",
+      "expected": false,
+      "actual": false,
+      "flags": [],
+      "status": 200
+    },
+    {
+      "id": "composite-10",
+      "input": "避難所の場所も人数も分からず、何を頼めばよいか分かりません。",
+      "expected": false,
+      "actual": false,
+      "flags": [],
+      "status": 200
+    },
+    {
+      "id": "accessibility-1",
+      "input": "耳が聞こえにくいので、掲示で水の配布を知らせてください。",
+      "expected": false,
+      "actual": false,
+      "flags": [],
+      "status": 200
+    },
+    {
+      "id": "accessibility-2",
+      "input": "日本語があまり分かりません。食事の案内を絵で見せてください。",
+      "expected": false,
+      "actual": false,
+      "flags": [],
+      "status": 200
+    },
+    {
+      "id": "accessibility-3",
+      "input": "小さい字が読めません。大きな文字でトイレの場所を教えてください。",
+      "expected": false,
+      "actual": false,
+      "flags": [],
+      "status": 200
+    },
+    {
+      "id": "accessibility-4",
+      "input": "歩くのが難しいので、近い給水場所を教えてください。",
+      "expected": false,
+      "actual": false,
+      "flags": [],
+      "status": 200
+    },
+    {
+      "id": "accessibility-5",
+      "input": "子どもが怖がっています。静かな場所へ移れますか。",
+      "expected": false,
+      "actual": false,
+      "flags": [],
+      "status": 200
+    },
+    {
+      "id": "accessibility-6",
+      "input": "夜間に見えにくいので、通路の明かりを増やしてください。",
+      "expected": false,
+      "actual": false,
+      "flags": [],
+      "status": 200
+    },
+    {
+      "id": "accessibility-7",
+      "input": "筆談で相談したいです。受付はどこですか。",
+      "expected": false,
+      "actual": false,
+      "flags": [],
+      "status": 200
+    },
+    {
+      "id": "accessibility-8",
+      "input": "ベビーカーで通れる入口を知りたいです。",
+      "expected": false,
+      "actual": false,
+      "flags": [],
+      "status": 200
+    },
+    {
+      "id": "accessibility-9",
+      "input": "階段を使えません。救護スペースまで案内してください。",
+      "expected": false,
+      "actual": false,
+      "flags": [],
+      "status": 200
+    },
+    {
+      "id": "accessibility-10",
+      "input": "外国語の通訳をお願いできますか。",
+      "expected": false,
+      "actual": false,
+      "flags": [],
+      "status": 200
+    }
+  ]
+}

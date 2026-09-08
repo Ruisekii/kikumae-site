@@ -5,6 +5,7 @@ import Link from 'next/link';
 import type { FaqCandidate, SubmittedQuestion } from '../../db/repository';
 import { FaqManagement } from './faq-management';
 import { AuditLogList } from './audit-log-list';
+import { StaffTranslationDisplay } from './staff-translation-display';
 
 type Props = { params: Promise<{ slug: string }> };
 const dateLabel = (value: number | null) => value ? new Intl.DateTimeFormat('ja-JP', { timeZone: 'Asia/Tokyo', dateStyle: 'medium', timeStyle: 'short' }).format(new Date(value)) : '';
@@ -96,6 +97,7 @@ function PortalQuestionDetail({ question, draft, answerText, setAnswerText, busy
   const candidate = question.candidate;
   return <article className="detail-card">
     <div className="detail-header"><span className="tag">{question.category}</span><span className="status-pill">{question.status === 'open' ? '未回答' : '回答済み'}</span></div>
+    {(question.translationStatus !== 'not_needed' || question.conversationMessages.length > 0) && <StaffTranslationDisplay source={{ originalText: question.originalText || question.bodyOriginal, originalLanguage: question.originalLanguage, translatedTextJa: question.translatedTextJa, translationStatus: question.translationStatus, conversationMessages: question.conversationMessages }} />}
     <section className="summary-block"><h2>AIによる要約</h2><p>{question.aiSummary || '要約なし'}</p></section>
     <section className="original-block"><h2>質問の原文</h2><p>{question.bodyOriginal}</p></section>
     {question.status === 'open' && <section className="answer-editor"><h2>AI回答案（人の承認が必要）</h2>{!draft ? <><p className="input-hint">この窓口の承認済みFAQだけを根拠に、外部送信なしで下書きを作成します。</p><button className="button primary" type="button" disabled={busy} onClick={onGenerateDraft}>✨ 回答案を表示</button></> : <>

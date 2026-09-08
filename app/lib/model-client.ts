@@ -1,5 +1,6 @@
 import type { IncidentState } from './voice-conversation';
 import type { ShelterIntake } from '../../db/local-ai';
+import type { ConversationLanguage } from './conversation-language';
 
 export type VoiceModelMode = 'conversation' | 'extract';
 export type VoiceRuntimeMode = 'local-llm' | 'local-rules' | 'auto';
@@ -9,6 +10,8 @@ export type VoiceModelRequest = {
   text: string;
   state: IncidentState;
   intake: ShelterIntake;
+  /** The resident-facing conversation language, separate from staff translation. */
+  selectedLanguage: ConversationLanguage;
   runtimeMode?: VoiceRuntimeMode;
 };
 

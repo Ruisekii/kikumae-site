@@ -4,6 +4,32 @@ export const INCIDENT_SCHEMA_VERSION = '1.0';
 
 export type CanonicalIncidentUrgency = 'unknown' | 'low' | 'normal' | 'medium' | 'high' | 'critical';
 
+export type IncidentSource = 'user_selection' | 'user_text' | 'safety_rule' | 'llm_extraction' | 'staff_edit';
+
+export type IncidentFieldProvenance = {
+  value: unknown;
+  source: IncidentSource;
+  confirmed: boolean;
+  messageId: string | null;
+  evidence?: string | null;
+};
+
+export type IncidentProvenance = {
+  location?: IncidentFieldProvenance;
+  target?: IncidentFieldProvenance;
+  request?: IncidentFieldProvenance;
+  facts?: IncidentFieldProvenance[];
+  urgency?: IncidentFieldProvenance;
+  safetyFlags?: IncidentFieldProvenance;
+  needType?: IncidentFieldProvenance;
+  symptomCategory?: IncidentFieldProvenance;
+  affectedCount?: IncidentFieldProvenance;
+  quantity?: IncidentFieldProvenance;
+  time?: IncidentFieldProvenance;
+};
+
+export type FourBStatus = 'not_needed' | 'pending' | 'completed' | 'failed';
+
 export type CanonicalIncidentTarget = {
   type: string | null;
   count: number | null;
@@ -27,6 +53,10 @@ export type CanonicalIncidentState = {
   originalText: string[];
   confidence: number | null;
   category: ShelterCategory | null;
+  provenance?: IncidentProvenance;
+  structuredComplete?: boolean;
+  fourBRequested?: boolean;
+  fourBStatus?: FourBStatus;
 };
 
 export const incidentStateJsonSchema = {
@@ -139,5 +169,9 @@ export function normalizeIncidentCandidate(value: unknown, fallback: CanonicalIn
     originalText: fallback.originalText,
     confidence: source.confidence === null ? null : confidenceOrNull(source.confidence) ?? fallback.confidence,
     category,
+    provenance: fallback.provenance,
+    structuredComplete: fallback.structuredComplete,
+    fourBRequested: fallback.fourBRequested,
+    fourBStatus: fallback.fourBStatus,
   };
 }

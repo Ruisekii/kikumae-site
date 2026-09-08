@@ -1,0 +1,42 @@
+{
+  "generatedAt": "2026-09-08T07:43:50.344Z",
+  "ollamaUrl": "http://127.0.0.1:11434",
+  "models": [
+    {
+      "name": "qwen3.5:2b",
+      "sizeBytes": 2741192820,
+      "quantization": "Q8_0",
+      "parameterSize": "2.3B"
+    },
+    {
+      "name": "qwen3.5:4b",
+      "sizeBytes": 3389983735,
+      "quantization": "Q4_K_M",
+      "parameterSize": "4.7B"
+    },
+    {
+      "name": "qwen2.5:3b-instruct",
+      "sizeBytes": 1929912432,
+      "quantization": "Q4_K_M",
+      "parameterSize": "3.1B"
+    },
+    {
+      "name": "qwen2.5:1.5b-instruct",
+      "sizeBytes": 986061892,
+      "quantization": "Q4_K_M",
+      "parameterSize": "1.5B"
+    }
+  ],
+  "loaded": [
+    {
+      "name": "qwen3.5:2b",
+      "sizeVramBytes": 0,
+      "sizeBytes": 2361424607
+    }
+  ],
+  "qwen9b": {
+    "installed": false,
+    "status": 404
+  },
+  "interpretation": "CPU/RAM/GPUのOS監査はdocs/phase2a5-hardware-audit.mdを正本とし、ここではOllama APIから取得できるモデル・ロード状態を追加記録する。"
+}

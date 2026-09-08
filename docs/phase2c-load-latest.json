@@ -1,0 +1,1542 @@
+{
+  "generatedAt": "2026-09-08T11:29:50.743Z",
+  "baseUrl": "http://localhost:3000",
+  "levels": [
+    1,
+    3,
+    5,
+    10
+  ],
+  "modelConfig": {
+    "conversation": "server-configured",
+    "extraction": "server-configured"
+  },
+  "runs": [
+    {
+      "level": 1,
+      "before": {
+        "cpuPercent": null,
+        "memoryUsedPercent": null,
+        "memoryAvailableGiB": null,
+        "gpu": "unknown",
+        "vramGiB": null
+      },
+      "afterConversation": {
+        "cpuPercent": null,
+        "memoryUsedPercent": null,
+        "memoryAvailableGiB": null,
+        "gpu": "unknown",
+        "vramGiB": null
+      },
+      "after": {
+        "cpuPercent": null,
+        "memoryUsedPercent": null,
+        "memoryAvailableGiB": null,
+        "gpu": "unknown",
+        "vramGiB": null
+      },
+      "conversation": {
+        "count": 1,
+        "httpSuccess": 1,
+        "timeout": 0,
+        "fallback": 0,
+        "elapsedMs": {
+          "p50": 5361,
+          "p95": 5361,
+          "max": 5361
+        },
+        "serverTotalMs": {
+          "p50": 5240,
+          "p95": 5240,
+          "max": 5240
+        },
+        "clientOverheadProxyMs": {
+          "p50": 121,
+          "p95": 121,
+          "max": 121
+        },
+        "queueMeasurement": "not exposed by Ollama OpenAI-compatible API; client overhead is reported separately"
+      },
+      "extraction": {
+        "count": 1,
+        "httpSuccess": 1,
+        "timeout": 0,
+        "fallback": 0,
+        "elapsedMs": {
+          "p50": 48974,
+          "p95": 48974,
+          "max": 48974
+        },
+        "serverTotalMs": {
+          "p50": 48839,
+          "p95": 48839,
+          "max": 48839
+        },
+        "clientOverheadProxyMs": {
+          "p50": 135,
+          "p95": 135,
+          "max": 135
+        },
+        "queueMeasurement": "not exposed by Ollama OpenAI-compatible API; client overhead is reported separately"
+      },
+      "rows": {
+        "conversation": [
+          {
+            "status": 200,
+            "elapsedMs": 5361,
+            "fallback": false,
+            "timeout": false,
+            "telemetry": {
+              "stage": "conversation",
+              "model": "qwen3.5:2b",
+              "promptVariant": "full",
+              "safetyGuardMs": 0,
+              "preprocessingMs": 0,
+              "modelTimings": {
+                "requestBuildMs": 0,
+                "httpHeadersMs": 4081,
+                "firstTokenMs": 4082,
+                "promptUntilFirstTokenMs": 1,
+                "generationMs": 1158,
+                "bodyReadMs": 1159,
+                "jsonParseMs": 0,
+                "totalMs": 5240,
+                "stream": true,
+                "promptEvalMs": null,
+                "generationEvalMs": null,
+                "serverTotalMs": null,
+                "modelLoadMs": null,
+                "queueMs": null,
+                "promptTokens": null,
+                "completionTokens": null
+              },
+              "totalMs": 5240,
+              "fallback": false
+            },
+            "clientOverheadMs": 121
+          }
+        ],
+        "extraction": [
+          {
+            "status": 200,
+            "elapsedMs": 48974,
+            "fallback": false,
+            "timeout": false,
+            "telemetry": {
+              "stage": "extract",
+              "model": "qwen3.5:4b",
+              "promptVariant": "full",
+              "safetyGuardMs": 0,
+              "preprocessingMs": 0,
+              "modelTimings": {
+                "requestBuildMs": 0,
+                "httpHeadersMs": 33367,
+                "firstTokenMs": 33370,
+                "promptUntilFirstTokenMs": 3,
+                "generationMs": 15455,
+                "bodyReadMs": 15458,
+                "jsonParseMs": 0,
+                "totalMs": 48825,
+                "stream": true,
+                "promptEvalMs": null,
+                "generationEvalMs": null,
+                "serverTotalMs": null,
+                "modelLoadMs": null,
+                "queueMs": null,
+                "promptTokens": null,
+                "completionTokens": null
+              },
+              "normalizationMs": 13,
+              "totalMs": 48839,
+              "fallback": false
+            },
+            "clientOverheadMs": 135
+          }
+        ]
+      }
+    },
+    {
+      "level": 3,
+      "before": {
+        "cpuPercent": null,
+        "memoryUsedPercent": null,
+        "memoryAvailableGiB": null,
+        "gpu": "unknown",
+        "vramGiB": null
+      },
+      "afterConversation": {
+        "cpuPercent": null,
+        "memoryUsedPercent": null,
+        "memoryAvailableGiB": null,
+        "gpu": "unknown",
+        "vramGiB": null
+      },
+      "after": {
+        "cpuPercent": null,
+        "memoryUsedPercent": null,
+        "memoryAvailableGiB": null,
+        "gpu": "unknown",
+        "vramGiB": null
+      },
+      "conversation": {
+        "count": 3,
+        "httpSuccess": 3,
+        "timeout": 0,
+        "fallback": 0,
+        "elapsedMs": {
+          "p50": 2780,
+          "p95": 4059,
+          "max": 4059
+        },
+        "serverTotalMs": {
+          "p50": 2599,
+          "p95": 3869,
+          "max": 3869
+        },
+        "clientOverheadProxyMs": {
+          "p50": 181,
+          "p95": 190,
+          "max": 190
+        },
+        "queueMeasurement": "not exposed by Ollama OpenAI-compatible API; client overhead is reported separately"
+      },
+      "extraction": {
+        "count": 3,
+        "httpSuccess": 3,
+        "timeout": 0,
+        "fallback": 0,
+        "elapsedMs": {
+          "p50": 31045,
+          "p95": 47604,
+          "max": 47604
+        },
+        "serverTotalMs": {
+          "p50": 30889,
+          "p95": 47155,
+          "max": 47155
+        },
+        "clientOverheadProxyMs": {
+          "p50": 157,
+          "p95": 449,
+          "max": 449
+        },
+        "queueMeasurement": "not exposed by Ollama OpenAI-compatible API; client overhead is reported separately"
+      },
+      "rows": {
+        "conversation": [
+          {
+            "status": 200,
+            "elapsedMs": 1511,
+            "fallback": false,
+            "timeout": false,
+            "telemetry": {
+              "stage": "conversation",
+              "model": "qwen3.5:2b",
+              "promptVariant": "full",
+              "safetyGuardMs": 0,
+              "preprocessingMs": 0,
+              "modelTimings": {
+                "requestBuildMs": 0,
+                "httpHeadersMs": 121,
+                "firstTokenMs": 124,
+                "promptUntilFirstTokenMs": 3,
+                "generationMs": 1245,
+                "bodyReadMs": 1248,
+                "jsonParseMs": 0,
+                "totalMs": 1369,
+                "stream": true,
+                "promptEvalMs": null,
+                "generationEvalMs": null,
+                "serverTotalMs": null,
+                "modelLoadMs": null,
+                "queueMs": null,
+                "promptTokens": null,
+                "completionTokens": null
+              },
+              "totalMs": 1370,
+              "fallback": false
+            },
+            "clientOverheadMs": 141
+          },
+          {
+            "status": 200,
+            "elapsedMs": 2780,
+            "fallback": false,
+            "timeout": false,
+            "telemetry": {
+              "stage": "conversation",
+              "model": "qwen3.5:2b",
+              "promptVariant": "full",
+              "safetyGuardMs": 0,
+              "preprocessingMs": 0,
+              "modelTimings": {
+                "requestBuildMs": 0,
+                "httpHeadersMs": 1425,
+                "firstTokenMs": 1426,
+                "promptUntilFirstTokenMs": 1,
+                "generationMs": 1173,
+                "bodyReadMs": 1174,
+                "jsonParseMs": 0,
+                "totalMs": 2599,
+                "stream": true,
+                "promptEvalMs": null,
+                "generationEvalMs": null,
+                "serverTotalMs": null,
+                "modelLoadMs": null,
+                "queueMs": null,
+                "promptTokens": null,
+                "completionTokens": null
+              },
+              "totalMs": 2599,
+              "fallback": false
+            },
+            "clientOverheadMs": 181
+          },
+          {
+            "status": 200,
+            "elapsedMs": 4059,
+            "fallback": false,
+            "timeout": false,
+            "telemetry": {
+              "stage": "conversation",
+              "model": "qwen3.5:2b",
+              "promptVariant": "full",
+              "safetyGuardMs": 0,
+              "preprocessingMs": 0,
+              "modelTimings": {
+                "requestBuildMs": 0,
+                "httpHeadersMs": 2690,
+                "firstTokenMs": 2692,
+                "promptUntilFirstTokenMs": 2,
+                "generationMs": 1177,
+                "bodyReadMs": 1179,
+                "jsonParseMs": 0,
+                "totalMs": 3869,
+                "stream": true,
+                "promptEvalMs": null,
+                "generationEvalMs": null,
+                "serverTotalMs": null,
+                "modelLoadMs": null,
+                "queueMs": null,
+                "promptTokens": null,
+                "completionTokens": null
+              },
+              "totalMs": 3869,
+              "fallback": false
+            },
+            "clientOverheadMs": 190
+          }
+        ],
+        "extraction": [
+          {
+            "status": 200,
+            "elapsedMs": 16536,
+            "fallback": false,
+            "timeout": false,
+            "telemetry": {
+              "stage": "extract",
+              "model": "qwen3.5:4b",
+              "promptVariant": "full",
+              "safetyGuardMs": 0,
+              "preprocessingMs": 0,
+              "modelTimings": {
+                "requestBuildMs": 0,
+                "httpHeadersMs": 203,
+                "firstTokenMs": 204,
+                "promptUntilFirstTokenMs": 1,
+                "generationMs": 16172,
+                "bodyReadMs": 16173,
+                "jsonParseMs": 0,
+                "totalMs": 16376,
+                "stream": true,
+                "promptEvalMs": null,
+                "generationEvalMs": null,
+                "serverTotalMs": null,
+                "modelLoadMs": null,
+                "queueMs": null,
+                "promptTokens": null,
+                "completionTokens": null
+              },
+              "normalizationMs": 3,
+              "totalMs": 16379,
+              "fallback": false
+            },
+            "clientOverheadMs": 157
+          },
+          {
+            "status": 200,
+            "elapsedMs": 47604,
+            "fallback": false,
+            "timeout": false,
+            "telemetry": {
+              "stage": "extract",
+              "model": "qwen3.5:4b",
+              "promptVariant": "full",
+              "safetyGuardMs": 0,
+              "preprocessingMs": 0,
+              "modelTimings": {
+                "requestBuildMs": 1,
+                "httpHeadersMs": 31092,
+                "firstTokenMs": 31094,
+                "promptUntilFirstTokenMs": 2,
+                "generationMs": 16060,
+                "bodyReadMs": 16062,
+                "jsonParseMs": 0,
+                "totalMs": 47155,
+                "stream": true,
+                "promptEvalMs": null,
+                "generationEvalMs": null,
+                "serverTotalMs": null,
+                "modelLoadMs": null,
+                "queueMs": null,
+                "promptTokens": null,
+                "completionTokens": null
+              },
+              "normalizationMs": 0,
+              "totalMs": 47155,
+              "fallback": false
+            },
+            "clientOverheadMs": 449
+          },
+          {
+            "status": 200,
+            "elapsedMs": 31045,
+            "fallback": false,
+            "timeout": false,
+            "telemetry": {
+              "stage": "extract",
+              "model": "qwen3.5:4b",
+              "promptVariant": "full",
+              "safetyGuardMs": 0,
+              "preprocessingMs": 0,
+              "modelTimings": {
+                "requestBuildMs": 0,
+                "httpHeadersMs": 16587,
+                "firstTokenMs": 16589,
+                "promptUntilFirstTokenMs": 2,
+                "generationMs": 14299,
+                "bodyReadMs": 14301,
+                "jsonParseMs": 0,
+                "totalMs": 30888,
+                "stream": true,
+                "promptEvalMs": null,
+                "generationEvalMs": null,
+                "serverTotalMs": null,
+                "modelLoadMs": null,
+                "queueMs": null,
+                "promptTokens": null,
+                "completionTokens": null
+              },
+              "normalizationMs": 1,
+              "totalMs": 30889,
+              "fallback": false
+            },
+            "clientOverheadMs": 156
+          }
+        ]
+      }
+    },
+    {
+      "level": 5,
+      "before": {
+        "cpuPercent": null,
+        "memoryUsedPercent": null,
+        "memoryAvailableGiB": null,
+        "gpu": "unknown",
+        "vramGiB": null
+      },
+      "afterConversation": {
+        "cpuPercent": null,
+        "memoryUsedPercent": null,
+        "memoryAvailableGiB": null,
+        "gpu": "unknown",
+        "vramGiB": null
+      },
+      "after": {
+        "cpuPercent": null,
+        "memoryUsedPercent": null,
+        "memoryAvailableGiB": null,
+        "gpu": "unknown",
+        "vramGiB": null
+      },
+      "conversation": {
+        "count": 5,
+        "httpSuccess": 5,
+        "timeout": 0,
+        "fallback": 0,
+        "elapsedMs": {
+          "p50": 4547,
+          "p95": 7248,
+          "max": 7248
+        },
+        "serverTotalMs": {
+          "p50": 4329,
+          "p95": 7036,
+          "max": 7036
+        },
+        "clientOverheadProxyMs": {
+          "p50": 218,
+          "p95": 251,
+          "max": 251
+        },
+        "queueMeasurement": "not exposed by Ollama OpenAI-compatible API; client overhead is reported separately"
+      },
+      "extraction": {
+        "count": 5,
+        "httpSuccess": 5,
+        "timeout": 0,
+        "fallback": 0,
+        "elapsedMs": {
+          "p50": 48218,
+          "p95": 82498,
+          "max": 82498
+        },
+        "serverTotalMs": {
+          "p50": 48064,
+          "p95": 82313,
+          "max": 82313
+        },
+        "clientOverheadProxyMs": {
+          "p50": 154,
+          "p95": 185,
+          "max": 185
+        },
+        "queueMeasurement": "not exposed by Ollama OpenAI-compatible API; client overhead is reported separately"
+      },
+      "rows": {
+        "conversation": [
+          {
+            "status": 200,
+            "elapsedMs": 5988,
+            "fallback": false,
+            "timeout": false,
+            "telemetry": {
+              "stage": "conversation",
+              "model": "qwen3.5:2b",
+              "promptVariant": "full",
+              "safetyGuardMs": 0,
+              "preprocessingMs": 0,
+              "modelTimings": {
+                "requestBuildMs": 0,
+                "httpHeadersMs": 4422,
+                "firstTokenMs": 4422,
+                "promptUntilFirstTokenMs": 0,
+                "generationMs": 1345,
+                "bodyReadMs": 1345,
+                "jsonParseMs": 0,
+                "totalMs": 5767,
+                "stream": true,
+                "promptEvalMs": null,
+                "generationEvalMs": null,
+                "serverTotalMs": null,
+                "modelLoadMs": null,
+                "queueMs": null,
+                "promptTokens": null,
+                "completionTokens": null
+              },
+              "totalMs": 5767,
+              "fallback": false
+            },
+            "clientOverheadMs": 221
+          },
+          {
+            "status": 200,
+            "elapsedMs": 4547,
+            "fallback": false,
+            "timeout": false,
+            "telemetry": {
+              "stage": "conversation",
+              "model": "qwen3.5:2b",
+              "promptVariant": "full",
+              "safetyGuardMs": 1,
+              "preprocessingMs": 0,
+              "modelTimings": {
+                "requestBuildMs": 0,
+                "httpHeadersMs": 3165,
+                "firstTokenMs": 3166,
+                "promptUntilFirstTokenMs": 1,
+                "generationMs": 1162,
+                "bodyReadMs": 1163,
+                "jsonParseMs": 0,
+                "totalMs": 4328,
+                "stream": true,
+                "promptEvalMs": null,
+                "generationEvalMs": null,
+                "serverTotalMs": null,
+                "modelLoadMs": null,
+                "queueMs": null,
+                "promptTokens": null,
+                "completionTokens": null
+              },
+              "totalMs": 4329,
+              "fallback": false
+            },
+            "clientOverheadMs": 218
+          },
+          {
+            "status": 200,
+            "elapsedMs": 1574,
+            "fallback": false,
+            "timeout": false,
+            "telemetry": {
+              "stage": "conversation",
+              "model": "qwen3.5:2b",
+              "promptVariant": "full",
+              "safetyGuardMs": 0,
+              "preprocessingMs": 0,
+              "modelTimings": {
+                "requestBuildMs": 0,
+                "httpHeadersMs": 100,
+                "firstTokenMs": 101,
+                "promptUntilFirstTokenMs": 1,
+                "generationMs": 1222,
+                "bodyReadMs": 1223,
+                "jsonParseMs": 0,
+                "totalMs": 1323,
+                "stream": true,
+                "promptEvalMs": null,
+                "generationEvalMs": null,
+                "serverTotalMs": null,
+                "modelLoadMs": null,
+                "queueMs": null,
+                "promptTokens": null,
+                "completionTokens": null
+              },
+              "totalMs": 1323,
+              "fallback": false
+            },
+            "clientOverheadMs": 251
+          },
+          {
+            "status": 200,
+            "elapsedMs": 7248,
+            "fallback": false,
+            "timeout": false,
+            "telemetry": {
+              "stage": "conversation",
+              "model": "qwen3.5:2b",
+              "promptVariant": "full",
+              "safetyGuardMs": 0,
+              "preprocessingMs": 0,
+              "modelTimings": {
+                "requestBuildMs": 0,
+                "httpHeadersMs": 5856,
+                "firstTokenMs": 5857,
+                "promptUntilFirstTokenMs": 1,
+                "generationMs": 1179,
+                "bodyReadMs": 1180,
+                "jsonParseMs": 0,
+                "totalMs": 7036,
+                "stream": true,
+                "promptEvalMs": null,
+                "generationEvalMs": null,
+                "serverTotalMs": null,
+                "modelLoadMs": null,
+                "queueMs": null,
+                "promptTokens": null,
+                "completionTokens": null
+              },
+              "totalMs": 7036,
+              "fallback": false
+            },
+            "clientOverheadMs": 212
+          },
+          {
+            "status": 200,
+            "elapsedMs": 3290,
+            "fallback": false,
+            "timeout": false,
+            "telemetry": {
+              "stage": "conversation",
+              "model": "qwen3.5:2b",
+              "promptVariant": "full",
+              "safetyGuardMs": 0,
+              "preprocessingMs": 0,
+              "modelTimings": {
+                "requestBuildMs": 0,
+                "httpHeadersMs": 1415,
+                "firstTokenMs": 1416,
+                "promptUntilFirstTokenMs": 1,
+                "generationMs": 1657,
+                "bodyReadMs": 1658,
+                "jsonParseMs": 0,
+                "totalMs": 3073,
+                "stream": true,
+                "promptEvalMs": null,
+                "generationEvalMs": null,
+                "serverTotalMs": null,
+                "modelLoadMs": null,
+                "queueMs": null,
+                "promptTokens": null,
+                "completionTokens": null
+              },
+              "totalMs": 3073,
+              "fallback": false
+            },
+            "clientOverheadMs": 217
+          }
+        ],
+        "extraction": [
+          {
+            "status": 200,
+            "elapsedMs": 48218,
+            "fallback": false,
+            "timeout": false,
+            "telemetry": {
+              "stage": "extract",
+              "model": "qwen3.5:4b",
+              "promptVariant": "full",
+              "safetyGuardMs": 0,
+              "preprocessingMs": 0,
+              "modelTimings": {
+                "requestBuildMs": 0,
+                "httpHeadersMs": 32270,
+                "firstTokenMs": 32271,
+                "promptUntilFirstTokenMs": 1,
+                "generationMs": 15793,
+                "bodyReadMs": 15794,
+                "jsonParseMs": 0,
+                "totalMs": 48064,
+                "stream": true,
+                "promptEvalMs": null,
+                "generationEvalMs": null,
+                "serverTotalMs": null,
+                "modelLoadMs": null,
+                "queueMs": null,
+                "promptTokens": null,
+                "completionTokens": null
+              },
+              "normalizationMs": 0,
+              "totalMs": 48064,
+              "fallback": false
+            },
+            "clientOverheadMs": 154
+          },
+          {
+            "status": 200,
+            "elapsedMs": 16326,
+            "fallback": false,
+            "timeout": false,
+            "telemetry": {
+              "stage": "extract",
+              "model": "qwen3.5:4b",
+              "promptVariant": "full",
+              "safetyGuardMs": 0,
+              "preprocessingMs": 0,
+              "modelTimings": {
+                "requestBuildMs": 0,
+                "httpHeadersMs": 214,
+                "firstTokenMs": 215,
+                "promptUntilFirstTokenMs": 1,
+                "generationMs": 15962,
+                "bodyReadMs": 15963,
+                "jsonParseMs": 0,
+                "totalMs": 16177,
+                "stream": true,
+                "promptEvalMs": null,
+                "generationEvalMs": null,
+                "serverTotalMs": null,
+                "modelLoadMs": null,
+                "queueMs": null,
+                "promptTokens": null,
+                "completionTokens": null
+              },
+              "normalizationMs": 0,
+              "totalMs": 16177,
+              "fallback": false
+            },
+            "clientOverheadMs": 149
+          },
+          {
+            "status": 200,
+            "elapsedMs": 82498,
+            "fallback": false,
+            "timeout": false,
+            "telemetry": {
+              "stage": "extract",
+              "model": "qwen3.5:4b",
+              "promptVariant": "full",
+              "safetyGuardMs": 0,
+              "preprocessingMs": 0,
+              "modelTimings": {
+                "requestBuildMs": 0,
+                "httpHeadersMs": 66336,
+                "firstTokenMs": 66337,
+                "promptUntilFirstTokenMs": 1,
+                "generationMs": 15976,
+                "bodyReadMs": 15977,
+                "jsonParseMs": 0,
+                "totalMs": 82313,
+                "stream": true,
+                "promptEvalMs": null,
+                "generationEvalMs": null,
+                "serverTotalMs": null,
+                "modelLoadMs": null,
+                "queueMs": null,
+                "promptTokens": null,
+                "completionTokens": null
+              },
+              "normalizationMs": 0,
+              "totalMs": 82313,
+              "fallback": false
+            },
+            "clientOverheadMs": 185
+          },
+          {
+            "status": 200,
+            "elapsedMs": 32227,
+            "fallback": false,
+            "timeout": false,
+            "telemetry": {
+              "stage": "extract",
+              "model": "qwen3.5:4b",
+              "promptVariant": "full",
+              "safetyGuardMs": 0,
+              "preprocessingMs": 0,
+              "modelTimings": {
+                "requestBuildMs": 0,
+                "httpHeadersMs": 16357,
+                "firstTokenMs": 16358,
+                "promptUntilFirstTokenMs": 1,
+                "generationMs": 15718,
+                "bodyReadMs": 15719,
+                "jsonParseMs": 0,
+                "totalMs": 32076,
+                "stream": true,
+                "promptEvalMs": null,
+                "generationEvalMs": null,
+                "serverTotalMs": null,
+                "modelLoadMs": null,
+                "queueMs": null,
+                "promptTokens": null,
+                "completionTokens": null
+              },
+              "normalizationMs": 0,
+              "totalMs": 32076,
+              "fallback": false
+            },
+            "clientOverheadMs": 151
+          },
+          {
+            "status": 200,
+            "elapsedMs": 66328,
+            "fallback": false,
+            "timeout": false,
+            "telemetry": {
+              "stage": "extract",
+              "model": "qwen3.5:4b",
+              "promptVariant": "full",
+              "safetyGuardMs": 0,
+              "preprocessingMs": 0,
+              "modelTimings": {
+                "requestBuildMs": 0,
+                "httpHeadersMs": 48223,
+                "firstTokenMs": 48225,
+                "promptUntilFirstTokenMs": 2,
+                "generationMs": 17920,
+                "bodyReadMs": 17922,
+                "jsonParseMs": 0,
+                "totalMs": 66145,
+                "stream": true,
+                "promptEvalMs": null,
+                "generationEvalMs": null,
+                "serverTotalMs": null,
+                "modelLoadMs": null,
+                "queueMs": null,
+                "promptTokens": null,
+                "completionTokens": null
+              },
+              "normalizationMs": 1,
+              "totalMs": 66146,
+              "fallback": false
+            },
+            "clientOverheadMs": 182
+          }
+        ]
+      }
+    },
+    {
+      "level": 10,
+      "before": {
+        "cpuPercent": null,
+        "memoryUsedPercent": null,
+        "memoryAvailableGiB": null,
+        "gpu": "unknown",
+        "vramGiB": null
+      },
+      "afterConversation": {
+        "cpuPercent": null,
+        "memoryUsedPercent": null,
+        "memoryAvailableGiB": null,
+        "gpu": "unknown",
+        "vramGiB": null
+      },
+      "after": {
+        "cpuPercent": null,
+        "memoryUsedPercent": null,
+        "memoryAvailableGiB": null,
+        "gpu": "unknown",
+        "vramGiB": null
+      },
+      "conversation": {
+        "count": 10,
+        "httpSuccess": 10,
+        "timeout": 0,
+        "fallback": 0,
+        "elapsedMs": {
+          "p50": 6959,
+          "p95": 13437,
+          "max": 13437
+        },
+        "serverTotalMs": {
+          "p50": 6543,
+          "p95": 13027,
+          "max": 13027
+        },
+        "clientOverheadProxyMs": {
+          "p50": 416,
+          "p95": 455,
+          "max": 455
+        },
+        "queueMeasurement": "not exposed by Ollama OpenAI-compatible API; client overhead is reported separately"
+      },
+      "extraction": {
+        "count": 10,
+        "httpSuccess": 7,
+        "timeout": 0,
+        "fallback": 3,
+        "elapsedMs": {
+          "p50": 77492,
+          "p95": 120619,
+          "max": 120619
+        },
+        "serverTotalMs": {
+          "p50": 62226,
+          "p95": 110198,
+          "max": 110198
+        },
+        "clientOverheadProxyMs": {
+          "p50": 312,
+          "p95": 1553,
+          "max": 1553
+        },
+        "queueMeasurement": "not exposed by Ollama OpenAI-compatible API; client overhead is reported separately"
+      },
+      "rows": {
+        "conversation": [
+          {
+            "status": 200,
+            "elapsedMs": 8256,
+            "fallback": false,
+            "timeout": false,
+            "telemetry": {
+              "stage": "conversation",
+              "model": "qwen3.5:2b",
+              "promptVariant": "full",
+              "safetyGuardMs": 0,
+              "preprocessingMs": 0,
+              "modelTimings": {
+                "requestBuildMs": 0,
+                "httpHeadersMs": 6634,
+                "firstTokenMs": 6635,
+                "promptUntilFirstTokenMs": 1,
+                "generationMs": 1165,
+                "bodyReadMs": 1166,
+                "jsonParseMs": 0,
+                "totalMs": 7800,
+                "stream": true,
+                "promptEvalMs": null,
+                "generationEvalMs": null,
+                "serverTotalMs": null,
+                "modelLoadMs": null,
+                "queueMs": null,
+                "promptTokens": null,
+                "completionTokens": null
+              },
+              "totalMs": 7801,
+              "fallback": false
+            },
+            "clientOverheadMs": 455
+          },
+          {
+            "status": 200,
+            "elapsedMs": 12193,
+            "fallback": false,
+            "timeout": false,
+            "telemetry": {
+              "stage": "conversation",
+              "model": "qwen3.5:2b",
+              "promptVariant": "full",
+              "safetyGuardMs": 0,
+              "preprocessingMs": 0,
+              "modelTimings": {
+                "requestBuildMs": 0,
+                "httpHeadersMs": 10624,
+                "firstTokenMs": 10625,
+                "promptUntilFirstTokenMs": 1,
+                "generationMs": 1148,
+                "bodyReadMs": 1149,
+                "jsonParseMs": 0,
+                "totalMs": 11773,
+                "stream": true,
+                "promptEvalMs": null,
+                "generationEvalMs": null,
+                "serverTotalMs": null,
+                "modelLoadMs": null,
+                "queueMs": null,
+                "promptTokens": null,
+                "completionTokens": null
+              },
+              "totalMs": 11773,
+              "fallback": false
+            },
+            "clientOverheadMs": 420
+          },
+          {
+            "status": 200,
+            "elapsedMs": 6959,
+            "fallback": false,
+            "timeout": false,
+            "telemetry": {
+              "stage": "conversation",
+              "model": "qwen3.5:2b",
+              "promptVariant": "full",
+              "safetyGuardMs": 0,
+              "preprocessingMs": 0,
+              "modelTimings": {
+                "requestBuildMs": 0,
+                "httpHeadersMs": 5223,
+                "firstTokenMs": 5224,
+                "promptUntilFirstTokenMs": 1,
+                "generationMs": 1318,
+                "bodyReadMs": 1319,
+                "jsonParseMs": 0,
+                "totalMs": 6542,
+                "stream": true,
+                "promptEvalMs": null,
+                "generationEvalMs": null,
+                "serverTotalMs": null,
+                "modelLoadMs": null,
+                "queueMs": null,
+                "promptTokens": null,
+                "completionTokens": null
+              },
+              "totalMs": 6543,
+              "fallback": false
+            },
+            "clientOverheadMs": 416
+          },
+          {
+            "status": 200,
+            "elapsedMs": 13437,
+            "fallback": false,
+            "timeout": false,
+            "telemetry": {
+              "stage": "conversation",
+              "model": "qwen3.5:2b",
+              "promptVariant": "full",
+              "safetyGuardMs": 0,
+              "preprocessingMs": 0,
+              "modelTimings": {
+                "requestBuildMs": 0,
+                "httpHeadersMs": 11866,
+                "firstTokenMs": 11867,
+                "promptUntilFirstTokenMs": 1,
+                "generationMs": 1160,
+                "bodyReadMs": 1161,
+                "jsonParseMs": 0,
+                "totalMs": 13027,
+                "stream": true,
+                "promptEvalMs": null,
+                "generationEvalMs": null,
+                "serverTotalMs": null,
+                "modelLoadMs": null,
+                "queueMs": null,
+                "promptTokens": null,
+                "completionTokens": null
+              },
+              "totalMs": 13027,
+              "fallback": false
+            },
+            "clientOverheadMs": 410
+          },
+          {
+            "status": 200,
+            "elapsedMs": 2999,
+            "fallback": false,
+            "timeout": false,
+            "telemetry": {
+              "stage": "conversation",
+              "model": "qwen3.5:2b",
+              "promptVariant": "full",
+              "safetyGuardMs": 0,
+              "preprocessingMs": 0,
+              "modelTimings": {
+                "requestBuildMs": 0,
+                "httpHeadersMs": 1438,
+                "firstTokenMs": 1439,
+                "promptUntilFirstTokenMs": 1,
+                "generationMs": 1141,
+                "bodyReadMs": 1142,
+                "jsonParseMs": 0,
+                "totalMs": 2580,
+                "stream": true,
+                "promptEvalMs": null,
+                "generationEvalMs": null,
+                "serverTotalMs": null,
+                "modelLoadMs": null,
+                "queueMs": null,
+                "promptTokens": null,
+                "completionTokens": null
+              },
+              "totalMs": 2581,
+              "fallback": false
+            },
+            "clientOverheadMs": 418
+          },
+          {
+            "status": 200,
+            "elapsedMs": 9667,
+            "fallback": false,
+            "timeout": false,
+            "telemetry": {
+              "stage": "conversation",
+              "model": "qwen3.5:2b",
+              "promptVariant": "full",
+              "safetyGuardMs": 0,
+              "preprocessingMs": 0,
+              "modelTimings": {
+                "requestBuildMs": 0,
+                "httpHeadersMs": 7889,
+                "firstTokenMs": 7890,
+                "promptUntilFirstTokenMs": 1,
+                "generationMs": 1356,
+                "bodyReadMs": 1357,
+                "jsonParseMs": 0,
+                "totalMs": 9246,
+                "stream": true,
+                "promptEvalMs": null,
+                "generationEvalMs": null,
+                "serverTotalMs": null,
+                "modelLoadMs": null,
+                "queueMs": null,
+                "promptTokens": null,
+                "completionTokens": null
+              },
+              "totalMs": 9246,
+              "fallback": false
+            },
+            "clientOverheadMs": 421
+          },
+          {
+            "status": 200,
+            "elapsedMs": 5547,
+            "fallback": false,
+            "timeout": false,
+            "telemetry": {
+              "stage": "conversation",
+              "model": "qwen3.5:2b",
+              "promptVariant": "full",
+              "safetyGuardMs": 0,
+              "preprocessingMs": 0,
+              "modelTimings": {
+                "requestBuildMs": 0,
+                "httpHeadersMs": 3978,
+                "firstTokenMs": 3979,
+                "promptUntilFirstTokenMs": 1,
+                "generationMs": 1154,
+                "bodyReadMs": 1155,
+                "jsonParseMs": 0,
+                "totalMs": 5133,
+                "stream": true,
+                "promptEvalMs": null,
+                "generationEvalMs": null,
+                "serverTotalMs": null,
+                "modelLoadMs": null,
+                "queueMs": null,
+                "promptTokens": null,
+                "completionTokens": null
+              },
+              "totalMs": 5133,
+              "fallback": false
+            },
+            "clientOverheadMs": 414
+          },
+          {
+            "status": 200,
+            "elapsedMs": 4306,
+            "fallback": false,
+            "timeout": false,
+            "telemetry": {
+              "stage": "conversation",
+              "model": "qwen3.5:2b",
+              "promptVariant": "full",
+              "safetyGuardMs": 0,
+              "preprocessingMs": 0,
+              "modelTimings": {
+                "requestBuildMs": 0,
+                "httpHeadersMs": 2674,
+                "firstTokenMs": 2675,
+                "promptUntilFirstTokenMs": 1,
+                "generationMs": 1215,
+                "bodyReadMs": 1216,
+                "jsonParseMs": 0,
+                "totalMs": 3890,
+                "stream": true,
+                "promptEvalMs": null,
+                "generationEvalMs": null,
+                "serverTotalMs": null,
+                "modelLoadMs": null,
+                "queueMs": null,
+                "promptTokens": null,
+                "completionTokens": null
+              },
+              "totalMs": 3890,
+              "fallback": false
+            },
+            "clientOverheadMs": 416
+          },
+          {
+            "status": 200,
+            "elapsedMs": 1763,
+            "fallback": false,
+            "timeout": false,
+            "telemetry": {
+              "stage": "conversation",
+              "model": "qwen3.5:2b",
+              "promptVariant": "full",
+              "safetyGuardMs": 0,
+              "preprocessingMs": 0,
+              "modelTimings": {
+                "requestBuildMs": 0,
+                "httpHeadersMs": 112,
+                "firstTokenMs": 113,
+                "promptUntilFirstTokenMs": 1,
+                "generationMs": 1235,
+                "bodyReadMs": 1236,
+                "jsonParseMs": 1,
+                "totalMs": 1349,
+                "stream": true,
+                "promptEvalMs": null,
+                "generationEvalMs": null,
+                "serverTotalMs": null,
+                "modelLoadMs": null,
+                "queueMs": null,
+                "promptTokens": null,
+                "completionTokens": null
+              },
+              "totalMs": 1349,
+              "fallback": false
+            },
+            "clientOverheadMs": 414
+          },
+          {
+            "status": 200,
+            "elapsedMs": 10948,
+            "fallback": false,
+            "timeout": false,
+            "telemetry": {
+              "stage": "conversation",
+              "model": "qwen3.5:2b",
+              "promptVariant": "full",
+              "safetyGuardMs": 0,
+              "preprocessingMs": 0,
+              "modelTimings": {
+                "requestBuildMs": 0,
+                "httpHeadersMs": 9335,
+                "firstTokenMs": 9336,
+                "promptUntilFirstTokenMs": 1,
+                "generationMs": 1194,
+                "bodyReadMs": 1195,
+                "jsonParseMs": 0,
+                "totalMs": 10530,
+                "stream": true,
+                "promptEvalMs": null,
+                "generationEvalMs": null,
+                "serverTotalMs": null,
+                "modelLoadMs": null,
+                "queueMs": null,
+                "promptTokens": null,
+                "completionTokens": null
+              },
+              "totalMs": 10531,
+              "fallback": false
+            },
+            "clientOverheadMs": 417
+          }
+        ],
+        "extraction": [
+          {
+            "status": 200,
+            "elapsedMs": 93501,
+            "fallback": false,
+            "timeout": false,
+            "telemetry": {
+              "stage": "extract",
+              "model": "qwen3.5:4b",
+              "promptVariant": "full",
+              "safetyGuardMs": 0,
+              "preprocessingMs": 0,
+              "modelTimings": {
+                "requestBuildMs": 0,
+                "httpHeadersMs": 77389,
+                "firstTokenMs": 77390,
+                "promptUntilFirstTokenMs": 1,
+                "generationMs": 15789,
+                "bodyReadMs": 15790,
+                "jsonParseMs": 0,
+                "totalMs": 93179,
+                "stream": true,
+                "promptEvalMs": null,
+                "generationEvalMs": null,
+                "serverTotalMs": null,
+                "modelLoadMs": null,
+                "queueMs": null,
+                "promptTokens": null,
+                "completionTokens": null
+              },
+              "normalizationMs": 0,
+              "totalMs": 93179,
+              "fallback": false
+            },
+            "clientOverheadMs": 322
+          },
+          {
+            "status": 200,
+            "elapsedMs": 16129,
+            "fallback": false,
+            "timeout": false,
+            "telemetry": {
+              "stage": "extract",
+              "model": "qwen3.5:4b",
+              "promptVariant": "full",
+              "safetyGuardMs": 0,
+              "preprocessingMs": 0,
+              "modelTimings": {
+                "requestBuildMs": 0,
+                "httpHeadersMs": 272,
+                "firstTokenMs": 274,
+                "promptUntilFirstTokenMs": 2,
+                "generationMs": 15570,
+                "bodyReadMs": 15572,
+                "jsonParseMs": 0,
+                "totalMs": 15844,
+                "stream": true,
+                "promptEvalMs": null,
+                "generationEvalMs": null,
+                "serverTotalMs": null,
+                "modelLoadMs": null,
+                "queueMs": null,
+                "promptTokens": null,
+                "completionTokens": null
+              },
+              "normalizationMs": 0,
+              "totalMs": 15844,
+              "fallback": false
+            },
+            "clientOverheadMs": 285
+          },
+          {
+            "status": 200,
+            "elapsedMs": 31988,
+            "fallback": false,
+            "timeout": false,
+            "telemetry": {
+              "stage": "extract",
+              "model": "qwen3.5:4b",
+              "promptVariant": "full",
+              "safetyGuardMs": 0,
+              "preprocessingMs": 0,
+              "modelTimings": {
+                "requestBuildMs": 0,
+                "httpHeadersMs": 16032,
+                "firstTokenMs": 16033,
+                "promptUntilFirstTokenMs": 1,
+                "generationMs": 15643,
+                "bodyReadMs": 15644,
+                "jsonParseMs": 0,
+                "totalMs": 31676,
+                "stream": true,
+                "promptEvalMs": null,
+                "generationEvalMs": null,
+                "serverTotalMs": null,
+                "modelLoadMs": null,
+                "queueMs": null,
+                "promptTokens": null,
+                "completionTokens": null
+              },
+              "normalizationMs": 0,
+              "totalMs": 31676,
+              "fallback": false
+            },
+            "clientOverheadMs": 312
+          },
+          {
+            "status": 200,
+            "elapsedMs": 62514,
+            "fallback": false,
+            "timeout": false,
+            "telemetry": {
+              "stage": "extract",
+              "model": "qwen3.5:4b",
+              "promptVariant": "full",
+              "safetyGuardMs": 0,
+              "preprocessingMs": 0,
+              "modelTimings": {
+                "requestBuildMs": 0,
+                "httpHeadersMs": 49020,
+                "firstTokenMs": 49022,
+                "promptUntilFirstTokenMs": 2,
+                "generationMs": 13204,
+                "bodyReadMs": 13206,
+                "jsonParseMs": 0,
+                "totalMs": 62226,
+                "stream": true,
+                "promptEvalMs": null,
+                "generationEvalMs": null,
+                "serverTotalMs": null,
+                "modelLoadMs": null,
+                "queueMs": null,
+                "promptTokens": null,
+                "completionTokens": null
+              },
+              "normalizationMs": 0,
+              "totalMs": 62226,
+              "fallback": false
+            },
+            "clientOverheadMs": 288
+          },
+          {
+            "status": 200,
+            "elapsedMs": 49332,
+            "fallback": false,
+            "timeout": false,
+            "telemetry": {
+              "stage": "extract",
+              "model": "qwen3.5:4b",
+              "promptVariant": "full",
+              "safetyGuardMs": 0,
+              "preprocessingMs": 0,
+              "modelTimings": {
+                "requestBuildMs": 0,
+                "httpHeadersMs": 31873,
+                "firstTokenMs": 31874,
+                "promptUntilFirstTokenMs": 1,
+                "generationMs": 15904,
+                "bodyReadMs": 15905,
+                "jsonParseMs": 0,
+                "totalMs": 47778,
+                "stream": true,
+                "promptEvalMs": null,
+                "generationEvalMs": null,
+                "serverTotalMs": null,
+                "modelLoadMs": null,
+                "queueMs": null,
+                "promptTokens": null,
+                "completionTokens": null
+              },
+              "normalizationMs": 1,
+              "totalMs": 47779,
+              "fallback": false
+            },
+            "clientOverheadMs": 1553
+          },
+          {
+            "status": 200,
+            "elapsedMs": 77492,
+            "fallback": false,
+            "timeout": false,
+            "telemetry": {
+              "stage": "extract",
+              "model": "qwen3.5:4b",
+              "promptVariant": "full",
+              "safetyGuardMs": 0,
+              "preprocessingMs": 0,
+              "modelTimings": {
+                "requestBuildMs": 0,
+                "httpHeadersMs": 62415,
+                "firstTokenMs": 62416,
+                "promptUntilFirstTokenMs": 1,
+                "generationMs": 14790,
+                "bodyReadMs": 14791,
+                "jsonParseMs": 0,
+                "totalMs": 77206,
+                "stream": true,
+                "promptEvalMs": null,
+                "generationEvalMs": null,
+                "serverTotalMs": null,
+                "modelLoadMs": null,
+                "queueMs": null,
+                "promptTokens": null,
+                "completionTokens": null
+              },
+              "normalizationMs": 0,
+              "totalMs": 77207,
+              "fallback": false
+            },
+            "clientOverheadMs": 285
+          },
+          {
+            "status": 502,
+            "elapsedMs": 120606,
+            "fallback": true,
+            "timeout": false,
+            "telemetry": {},
+            "clientOverheadMs": null
+          },
+          {
+            "status": 200,
+            "elapsedMs": 110645,
+            "fallback": false,
+            "timeout": false,
+            "telemetry": {
+              "stage": "extract",
+              "model": "qwen3.5:4b",
+              "promptVariant": "full",
+              "safetyGuardMs": 0,
+              "preprocessingMs": 0,
+              "modelTimings": {
+                "requestBuildMs": 0,
+                "httpHeadersMs": 93344,
+                "firstTokenMs": 93347,
+                "promptUntilFirstTokenMs": 3,
+                "generationMs": 16851,
+                "bodyReadMs": 16854,
+                "jsonParseMs": 0,
+                "totalMs": 110198,
+                "stream": true,
+                "promptEvalMs": null,
+                "generationEvalMs": null,
+                "serverTotalMs": null,
+                "modelLoadMs": null,
+                "queueMs": null,
+                "promptTokens": null,
+                "completionTokens": null
+              },
+              "normalizationMs": 0,
+              "totalMs": 110198,
+              "fallback": false
+            },
+            "clientOverheadMs": 447
+          },
+          {
+            "status": 502,
+            "elapsedMs": 120615,
+            "fallback": true,
+            "timeout": false,
+            "telemetry": {},
+            "clientOverheadMs": null
+          },
+          {
+            "status": 502,
+            "elapsedMs": 120619,
+            "fallback": true,
+            "timeout": false,
+            "telemetry": {},
+            "clientOverheadMs": null
+          }
+        ]
+      }
+    }
+  ]
+}

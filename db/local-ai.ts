@@ -9,6 +9,7 @@
 
 import type { Faq, RelatedFaq } from './repository';
 import { resolveShelterZoneId, shelterLocationLabel } from '../lib/shelter-map-data';
+import type { FourBStatus, IncidentProvenance } from '../app/lib/incident-schema';
 
 export type AiFaq = Faq;
 export type AiRelatedFaq = RelatedFaq;
@@ -41,6 +42,10 @@ export type StructuredIncident = {
   missingFields?: string[];
   confidence?: number | null;
   category?: ShelterCategory | null;
+  provenance?: IncidentProvenance;
+  structuredComplete?: boolean;
+  fourBRequested?: boolean;
+  fourBStatus?: FourBStatus;
 };
 
 export type ShelterAnalysis = {

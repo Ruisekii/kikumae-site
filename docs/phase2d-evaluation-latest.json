@@ -1,0 +1,1881 @@
+{
+  "generatedAt": "2026-09-08T14:50:42.328Z",
+  "baseUrl": "http://localhost:3000",
+  "fixedCaseCount": 20,
+  "gate": {
+    "fourBUseRate": 0.5,
+    "fourBFreeCompletionRate": 1,
+    "explicitGateAccuracy": 1,
+    "gateExpectedCases": 7
+  },
+  "quality": {
+    "triageCasesPassed": 20,
+    "triageCasesTotal": 20,
+    "requestRetention": 1,
+    "locationRetention": 1,
+    "targetCountRetention": 1,
+    "safetyImmediateAccuracy": 1
+  },
+  "latencyMs": {
+    "safetyAndCardFirst": {
+      "p50": 55,
+      "p95": 68,
+      "max": 171
+    },
+    "conversation": {
+      "count": 6,
+      "p50": 5908,
+      "p95": 25445,
+      "max": 25445
+    },
+    "conditionalExtraction": {
+      "count": 1,
+      "p50": 54528,
+      "p95": 54528,
+      "max": 54528
+    }
+  },
+  "conversation": [
+    {
+      "id": "water-structured",
+      "result": {
+        "status": 200,
+        "elapsedMs": 25445,
+        "payload": {
+          "ok": true,
+          "aiMode": "model-gateway",
+          "runtimeMode": "auto",
+          "provider": "openai-compatible",
+          "selectedLanguage": "ja",
+          "reply": "体育館Aで4人が困っています。",
+          "nextField": null,
+          "requiresConfirmation": true,
+          "safety": {
+            "flags": [],
+            "immediate": false
+          },
+          "telemetry": {
+            "stage": "conversation",
+            "model": "qwen3.5:2b",
+            "promptVariant": "full",
+            "safetyGuardMs": 0,
+            "preprocessingMs": 0,
+            "modelTimings": {
+              "requestBuildMs": 0,
+              "httpHeadersMs": 23735,
+              "firstTokenMs": 23741,
+              "promptUntilFirstTokenMs": 6,
+              "generationMs": 1642,
+              "bodyReadMs": 1648,
+              "jsonParseMs": 0,
+              "totalMs": 25383,
+              "stream": true,
+              "promptEvalMs": null,
+              "generationEvalMs": null,
+              "serverTotalMs": null,
+              "modelLoadMs": null,
+              "queueMs": null,
+              "promptTokens": null,
+              "completionTokens": null
+            },
+            "totalMs": 25385,
+            "fallback": false
+          }
+        }
+      }
+    },
+    {
+      "id": "food-structured",
+      "result": {
+        "status": 200,
+        "elapsedMs": 6125,
+        "payload": {
+          "ok": true,
+          "aiMode": "model-gateway",
+          "runtimeMode": "auto",
+          "provider": "openai-compatible",
+          "selectedLanguage": "ja",
+          "reply": "体育館Bの食事配布場所を知りたいですか？",
+          "nextField": null,
+          "requiresConfirmation": true,
+          "safety": {
+            "flags": [],
+            "immediate": false
+          },
+          "telemetry": {
+            "stage": "conversation",
+            "model": "qwen3.5:2b",
+            "promptVariant": "full",
+            "safetyGuardMs": 0,
+            "preprocessingMs": 0,
+            "modelTimings": {
+              "requestBuildMs": 0,
+              "httpHeadersMs": 4237,
+              "firstTokenMs": 4240,
+              "promptUntilFirstTokenMs": 3,
+              "generationMs": 1796,
+              "bodyReadMs": 1799,
+              "jsonParseMs": 0,
+              "totalMs": 6036,
+              "stream": true,
+              "promptEvalMs": null,
+              "generationEvalMs": null,
+              "serverTotalMs": null,
+              "modelLoadMs": null,
+              "queueMs": null,
+              "promptTokens": null,
+              "completionTokens": null
+            },
+            "totalMs": 6036,
+            "fallback": false
+          }
+        }
+      }
+    },
+    {
+      "id": "blanket-structured",
+      "result": {
+        "status": 200,
+        "elapsedMs": 6116,
+        "payload": {
+          "ok": true,
+          "aiMode": "model-gateway",
+          "runtimeMode": "auto",
+          "provider": "openai-compatible",
+          "selectedLanguage": "ja",
+          "reply": "毛布不足の相談を承知しました。",
+          "nextField": null,
+          "requiresConfirmation": true,
+          "safety": {
+            "flags": [],
+            "immediate": false
+          },
+          "telemetry": {
+            "stage": "conversation",
+            "model": "qwen3.5:2b",
+            "promptVariant": "full",
+            "safetyGuardMs": 0,
+            "preprocessingMs": 0,
+            "modelTimings": {
+              "requestBuildMs": 0,
+              "httpHeadersMs": 4196,
+              "firstTokenMs": 4197,
+              "promptUntilFirstTokenMs": 1,
+              "generationMs": 1822,
+              "bodyReadMs": 1823,
+              "jsonParseMs": 0,
+              "totalMs": 6019,
+              "stream": true,
+              "promptEvalMs": null,
+              "generationEvalMs": null,
+              "serverTotalMs": null,
+              "modelLoadMs": null,
+              "queueMs": null,
+              "promptTokens": null,
+              "completionTokens": null
+            },
+            "totalMs": 6019,
+            "fallback": false
+          }
+        }
+      }
+    },
+    {
+      "id": "toilet-structured",
+      "result": {
+        "status": 200,
+        "elapsedMs": 5908,
+        "payload": {
+          "ok": true,
+          "aiMode": "model-gateway",
+          "runtimeMode": "auto",
+          "provider": "openai-compatible",
+          "selectedLanguage": "ja",
+          "reply": "北トイレが使えなくなりました。",
+          "nextField": null,
+          "requiresConfirmation": true,
+          "safety": {
+            "flags": [],
+            "immediate": false
+          },
+          "telemetry": {
+            "stage": "conversation",
+            "model": "qwen3.5:2b",
+            "promptVariant": "full",
+            "safetyGuardMs": 1,
+            "preprocessingMs": 0,
+            "modelTimings": {
+              "requestBuildMs": 0,
+              "httpHeadersMs": 4194,
+              "firstTokenMs": 4195,
+              "promptUntilFirstTokenMs": 1,
+              "generationMs": 1656,
+              "bodyReadMs": 1657,
+              "jsonParseMs": 0,
+              "totalMs": 5851,
+              "stream": true,
+              "promptEvalMs": null,
+              "generationEvalMs": null,
+              "serverTotalMs": null,
+              "modelLoadMs": null,
+              "queueMs": null,
+              "promptTokens": null,
+              "completionTokens": null
+            },
+            "totalMs": 5853,
+            "fallback": false
+          }
+        }
+      }
+    },
+    {
+      "id": "medicine-structured",
+      "result": {
+        "status": 200,
+        "elapsedMs": 5687,
+        "payload": {
+          "ok": true,
+          "aiMode": "model-gateway",
+          "runtimeMode": "auto",
+          "provider": "openai-compatible",
+          "selectedLanguage": "ja",
+          "reply": "緊急の可能性がある内容として、先に職員へ知らせます。近くの職員にもすぐ知らせてください。",
+          "nextField": null,
+          "requiresConfirmation": false,
+          "safety": {
+            "flags": [
+              "重大な体調変化"
+            ],
+            "immediate": true
+          },
+          "telemetry": {
+            "stage": "conversation",
+            "model": "qwen3.5:2b",
+            "promptVariant": "full",
+            "safetyGuardMs": 0,
+            "preprocessingMs": 0,
+            "modelTimings": {
+              "requestBuildMs": 0,
+              "httpHeadersMs": 4092,
+              "firstTokenMs": 4092,
+              "promptUntilFirstTokenMs": 0,
+              "generationMs": 1525,
+              "bodyReadMs": 1525,
+              "jsonParseMs": 0,
+              "totalMs": 5617,
+              "stream": true,
+              "promptEvalMs": null,
+              "generationEvalMs": null,
+              "serverTotalMs": null,
+              "modelLoadMs": null,
+              "queueMs": null,
+              "promptTokens": null,
+              "completionTokens": null
+            },
+            "totalMs": 5619,
+            "fallback": false
+          }
+        }
+      }
+    },
+    {
+      "id": "pet-structured",
+      "result": {
+        "status": 200,
+        "elapsedMs": 5648,
+        "payload": {
+          "ok": true,
+          "aiMode": "model-gateway",
+          "runtimeMode": "auto",
+          "provider": "openai-compatible",
+          "selectedLanguage": "ja",
+          "reply": "犬と過ごせる場所を教えてください。",
+          "nextField": null,
+          "requiresConfirmation": true,
+          "safety": {
+            "flags": [],
+            "immediate": false
+          },
+          "telemetry": {
+            "stage": "conversation",
+            "model": "qwen3.5:2b",
+            "promptVariant": "full",
+            "safetyGuardMs": 0,
+            "preprocessingMs": 0,
+            "modelTimings": {
+              "requestBuildMs": 1,
+              "httpHeadersMs": 3912,
+              "firstTokenMs": 3913,
+              "promptUntilFirstTokenMs": 1,
+              "generationMs": 1669,
+              "bodyReadMs": 1670,
+              "jsonParseMs": 0,
+              "totalMs": 5582,
+              "stream": true,
+              "promptEvalMs": null,
+              "generationEvalMs": null,
+              "serverTotalMs": null,
+              "modelLoadMs": null,
+              "queueMs": null,
+              "promptTokens": null,
+              "completionTokens": null
+            },
+            "totalMs": 5582,
+            "fallback": false
+          }
+        }
+      }
+    }
+  ],
+  "conditionalExtraction": [
+    {
+      "id": "pet-structured",
+      "result": {
+        "status": 200,
+        "elapsedMs": 54528,
+        "payload": {
+          "ok": true,
+          "aiMode": "model-gateway",
+          "runtimeMode": "auto",
+          "provider": "openai-compatible",
+          "incident": {
+            "language": "ja",
+            "location": "受付",
+            "target": {
+              "type": "pet",
+              "count": 1,
+              "ageGroup": null
+            },
+            "facts": [
+              "犬"
+            ],
+            "request": "general_assistance",
+            "urgency": "unknown",
+            "safetyFlags": [],
+            "missingFields": [
+              "追加確認"
+            ],
+            "askedFields": [
+              "追加確認"
+            ],
+            "originalText": [
+              "犬と過ごせる場所を教えてください。"
+            ],
+            "confidence": null,
+            "category": null
+          },
+          "safety": {
+            "flags": [],
+            "immediate": false
+          },
+          "telemetry": {
+            "stage": "extract",
+            "model": "qwen3.5:4b",
+            "promptVariant": "full",
+            "safetyGuardMs": 0,
+            "preprocessingMs": 0,
+            "modelTimings": {
+              "requestBuildMs": 0,
+              "httpHeadersMs": 39380,
+              "firstTokenMs": 39382,
+              "promptUntilFirstTokenMs": 2,
+              "generationMs": 14990,
+              "bodyReadMs": 14992,
+              "jsonParseMs": 0,
+              "totalMs": 54372,
+              "stream": true,
+              "promptEvalMs": null,
+              "generationEvalMs": null,
+              "serverTotalMs": null,
+              "modelLoadMs": null,
+              "queueMs": 0,
+              "promptTokens": null,
+              "completionTokens": null
+            },
+            "normalizationMs": 4,
+            "totalMs": 54377,
+            "fallback": false
+          }
+        }
+      }
+    }
+  ],
+  "cases": [
+    {
+      "id": "water-structured",
+      "text": "飲料水が足りません。体育館Aで4人が困っています。",
+      "expected": {
+        "request": "water_supply",
+        "location": "体育館A",
+        "count": 4,
+        "safety": false
+      },
+      "result": {
+        "status": 200,
+        "elapsedMs": 171,
+        "payload": {
+          "ok": true,
+          "aiMode": "deterministic-triage",
+          "runtimeMode": "auto",
+          "selectedLanguage": "ja",
+          "incident": {
+            "language": "ja",
+            "location": "体育館A",
+            "target": {
+              "type": null,
+              "count": 4,
+              "ageGroup": null
+            },
+            "facts": [
+              "水",
+              "飲料水・給水の不足または案内"
+            ],
+            "request": "water_supply",
+            "urgency": "medium",
+            "safetyFlags": [],
+            "missingFields": [],
+            "askedFields": [],
+            "originalText": [
+              "飲料水が足りません。体育館Aで4人が困っています。"
+            ],
+            "confidence": null,
+            "category": null,
+            "structuredComplete": true,
+            "fourBRequested": false,
+            "fourBStatus": "not_needed"
+          },
+          "safety": {
+            "flags": [],
+            "immediate": false
+          },
+          "extraction": {
+            "useExtraction": false,
+            "structuredComplete": true,
+            "reasons": []
+          },
+          "telemetry": {
+            "stage": "triage",
+            "model": null,
+            "promptVariant": "full",
+            "safetyGuardMs": 0,
+            "preprocessingMs": 0,
+            "totalMs": 2,
+            "fallback": false
+          }
+        }
+      },
+      "comparison": {
+        "requestMatch": true,
+        "locationMatch": true,
+        "countMatch": true,
+        "safetyMatch": true,
+        "gateMatch": true,
+        "passed": true
+      }
+    },
+    {
+      "id": "food-structured",
+      "text": "食事の配布場所を知りたいです。体育館Bに2人います。",
+      "expected": {
+        "request": "food_supply",
+        "location": "体育館B",
+        "count": 2,
+        "safety": false
+      },
+      "result": {
+        "status": 200,
+        "elapsedMs": 49,
+        "payload": {
+          "ok": true,
+          "aiMode": "deterministic-triage",
+          "runtimeMode": "auto",
+          "selectedLanguage": "ja",
+          "incident": {
+            "language": "ja",
+            "location": "体育館B",
+            "target": {
+              "type": null,
+              "count": 2,
+              "ageGroup": null
+            },
+            "facts": [
+              "配布",
+              "食事",
+              "配布に関する確認",
+              "食事・食料に関する相談"
+            ],
+            "request": "food_supply",
+            "urgency": "medium",
+            "safetyFlags": [],
+            "missingFields": [],
+            "askedFields": [],
+            "originalText": [
+              "食事の配布場所を知りたいです。体育館Bに2人います。"
+            ],
+            "confidence": null,
+            "category": null,
+            "structuredComplete": true,
+            "fourBRequested": false,
+            "fourBStatus": "not_needed"
+          },
+          "safety": {
+            "flags": [],
+            "immediate": false
+          },
+          "extraction": {
+            "useExtraction": false,
+            "structuredComplete": true,
+            "reasons": []
+          },
+          "telemetry": {
+            "stage": "triage",
+            "model": null,
+            "promptVariant": "full",
+            "safetyGuardMs": 1,
+            "preprocessingMs": 0,
+            "totalMs": 1,
+            "fallback": false
+          }
+        }
+      },
+      "comparison": {
+        "requestMatch": true,
+        "locationMatch": true,
+        "countMatch": true,
+        "safetyMatch": true,
+        "gateMatch": true,
+        "passed": true
+      }
+    },
+    {
+      "id": "blanket-structured",
+      "text": "毛布が足りません。4枚必要です。",
+      "expected": {
+        "request": "food_supply",
+        "location": "体育館A",
+        "count": 4,
+        "safety": false
+      },
+      "result": {
+        "status": 200,
+        "elapsedMs": 55,
+        "payload": {
+          "ok": true,
+          "aiMode": "deterministic-triage",
+          "runtimeMode": "auto",
+          "selectedLanguage": "ja",
+          "incident": {
+            "language": "ja",
+            "location": "体育館A",
+            "target": {
+              "type": null,
+              "count": 4,
+              "ageGroup": null
+            },
+            "facts": [
+              "毛布"
+            ],
+            "request": "food_supply",
+            "urgency": "medium",
+            "safetyFlags": [],
+            "missingFields": [],
+            "askedFields": [],
+            "originalText": [
+              "毛布が足りません。4枚必要です。"
+            ],
+            "confidence": null,
+            "category": null,
+            "structuredComplete": true,
+            "fourBRequested": false,
+            "fourBStatus": "not_needed"
+          },
+          "safety": {
+            "flags": [],
+            "immediate": false
+          },
+          "extraction": {
+            "useExtraction": false,
+            "structuredComplete": true,
+            "reasons": []
+          },
+          "telemetry": {
+            "stage": "triage",
+            "model": null,
+            "promptVariant": "full",
+            "safetyGuardMs": 0,
+            "preprocessingMs": 0,
+            "totalMs": 0,
+            "fallback": false
+          }
+        }
+      },
+      "comparison": {
+        "requestMatch": true,
+        "locationMatch": true,
+        "countMatch": true,
+        "safetyMatch": true,
+        "gateMatch": true,
+        "passed": true
+      }
+    },
+    {
+      "id": "toilet-structured",
+      "text": "北トイレが詰まっていて使えません。",
+      "expected": {
+        "request": "toilet_assistance",
+        "location": "北トイレ",
+        "safety": false
+      },
+      "result": {
+        "status": 200,
+        "elapsedMs": 51,
+        "payload": {
+          "ok": true,
+          "aiMode": "deterministic-triage",
+          "runtimeMode": "auto",
+          "selectedLanguage": "ja",
+          "incident": {
+            "language": "ja",
+            "location": "北トイレ",
+            "target": null,
+            "facts": [
+              "トイレ",
+              "詰ま",
+              "トイレに関する相談",
+              "使用できない"
+            ],
+            "request": "toilet_assistance",
+            "urgency": "medium",
+            "safetyFlags": [],
+            "missingFields": [],
+            "askedFields": [],
+            "originalText": [
+              "北トイレが詰まっていて使えません。"
+            ],
+            "confidence": null,
+            "category": null,
+            "structuredComplete": true,
+            "fourBRequested": false,
+            "fourBStatus": "not_needed"
+          },
+          "safety": {
+            "flags": [],
+            "immediate": false
+          },
+          "extraction": {
+            "useExtraction": false,
+            "structuredComplete": true,
+            "reasons": []
+          },
+          "telemetry": {
+            "stage": "triage",
+            "model": null,
+            "promptVariant": "full",
+            "safetyGuardMs": 0,
+            "preprocessingMs": 0,
+            "totalMs": 1,
+            "fallback": false
+          }
+        }
+      },
+      "comparison": {
+        "requestMatch": true,
+        "locationMatch": true,
+        "countMatch": true,
+        "safetyMatch": true,
+        "gateMatch": true,
+        "passed": true
+      }
+    },
+    {
+      "id": "medicine-structured",
+      "text": "薬がなくなりそうです。救護スペースにいます。",
+      "expected": {
+        "request": "medical_assistance",
+        "location": "救護スペース",
+        "safety": true
+      },
+      "result": {
+        "status": 200,
+        "elapsedMs": 68,
+        "payload": {
+          "ok": true,
+          "aiMode": "deterministic-triage",
+          "runtimeMode": "auto",
+          "selectedLanguage": "ja",
+          "incident": {
+            "language": "ja",
+            "location": "救護スペース",
+            "target": null,
+            "facts": [
+              "なくなりそう",
+              "薬・持病に関する相談"
+            ],
+            "request": "medical_assistance",
+            "urgency": "high",
+            "safetyFlags": [
+              "重大な体調変化"
+            ],
+            "missingFields": [],
+            "askedFields": [],
+            "originalText": [
+              "薬がなくなりそうです。救護スペースにいます。"
+            ],
+            "confidence": null,
+            "category": null,
+            "structuredComplete": true,
+            "fourBRequested": false,
+            "fourBStatus": "not_needed"
+          },
+          "safety": {
+            "flags": [
+              "重大な体調変化"
+            ],
+            "immediate": true
+          },
+          "extraction": {
+            "useExtraction": false,
+            "structuredComplete": true,
+            "reasons": []
+          },
+          "telemetry": {
+            "stage": "triage",
+            "model": null,
+            "promptVariant": "full",
+            "safetyGuardMs": 0,
+            "preprocessingMs": 0,
+            "totalMs": 0,
+            "fallback": false
+          }
+        }
+      },
+      "comparison": {
+        "requestMatch": true,
+        "locationMatch": true,
+        "countMatch": true,
+        "safetyMatch": true,
+        "gateMatch": true,
+        "passed": true
+      }
+    },
+    {
+      "id": "pet-structured",
+      "text": "犬と過ごせる場所を教えてください。",
+      "expected": {
+        "request": "general_assistance",
+        "location": "受付",
+        "safety": false
+      },
+      "result": {
+        "status": 200,
+        "elapsedMs": 53,
+        "payload": {
+          "ok": true,
+          "aiMode": "deterministic-triage",
+          "runtimeMode": "auto",
+          "selectedLanguage": "ja",
+          "incident": {
+            "language": "ja",
+            "location": "受付",
+            "target": {
+              "type": "pet",
+              "count": 1,
+              "ageGroup": null
+            },
+            "facts": [
+              "犬"
+            ],
+            "request": "general_assistance",
+            "urgency": "unknown",
+            "safetyFlags": [],
+            "missingFields": [
+              "追加確認"
+            ],
+            "askedFields": [],
+            "originalText": [
+              "犬と過ごせる場所を教えてください。"
+            ],
+            "confidence": null,
+            "category": null,
+            "structuredComplete": false,
+            "fourBRequested": true,
+            "fourBStatus": "pending"
+          },
+          "safety": {
+            "flags": [],
+            "immediate": false
+          },
+          "extraction": {
+            "useExtraction": true,
+            "structuredComplete": false,
+            "reasons": [
+              "structured_incomplete"
+            ]
+          },
+          "telemetry": {
+            "stage": "triage",
+            "model": null,
+            "promptVariant": "full",
+            "safetyGuardMs": 0,
+            "preprocessingMs": 0,
+            "totalMs": 0,
+            "fallback": false
+          }
+        }
+      },
+      "comparison": {
+        "requestMatch": true,
+        "locationMatch": true,
+        "countMatch": true,
+        "safetyMatch": true,
+        "gateMatch": true,
+        "passed": true
+      }
+    },
+    {
+      "id": "charging-structured",
+      "text": "携帯電話を充電したいです。",
+      "expected": {
+        "request": "general_assistance",
+        "location": "受付",
+        "safety": false
+      },
+      "result": {
+        "status": 200,
+        "elapsedMs": 57,
+        "payload": {
+          "ok": true,
+          "aiMode": "deterministic-triage",
+          "runtimeMode": "auto",
+          "selectedLanguage": "ja",
+          "incident": {
+            "language": "ja",
+            "location": "受付",
+            "target": null,
+            "facts": [
+              "充電",
+              "携帯電話"
+            ],
+            "request": "general_assistance",
+            "urgency": "unknown",
+            "safetyFlags": [],
+            "missingFields": [
+              "追加確認"
+            ],
+            "askedFields": [],
+            "originalText": [
+              "携帯電話を充電したいです。"
+            ],
+            "confidence": null,
+            "category": null,
+            "structuredComplete": false,
+            "fourBRequested": true,
+            "fourBStatus": "pending"
+          },
+          "safety": {
+            "flags": [],
+            "immediate": false
+          },
+          "extraction": {
+            "useExtraction": true,
+            "structuredComplete": false,
+            "reasons": [
+              "structured_incomplete"
+            ]
+          },
+          "telemetry": {
+            "stage": "triage",
+            "model": null,
+            "promptVariant": "full",
+            "safetyGuardMs": 0,
+            "preprocessingMs": 0,
+            "totalMs": 0,
+            "fallback": false
+          }
+        }
+      },
+      "comparison": {
+        "requestMatch": true,
+        "locationMatch": true,
+        "countMatch": true,
+        "safetyMatch": true,
+        "gateMatch": true,
+        "passed": true
+      }
+    },
+    {
+      "id": "water-missing-location",
+      "text": "昨日から水がありません。子どももいて困っています。",
+      "expected": {
+        "request": "water_supply",
+        "location": null,
+        "count": 1,
+        "safety": false,
+        "fourB": true
+      },
+      "result": {
+        "status": 200,
+        "elapsedMs": 47,
+        "payload": {
+          "ok": true,
+          "aiMode": "deterministic-triage",
+          "runtimeMode": "auto",
+          "selectedLanguage": "ja",
+          "incident": {
+            "language": "ja",
+            "location": null,
+            "target": {
+              "type": "child",
+              "count": 1,
+              "ageGroup": null
+            },
+            "facts": [
+              "水",
+              "飲料水・給水の不足または案内",
+              "子どもがいる",
+              "昨日"
+            ],
+            "request": "water_supply",
+            "urgency": "medium",
+            "safetyFlags": [],
+            "missingFields": [
+              "場所"
+            ],
+            "askedFields": [],
+            "originalText": [
+              "昨日から水がありません。子どももいて困っています。"
+            ],
+            "confidence": null,
+            "category": null,
+            "structuredComplete": false,
+            "fourBRequested": true,
+            "fourBStatus": "pending"
+          },
+          "safety": {
+            "flags": [],
+            "immediate": false
+          },
+          "extraction": {
+            "useExtraction": true,
+            "structuredComplete": false,
+            "reasons": [
+              "structured_incomplete"
+            ]
+          },
+          "telemetry": {
+            "stage": "triage",
+            "model": null,
+            "promptVariant": "full",
+            "safetyGuardMs": 0,
+            "preprocessingMs": 0,
+            "totalMs": 1,
+            "fallback": false
+          }
+        }
+      },
+      "comparison": {
+        "requestMatch": true,
+        "locationMatch": true,
+        "countMatch": true,
+        "safetyMatch": true,
+        "gateMatch": true,
+        "passed": true
+      }
+    },
+    {
+      "id": "medical-known-location",
+      "text": "体育館Aで子どもが39度あってぐったりしています。",
+      "expected": {
+        "request": "medical_assistance",
+        "location": "体育館A",
+        "count": 1,
+        "safety": true
+      },
+      "result": {
+        "status": 200,
+        "elapsedMs": 60,
+        "payload": {
+          "ok": true,
+          "aiMode": "deterministic-triage",
+          "runtimeMode": "auto",
+          "selectedLanguage": "ja",
+          "incident": {
+            "language": "ja",
+            "location": "体育館A",
+            "target": {
+              "type": "child",
+              "count": 1,
+              "ageGroup": null
+            },
+            "facts": [
+              "子どもがいる",
+              "39度の発熱",
+              "ぐったりしている"
+            ],
+            "request": "medical_assistance",
+            "urgency": "high",
+            "safetyFlags": [
+              "重大な体調変化"
+            ],
+            "missingFields": [],
+            "askedFields": [],
+            "originalText": [
+              "体育館Aで子どもが39度あってぐったりしています。"
+            ],
+            "confidence": null,
+            "category": null,
+            "structuredComplete": true,
+            "fourBRequested": false,
+            "fourBStatus": "not_needed"
+          },
+          "safety": {
+            "flags": [
+              "重大な体調変化"
+            ],
+            "immediate": true
+          },
+          "extraction": {
+            "useExtraction": false,
+            "structuredComplete": true,
+            "reasons": []
+          },
+          "telemetry": {
+            "stage": "triage",
+            "model": null,
+            "promptVariant": "full",
+            "safetyGuardMs": 0,
+            "preprocessingMs": 0,
+            "totalMs": 0,
+            "fallback": false
+          }
+        }
+      },
+      "comparison": {
+        "requestMatch": true,
+        "locationMatch": true,
+        "countMatch": true,
+        "safetyMatch": true,
+        "gateMatch": true,
+        "passed": true
+      }
+    },
+    {
+      "id": "fire-known-location",
+      "text": "調理室から煙が出ています。",
+      "expected": {
+        "request": "fire_response",
+        "location": "調理室",
+        "safety": true
+      },
+      "result": {
+        "status": 200,
+        "elapsedMs": 56,
+        "payload": {
+          "ok": true,
+          "aiMode": "deterministic-triage",
+          "runtimeMode": "auto",
+          "selectedLanguage": "ja",
+          "incident": {
+            "language": "ja",
+            "location": "調理室",
+            "target": null,
+            "facts": [
+              "煙または火"
+            ],
+            "request": "fire_response",
+            "urgency": "high",
+            "safetyFlags": [
+              "火災・煙"
+            ],
+            "missingFields": [],
+            "askedFields": [],
+            "originalText": [
+              "調理室から煙が出ています。"
+            ],
+            "confidence": null,
+            "category": null,
+            "structuredComplete": true,
+            "fourBRequested": false,
+            "fourBStatus": "not_needed"
+          },
+          "safety": {
+            "flags": [
+              "火災・煙"
+            ],
+            "immediate": true
+          },
+          "extraction": {
+            "useExtraction": false,
+            "structuredComplete": true,
+            "reasons": []
+          },
+          "telemetry": {
+            "stage": "triage",
+            "model": null,
+            "promptVariant": "full",
+            "safetyGuardMs": 0,
+            "preprocessingMs": 0,
+            "totalMs": 0,
+            "fallback": false
+          }
+        }
+      },
+      "comparison": {
+        "requestMatch": true,
+        "locationMatch": true,
+        "countMatch": true,
+        "safetyMatch": true,
+        "gateMatch": true,
+        "passed": true
+      }
+    },
+    {
+      "id": "violence-known-location",
+      "text": "受付で刃物を振り回している人がいます。",
+      "expected": {
+        "request": "safety_assistance",
+        "location": "受付",
+        "safety": true
+      },
+      "result": {
+        "status": 200,
+        "elapsedMs": 58,
+        "payload": {
+          "ok": true,
+          "aiMode": "deterministic-triage",
+          "runtimeMode": "auto",
+          "selectedLanguage": "ja",
+          "incident": {
+            "language": "ja",
+            "location": "受付",
+            "target": null,
+            "facts": [
+              "安全上の危険"
+            ],
+            "request": "safety_assistance",
+            "urgency": "high",
+            "safetyFlags": [
+              "暴力・武器"
+            ],
+            "missingFields": [],
+            "askedFields": [],
+            "originalText": [
+              "受付で刃物を振り回している人がいます。"
+            ],
+            "confidence": null,
+            "category": null,
+            "structuredComplete": true,
+            "fourBRequested": false,
+            "fourBStatus": "not_needed"
+          },
+          "safety": {
+            "flags": [
+              "暴力・武器"
+            ],
+            "immediate": true
+          },
+          "extraction": {
+            "useExtraction": false,
+            "structuredComplete": true,
+            "reasons": []
+          },
+          "telemetry": {
+            "stage": "triage",
+            "model": null,
+            "promptVariant": "full",
+            "safetyGuardMs": 0,
+            "preprocessingMs": 0,
+            "totalMs": 0,
+            "fallback": false
+          }
+        }
+      },
+      "comparison": {
+        "requestMatch": true,
+        "locationMatch": true,
+        "countMatch": true,
+        "safetyMatch": true,
+        "gateMatch": true,
+        "passed": true
+      }
+    },
+    {
+      "id": "fever-missing-location",
+      "text": "何回言っても誰も来ないんですけど！子供が39度あってぐったりしてるんです！",
+      "expected": {
+        "request": "medical_assistance",
+        "location": null,
+        "count": 1,
+        "safety": true,
+        "fourB": true
+      },
+      "result": {
+        "status": 200,
+        "elapsedMs": 46,
+        "payload": {
+          "ok": true,
+          "aiMode": "deterministic-triage",
+          "runtimeMode": "auto",
+          "selectedLanguage": "ja",
+          "incident": {
+            "language": "ja",
+            "location": null,
+            "target": {
+              "type": "child",
+              "count": 1,
+              "ageGroup": null
+            },
+            "facts": [
+              "子どもがいる",
+              "39度の発熱",
+              "ぐったりしている"
+            ],
+            "request": "medical_assistance",
+            "urgency": "high",
+            "safetyFlags": [
+              "重大な体調変化"
+            ],
+            "missingFields": [
+              "場所"
+            ],
+            "askedFields": [],
+            "originalText": [
+              "何回言っても誰も来ないんですけど！子供が39度あってぐったりしてるんです！"
+            ],
+            "confidence": null,
+            "category": null,
+            "structuredComplete": false,
+            "fourBRequested": true,
+            "fourBStatus": "pending"
+          },
+          "safety": {
+            "flags": [
+              "重大な体調変化"
+            ],
+            "immediate": true
+          },
+          "extraction": {
+            "useExtraction": true,
+            "structuredComplete": false,
+            "reasons": [
+              "structured_incomplete"
+            ]
+          },
+          "telemetry": {
+            "stage": "triage",
+            "model": null,
+            "promptVariant": "full",
+            "safetyGuardMs": 0,
+            "preprocessingMs": 0,
+            "totalMs": 1,
+            "fallback": false
+          }
+        }
+      },
+      "comparison": {
+        "requestMatch": true,
+        "locationMatch": true,
+        "countMatch": true,
+        "safetyMatch": true,
+        "gateMatch": true,
+        "passed": true
+      }
+    },
+    {
+      "id": "long-mixed",
+      "text": "水が足りないうえに、隣ではトイレも使えず、昨日から何度も伝えています。子どもがいて配布の時間も分からず、いったいどこへ行けばいいのか教えてください。",
+      "expected": {
+        "request": "toilet_assistance",
+        "location": "体育館北側",
+        "count": 3,
+        "safety": false,
+        "fourB": true
+      },
+      "result": {
+        "status": 200,
+        "elapsedMs": 55,
+        "payload": {
+          "ok": true,
+          "aiMode": "deterministic-triage",
+          "runtimeMode": "auto",
+          "selectedLanguage": "ja",
+          "incident": {
+            "language": "ja",
+            "location": "体育館北側",
+            "target": {
+              "type": "child",
+              "count": 3,
+              "ageGroup": null
+            },
+            "facts": [
+              "水",
+              "配布",
+              "トイレ",
+              "飲料水・給水の不足または案内",
+              "配布に関する確認",
+              "トイレに関する相談",
+              "子どもがいる",
+              "昨日"
+            ],
+            "request": "toilet_assistance",
+            "urgency": "medium",
+            "safetyFlags": [],
+            "missingFields": [],
+            "askedFields": [],
+            "originalText": [
+              "水が足りないうえに、隣ではトイレも使えず、昨日から何度も伝えています。子どもがいて配布の時間も分からず、いったいどこへ行けばいいのか教えてください。"
+            ],
+            "confidence": null,
+            "category": null,
+            "structuredComplete": true,
+            "fourBRequested": true,
+            "fourBStatus": "pending"
+          },
+          "safety": {
+            "flags": [],
+            "immediate": false
+          },
+          "extraction": {
+            "useExtraction": true,
+            "structuredComplete": true,
+            "reasons": [
+              "mixed_request"
+            ]
+          },
+          "telemetry": {
+            "stage": "triage",
+            "model": null,
+            "promptVariant": "full",
+            "safetyGuardMs": 0,
+            "preprocessingMs": 0,
+            "totalMs": 0,
+            "fallback": false
+          }
+        }
+      },
+      "comparison": {
+        "requestMatch": true,
+        "locationMatch": true,
+        "countMatch": true,
+        "safetyMatch": true,
+        "gateMatch": true,
+        "passed": true
+      }
+    },
+    {
+      "id": "uncertain-symptom",
+      "text": "たぶん母が熱っぽいかもしれません。薬も残り少ないです。",
+      "expected": {
+        "request": "medical_assistance",
+        "location": "B区画",
+        "count": 1,
+        "safety": false,
+        "fourB": true
+      },
+      "result": {
+        "status": 200,
+        "elapsedMs": 48,
+        "payload": {
+          "ok": true,
+          "aiMode": "deterministic-triage",
+          "runtimeMode": "auto",
+          "selectedLanguage": "ja",
+          "incident": {
+            "language": "ja",
+            "location": "B区画",
+            "target": {
+              "type": "adult",
+              "count": 1,
+              "ageGroup": "adult"
+            },
+            "facts": [
+              "薬・持病に関する相談"
+            ],
+            "request": "medical_assistance",
+            "urgency": "high",
+            "safetyFlags": [],
+            "missingFields": [],
+            "askedFields": [],
+            "originalText": [
+              "たぶん母が熱っぽいかもしれません。薬も残り少ないです。"
+            ],
+            "confidence": null,
+            "category": null,
+            "structuredComplete": true,
+            "fourBRequested": true,
+            "fourBStatus": "pending"
+          },
+          "safety": {
+            "flags": [],
+            "immediate": false
+          },
+          "extraction": {
+            "useExtraction": true,
+            "structuredComplete": true,
+            "reasons": [
+              "uncertainty_or_contradiction"
+            ]
+          },
+          "telemetry": {
+            "stage": "triage",
+            "model": null,
+            "promptVariant": "full",
+            "safetyGuardMs": 0,
+            "preprocessingMs": 0,
+            "totalMs": 0,
+            "fallback": false
+          }
+        }
+      },
+      "comparison": {
+        "requestMatch": true,
+        "locationMatch": true,
+        "countMatch": true,
+        "safetyMatch": true,
+        "gateMatch": true,
+        "passed": true
+      }
+    },
+    {
+      "id": "other-need",
+      "text": "通路が暗くて夜に歩くのが怖いです。",
+      "expected": {
+        "request": "general_assistance",
+        "location": "西側の通路",
+        "safety": false
+      },
+      "result": {
+        "status": 200,
+        "elapsedMs": 54,
+        "payload": {
+          "ok": true,
+          "aiMode": "deterministic-triage",
+          "runtimeMode": "auto",
+          "selectedLanguage": "ja",
+          "incident": {
+            "language": "ja",
+            "location": "西側の通路",
+            "target": null,
+            "facts": [
+              "怖い"
+            ],
+            "request": "general_assistance",
+            "urgency": "unknown",
+            "safetyFlags": [],
+            "missingFields": [
+              "追加確認"
+            ],
+            "askedFields": [],
+            "originalText": [
+              "通路が暗くて夜に歩くのが怖いです。"
+            ],
+            "confidence": null,
+            "category": null,
+            "structuredComplete": false,
+            "fourBRequested": true,
+            "fourBStatus": "pending"
+          },
+          "safety": {
+            "flags": [],
+            "immediate": false
+          },
+          "extraction": {
+            "useExtraction": true,
+            "structuredComplete": false,
+            "reasons": [
+              "structured_incomplete"
+            ]
+          },
+          "telemetry": {
+            "stage": "triage",
+            "model": null,
+            "promptVariant": "full",
+            "safetyGuardMs": 0,
+            "preprocessingMs": 0,
+            "totalMs": 0,
+            "fallback": false
+          }
+        }
+      },
+      "comparison": {
+        "requestMatch": true,
+        "locationMatch": true,
+        "countMatch": true,
+        "safetyMatch": true,
+        "gateMatch": true,
+        "passed": true
+      }
+    },
+    {
+      "id": "mixed-water-medicine",
+      "text": "水も薬も足りません。母は糖尿病で、昨日からインスリンを打てていません。",
+      "expected": {
+        "request": "medical_assistance",
+        "location": "救護スペース",
+        "count": 1,
+        "safety": true,
+        "fourB": true
+      },
+      "result": {
+        "status": 200,
+        "elapsedMs": 47,
+        "payload": {
+          "ok": true,
+          "aiMode": "deterministic-triage",
+          "runtimeMode": "auto",
+          "selectedLanguage": "ja",
+          "incident": {
+            "language": "ja",
+            "location": "救護スペース",
+            "target": {
+              "type": "adult",
+              "count": 1,
+              "ageGroup": "adult"
+            },
+            "facts": [
+              "水",
+              "インスリン",
+              "飲料水・給水の不足または案内",
+              "薬・持病に関する相談",
+              "昨日"
+            ],
+            "request": "medical_assistance",
+            "urgency": "high",
+            "safetyFlags": [
+              "重大な体調変化"
+            ],
+            "missingFields": [],
+            "askedFields": [],
+            "originalText": [
+              "水も薬も足りません。母は糖尿病で、昨日からインスリンを打てていません。"
+            ],
+            "confidence": null,
+            "category": null,
+            "structuredComplete": true,
+            "fourBRequested": true,
+            "fourBStatus": "pending"
+          },
+          "safety": {
+            "flags": [
+              "重大な体調変化"
+            ],
+            "immediate": true
+          },
+          "extraction": {
+            "useExtraction": true,
+            "structuredComplete": true,
+            "reasons": [
+              "mixed_request"
+            ]
+          },
+          "telemetry": {
+            "stage": "triage",
+            "model": null,
+            "promptVariant": "full",
+            "safetyGuardMs": 0,
+            "preprocessingMs": 0,
+            "totalMs": 0,
+            "fallback": false
+          }
+        }
+      },
+      "comparison": {
+        "requestMatch": true,
+        "locationMatch": true,
+        "countMatch": true,
+        "safetyMatch": true,
+        "gateMatch": true,
+        "passed": true
+      }
+    },
+    {
+      "id": "contradiction",
+      "text": "火事ではありませんが、焦げたにおいがして煙のようなものが見えます。",
+      "expected": {
+        "request": "fire_response",
+        "location": "調理室",
+        "safety": true,
+        "fourB": true
+      },
+      "result": {
+        "status": 200,
+        "elapsedMs": 55,
+        "payload": {
+          "ok": true,
+          "aiMode": "deterministic-triage",
+          "runtimeMode": "auto",
+          "selectedLanguage": "ja",
+          "incident": {
+            "language": "ja",
+            "location": "調理室",
+            "target": null,
+            "facts": [
+              "煙または火"
+            ],
+            "request": "fire_response",
+            "urgency": "high",
+            "safetyFlags": [
+              "火災・煙"
+            ],
+            "missingFields": [],
+            "askedFields": [],
+            "originalText": [
+              "火事ではありませんが、焦げたにおいがして煙のようなものが見えます。"
+            ],
+            "confidence": null,
+            "category": null,
+            "structuredComplete": true,
+            "fourBRequested": true,
+            "fourBStatus": "pending"
+          },
+          "safety": {
+            "flags": [
+              "火災・煙"
+            ],
+            "immediate": true
+          },
+          "extraction": {
+            "useExtraction": true,
+            "structuredComplete": true,
+            "reasons": [
+              "contradiction"
+            ]
+          },
+          "telemetry": {
+            "stage": "triage",
+            "model": null,
+            "promptVariant": "full",
+            "safetyGuardMs": 0,
+            "preprocessingMs": 0,
+            "totalMs": 0,
+            "fallback": false
+          }
+        }
+      },
+      "comparison": {
+        "requestMatch": true,
+        "locationMatch": true,
+        "countMatch": true,
+        "safetyMatch": true,
+        "gateMatch": true,
+        "passed": true
+      }
+    },
+    {
+      "id": "information-poor",
+      "text": "困っています。",
+      "expected": {
+        "request": "general_assistance",
+        "location": null,
+        "safety": false,
+        "fourB": true
+      },
+      "result": {
+        "status": 200,
+        "elapsedMs": 56,
+        "payload": {
+          "ok": true,
+          "aiMode": "deterministic-triage",
+          "runtimeMode": "auto",
+          "selectedLanguage": "ja",
+          "incident": {
+            "language": "ja",
+            "location": null,
+            "target": null,
+            "facts": [],
+            "request": "general_assistance",
+            "urgency": "unknown",
+            "safetyFlags": [],
+            "missingFields": [
+              "場所",
+              "追加確認"
+            ],
+            "askedFields": [],
+            "originalText": [
+              "困っています。"
+            ],
+            "confidence": null,
+            "category": null,
+            "structuredComplete": false,
+            "fourBRequested": true,
+            "fourBStatus": "pending"
+          },
+          "safety": {
+            "flags": [],
+            "immediate": false
+          },
+          "extraction": {
+            "useExtraction": true,
+            "structuredComplete": false,
+            "reasons": [
+              "structured_incomplete"
+            ]
+          },
+          "telemetry": {
+            "stage": "triage",
+            "model": null,
+            "promptVariant": "full",
+            "safetyGuardMs": 0,
+            "preprocessingMs": 0,
+            "totalMs": 0,
+            "fallback": false
+          }
+        }
+      },
+      "comparison": {
+        "requestMatch": true,
+        "locationMatch": true,
+        "countMatch": true,
+        "safetyMatch": true,
+        "gateMatch": true,
+        "passed": true
+      }
+    },
+    {
+      "id": "normal-request",
+      "text": "明日の食事配布の時間を教えてください。",
+      "expected": {
+        "request": "food_supply",
+        "location": "体育館入口",
+        "count": 2,
+        "safety": false
+      },
+      "result": {
+        "status": 200,
+        "elapsedMs": 60,
+        "payload": {
+          "ok": true,
+          "aiMode": "deterministic-triage",
+          "runtimeMode": "auto",
+          "selectedLanguage": "ja",
+          "incident": {
+            "language": "ja",
+            "location": "体育館入口",
+            "target": {
+              "type": null,
+              "count": 2,
+              "ageGroup": null
+            },
+            "facts": [
+              "配布",
+              "食事",
+              "配布に関する確認",
+              "食事・食料に関する相談"
+            ],
+            "request": "food_supply",
+            "urgency": "medium",
+            "safetyFlags": [],
+            "missingFields": [],
+            "askedFields": [],
+            "originalText": [
+              "明日の食事配布の時間を教えてください。"
+            ],
+            "confidence": null,
+            "category": null,
+            "structuredComplete": true,
+            "fourBRequested": false,
+            "fourBStatus": "not_needed"
+          },
+          "safety": {
+            "flags": [],
+            "immediate": false
+          },
+          "extraction": {
+            "useExtraction": false,
+            "structuredComplete": true,
+            "reasons": []
+          },
+          "telemetry": {
+            "stage": "triage",
+            "model": null,
+            "promptVariant": "full",
+            "safetyGuardMs": 0,
+            "preprocessingMs": 0,
+            "totalMs": 0,
+            "fallback": false
+          }
+        }
+      },
+      "comparison": {
+        "requestMatch": true,
+        "locationMatch": true,
+        "countMatch": true,
+        "safetyMatch": true,
+        "gateMatch": true,
+        "passed": true
+      }
+    },
+    {
+      "id": "emotional-nonurgent",
+      "text": "何度お願いしても毛布が来なくて本当に困っています。寒いので今日中に確認してください。",
+      "expected": {
+        "request": "food_supply",
+        "location": "A区画",
+        "count": 2,
+        "safety": false
+      },
+      "result": {
+        "status": 200,
+        "elapsedMs": 55,
+        "payload": {
+          "ok": true,
+          "aiMode": "deterministic-triage",
+          "runtimeMode": "auto",
+          "selectedLanguage": "ja",
+          "incident": {
+            "language": "ja",
+            "location": "A区画",
+            "target": {
+              "type": null,
+              "count": 2,
+              "ageGroup": null
+            },
+            "facts": [
+              "毛布",
+              "寒い"
+            ],
+            "request": "food_supply",
+            "urgency": "medium",
+            "safetyFlags": [],
+            "missingFields": [],
+            "askedFields": [],
+            "originalText": [
+              "何度お願いしても毛布が来なくて本当に困っています。寒いので今日中に確認してください。"
+            ],
+            "confidence": null,
+            "category": null,
+            "structuredComplete": true,
+            "fourBRequested": false,
+            "fourBStatus": "not_needed"
+          },
+          "safety": {
+            "flags": [],
+            "immediate": false
+          },
+          "extraction": {
+            "useExtraction": false,
+            "structuredComplete": true,
+            "reasons": []
+          },
+          "telemetry": {
+            "stage": "triage",
+            "model": null,
+            "promptVariant": "full",
+            "safetyGuardMs": 0,
+            "preprocessingMs": 0,
+            "totalMs": 0,
+            "fallback": false
+          }
+        }
+      },
+      "comparison": {
+        "requestMatch": true,
+        "locationMatch": true,
+        "countMatch": true,
+        "safetyMatch": true,
+        "gateMatch": true,
+        "passed": true
+      }
+    }
+  ]
+}

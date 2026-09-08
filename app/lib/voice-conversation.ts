@@ -5,9 +5,20 @@ import {
   type ShelterCategory,
   type ShelterIntake,
 } from '../../db/local-ai';
-import { normalizeIncidentCandidate, type CanonicalIncidentState } from './incident-schema';
+import { normalizeIncidentCandidate, type CanonicalIncidentState, type FourBStatus, type IncidentFieldProvenance, type IncidentProvenance, type IncidentSource } from './incident-schema';
 import { safetyGuard, type SafetyResult } from './safety-guard';
 import { requestVoiceModel } from './model-client';
+import { extractMultilingualIncidentHints } from './multilingual-incident';
+import {
+  localizedAcknowledgement,
+  localizedEmergencyReply,
+  localizedFieldQuestion,
+  localizedReadyReply,
+  localizedSafetyFallback,
+  normalizeConversationLanguage,
+  speechLanguageTag,
+  type ConversationLanguage,
+} from './conversation-language';
 
 export type TurnState = 'IDLE' | 'LISTENING' | 'USER_SPEAKING' | 'PROCESSING' | 'AI_SPEAKING' | 'INTERRUPTED' | 'ERROR';
 
@@ -29,6 +40,10 @@ export interface IncidentState {
   confidence?: number;
   category?: ShelterCategory;
   analysis?: ShelterAnalysis;
+  provenance?: IncidentProvenance;
+  structuredComplete?: boolean;
+  fourBRequested?: boolean;
+  fourBStatus?: FourBStatus;
 }
 
 export type ConversationTurn = {
@@ -59,7 +74,7 @@ export interface ASRProvider {
 
 export interface TTSProvider {
   readonly supported: boolean;
-  speak(text: string, callbacks: { onStart: () => void; onEnd: () => void; onError: () => void }): void;
+  speak(text: string, callbacks: { onStart: () => void; onEnd: () => void; onError: () => void }, language?: ConversationLanguage): void;
   stop(): void;
 }
 
@@ -99,10 +114,60 @@ function mergeUnique(values: string[], limit = 20): string[] {
   return Array.from(new Set(values.filter(Boolean))).slice(0, limit);
 }
 
-export function createInitialIncident(intake: ShelterIntake = {}): IncidentState {
-  const count = countFromText(intake.peopleCount ?? '');
+function provenance(value: unknown, source: IncidentSource, confirmed: boolean, evidence: string | null = null, messageId: string | null = null): IncidentFieldProvenance {
+  return { value, source, confirmed, messageId, evidence };
+}
+
+function structuredComplete(state: IncidentState): boolean {
+  if (!state.request || state.request === 'general_assistance' || !state.location) return false;
+  if (['water_supply', 'food_supply', 'infant_supplies'].includes(state.request) && !state.target?.count) return false;
+  if (state.request === 'medical_assistance' && !state.facts.length && !state.safetyFlags.length) return false;
+  return true;
+}
+
+/**
+ * 4B is an escalation lane, not the source of truth. Simple, structured
+ * incidents can be shown to staff immediately from deterministic fields.
+ */
+export function shouldRequestExtraction(text: string, state: IncidentState): { useExtraction: boolean; structuredComplete: boolean; reasons: string[] } {
+  const reasons: string[] = [];
+  const body = text.trim();
+  const complete = structuredComplete(state);
+  if (!complete) reasons.push('structured_incomplete');
+  if (body.length > 120) reasons.push('long_free_text');
+  if (/(かもしれ|たぶん|おそらく|でも|ただ|一方|maybe|perhaps|not sure|可能|也许|可能性|아마|모르)/i.test(body)) reasons.push('uncertainty_or_contradiction');
+  const domainHits = [/(水|飲料|給水|water)/i, /(食料|毛布|おむつ|ミルク|food|blanket)/i, /(トイレ|toilet)/i, /(薬|発熱|呼吸|medical|medicine|fever|breath)/i, /(火|煙|fire)/i, /(暴力|violence)/i].filter((pattern) => pattern.test(body)).length;
+  if (domainHits >= 2 || (domainHits > 0 && /(また|さらに|同時|それから|and|also|그리고|以及)/i.test(body))) reasons.push('mixed_request');
+  if (/(ではない|ではありません|not\s+(?:a\s+)?fire|but\s+there)/i.test(body)) reasons.push('contradiction');
+  if (state.safetyFlags.length && body.length > 80) reasons.push('important_hidden_facts_possible');
+  return { useExtraction: reasons.length > 0, structuredComplete: complete, reasons };
+}
+
+function withTextProvenance(state: IncidentState, text: string, next: IncidentState): IncidentState {
+  const current = state.provenance ?? {};
+  const nextFacts = next.facts.filter((fact) => !state.facts.includes(fact)).map((fact) => provenance(fact, 'user_text', false, text));
   return {
-    language: 'ja',
+    ...next,
+    provenance: {
+      ...current,
+      ...(next.location && next.location !== state.location ? { location: provenance(next.location, 'user_text', false, text) } : {}),
+      ...(next.target && JSON.stringify(next.target) !== JSON.stringify(state.target) ? { target: provenance(next.target, 'user_text', false, text) } : {}),
+      ...(next.request && next.request !== state.request ? { request: provenance(next.request, 'user_text', false, text) } : {}),
+      ...(nextFacts.length ? { facts: [...(current.facts ?? []), ...nextFacts].slice(-20) } : {}),
+      ...(next.urgency !== 'unknown' && next.urgency !== state.urgency ? { urgency: provenance(next.urgency, next.safetyFlags.length ? 'safety_rule' : 'user_text', false, text) } : {}),
+      ...(next.safetyFlags.length ? { safetyFlags: provenance(next.safetyFlags, 'safety_rule', false, text) } : {}),
+    },
+    structuredComplete: structuredComplete(next),
+  };
+}
+
+export function createInitialIncident(intake: ShelterIntake = {}, language: ConversationLanguage = 'ja'): IncidentState {
+  const count = countFromText(intake.peopleCount ?? '');
+  const initialProvenance: IncidentProvenance = {};
+  if (intake.location) initialProvenance.location = provenance(intake.location, 'user_selection', true, null, 'intake:location');
+  if (count) initialProvenance.target = provenance({ count }, 'user_selection', true, null, 'intake:peopleCount');
+  return {
+    language: normalizeConversationLanguage(language),
     location: intake.location || undefined,
     target: count ? { count } : undefined,
     facts: [],
@@ -111,6 +176,10 @@ export function createInitialIncident(intake: ShelterIntake = {}): IncidentState
     missingFields: [],
     askedFields: [],
     originalText: [],
+    provenance: initialProvenance,
+    structuredComplete: false,
+    fourBRequested: false,
+    fourBStatus: 'not_needed',
   };
 }
 
@@ -134,20 +203,29 @@ export function extractIncident(text: string, state: IncidentState, intake: Shel
   // is immediately overwritten by the older IncidentState.
   const analysis = generateShelterAnalysis(body, { ...intakeFromIncident(state), ...intake });
   const safety = safetyGuard.inspect(body);
-  return {
+  const hints = extractMultilingualIncidentHints(text);
+  const category = hints.category ?? analysis.category;
+  const request = hints.request ?? analysis.request;
+  const location = analysis.location || state.location || hints.location;
+  const target = hints.target ?? targetFromAnalysis(analysis) ?? state.target;
+  const missing = new Set(analysis.missingInformation);
+  if (!location) missing.add('場所');
+  if (!target?.count && ['water_supply', 'food_supply', 'infant_supplies'].includes(request ?? '')) missing.add('人数');
+  const next = {
     ...state,
-    location: analysis.location || state.location,
-    target: targetFromAnalysis(analysis) ?? state.target,
-    facts: mergeUnique(analysis.facts),
-    request: analysis.request,
-    urgency: urgencyFromAnalysis(analysis, safety),
+    location,
+    target,
+    facts: mergeUnique([...analysis.facts, ...hints.facts]),
+    request,
+    urgency: hints.urgent ? 'critical' : urgencyFromAnalysis(analysis, safety),
     safetyFlags: mergeUnique([...state.safetyFlags, ...safety.flags], 10),
-    missingFields: mergeUnique(analysis.missingInformation, 10),
+    missingFields: mergeUnique(Array.from(missing), 10),
     originalText: [...state.originalText, text.trim()].filter(Boolean).join('\n').slice(0, 500).split('\n'),
     confidence: analysis.urgencyConfidence,
-    category: analysis.category,
+    category,
     analysis,
   };
+  return withTextProvenance(state, text, next);
 }
 
 export function applyIncidentAnswer(state: IncidentState, field: IncidentField, answer: string): IncidentState {
@@ -159,15 +237,29 @@ export function applyIncidentAnswer(state: IncidentState, field: IncidentField, 
   if (field === '最後に受け取った時刻') intake.lastReceivedAt = value;
   if (field === '追加確認') intake.additionalDetails = value;
   const next = extractIncident(value, { ...state, askedFields: mergeUnique([...state.askedFields, field]) }, intake);
-  return { ...next, askedFields: mergeUnique([...next.askedFields, field], 10) };
+  const fieldId = `choice:${field}:${Date.now()}`;
+  const provenanceByField: IncidentProvenance = { ...(next.provenance ?? {}) };
+  if (field === '場所') provenanceByField.location = provenance(value, 'user_selection', true, null, fieldId);
+  if (field === '人数') {
+    const count = Number(value.match(/\d+/)?.[0] ?? NaN);
+    provenanceByField.target = provenance({ ...(next.target ?? {}), ...(Number.isFinite(count) ? { count } : {}) }, 'user_selection', true, null, fieldId);
+    provenanceByField.affectedCount = provenance(value, 'user_selection', true, null, fieldId);
+  }
+  if (field === '残量') provenanceByField.quantity = provenance(value, 'user_selection', true, null, fieldId);
+  if (field === '最後に受け取った時刻') provenanceByField.time = provenance(value, 'user_selection', true, null, fieldId);
+  if (field === '追加確認') provenanceByField.facts = [...(next.provenance?.facts ?? []), provenance(value, 'user_selection', true, null, fieldId)].slice(-20);
+  return { ...next, askedFields: mergeUnique([...next.askedFields, field], 10), provenance: provenanceByField, structuredComplete: structuredComplete(next) };
 }
 
 export function nextMissingField(state: IncidentState): IncidentField | null {
   return FIELD_ORDER.find((field) => state.missingFields.includes(field) && !state.askedFields.includes(field)) ?? null;
 }
 
-export function fieldQuestion(field: IncidentField, category: ShelterCategory = 'その他'): string {
-  if (field === '追加確認') return category === 'トイレ・衛生' ? 'そのトイレは今、使えますか？' : 'いちばん気になる状況を教えてください。';
+export function fieldQuestion(field: IncidentField, category: ShelterCategory = 'その他', language: ConversationLanguage = 'ja'): string {
+  if (field === '追加確認' && category !== 'トイレ・衛生') return localizedFieldQuestion(field, category, language);
+  if (field === '追加確認') return localizedFieldQuestion(field, category, language);
+  if (field === '残量' && category === '水・飲料') return localizedFieldQuestion(field, category, language);
+  if (language !== 'ja') return localizedFieldQuestion(field, category, language);
   return shelterFollowUp(field, category).question;
 }
 
@@ -177,9 +269,7 @@ export function fieldOptions(field: IncidentField, category: ShelterCategory = '
 }
 
 function shortAcknowledgement(state: IncidentState): string {
-  if (state.safetyFlags.length) return '緊急の可能性がある内容として、先に職員へ知らせます。';
-  if (state.urgency === 'high' || state.urgency === 'medium') return '状況を確認します。';
-  return '必要な情報だけ確認します。';
+  return localizedAcknowledgement(normalizeConversationLanguage(state.language), state.safetyFlags.length > 0, state.urgency);
 }
 
 export function buildIncidentCard(state: IncidentState): string {
@@ -194,9 +284,14 @@ export function buildIncidentCard(state: IncidentState): string {
   ].join('\n');
 }
 
-function safeReply(text: string): string {
-  if (!FORBIDDEN_PHRASES.some((phrase) => text.includes(phrase))) return text;
-  return '状況を確認します。必要な情報を一つだけ教えてください。';
+function safeReply(text: string, language: ConversationLanguage = 'ja'): string {
+  const forbidden = language === 'en'
+    ? ['calm down', 'take a deep breath', "don't worry", 'you will be fine', "you're fine"]
+    : language === 'zh' ? ['冷静下来', '深呼吸', '别担心', '没事']
+      : language === 'ko' ? ['진정하세요', '심호흡', '걱정하지 마세요', '괜찮습니다']
+        : FORBIDDEN_PHRASES;
+  if (!forbidden.some((phrase) => text.toLocaleLowerCase().includes(phrase.toLocaleLowerCase()))) return text;
+  return localizedSafetyFallback(language);
 }
 
 export class LocalRulesConversationProvider implements ConversationProvider {
@@ -204,13 +299,14 @@ export class LocalRulesConversationProvider implements ConversationProvider {
     const nextState = extractIncident(text, state, intake);
     const safety = safetyGuard.inspect(nextState.originalText.join('\n'));
     const nextField = nextMissingField(nextState);
-    const question = nextField ? fieldQuestion(nextField, nextState.category ?? 'その他') : '';
+    const language = normalizeConversationLanguage(nextState.language);
+    const question = nextField ? fieldQuestion(nextField, nextState.category ?? 'その他', language) : '';
     const reply = safety.immediate
-      ? `${shortAcknowledgement(nextState)}${nextField ? ` 今いる場所を教えてください。` : ' 近くの職員にもすぐ知らせてください。'}`
+      ? localizedEmergencyReply(language, Boolean(nextField))
       : nextField
         ? `${shortAcknowledgement(nextState)} ${question}`
-        : '内容を整理しました。職員へ伝える内容を確認してください。';
-    return { state: nextState, reply: safeReply(reply), nextField, safety, requiresConfirmation: !safety.immediate && !nextField };
+        : localizedReadyReply(language);
+    return { state: nextState, reply: safeReply(reply, language), nextField, safety, requiresConfirmation: !safety.immediate && !nextField };
   }
 }
 
@@ -235,11 +331,20 @@ export function canonicalFromIncident(state: IncidentState): CanonicalIncidentSt
     originalText: state.originalText,
     confidence: state.confidence ?? null,
     category: state.category ?? null,
+    provenance: state.provenance,
+    structuredComplete: state.structuredComplete,
+    fourBRequested: state.fourBRequested,
+    fourBStatus: state.fourBStatus,
   };
 }
 
 function stateFromCanonical(fallback: IncidentState, candidate: CanonicalIncidentState): IncidentState {
   const safety = safetyGuard.inspect(fallback.originalText.join('\n'));
+  const candidateProvenance: IncidentProvenance = { ...(fallback.provenance ?? {}) };
+  if (candidate.location && candidate.location !== fallback.location) candidateProvenance.location = provenance(candidate.location, 'llm_extraction', false, fallback.originalText.join('\n'));
+  if (candidate.target && JSON.stringify(candidate.target) !== JSON.stringify(fallback.target)) candidateProvenance.target = provenance(candidate.target, 'llm_extraction', false, fallback.originalText.join('\n'));
+  if (candidate.request && candidate.request !== fallback.request) candidateProvenance.request = provenance(candidate.request, 'llm_extraction', false, fallback.originalText.join('\n'));
+  if (candidate.facts.length) candidateProvenance.facts = candidate.facts.map((fact) => fallback.facts.includes(fact) ? (fallback.provenance?.facts?.find((item) => item.value === fact) ?? provenance(fact, 'user_text', false, null)) : provenance(fact, 'llm_extraction', false, fallback.originalText.join('\n'))).slice(-20);
   return {
     ...fallback,
     location: candidate.location ?? undefined,
@@ -257,6 +362,10 @@ function stateFromCanonical(fallback: IncidentState, candidate: CanonicalInciden
     originalText: fallback.originalText,
     confidence: candidate.confidence ?? fallback.confidence,
     category: candidate.category ?? fallback.category,
+    provenance: candidateProvenance,
+    structuredComplete: structuredComplete({ ...fallback, location: candidate.location ?? undefined, request: candidate.request ?? undefined, target: candidate.target ? { count: candidate.target.count ?? undefined, type: candidate.target.type ?? undefined, ageGroup: candidate.target.ageGroup ?? undefined } : undefined, facts: candidate.facts }),
+    fourBRequested: true,
+    fourBStatus: 'completed',
   };
 }
 
@@ -271,11 +380,14 @@ export class ApiConversationProvider implements ConversationProvider {
   async respond(text: string, state: IncidentState, intake: ShelterIntake = {}): Promise<ConversationTurn> {
     const fallback = await this.fallback.respond(text, state, intake);
     try {
-      const result = await requestVoiceModel({ mode: 'conversation', text, state, intake });
-      const nextField = fieldFromModel(result.nextField) ?? fallback.nextField;
+      const result = await requestVoiceModel({ mode: 'conversation', text, state, intake, selectedLanguage: normalizeConversationLanguage(state.language) });
+      const modelField = fieldFromModel(result.nextField);
+      const nextField = modelField && !state.askedFields.includes(modelField) && (state.missingFields.includes(modelField) || (modelField === '場所' && !state.location))
+        ? modelField
+        : fallback.nextField;
       return {
         state,
-        reply: safeReply(typeof result.reply === 'string' ? result.reply.trim().slice(0, 500) : fallback.reply),
+        reply: safeReply(typeof result.reply === 'string' ? result.reply.trim().slice(0, 500) : fallback.reply, normalizeConversationLanguage(state.language)),
         nextField,
         safety: fallback.safety,
         requiresConfirmation: nextField === null && result.requiresConfirmation !== false,
@@ -407,11 +519,11 @@ export class BrowserASRProvider implements ASRProvider {
 export class BrowserTTSProvider implements TTSProvider {
   readonly supported = typeof window !== 'undefined' && 'speechSynthesis' in window;
 
-  speak(text: string, callbacks: { onStart: () => void; onEnd: () => void; onError: () => void }): void {
+  speak(text: string, callbacks: { onStart: () => void; onEnd: () => void; onError: () => void }, language: ConversationLanguage = 'ja'): void {
     if (!this.supported || typeof window === 'undefined') { callbacks.onError(); return; }
     window.speechSynthesis.cancel();
     const utterance = new SpeechSynthesisUtterance(text);
-    utterance.lang = 'ja-JP'; utterance.rate = 0.96; utterance.pitch = 1; utterance.volume = 1;
+    utterance.lang = speechLanguageTag(language); utterance.rate = 0.96; utterance.pitch = 1; utterance.volume = 1;
     utterance.onstart = callbacks.onStart;
     utterance.onend = callbacks.onEnd;
     utterance.onerror = callbacks.onError;
@@ -504,11 +616,11 @@ export class ApiIncidentExtractor implements IncidentExtractor {
     // Do not append the same answer a second time before asking the model.
     const fallback = state.originalText.at(-1) === text ? state : await this.fallback.extract(text, state, intake);
     try {
-      const result = await requestVoiceModel({ mode: 'extract', text, state: fallback, intake });
+      const result = await requestVoiceModel({ mode: 'extract', text, state: fallback, intake, selectedLanguage: normalizeConversationLanguage(fallback.language) });
       const candidate = normalizeIncidentCandidate(result.incident, canonicalFromIncident(fallback));
       return stateFromCanonical(fallback, candidate);
     } catch {
-      return fallback;
+      return { ...fallback, fourBRequested: true, fourBStatus: 'failed', structuredComplete: structuredComplete(fallback) };
     }
   }
 }

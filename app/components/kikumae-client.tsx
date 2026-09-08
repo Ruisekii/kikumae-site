@@ -364,7 +364,7 @@ export function KikumaeClient({ faqs }: Props) {
     if (!preview || busy || submitLockRef.current) return;
     submitLockRef.current = true; previewRequestRef.current += 1; setBusy(true); setStatus(t('messages.delivering'));
     try {
-      const response = await fetch('/api/questions', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ body: originalBody, summary: preview.summary, category: preview.category, submissionKey: preview.submissionKey, intake }), signal: AbortSignal.timeout(15000) });
+      const response = await fetch('/api/questions', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ body: originalBody, summary: preview.summary, category: preview.category, submissionKey: preview.submissionKey, selectedLanguage: language, conversation: [{ role: 'user', originalText: originalBody, originalLanguage: language }], intake }), signal: AbortSignal.timeout(15000) });
       const payload = await response.json() as { message?: string; checkUrl?: string; id?: number };
       if (!response.ok) { setStatus(t('errors.deliver')); return; }
       const url = payload.checkUrl ?? ''; const id = typeof payload.id === 'number' ? payload.id : null;
@@ -380,7 +380,7 @@ export function KikumaeClient({ faqs }: Props) {
     submitLockRef.current = true; previewRequestRef.current += 1; setBusy(true); setStatus(t('messages.emergencySending'));
     const body = '【緊急】命に関わる・今すぐ助けが必要です。近くの職員への即時対応をお願いします。';
     try {
-      const response = await fetch('/api/questions', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ body, summary: '緊急のため、職員による即時確認が必要です。', category: 'その他', submissionKey: crypto.randomUUID(), intake: { ...emptyIntake, additionalDetails: '近くの職員にも直接声をかけてください。' } }), signal: AbortSignal.timeout(15000) });
+      const response = await fetch('/api/questions', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ body, summary: '緊急のため、職員による即時確認が必要です。', category: 'その他', selectedLanguage: language, submissionKey: crypto.randomUUID(), intake: { ...emptyIntake, additionalDetails: '近くの職員にも直接声をかけてください。' } }), signal: AbortSignal.timeout(15000) });
       const payload = await response.json() as { message?: string; checkUrl?: string; id?: number };
       if (!response.ok) { setStatus(t('errors.emergencyDeliver')); return; }
       const url = payload.checkUrl ?? ''; const id = typeof payload.id === 'number' ? payload.id : null;

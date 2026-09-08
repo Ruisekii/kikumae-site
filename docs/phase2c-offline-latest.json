@@ -1,0 +1,62 @@
+{
+  "generatedAt": "2026-09-08T10:36:12.204Z",
+  "baseUrl": "http://localhost:3000",
+  "literalNetworkSwitchOffPerformed": false,
+  "literalNetworkSwitchOffReason": "OS全体のネットワーク遮断は、利用者の通信・他タスクを壊すため、この評価では実施していません。localhost限定の静的監査とローカルSafety実機呼び出しを行い、完全オフライン合格とは判定していません。",
+  "smoke": {
+    "webUi": {
+      "status": 200,
+      "ok": true
+    },
+    "safetyGuard": {
+      "status": 200,
+      "immediate": true,
+      "flags": [
+        "意識・呼吸の異常"
+      ]
+    },
+    "externalRequestsInHtml": []
+  },
+  "functions": [
+    {
+      "name": "Web UI",
+      "classification": "full-offline-local-ui",
+      "evidence": "localhostで応答。HTMLに検出できる外部src/hrefを確認。ブラウザ拡張・CDNキャッシュは別途確認が必要。"
+    },
+    {
+      "name": "Safety Guard",
+      "classification": "full-offline",
+      "evidence": "サーバー内の決定的ルールをlocalhostで実行。LLM・翻訳に依存しない。"
+    },
+    {
+      "name": "Conversation Qwen3.5 2B",
+      "classification": "conditional-offline",
+      "evidence": "Ollamaを同一PC/避難所LANに置き、モデルがロード済みの場合のみ。公開サイトからlocalhostへは接続しない。"
+    },
+    {
+      "name": "Incident Extraction Qwen3.5 4B",
+      "classification": "conditional-offline",
+      "evidence": "Ollamaを同一PC/避難所LANに置いた場合のみ。モデル停止時はlocal-rulesへFallback。"
+    },
+    {
+      "name": "外国語→日本語翻訳",
+      "classification": "conditional-offline",
+      "evidence": "Qwen利用時はローカルLLMに依存し、失敗時は原文を保持して翻訳失敗扱い。"
+    },
+    {
+      "name": "音声認識",
+      "classification": "offline-not-proven",
+      "evidence": "BrowserASRProvider（SpeechRecognition / webkitSpeechRecognition）。processLocallyがtrueと確認できない場合は完全ローカルと表示しない。実ブラウザの実測が必要。"
+    },
+    {
+      "name": "音声読み上げ",
+      "classification": "offline-not-proven",
+      "evidence": "BrowserTTSProvider（SpeechSynthesis）。OS/ブラウザ音声エンジンのオフライン可否をこのサーバー監査だけでは保証できない。"
+    },
+    {
+      "name": "職員画面",
+      "classification": "conditional-offline",
+      "evidence": "ローカルWeb/DBで動作可能。ただし公開Cloudflare環境のデータ同期・認証はオンライン依存。"
+    }
+  ]
+}

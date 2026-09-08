@@ -1,0 +1,263 @@
+{
+  "generatedAt": "2026-09-08T11:18:33.439Z",
+  "baseUrl": "http://localhost:3000",
+  "caseCount": 9,
+  "translationSuccess": 7,
+  "preservationPassed": 6,
+  "rows": [
+    {
+      "id": "en-uncertainty",
+      "language": "en",
+      "text": "She may have a fever. We are not sure.",
+      "checks": {
+        "uncertainty": true,
+        "negation": true,
+        "symptoms": [
+          "fever"
+        ]
+      },
+      "status": 200,
+      "elapsedMs": 3668,
+      "result": {
+        "originalText": "She may have a fever. We are not sure.",
+        "originalLanguage": "en",
+        "translatedTextJa": "彼女は熱を持っているかもしれません。私たちは確信を持っていません。",
+        "translationStatus": "translated"
+      },
+      "preservation": {
+        "numbers": true,
+        "uncertainty": true,
+        "negation": true,
+        "symptoms": true,
+        "location": true,
+        "passed": true
+      }
+    },
+    {
+      "id": "en-number-time",
+      "language": "en",
+      "text": "Four people need 6 bottles of water at 14:30 in Zone A.",
+      "checks": {
+        "numbers": [
+          "4",
+          "6",
+          "14:30"
+        ],
+        "location": "Zone A"
+      },
+      "status": 200,
+      "elapsedMs": 3883,
+      "result": {
+        "originalText": "Four people need 6 bottles of water at 14:30 in Zone A.",
+        "originalLanguage": "en",
+        "translatedTextJa": "A、ゾーンで14時30分に4人が水6本が必要。",
+        "translationStatus": "translated"
+      },
+      "preservation": {
+        "numbers": true,
+        "uncertainty": true,
+        "negation": true,
+        "symptoms": true,
+        "location": true,
+        "passed": true
+      }
+    },
+    {
+      "id": "en-negative",
+      "language": "en",
+      "text": "There is no fire, but the extinguisher is missing.",
+      "checks": {
+        "negation": true,
+        "symptoms": [
+          "fire"
+        ],
+        "location": "extinguisher"
+      },
+      "status": 200,
+      "elapsedMs": 2145,
+      "result": {
+        "originalText": "There is no fire, but the extinguisher is missing.",
+        "originalLanguage": "en",
+        "translatedTextJa": "",
+        "translationStatus": "failed"
+      },
+      "preservation": {
+        "numbers": true,
+        "uncertainty": true,
+        "negation": false,
+        "symptoms": false,
+        "location": false,
+        "passed": false
+      }
+    },
+    {
+      "id": "zh-number",
+      "language": "zh",
+      "text": "体育馆B有3个人，从昨天晚上20:00没有水。",
+      "checks": {
+        "numbers": [
+          "3",
+          "20:00"
+        ],
+        "location": "体育馆B",
+        "negation": true
+      },
+      "status": 200,
+      "elapsedMs": 3413,
+      "result": {
+        "originalText": "体育馆B有3个人，从昨天晚上20:00没有水。",
+        "originalLanguage": "zh",
+        "translatedTextJa": "体育館 B に 3 人がいます。昨夜 20:00 から水がありません。",
+        "translationStatus": "translated"
+      },
+      "preservation": {
+        "numbers": true,
+        "uncertainty": true,
+        "negation": true,
+        "symptoms": true,
+        "location": true,
+        "passed": true
+      }
+    },
+    {
+      "id": "zh-uncertain",
+      "language": "zh",
+      "text": "孩子可能发烧了，但还不能确定。",
+      "checks": {
+        "uncertainty": true,
+        "symptoms": [
+          "发烧"
+        ]
+      },
+      "status": 200,
+      "elapsedMs": 2912,
+      "result": {
+        "originalText": "孩子可能发烧了，但还不能确定。",
+        "originalLanguage": "zh",
+        "translatedTextJa": "子供が熱を持っている可能性がありますが、確定できません。",
+        "translationStatus": "translated"
+      },
+      "preservation": {
+        "numbers": true,
+        "uncertainty": true,
+        "negation": true,
+        "symptoms": true,
+        "location": true,
+        "passed": true
+      }
+    },
+    {
+      "id": "zh-negative",
+      "language": "zh",
+      "text": "不是火灾，只是有一点烟味。",
+      "checks": {
+        "negation": true,
+        "symptoms": [
+          "烟"
+        ]
+      },
+      "status": 200,
+      "elapsedMs": 3479,
+      "result": {
+        "originalText": "不是火灾，只是有一点烟味。",
+        "originalLanguage": "zh",
+        "translatedTextJa": "",
+        "translationStatus": "failed"
+      },
+      "preservation": {
+        "numbers": true,
+        "uncertainty": true,
+        "negation": false,
+        "symptoms": false,
+        "location": true,
+        "passed": false
+      }
+    },
+    {
+      "id": "ko-number",
+      "language": "ko",
+      "text": "B구역 2명에게 10:15부터 약이 없습니다.",
+      "checks": {
+        "numbers": [
+          "2",
+          "10:15"
+        ],
+        "location": "B구역",
+        "negation": true,
+        "symptoms": [
+          "약"
+        ]
+      },
+      "status": 200,
+      "elapsedMs": 4106,
+      "result": {
+        "originalText": "B구역 2명에게 10:15부터 약이 없습니다.",
+        "originalLanguage": "ko",
+        "translatedTextJa": "B 区は 10:15 から薬が二人に与えられない。",
+        "translationStatus": "translated"
+      },
+      "preservation": {
+        "numbers": false,
+        "uncertainty": true,
+        "negation": true,
+        "symptoms": true,
+        "location": true,
+        "passed": false
+      }
+    },
+    {
+      "id": "ko-uncertain",
+      "language": "ko",
+      "text": "아이가 열이 있는 것 같지만 확실하지 않습니다.",
+      "checks": {
+        "uncertainty": true,
+        "symptoms": [
+          "열"
+        ]
+      },
+      "status": 200,
+      "elapsedMs": 3271,
+      "result": {
+        "originalText": "아이가 열이 있는 것 같지만 확실하지 않습니다.",
+        "originalLanguage": "ko",
+        "translatedTextJa": "子供が熱があるようですが、確実ではありません。",
+        "translationStatus": "translated"
+      },
+      "preservation": {
+        "numbers": true,
+        "uncertainty": true,
+        "negation": true,
+        "symptoms": true,
+        "location": true,
+        "passed": true
+      }
+    },
+    {
+      "id": "ko-negative",
+      "language": "ko",
+      "text": "화재가 아닙니다. 전기 냄새만 납니다.",
+      "checks": {
+        "negation": true,
+        "symptoms": [
+          "전기 냄새"
+        ]
+      },
+      "status": 200,
+      "elapsedMs": 3888,
+      "result": {
+        "originalText": "화재가 아닙니다. 전기 냄새만 납니다.",
+        "originalLanguage": "ko",
+        "translatedTextJa": "火災ではありません。ただ電気の臭いです。",
+        "translationStatus": "translated"
+      },
+      "preservation": {
+        "numbers": true,
+        "uncertainty": true,
+        "negation": true,
+        "symptoms": true,
+        "location": true,
+        "passed": true
+      }
+    }
+  ]
+}

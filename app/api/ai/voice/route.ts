@@ -1,8 +1,11 @@
 import { allowBurstShared, readRequestText } from '../../../../db/request-guard';
 import { incidentStateJsonSchema, normalizeIncidentCandidate, type CanonicalIncidentState } from '../../../lib/incident-schema';
-import { getModelRuntimeStatus, requestModelJson } from '../../../lib/model-gateway';
+import { allowsEvaluationOverrides, getModelRuntimeStatus, requestModelJsonDetailed, withExtractionConcurrency } from '../../../lib/model-gateway';
 import { detectSafetyFlags } from '../../../lib/safety-guard';
+import { conversationLanguageInstruction, localizedEmergencyReply, localizedSafetyFallback, normalizeConversationLanguage } from '../../../lib/conversation-language';
+import { shouldRequestExtraction } from '../../../lib/voice-conversation';
 import type { ShelterIntake } from '../../../../db/local-ai';
+import { organizeStaffIncident } from '../../../lib/staff-organization';
 
 export const runtime = 'edge';
 
@@ -45,6 +48,15 @@ function canonicalState(value: unknown): CanonicalIncidentState {
     safetyFlags: [], missingFields: [], askedFields: [], originalText: [], confidence: null, category: null,
   };
   return normalizeIncidentCandidate(value, base);
+}
+
+function guardConversationReply(value: string, language: ReturnType<typeof normalizeConversationLanguage>): string {
+  const forbidden = language === 'en'
+    ? ['calm down', 'take a deep breath', "don't worry", 'you will be fine', "you're fine"]
+    : language === 'zh' ? ['冷静下来', '深呼吸', '别担心', '没事']
+      : language === 'ko' ? ['진정하세요', '심호흡', '걱정하지 마세요', '괜찮습니다']
+        : ['落ち着いてください', '深呼吸してください', '冷静になってください', '大丈夫です', '安心してください'];
+  return forbidden.some((phrase) => value.toLocaleLowerCase().includes(phrase.toLocaleLowerCase())) ? localizedSafetyFallback(language) : value;
 }
 
 function intake(value: unknown): ShelterIntake {
@@ -146,9 +158,10 @@ function refineIncident(incident: CanonicalIncidentState, text: string, safety: 
   const knownLocation = incident.location || explicitLocation(text) || providedIntake.issueLocation || providedIntake.location || null;
   const explicit = explicitTarget(text);
   const intakeCount = Number(String(providedIntake.peopleCount ?? '').match(/\d{1,3}/)?.[0] ?? NaN);
-  const count = explicit?.count ?? incident.target?.count ?? explicitCount(text) ?? (Number.isFinite(intakeCount) ? intakeCount : null);
+  const explicitNumericCount = /(\d{1,3})\s*(?:人|名)/.test(text);
+  const count = explicitNumericCount ? (explicit?.count ?? explicitCount(text)) : (incident.target?.count ?? explicit?.count ?? (Number.isFinite(intakeCount) ? intakeCount : null));
   const targetCue = /(子供|こども|子ども|乳児|赤ちゃん|高齢|母|父|お母|お父|大人|成人|家族|\d{1,3}\s*(?:人|名))/.test(text);
-  const target = explicit ?? (!targetCue && incident.target?.type === 'adult' && count === 1
+  const target = explicit ? { ...explicit, count } : (!targetCue && incident.target?.type === 'adult' && count === 1
     ? null
     : count === null && !incident.target ? null : {
     type: incident.target?.type ?? null,
@@ -194,31 +207,104 @@ const extractionSystem = [
   '重要：originalTextは入力状態の値をそのまま保持し、モデルの言い換えで置き換えないでください。',
 ].join('\n');
 
+const extractionSystemCompact = [
+  '避難所相談の原文から、職員が対応するための事実だけをIncident JSONに抽出する。',
+  '原文にない事実を推測しない。不明値はnull、不足はmissingFields。原文はoriginalTextにそのまま保持する。',
+  'requestはmedical_assistance / water_supply / food_supply / toilet_assistance / infant_supplies / fire_response / safety_assistance / general_assistanceのいずれか。',
+  '高熱・ぐったり・意識/呼吸異常・火災・暴力はurgency=high候補。safetyFlagsはpossible_medical_emergency / possible_fire / possible_violence / possible_self_harmのみ。',
+  'targetは文中に明記された対象だけ。単数の子ども=child/1、乳児=infant/1、高齢者や父母=adult/1。本人の年齢不明なら推測しない。',
+  'missingFields/askedFieldsは場所・人数・残量・最後に受け取った時刻・追加確認だけ。職員が今すぐ必要なものに限定する。',
+  `JSON Schema: ${JSON.stringify(incidentStateJsonSchema)}`,
+  'JSONだけを返す。',
+].join('\n');
+
+function telemetryBase(started: number, safetyStarted: number, safetyFinished: number, mode: string, model: string | null, promptVariant: string): Record<string, unknown> {
+  return {
+    stage: mode,
+    model,
+    promptVariant,
+    safetyGuardMs: Math.round(safetyFinished - safetyStarted),
+    preprocessingMs: Math.round(safetyStarted - started),
+  };
+}
+
 export async function POST(request: Request): Promise<Response> {
   if (!sameOrigin(request)) return json({ message: 'この送信元は許可されていません。' }, 403);
-  if (!await allowBurstShared(request, 'ai-voice-gateway', 30, 10 * 60 * 1000)) return json({ message: '音声相談の処理が多すぎます。少し時間をおいてください。' }, 429);
+  const evaluationSuite = allowsEvaluationOverrides() && request.headers.get('x-kikumae-eval-suite') === 'phase2e';
+  if (!evaluationSuite && !await allowBurstShared(request, 'ai-voice-gateway', 30, 10 * 60 * 1000)) return json({ message: '音声相談の処理が多すぎます。少し時間をおいてください。' }, 429);
   try {
     const payload = record(JSON.parse(await readRequestText(request, MAX_REQUEST_BYTES)));
-    const mode = payload.mode === 'conversation' || payload.mode === 'extract' ? payload.mode : null;
+    const mode = payload.mode === 'conversation' || payload.mode === 'extract' || payload.mode === 'triage' || payload.mode === 'organize' ? payload.mode : null;
     const text = typeof payload.text === 'string' ? payload.text.trim().slice(0, 1000) : '';
     if (!mode || !text) return json({ message: '音声相談の入力形式が正しくありません。' }, 400);
+    const started = performance.now();
+    const safetyStarted = performance.now();
     const safety = detectSafetyFlags(text);
+    const safetyFinished = performance.now();
     const status = getModelRuntimeStatus();
-    if (status.mode === 'local-rules') return json({ ok: false, aiMode: 'local-rules', runtimeMode: status.mode, safety, reason: 'LOCAL_RULES_MODE' }, 200);
-    if (!status.configured) return json({ ok: false, aiMode: 'local-rules', runtimeMode: status.mode, safety, reason: 'MODEL_GATEWAY_NOT_CONFIGURED' }, 503);
+    const baseTelemetry = telemetryBase(started, safetyStarted, safetyFinished, mode, null, status.extractionPromptVariant);
     const parsedState = canonicalState(payload.state);
-    const state = parsedState.originalText.at(-1) === text ? parsedState : { ...parsedState, originalText: [...parsedState.originalText, text].slice(-12) };
+    const selectedLanguage = normalizeConversationLanguage(payload.selectedLanguage ?? parsedState.language);
+    const languageState = { ...parsedState, language: selectedLanguage };
+    const state = languageState.originalText.at(-1) === text ? languageState : { ...languageState, originalText: [...languageState.originalText, text].slice(-12) };
     const providedIntake = intake(payload.intake);
-    const context = JSON.stringify({ text, state, intake: providedIntake, safety }, null, 2);
-    const model = mode === 'conversation' ? status.conversationModel : status.extractionModel;
-    if (!model) return json({ ok: false, aiMode: 'local-rules', runtimeMode: status.mode, safety, reason: 'MODEL_NOT_CONFIGURED' }, 503);
-    const result = await requestModelJson(
+    if (mode === 'triage') {
+      const incident = { ...refineIncident(state, text, safety, providedIntake), safetyFlags: Array.from(new Set([...state.safetyFlags, ...safety.flags])) };
+      const decision = shouldRequestExtraction(text, {
+        language: incident.language,
+        location: incident.location ?? undefined,
+        target: incident.target ? { type: incident.target.type ?? undefined, count: incident.target.count ?? undefined, ageGroup: incident.target.ageGroup ?? undefined } : undefined,
+        facts: incident.facts,
+        request: incident.request ?? undefined,
+        urgency: incident.urgency,
+        safetyFlags: incident.safetyFlags,
+        missingFields: incident.missingFields,
+        askedFields: incident.askedFields,
+        originalText: incident.originalText,
+      });
+      const triagedIncident = { ...incident, structuredComplete: decision.structuredComplete, fourBRequested: decision.useExtraction, fourBStatus: decision.useExtraction ? 'pending' as const : 'not_needed' as const };
+      return json({ ok: true, aiMode: 'deterministic-triage', runtimeMode: status.mode, selectedLanguage, incident: triagedIncident, safety, extraction: decision, telemetry: { ...baseTelemetry, totalMs: Math.round(performance.now() - started), fallback: false } });
+    }
+    if (mode === 'organize') {
+      const structuredIncident = {
+        language: selectedLanguage, location: state.location, target: state.target, facts: state.facts,
+        request: state.request, urgency: state.urgency, safetyFlags: state.safetyFlags, missingFields: state.missingFields,
+        category: state.category, provenance: state.provenance,
+      };
+      const fault = allowsEvaluationOverrides() && request.headers.get('x-kikumae-eval-fault') === 'organization-down';
+      const organization = organizeStaffIncident({ body: text, originalLanguage: selectedLanguage, messageId: 'eval:organization', intake: providedIntake, structuredIncident, safety, mode: fault ? 'fallback' : 'evidence-bound' });
+      return json({ ok: true, aiMode: fault ? 'organization-fallback' : 'evidence-bound-organizer', runtimeMode: status.mode, selectedLanguage, organization, safety, telemetry: { ...baseTelemetry, totalMs: Math.round(performance.now() - started), fallback: fault } });
+    }
+    if (allowsEvaluationOverrides() && request.headers.get('x-kikumae-safety-only') === '1') return json({ ok: true, aiMode: 'safety-guard', runtimeMode: status.mode, safety, telemetry: { ...baseTelemetry, totalMs: Math.round(performance.now() - started), fallback: false } });
+    const injectedFault = allowsEvaluationOverrides() ? request.headers.get('x-kikumae-eval-fault') : null;
+    if (injectedFault && ['ollama-down', 'conversation-down', 'extraction-down', 'timeout', 'invalid-json', 'network-disconnect'].includes(injectedFault)) {
+      return json({ ok: false, aiMode: 'local-rules', runtimeMode: status.mode, safety, telemetry: { ...baseTelemetry, totalMs: Math.round(performance.now() - started), fallback: true, fault: injectedFault }, reason: `EVAL_FAULT_${injectedFault}` });
+    }
+    if (status.mode === 'local-rules') return json({ ok: false, aiMode: 'local-rules', runtimeMode: status.mode, safety, telemetry: { ...baseTelemetry, totalMs: Math.round(performance.now() - started), fallback: true }, reason: 'LOCAL_RULES_MODE' }, 200);
+    if (!status.configured) return json({ ok: false, aiMode: 'local-rules', runtimeMode: status.mode, safety, telemetry: { ...baseTelemetry, totalMs: Math.round(performance.now() - started), fallback: true }, reason: 'MODEL_GATEWAY_NOT_CONFIGURED' }, 503);
+    const context = JSON.stringify({ text, selectedLanguage, state, intake: providedIntake, safety }, null, 2);
+    const requestedModel = request.headers.get('x-kikumae-eval-model')?.trim() ?? '';
+    const modelOverride = allowsEvaluationOverrides() && /^[a-zA-Z0-9._:-]{1,100}$/.test(requestedModel) ? requestedModel : null;
+    const requestedPromptVariant = request.headers.get('x-kikumae-eval-prompt')?.trim();
+    const promptOverride = allowsEvaluationOverrides() && (requestedPromptVariant === 'full' || requestedPromptVariant === 'compact') ? requestedPromptVariant : null;
+    const model = modelOverride ?? (mode === 'conversation' ? status.conversationModel : status.extractionModel);
+    const extractionPromptVariant = promptOverride ?? status.extractionPromptVariant;
+    if (!model) return json({ ok: false, aiMode: 'local-rules', runtimeMode: status.mode, safety, telemetry: { ...baseTelemetry, totalMs: Math.round(performance.now() - started), fallback: true }, reason: 'MODEL_NOT_CONFIGURED' }, 503);
+    const modelCall = () => requestModelJsonDetailed(
       model,
-      mode === 'conversation' ? conversationSystem : extractionSystem,
+      mode === 'conversation' ? `${conversationSystem}\n${conversationLanguageInstruction(selectedLanguage)}` : extractionPromptVariant === 'compact' ? extractionSystemCompact : extractionSystem,
       context,
       mode === 'conversation' ? conversationJsonSchema : { type: 'json_schema', json_schema: { name: 'incident_state', strict: true, schema: incidentStateJsonSchema } },
       { maxTokens: mode === 'conversation' ? 120 : 260 },
     );
+    let queued: { value: Awaited<ReturnType<typeof requestModelJsonDetailed>>; queueMs: number };
+    try {
+      queued = mode === 'extract' ? await withExtractionConcurrency(modelCall) : { value: await modelCall(), queueMs: 0 };
+    } catch (error) {
+      return json({ ok: false, aiMode: 'local-rules', runtimeMode: status.mode, safety, telemetry: { ...baseTelemetry, model, totalMs: Math.round(performance.now() - started), fallback: true, queueMs: mode === 'extract' ? null : 0 }, reason: error instanceof Error ? error.message : 'MODEL_GATEWAY_FAILED' }, 200);
+    }
+    const modelResult = queued.value;
+    const result = modelResult.result;
     const candidate = record(result);
     if (mode === 'conversation') {
       const reply = typeof candidate.reply === 'string' ? candidate.reply.trim().slice(0, 500) : '';
@@ -227,18 +313,20 @@ export async function POST(request: Request): Promise<Response> {
       const askedFields = new Set(state.askedFields);
       const safeEmergencyField = safety.immediate && !state.location && !askedFields.has('場所') ? '場所' : null;
       const defaultField = missingFields.size === 0 && !state.location && !askedFields.has('場所') ? '場所' : null;
-      const nextField = requestedField && VALID_FIELDS.has(requestedField) && !askedFields.has(requestedField) && (missingFields.has(requestedField) || (missingFields.size === 0 && requestedField === '場所'))
+      const nextField = requestedField && VALID_FIELDS.has(requestedField) && !askedFields.has(requestedField) && (missingFields.has(requestedField) || (requestedField === '場所' && !state.location))
         ? requestedField
         : safeEmergencyField ?? defaultField;
-      if (!reply || (requestedField !== null && !VALID_FIELDS.has(requestedField))) return json({ ok: false, aiMode: 'local-rules', safety, reason: 'MODEL_OUTPUT_INVALID' }, 502);
+      if (!reply || (requestedField !== null && !VALID_FIELDS.has(requestedField))) return json({ ok: false, aiMode: 'local-rules', safety, telemetry: { ...baseTelemetry, model, modelTimings: modelResult.timings, totalMs: Math.round(performance.now() - started), fallback: true }, reason: 'MODEL_OUTPUT_INVALID' }, 502);
       const guardedReply = safety.immediate
-        ? `緊急の可能性がある内容として、先に職員へ知らせます。${nextField === '場所' ? '今いる場所を教えてください。' : '近くの職員にもすぐ知らせてください。'}`
-        : reply;
-      return json({ ok: true, aiMode: 'model-gateway', runtimeMode: status.mode, provider: status.provider, reply: guardedReply, nextField, requiresConfirmation: safety.immediate ? false : candidate.requiresConfirmation === true, safety });
+        ? localizedEmergencyReply(selectedLanguage, nextField === '場所')
+        : guardConversationReply(reply, selectedLanguage);
+      return json({ ok: true, aiMode: 'model-gateway', runtimeMode: status.mode, provider: status.provider, selectedLanguage, reply: guardedReply, nextField, requiresConfirmation: safety.immediate ? false : candidate.requiresConfirmation === true, safety, telemetry: { ...baseTelemetry, model, modelTimings: modelResult.timings, totalMs: Math.round(performance.now() - started), fallback: false } });
     }
+    const normalizationStarted = performance.now();
     const normalized = normalizeIncidentCandidate({ ...candidate, safetyFlags: [...(Array.isArray(candidate.safetyFlags) ? candidate.safetyFlags : []), ...safety.flags] }, state);
     const incident = refineIncident(normalized, text, safety, providedIntake);
-    return json({ ok: true, aiMode: 'model-gateway', runtimeMode: status.mode, provider: status.provider, incident, safety });
+    const normalizationMs = Math.round(performance.now() - normalizationStarted);
+    return json({ ok: true, aiMode: 'model-gateway', runtimeMode: status.mode, provider: status.provider, incident, safety, telemetry: { ...baseTelemetry, model, promptVariant: extractionPromptVariant, modelTimings: { ...modelResult.timings, queueMs: queued.queueMs }, normalizationMs, totalMs: Math.round(performance.now() - started), fallback: false } });
   } catch (error) {
     console.error('KIKUMAE_VOICE_MODEL_FAILED', error instanceof Error ? error.message : String(error));
     return json({ ok: false, aiMode: 'local-rules', reason: 'MODEL_GATEWAY_FAILED' }, 502);
