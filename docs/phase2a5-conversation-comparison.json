@@ -1,0 +1,541 @@
+{
+  "generatedAt": "2026-09-08T02:06:12.309Z",
+  "baseUrl": "http://127.0.0.1:11434",
+  "cases": 20,
+  "byModel": {
+    "qwen3.5:2b": {
+      "caseCount": 20,
+      "validJson": 20,
+      "averageMs": 3221,
+      "results": [
+        {
+          "id": "water-1",
+          "label": "飲料水",
+          "input": "体育館の水がもうありません。4人分、すぐに飲み水が必要です。",
+          "status": 200,
+          "elapsedMs": 4720,
+          "result": {
+            "reply": "すみません、体育館の用水路が止まってます。すぐにお水が欲しいですか？",
+            "nextField": "場所",
+            "requiresConfirmation": false
+          },
+          "valid": true
+        },
+        {
+          "id": "water-2",
+          "label": "飲料水",
+          "input": "昨日から飲料水を受け取れていません。残りはほとんどありません。",
+          "status": 200,
+          "elapsedMs": 3020,
+          "result": {
+            "reply": "お困りですね。場所を教えていただけますか？",
+            "nextField": "場所",
+            "requiresConfirmation": true
+          },
+          "valid": true
+        },
+        {
+          "id": "water-3",
+          "label": "飲料水",
+          "input": "給水所はどこですか。水をもらいたいです。",
+          "status": 200,
+          "elapsedMs": 3121,
+          "result": {
+            "reply": "給水所の位置を教えていただけますか。",
+            "nextField": "場所",
+            "requiresConfirmation": true
+          },
+          "valid": true
+        },
+        {
+          "id": "water-4",
+          "label": "飲料水",
+          "input": "水が一滴もなく、赤ちゃんと2人で困っています。",
+          "status": 200,
+          "elapsedMs": 2821,
+          "result": {
+            "reply": "場所を教えていただけますか？",
+            "nextField": "場所",
+            "requiresConfirmation": true
+          },
+          "valid": true
+        },
+        {
+          "id": "water-5",
+          "label": "飲料水",
+          "input": "北側の水道が出ません。",
+          "status": 200,
+          "elapsedMs": 3310,
+          "result": {
+            "reply": "場所がわからないので、北側で何か確認できますか？",
+            "nextField": "場所",
+            "requiresConfirmation": true
+          },
+          "valid": true
+        },
+        {
+          "id": "water-6",
+          "label": "飲料水",
+          "input": "水の配布は何時からですか？",
+          "status": 200,
+          "elapsedMs": 3471,
+          "result": {
+            "reply": "水配達は現在10時からです。場所を指定できますか？",
+            "nextField": "場所",
+            "requiresConfirmation": true
+          },
+          "valid": true
+        },
+        {
+          "id": "water-7",
+          "label": "飲料水",
+          "input": "水が足りないです。家族6人で待っています。",
+          "status": 200,
+          "elapsedMs": 2754,
+          "result": {
+            "reply": "場所を教えていただけますか？",
+            "nextField": "場所",
+            "requiresConfirmation": true
+          },
+          "valid": true
+        },
+        {
+          "id": "water-8",
+          "label": "飲料水",
+          "input": "子ども2人を含む5人ですが、飲み水がなくなりそうです。",
+          "status": 200,
+          "elapsedMs": 3085,
+          "result": {
+            "reply": "お困りありがとうございます。場所を優先して確認いたします。",
+            "nextField": "場所",
+            "requiresConfirmation": false
+          },
+          "valid": true
+        },
+        {
+          "id": "water-9",
+          "label": "飲料水",
+          "input": "水のタンクが空です。至急補充をお願いします。",
+          "status": 200,
+          "elapsedMs": 2805,
+          "result": {
+            "reply": "場所を教えていただけますか。",
+            "nextField": "場所",
+            "requiresConfirmation": true
+          },
+          "valid": true
+        },
+        {
+          "id": "water-10",
+          "label": "飲料水",
+          "input": "水はどこでもらえますか。場所が分かりません。",
+          "status": 200,
+          "elapsedMs": 2789,
+          "result": {
+            "reply": "場所を教えていただけますか。",
+            "nextField": "場所",
+            "requiresConfirmation": true
+          },
+          "valid": true
+        },
+        {
+          "id": "toilet-1",
+          "label": "トイレ・衛生",
+          "input": "北トイレが詰まっていて使えません。",
+          "status": 200,
+          "elapsedMs": 3208,
+          "result": {
+            "reply": "北トイレが使えませんか？場所を教えてください。",
+            "nextField": "場所",
+            "requiresConfirmation": true
+          },
+          "valid": true
+        },
+        {
+          "id": "toilet-2",
+          "label": "トイレ・衛生",
+          "input": "南側のトイレがとても汚れていて使えません。",
+          "status": 200,
+          "elapsedMs": 3938,
+          "result": {
+            "reply": "場所：南側トイレ\n状況：使用不可\n確認：清潔度と原因について教えていただけますか？",
+            "nextField": "場所",
+            "requiresConfirmation": true
+          },
+          "valid": true
+        },
+        {
+          "id": "toilet-3",
+          "label": "トイレ・衛生",
+          "input": "トイレの水が流れません。",
+          "status": 200,
+          "elapsedMs": 3093,
+          "result": {
+            "reply": "場所を教えていただけますか？",
+            "nextField": "場所",
+            "requiresConfirmation": true
+          },
+          "valid": true
+        },
+        {
+          "id": "toilet-4",
+          "label": "トイレ・衛生",
+          "input": "車いすで使えるトイレはどこですか？",
+          "status": 200,
+          "elapsedMs": 3465,
+          "result": {
+            "reply": "車いすで使えるトイレの場所を教えていただけますか。",
+            "nextField": "場所",
+            "requiresConfirmation": true
+          },
+          "valid": true
+        },
+        {
+          "id": "toilet-5",
+          "label": "トイレ・衛生",
+          "input": "夜中にトイレへ行ける照明がありません。",
+          "status": 200,
+          "elapsedMs": 3056,
+          "result": {
+            "reply": "お困りありがとうございます。場所を教えていただけますか？",
+            "nextField": "場所",
+            "requiresConfirmation": true
+          },
+          "valid": true
+        },
+        {
+          "id": "toilet-6",
+          "label": "トイレ・衛生",
+          "input": "トイレが全部混んでいて、急いでいます。",
+          "status": 200,
+          "elapsedMs": 3305,
+          "result": {
+            "reply": "お困りですね。場所を教えていただけますか？",
+            "nextField": "場所",
+            "requiresConfirmation": true
+          },
+          "valid": true
+        },
+        {
+          "id": "toilet-7",
+          "label": "トイレ・衛生",
+          "input": "受付横のトイレが壊れています。",
+          "status": 200,
+          "elapsedMs": 3225,
+          "result": {
+            "reply": "トイレの修理状況を確認できますか？",
+            "nextField": "場所",
+            "requiresConfirmation": true
+          },
+          "valid": true
+        },
+        {
+          "id": "toilet-8",
+          "label": "トイレ・衛生",
+          "input": "おむつを替えられる場所を教えてください。",
+          "status": 200,
+          "elapsedMs": 3143,
+          "result": {
+            "reply": "おむつ替え室があります。場所を確認できますか？",
+            "nextField": "場所",
+            "requiresConfirmation": true
+          },
+          "valid": true
+        },
+        {
+          "id": "toilet-9",
+          "label": "トイレ・衛生",
+          "input": "トイレの清掃をお願いしたいです。",
+          "status": 200,
+          "elapsedMs": 3310,
+          "result": {
+            "reply": "トイレの清掃をお願いします。場所を教えていただけますか？",
+            "nextField": "場所",
+            "requiresConfirmation": true
+          },
+          "valid": true
+        },
+        {
+          "id": "toilet-10",
+          "label": "トイレ・衛生",
+          "input": "トイレの場所が分かりません。",
+          "status": 200,
+          "elapsedMs": 2779,
+          "result": {
+            "reply": "お困りありがとうございます。場所を教えていただけますか？",
+            "nextField": "場所",
+            "requiresConfirmation": true
+          },
+          "valid": true
+        }
+      ]
+    },
+    "qwen3.5:4b": {
+      "caseCount": 20,
+      "validJson": 20,
+      "averageMs": 4197,
+      "results": [
+        {
+          "id": "water-1",
+          "label": "飲料水",
+          "input": "体育館の水がもうありません。4人分、すぐに飲み水が必要です。",
+          "status": 200,
+          "elapsedMs": 4252,
+          "result": {
+            "reply": "すみません。どの避難所ですか？",
+            "nextField": null,
+            "requiresConfirmation": true
+          },
+          "valid": true
+        },
+        {
+          "id": "water-2",
+          "label": "飲料水",
+          "input": "昨日から飲料水を受け取れていません。残りはほとんどありません。",
+          "status": 200,
+          "elapsedMs": 3727,
+          "result": {
+            "reply": "今、どの避難所ですか？",
+            "nextField": "場所",
+            "requiresConfirmation": true
+          },
+          "valid": true
+        },
+        {
+          "id": "water-3",
+          "label": "飲料水",
+          "input": "給水所はどこですか。水をもらいたいです。",
+          "status": 200,
+          "elapsedMs": 4229,
+          "result": {
+            "reply": "給水所の位置をお教えください。",
+            "nextField": "場所",
+            "requiresConfirmation": true
+          },
+          "valid": true
+        },
+        {
+          "id": "water-4",
+          "label": "飲料水",
+          "input": "水が一滴もなく、赤ちゃんと2人で困っています。",
+          "status": 200,
+          "elapsedMs": 3899,
+          "result": {
+            "reply": "今どこですか？",
+            "nextField": "場所",
+            "requiresConfirmation": true
+          },
+          "valid": true
+        },
+        {
+          "id": "water-5",
+          "label": "飲料水",
+          "input": "北側の水道が出ません。",
+          "status": 200,
+          "elapsedMs": 3914,
+          "result": {
+            "reply": "北側です。",
+            "nextField": "場所",
+            "requiresConfirmation": true
+          },
+          "valid": true
+        },
+        {
+          "id": "water-6",
+          "label": "飲料水",
+          "input": "水の配布は何時からですか？",
+          "status": 200,
+          "elapsedMs": 4055,
+          "result": {
+            "reply": "水配布の時間は場所によって異なります。現在おられる場所をお知らせください。",
+            "nextField": "場所",
+            "requiresConfirmation": true
+          },
+          "valid": true
+        },
+        {
+          "id": "water-7",
+          "label": "飲料水",
+          "input": "水が足りないです。家族6人で待っています。",
+          "status": 200,
+          "elapsedMs": 5717,
+          "result": {
+            "reply": "水不足の状況、承知しました。現在、お住まいの避難所の場所をお知らせいただけますか？（例：A棟、B棟など）",
+            "nextField": "場所",
+            "requiresConfirmation": true
+          },
+          "valid": true
+        },
+        {
+          "id": "water-8",
+          "label": "飲料水",
+          "input": "子ども2人を含む5人ですが、飲み水がなくなりそうです。",
+          "status": 200,
+          "elapsedMs": 3762,
+          "result": {
+            "reply": "避難所の場所をお知らせください。",
+            "nextField": "場所",
+            "requiresConfirmation": true
+          },
+          "valid": true
+        },
+        {
+          "id": "water-9",
+          "label": "飲料水",
+          "input": "水のタンクが空です。至急補充をお願いします。",
+          "status": 200,
+          "elapsedMs": 3690,
+          "result": {
+            "reply": "どの避難所ですか？",
+            "nextField": "場所",
+            "requiresConfirmation": true
+          },
+          "valid": true
+        },
+        {
+          "id": "water-10",
+          "label": "飲料水",
+          "input": "水はどこでもらえますか。場所が分かりません。",
+          "status": 200,
+          "elapsedMs": 4408,
+          "result": {
+            "reply": "お水が必要です。避難所の場所をお教えください。",
+            "nextField": "場所",
+            "requiresConfirmation": true
+          },
+          "valid": true
+        },
+        {
+          "id": "toilet-1",
+          "label": "トイレ・衛生",
+          "input": "北トイレが詰まっていて使えません。",
+          "status": 200,
+          "elapsedMs": 4479,
+          "result": {
+            "reply": "トイレの詰まりを承知しました。お困りの場所をお知らせください。",
+            "nextField": null,
+            "requiresConfirmation": true
+          },
+          "valid": true
+        },
+        {
+          "id": "toilet-2",
+          "label": "トイレ・衛生",
+          "input": "南側のトイレがとても汚れていて使えません。",
+          "status": 200,
+          "elapsedMs": 4263,
+          "result": {
+            "reply": "南側のトイレが使えないですね。避難所の場所を教えてください。",
+            "nextField": null,
+            "requiresConfirmation": true
+          },
+          "valid": true
+        },
+        {
+          "id": "toilet-3",
+          "label": "トイレ・衛生",
+          "input": "トイレの水が流れません。",
+          "status": 200,
+          "elapsedMs": 3831,
+          "result": {
+            "reply": "トイレの場所をお知らせください。",
+            "nextField": null,
+            "requiresConfirmation": true
+          },
+          "valid": true
+        },
+        {
+          "id": "toilet-4",
+          "label": "トイレ・衛生",
+          "input": "車いすで使えるトイレはどこですか？",
+          "status": 200,
+          "elapsedMs": 4495,
+          "result": {
+            "reply": "車いすで使えるトイレを探していますね。どの避難所についてお尋ねですか？",
+            "nextField": null,
+            "requiresConfirmation": true
+          },
+          "valid": true
+        },
+        {
+          "id": "toilet-5",
+          "label": "トイレ・衛生",
+          "input": "夜中にトイレへ行ける照明がありません。",
+          "status": 200,
+          "elapsedMs": 4587,
+          "result": {
+            "reply": "夜中のトイレへの照明がないと分かります。どの避難所ですか？",
+            "nextField": null,
+            "requiresConfirmation": true
+          },
+          "valid": true
+        },
+        {
+          "id": "toilet-6",
+          "label": "トイレ・衛生",
+          "input": "トイレが全部混んでいて、急いでいます。",
+          "status": 200,
+          "elapsedMs": 4267,
+          "result": {
+            "reply": "トイレの場所を教えてください。",
+            "nextField": "場所",
+            "requiresConfirmation": true
+          },
+          "valid": true
+        },
+        {
+          "id": "toilet-7",
+          "label": "トイレ・衛生",
+          "input": "受付横のトイレが壊れています。",
+          "status": 200,
+          "elapsedMs": 4032,
+          "result": {
+            "reply": "受付横のトイレです。",
+            "nextField": null,
+            "requiresConfirmation": false
+          },
+          "valid": true
+        },
+        {
+          "id": "toilet-8",
+          "label": "トイレ・衛生",
+          "input": "おむつを替えられる場所を教えてください。",
+          "status": 200,
+          "elapsedMs": 4160,
+          "result": {
+            "reply": "おむつ替えができる場所があります。",
+            "nextField": null,
+            "requiresConfirmation": false
+          },
+          "valid": true
+        },
+        {
+          "id": "toilet-9",
+          "label": "トイレ・衛生",
+          "input": "トイレの清掃をお願いしたいです。",
+          "status": 200,
+          "elapsedMs": 4189,
+          "result": {
+            "reply": "トイレの清掃依頼ですね。どの避難所ですか？",
+            "nextField": "場所",
+            "requiresConfirmation": true
+          },
+          "valid": true
+        },
+        {
+          "id": "toilet-10",
+          "label": "トイレ・衛生",
+          "input": "トイレの場所が分かりません。",
+          "status": 200,
+          "elapsedMs": 3974,
+          "result": {
+            "reply": "トイレの場所をお調べします。どの避難所ですか？",
+            "nextField": "場所",
+            "requiresConfirmation": true
+          },
+          "valid": true
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,122 @@
+{
+  "generatedAt": "2026-09-08T02:03:24.414Z",
+  "ollamaUrl": "http://127.0.0.1:11434",
+  "results": [
+    {
+      "model": "qwen3.5:2b",
+      "cold": {
+        "ok": true,
+        "status": 200,
+        "elapsedMs": 14762,
+        "totalDurationMs": 14716,
+        "loadDurationMs": 9706,
+        "promptEvalDurationMs": 965,
+        "evalDurationMs": 3880,
+        "promptEvalCount": 85,
+        "evalCount": 67,
+        "tokensPerSecond": 17.27,
+        "responsePreview": "{\n  \"reply\": \"お疲れ様です。水がないとのこと、大変な状況ですね。まずは今すぐ補充できるか、または別の水源がある場所を確認してください。\",\n  \"nextField\": \"「今すぐ補充できるか」「別の水源がある場所」\",\n  \"requiresConfirmation\": false\n}",
+        "error": null
+      },
+      "warm": [
+        {
+          "ok": true,
+          "status": 200,
+          "elapsedMs": 11959,
+          "totalDurationMs": 11949,
+          "loadDurationMs": 7693,
+          "promptEvalDurationMs": 730,
+          "evalDurationMs": 3502,
+          "promptEvalCount": 85,
+          "evalCount": 67,
+          "tokensPerSecond": 19.13,
+          "responsePreview": "{\n  \"reply\": \"お疲れ様です。避難所では水道が止まっている場合、まずは食料や飲料水などの基本生活物資を確認してください。\",\n  \"nextField\": \"「食料・飲料水の在庫状況」について教えていただけますか？\",\n  \"requiresConfirmation\": false\n}",
+          "error": null
+        },
+        {
+          "ok": true,
+          "status": 200,
+          "elapsedMs": 3236,
+          "totalDurationMs": 3229,
+          "loadDurationMs": 5,
+          "promptEvalDurationMs": 78,
+          "evalDurationMs": 3139,
+          "promptEvalCount": 85,
+          "evalCount": 59,
+          "tokensPerSecond": 18.8,
+          "responsePreview": "{\n  \"reply\": \"お疲れ様です。水がないのは大変な状況ですね。まずは今すぐ補充できるか、または別の水源がある場所があるか教えていただけますか。\",\n  \"nextField\": \"water_source\",\n  \"requiresConfirmation\": true\n}",
+          "error": null
+        }
+      ],
+      "loadedAfter": [
+        {
+          "name": "qwen3.5:2b",
+          "sizeBytes": 2361424607,
+          "sizeVramBytes": 0,
+          "contextLength": 4096
+        }
+      ]
+    },
+    {
+      "model": "qwen3.5:4b",
+      "cold": {
+        "ok": true,
+        "status": 200,
+        "elapsedMs": 30997,
+        "totalDurationMs": 30977,
+        "loadDurationMs": 24945,
+        "promptEvalDurationMs": 1233,
+        "evalDurationMs": 4702,
+        "promptEvalCount": 85,
+        "evalCount": 61,
+        "tokensPerSecond": 12.97,
+        "responsePreview": "{\n  \"reply\": \"お辛い状況ですね。水がないことと、お子様がいることでとても心配です。まずは、近所の避難所や給水施設の具体的な場所を確認しましょうか。\",\n  \"nextField\": \"場所\",\n  \"requiresConfirmation\": false\n}",
+        "error": null
+      },
+      "warm": [
+        {
+          "ok": true,
+          "status": 200,
+          "elapsedMs": 13536,
+          "totalDurationMs": 13529,
+          "loadDurationMs": 7198,
+          "promptEvalDurationMs": 1208,
+          "evalDurationMs": 5118,
+          "promptEvalCount": 85,
+          "evalCount": 69,
+          "tokensPerSecond": 13.48,
+          "responsePreview": "{\n  \"reply\": \"お辛い状況ですね。水がないことと、お子様がいることで不安や怒りを感じていらっしゃるのをお察しします。今すぐ近所の給水所や避難所の場所を確認しましょうか？\",\n  \"nextField\": \"場所\",\n  \"requiresConfirmation\": true\n}",
+          "error": null
+        },
+        {
+          "ok": true,
+          "status": 200,
+          "elapsedMs": 5020,
+          "totalDurationMs": 5015,
+          "loadDurationMs": 5,
+          "promptEvalDurationMs": 103,
+          "evalDurationMs": 4902,
+          "promptEvalCount": 85,
+          "evalCount": 67,
+          "tokensPerSecond": 13.67,
+          "responsePreview": "{\n  \"reply\": \"お辛い状況ですね。水がないことと、お子様がいることで特に不安や怒りを感じていらっしゃるのですね。まずは、近所の避難所や給水場の場所を確認しましょうか。\",\n  \"nextField\": \"場所\",\n  \"requiresConfirmation\": false\n}",
+          "error": null
+        }
+      ],
+      "loadedAfter": [
+        {
+          "name": "qwen3.5:4b",
+          "sizeBytes": 3134277548,
+          "sizeVramBytes": 0,
+          "contextLength": 4096
+        },
+        {
+          "name": "qwen3.5:2b",
+          "sizeBytes": 2361424607,
+          "sizeVramBytes": 0,
+          "contextLength": 4096
+        }
+      ]
+    }
+  ]
+}

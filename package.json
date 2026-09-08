@@ -10,6 +10,10 @@
     "build": "vinext build",
     "start": "vinext start",
     "eval:phase2a": "node scripts/phase2a-eval.mjs",
+    "eval:phase2a5": "node scripts/phase2a5-eval.mjs",
+    "eval:phase2a5:postprocess": "node scripts/phase2a5-postprocess.mjs",
+    "eval:phase2a5:conversation": "node scripts/phase2a5-conversation-eval.mjs",
+    "benchmark:phase2a5": "node scripts/phase2a5-ollama-benchmark.mjs",
     "lint": "eslint . --ignore-pattern dist --ignore-pattern .next"
   },
   "dependencies": {

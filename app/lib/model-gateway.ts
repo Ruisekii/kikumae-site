@@ -49,7 +49,22 @@ function extractJson(content: unknown): unknown {
   try { return JSON.parse(clean); } catch { return null; }
 }
 
-export async function requestModelJson(model: string, system: string, user: string, responseFormat?: unknown): Promise<unknown> {
+export type ModelRequestOptions = {
+  maxTokens?: number;
+};
+
+function maxTokens(fallback: number): number {
+  const configured = Number(value('AI_MODEL_MAX_TOKENS'));
+  return Number.isFinite(configured) ? configured : fallback;
+}
+
+export async function requestModelJson(
+  model: string,
+  system: string,
+  user: string,
+  responseFormat?: unknown,
+  options: ModelRequestOptions = {},
+): Promise<unknown> {
   const apiKey = value('AI_MODEL_API_KEY');
   const response = await fetch(endpoint(), {
     method: 'POST',
@@ -60,7 +75,7 @@ export async function requestModelJson(model: string, system: string, user: stri
     body: JSON.stringify({
       model,
       temperature: 0.1,
-      max_tokens: 700,
+      max_tokens: Math.max(96, Math.min(900, Math.round(options.maxTokens ?? maxTokens(420)))),
       reasoning_effort: 'none',
       response_format: responseFormat ?? { type: 'json_object' },
       messages: [{ role: 'system', content: system }, { role: 'user', content: user }],

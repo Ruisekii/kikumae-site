@@ -65,32 +65,97 @@ function explicitCount(text: string): number | null {
 }
 
 function explicitLocation(text: string): string | null {
-  const toilet = text.match(/([^\s。]{1,30}トイレ)(?:が|は)/);
+  const toilet = text.match(/([^\s。]{1,30}トイレ)(?:が|は|へ|を|に)/);
   if (toilet?.[1]) return toilet[1];
+  const named = text.match(/(西側の通路|北側の水場|体育館(?:東側|西側|北側|南側)?|(?:北|南|東|西)側|受付横|入口付近|救護スペース|調理室|A区画|B区画)/);
+  if (named?.[1]) return named[1];
   const incidentPlace = text.match(/([^。]{1,30}?)(?:から|で)(?:煙|火|出火)/);
   return incidentPlace?.[1]?.trim() || null;
 }
 
 function explicitFacts(text: string): string[] {
   const facts: string[] = [];
+  const add = (value: string) => { if (!facts.includes(value)) facts.push(value); };
+  const directTerms = ['水', '給水', '水道', '配布', 'トイレ', '汚れ', '詰ま', '流れない', '使えない', '車いす', '混ん', 'おむつ', 'ミルク', '毛布', '生理用品', '食事', '備蓄品', 'インスリン', '打てていない', '転ん', '歩けない', '高齢', '胸が痛い', 'けが', '血が止まらない', '包丁', '殺す', '閉じ込め', '返事がない', '壁', '崩れ', '危険', '怖い', '大声', '眠れない', '充電', '携帯電話', 'つながらない', '寒い', '犬', 'ペット', '受付時間', '場所が分からない', 'なくなりそう', '切れ'];
+  directTerms.filter((term) => text.includes(term)).forEach(add);
+  if (/水|飲料水|給水|水道/.test(text)) add('飲料水・給水の不足または案内');
+  if (/水道/.test(text)) add('水道が出ない');
+  if (/配布/.test(text)) add('配布に関する確認');
+  if (/食料|食事|ごはん|食べ物/.test(text)) add('食事・食料に関する相談');
+  if (/トイレ/.test(text)) add('トイレに関する相談');
+  if (/おむつ|ミルク|乳児|赤ちゃん/.test(text)) add('育児用品が不足');
+  if (/赤ちゃん|乳児/.test(text)) add('赤ちゃんがいる');
+  if (/子ども|こども|子供/.test(text)) add('子どもがいる');
+  if (/家族/.test(text)) add('家族が避難している');
+  if (/薬|インスリン|持病/.test(text)) add('薬・持病に関する相談');
+  if (/煙|けむり|火災|火事|燃え/.test(text)) add('煙または火');
+  if (/殴|暴力|刃物|武器|物を投げ/.test(text)) add('安全上の危険');
+  const fever = text.match(/(\d{2})\s*(?:度|℃)/);
+  if (fever?.[1]) add(`${fever[1]}度の発熱`);
+  if (/ぐったり/.test(text)) add('ぐったりしている');
+  if (/意識|反応が弱|起きない|起きん/.test(text)) add('意識・反応の異常');
+  if (/息|呼吸|会話が続か|しゃべれん/.test(text)) add('呼吸・会話の異常');
+  if (/血が止ま|出血/.test(text)) add('出血がある');
+  const time = text.match(/昨日|一昨日|今朝|今晩|昨夜|さっき|先ほど|数時間前|朝から|昼から|夜から|\d+時間|\d+分/);
+  if (time?.[0]) add(time[0]);
   if (/使えません|使用できません|使えない/.test(text)) facts.push('使用できない');
   if (/会話が続きません|会話が続かない/.test(text)) facts.push('会話が続かない');
-  return facts;
+  return Array.from(new Set(facts)).slice(0, 20);
+}
+
+function explicitTarget(text: string): CanonicalIncidentState['target'] | null {
+  const countOf = (pattern: RegExp, fallback = 1) => {
+    const match = text.match(pattern);
+    return match?.[1] ? Number(match[1]) : fallback;
+  };
+  if (/乳児|赤ちゃん/.test(text)) {
+    const accompanied = /(?:乳児|赤ちゃん)\s*と\s*\d{1,3}\s*(?:人|名)/.test(text);
+    return { type: 'infant', count: accompanied ? 1 : countOf(/(?:乳児|赤ちゃん)(?:が|を)?\s*(\d{1,3})\s*(?:人|名)/, 1), ageGroup: null };
+  }
+  if (/子ども|こども|子供/.test(text)) return { type: 'child', count: countOf(/(?:子ども|こども|子供)\s*(\d{1,3})\s*(?:人|名)/, 1), ageGroup: null };
+  if (/ペット|犬|猫/.test(text)) return { type: 'pet', count: countOf(/(?:犬|猫|ペット)\s*(\d{1,3})\s*(?:匹|頭)?/, 1), ageGroup: null };
+  if (/高齢|お年寄り|母|父|お母|お父/.test(text)) return { type: 'adult', count: 1, ageGroup: 'adult' };
+  const count = explicitCount(text);
+  return count === null ? null : { type: null, count, ageGroup: null };
+}
+
+function requestFromText(text: string, safety: ReturnType<typeof detectSafetyFlags>): string | null {
+  if (safety.flags.includes('火災・煙') || /煙|けむり|火災|火事|燃え/.test(text)) return 'fire_response';
+  if (safety.flags.includes('暴力・武器') || /暴力|殴|刃物|武器|振り回|物を投げ/.test(text)) return 'safety_assistance';
+  if (safety.flags.some((flag) => /意識|呼吸|体調|出血|胸痛/.test(flag)) || /薬|インスリン|高熱|発熱|ぐったり|息|胸|けが|怪我|救護/.test(text)) return 'medical_assistance';
+  if (/トイレ/.test(text)) return 'toilet_assistance';
+  if (/おむつ|ミルク|乳児|赤ちゃん/.test(text)) return 'infant_supplies';
+  if (/水|飲料水|給水|水道/.test(text)) return 'water_supply';
+  if (/食料|食事|ごはん|食べ物|毛布|生理用品|備蓄品/.test(text)) return 'food_supply';
+  return null;
+}
+
+function supportedFact(fact: string, text: string): boolean {
+  const normalizedFact = fact.replace(/[\s、。・!！?？「」『』()（）\[\]【】,.:;〜~ー\-]/g, '');
+  const normalizedText = text.replace(/[\s、。・!！?？「」『』()（）\[\]【】,.:;〜~ー\-]/g, '');
+  if (normalizedFact.length < 2) return false;
+  if (normalizedText.includes(normalizedFact)) return true;
+  const chunks = normalizedFact.match(/[一-龥ぁ-んァ-ン]{2,}|\d{2,}/g) ?? [];
+  if (chunks.some((chunk) => normalizedText.includes(chunk))) return true;
+  const aliases = [['水', '飲料水', '給水'], ['煙', 'けむり'], ['おむつ', '紙おむつ'], ['食事', 'ごはん'], ['使えない', '使用できない'], ['会話', 'しゃべれない'], ['ぐったり', '発熱', '度'], ['意識', '反応'], ['血', '出血']];
+  return aliases.some((group) => group.some((item) => normalizedFact.includes(item)) && group.some((item) => normalizedText.includes(item)));
 }
 
 function refineIncident(incident: CanonicalIncidentState, text: string, safety: ReturnType<typeof detectSafetyFlags>, providedIntake: ShelterIntake): CanonicalIncidentState {
-  const request = incident.request ?? (safety.flags.includes('火災・煙') ? 'fire_response' : safety.flags.includes('暴力・武器') ? 'safety_assistance' : null);
+  const request = requestFromText(text, safety) ?? incident.request ?? (safety.flags.includes('火災・煙') ? 'fire_response' : safety.flags.includes('暴力・武器') ? 'safety_assistance' : null);
   const knownLocation = incident.location || explicitLocation(text) || providedIntake.issueLocation || providedIntake.location || null;
-  const count = incident.target?.count ?? explicitCount(text);
+  const explicit = explicitTarget(text);
+  const intakeCount = Number(String(providedIntake.peopleCount ?? '').match(/\d{1,3}/)?.[0] ?? NaN);
+  const count = explicit?.count ?? incident.target?.count ?? explicitCount(text) ?? (Number.isFinite(intakeCount) ? intakeCount : null);
   const targetCue = /(子供|こども|子ども|乳児|赤ちゃん|高齢|母|父|お母|お父|大人|成人|家族|\d{1,3}\s*(?:人|名))/.test(text);
-  const target = !targetCue && incident.target?.type === 'adult' && count === 1
+  const target = explicit ?? (!targetCue && incident.target?.type === 'adult' && count === 1
     ? null
     : count === null && !incident.target ? null : {
     type: incident.target?.type ?? null,
     count,
     ageGroup: incident.target?.ageGroup ?? null,
-  };
-  const facts = Array.from(new Set([...incident.facts, ...explicitFacts(text)])).slice(0, 20);
+  });
+  const facts = Array.from(new Set([...incident.facts.filter((fact) => supportedFact(fact, text)), ...explicitFacts(text)])).slice(0, 20);
   const urgency = incident.urgency !== 'unknown'
     ? request === 'toilet_assistance' && /詰まって|使えない|使用できない|壊れ/.test(text) && incident.urgency === 'low' ? 'medium' as const : incident.urgency
     : safety.immediate
@@ -98,12 +163,9 @@ function refineIncident(incident: CanonicalIncidentState, text: string, safety: 
       : ['water_supply', 'food_supply', 'infant_supplies', 'toilet_assistance'].includes(request ?? '')
         ? 'medium' as const
         : incident.urgency;
-  const fields = new Set(incident.missingFields);
-  if (knownLocation) fields.delete('場所'); else fields.add('場所');
-  if (count !== null) fields.delete('人数');
-  if (/(昨日|今日|今朝|昨夜|さっき|先ほど|\d+時間|\d+分|ずっと|以前から)/.test(text)) fields.delete('最後に受け取った時刻');
-  if (!['water_supply', 'food_supply'].includes(request ?? '')) fields.delete('残量');
-  if (!['water_supply', 'food_supply'].includes(request ?? '')) fields.delete('最後に受け取った時刻');
+  const fields = new Set<string>();
+  if (!knownLocation) fields.add('場所');
+  if (count === null && ['water_supply', 'food_supply', 'infant_supplies'].includes(request ?? '')) fields.add('人数');
   if (safety.immediate || ['medical_assistance', 'fire_response', 'safety_assistance', 'toilet_assistance'].includes(request ?? '')) {
     return { ...incident, location: knownLocation, target, facts, request, urgency: urgency === 'unknown' ? 'high' : urgency, missingFields: knownLocation ? [] : ['場所'] };
   }
@@ -155,6 +217,7 @@ export async function POST(request: Request): Promise<Response> {
       mode === 'conversation' ? conversationSystem : extractionSystem,
       context,
       mode === 'conversation' ? conversationJsonSchema : { type: 'json_schema', json_schema: { name: 'incident_state', strict: true, schema: incidentStateJsonSchema } },
+      { maxTokens: mode === 'conversation' ? 120 : 260 },
     );
     const candidate = record(result);
     if (mode === 'conversation') {
@@ -163,9 +226,10 @@ export async function POST(request: Request): Promise<Response> {
       const missingFields = new Set(state.missingFields);
       const askedFields = new Set(state.askedFields);
       const safeEmergencyField = safety.immediate && !state.location && !askedFields.has('場所') ? '場所' : null;
+      const defaultField = missingFields.size === 0 && !state.location && !askedFields.has('場所') ? '場所' : null;
       const nextField = requestedField && VALID_FIELDS.has(requestedField) && !askedFields.has(requestedField) && (missingFields.has(requestedField) || (missingFields.size === 0 && requestedField === '場所'))
         ? requestedField
-        : safeEmergencyField;
+        : safeEmergencyField ?? defaultField;
       if (!reply || (requestedField !== null && !VALID_FIELDS.has(requestedField))) return json({ ok: false, aiMode: 'local-rules', safety, reason: 'MODEL_OUTPUT_INVALID' }, 502);
       const guardedReply = safety.immediate
         ? `緊急の可能性がある内容として、先に職員へ知らせます。${nextField === '場所' ? '今いる場所を教えてください。' : '近くの職員にもすぐ知らせてください。'}`

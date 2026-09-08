@@ -52,6 +52,7 @@ export default defineConfig(async ({ mode }) => {
       AI_MODEL_BASE_URL: localEnv.AI_MODEL_BASE_URL ?? '',
       AI_CONVERSATION_MODEL: localEnv.AI_CONVERSATION_MODEL ?? '',
       AI_EXTRACTION_MODEL: localEnv.AI_EXTRACTION_MODEL ?? '',
+      AI_MODEL_MAX_TOKENS: localEnv.AI_MODEL_MAX_TOKENS ?? '',
     } : {},
   };
 

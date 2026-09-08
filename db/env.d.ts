@@ -10,5 +10,6 @@ declare namespace Cloudflare {
     AI_EXTRACTION_MODEL?: string;
     AI_MODEL_MODE?: string;
     AI_MODEL_TIMEOUT_MS?: string;
+    AI_MODEL_MAX_TOKENS?: string;
   }
 }

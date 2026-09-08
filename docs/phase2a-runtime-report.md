@@ -40,3 +40,12 @@ Safety GuardはLLMと並列に実行し、医療・呼吸・火災・暴力を�
 ## 次の判断
 
 4Bでも医療・火災・暴力のSafety FlagとIncident JSON化は確認できました。次に9Bへ上げる場合は、速度・メモリ増加と引き換えに、複合案件の事実欠落、カテゴリ境界、追加確認項目の妥当性を比較する段階です。先に9Bへ移行するより、現在の10件を増やした回帰テストと、避難所固有のIntake情報を含む評価を増やす方が合理的です。
+
+## Phase 2A.5 追補
+
+110件の固定評価、2B/4B Conversation比較、Ollamaのcold/warmベンチマーク、GPU監査を追加しました。最新の実測値は以下です。
+
+- `docs/phase2a5-evaluation-latest.md`
+- `docs/phase2a5-conversation-comparison.md`
+- `docs/phase2a5-ollama-benchmark.md`
+- `docs/phase2a5-hardware-audit.md`
