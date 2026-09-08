@@ -2,17 +2,20 @@ import type { IncidentState } from './voice-conversation';
 import type { ShelterIntake } from '../../db/local-ai';
 
 export type VoiceModelMode = 'conversation' | 'extract';
+export type VoiceRuntimeMode = 'local-llm' | 'local-rules' | 'auto';
 
 export type VoiceModelRequest = {
   mode: VoiceModelMode;
   text: string;
   state: IncidentState;
   intake: ShelterIntake;
+  runtimeMode?: VoiceRuntimeMode;
 };
 
 export type VoiceModelResponse = {
   ok?: boolean;
   aiMode?: string;
+  runtimeMode?: VoiceRuntimeMode;
   provider?: string;
   reply?: string;
   nextField?: string | null;
@@ -22,7 +25,7 @@ export type VoiceModelResponse = {
 
 export async function requestVoiceModel(payload: VoiceModelRequest): Promise<VoiceModelResponse> {
   const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), 7000);
+  const timeout = setTimeout(() => controller.abort(), 120000);
   try {
     const response = await fetch('/api/ai/voice', {
       method: 'POST',
@@ -37,4 +40,3 @@ export async function requestVoiceModel(payload: VoiceModelRequest): Promise<Voi
     clearTimeout(timeout);
   }
 }
-

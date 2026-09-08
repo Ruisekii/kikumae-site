@@ -51,9 +51,9 @@ export const incidentStateJsonSchema = {
     facts: { type: 'array', items: { type: 'string' }, maxItems: 20 },
     request: { type: ['string', 'null'] },
     urgency: { type: 'string', enum: ['unknown', 'low', 'normal', 'medium', 'high', 'critical'] },
-    safetyFlags: { type: 'array', items: { type: 'string' }, maxItems: 20 },
-    missingFields: { type: 'array', items: { type: 'string' }, maxItems: 12 },
-    askedFields: { type: 'array', items: { type: 'string' }, maxItems: 12 },
+    safetyFlags: { type: 'array', items: { type: 'string', enum: ['possible_medical_emergency', 'possible_fire', 'possible_violence', 'possible_self_harm'] }, maxItems: 20 },
+    missingFields: { type: 'array', items: { type: 'string', enum: ['場所', '人数', '残量', '最後に受け取った時刻', '追加確認'] }, maxItems: 12 },
+    askedFields: { type: 'array', items: { type: 'string', enum: ['場所', '人数', '残量', '最後に受け取った時刻', '追加確認'] }, maxItems: 12 },
     originalText: { type: 'array', items: { type: 'string' }, maxItems: 12 },
     confidence: { type: ['number', 'null'], minimum: 0, maximum: 1 },
     category: { type: ['string', 'null'] },
@@ -62,6 +62,13 @@ export const incidentStateJsonSchema = {
 
 const URGENCY_VALUES = new Set<CanonicalIncidentUrgency>(['unknown', 'low', 'normal', 'medium', 'high', 'critical']);
 const CATEGORIES = new Set<ShelterCategory>(['水・飲料', '食料・物資', '医療・薬', 'トイレ・衛生', '設備・充電', 'ペット', '安全・その他', 'その他']);
+const INCIDENT_FIELDS = new Set(['場所', '人数', '残量', '最後に受け取った時刻', '追加確認']);
+const SAFETY_FLAG_ALIASES: Array<[RegExp, string]> = [
+  [/医療|体調|発熱|高熱|ぐったり|意識|呼吸|胸|けいれん/, 'possible_medical_emergency'],
+  [/火災|火|煙|燃え/, 'possible_fire'],
+  [/暴力|殴|蹴|刃物|武器|振り回/, 'possible_violence'],
+  [/自傷|自殺|死にたい|殺す/, 'possible_self_harm'],
+];
 
 function record(value: unknown): Record<string, unknown> | null {
   return value && typeof value === 'object' && !Array.isArray(value) ? value as Record<string, unknown> : null;
@@ -84,6 +91,23 @@ function integerOrNull(value: unknown): number | null {
 function confidenceOrNull(value: unknown): number | null {
   if (typeof value !== 'number' || !Number.isFinite(value)) return null;
   return Math.max(0, Math.min(1, value));
+}
+
+function safetyFlagList(value: unknown): string[] | null {
+  if (!Array.isArray(value)) return null;
+  const flags = value.flatMap((item) => {
+    if (typeof item !== 'string' || !item.trim()) return [];
+    const trimmed = item.trim();
+    if (['possible_medical_emergency', 'possible_fire', 'possible_violence', 'possible_self_harm'].includes(trimmed)) return [trimmed];
+    const alias = SAFETY_FLAG_ALIASES.find(([pattern]) => pattern.test(trimmed));
+    return alias ? [alias[1]] : [];
+  });
+  return Array.from(new Set(flags)).slice(0, 20);
+}
+
+function incidentFieldList(value: unknown, limit: number): string[] | null {
+  if (!Array.isArray(value)) return null;
+  return Array.from(new Set(value.filter((item): item is string => typeof item === 'string' && INCIDENT_FIELDS.has(item)))).slice(0, limit);
 }
 
 /** Model output is untrusted. Keep only schema-shaped values and preserve the raw text from the app state. */
@@ -109,12 +133,11 @@ export function normalizeIncidentCandidate(value: unknown, fallback: CanonicalIn
     facts: stringList(source.facts, 20) ?? fallback.facts,
     request: source.request === null ? null : stringOrNull(source.request) ?? fallback.request,
     urgency,
-    safetyFlags: stringList(source.safetyFlags, 20) ?? fallback.safetyFlags,
-    missingFields: stringList(source.missingFields, 12) ?? fallback.missingFields,
-    askedFields: stringList(source.askedFields, 12) ?? fallback.askedFields,
+    safetyFlags: safetyFlagList(source.safetyFlags) ?? fallback.safetyFlags,
+    missingFields: incidentFieldList(source.missingFields, 12) ?? fallback.missingFields,
+    askedFields: incidentFieldList(source.askedFields, 12) ?? fallback.askedFields,
     originalText: fallback.originalText,
     confidence: source.confidence === null ? null : confidenceOrNull(source.confidence) ?? fallback.confidence,
     category,
   };
 }
-

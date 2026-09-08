@@ -8,5 +8,7 @@ declare namespace Cloudflare {
     AI_MODEL_API_KEY?: string;
     AI_CONVERSATION_MODEL?: string;
     AI_EXTRACTION_MODEL?: string;
+    AI_MODEL_MODE?: string;
+    AI_MODEL_TIMEOUT_MS?: string;
   }
 }
