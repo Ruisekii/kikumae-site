@@ -64,9 +64,23 @@ function explicitCount(text: string): number | null {
   return match?.[1] ? Number(match[1]) : null;
 }
 
+function explicitLocation(text: string): string | null {
+  const toilet = text.match(/([^\s。]{1,30}トイレ)(?:が|は)/);
+  if (toilet?.[1]) return toilet[1];
+  const incidentPlace = text.match(/([^。]{1,30}?)(?:から|で)(?:煙|火|出火)/);
+  return incidentPlace?.[1]?.trim() || null;
+}
+
+function explicitFacts(text: string): string[] {
+  const facts: string[] = [];
+  if (/使えません|使用できません|使えない/.test(text)) facts.push('使用できない');
+  if (/会話が続きません|会話が続かない/.test(text)) facts.push('会話が続かない');
+  return facts;
+}
+
 function refineIncident(incident: CanonicalIncidentState, text: string, safety: ReturnType<typeof detectSafetyFlags>, providedIntake: ShelterIntake): CanonicalIncidentState {
   const request = incident.request ?? (safety.flags.includes('火災・煙') ? 'fire_response' : safety.flags.includes('暴力・武器') ? 'safety_assistance' : null);
-  const knownLocation = incident.location || providedIntake.issueLocation || providedIntake.location || null;
+  const knownLocation = incident.location || explicitLocation(text) || providedIntake.issueLocation || providedIntake.location || null;
   const count = incident.target?.count ?? explicitCount(text);
   const targetCue = /(子供|こども|子ども|乳児|赤ちゃん|高齢|母|父|お母|お父|大人|成人|家族|\d{1,3}\s*(?:人|名))/.test(text);
   const target = !targetCue && incident.target?.type === 'adult' && count === 1
@@ -76,8 +90,9 @@ function refineIncident(incident: CanonicalIncidentState, text: string, safety: 
     count,
     ageGroup: incident.target?.ageGroup ?? null,
   };
+  const facts = Array.from(new Set([...incident.facts, ...explicitFacts(text)])).slice(0, 20);
   const urgency = incident.urgency !== 'unknown'
-    ? incident.urgency
+    ? request === 'toilet_assistance' && /詰まって|使えない|使用できない|壊れ/.test(text) && incident.urgency === 'low' ? 'medium' as const : incident.urgency
     : safety.immediate
       ? 'high' as const
       : ['water_supply', 'food_supply', 'infant_supplies', 'toilet_assistance'].includes(request ?? '')
@@ -90,11 +105,11 @@ function refineIncident(incident: CanonicalIncidentState, text: string, safety: 
   if (!['water_supply', 'food_supply'].includes(request ?? '')) fields.delete('残量');
   if (!['water_supply', 'food_supply'].includes(request ?? '')) fields.delete('最後に受け取った時刻');
   if (safety.immediate || ['medical_assistance', 'fire_response', 'safety_assistance', 'toilet_assistance'].includes(request ?? '')) {
-    return { ...incident, location: knownLocation, target, request, urgency: urgency === 'unknown' ? 'high' : urgency, missingFields: knownLocation ? [] : ['場所'] };
+    return { ...incident, location: knownLocation, target, facts, request, urgency: urgency === 'unknown' ? 'high' : urgency, missingFields: knownLocation ? [] : ['場所'] };
   }
-  if (request === 'infant_supplies') return { ...incident, location: knownLocation, target, request, urgency, missingFields: knownLocation ? [] : ['場所'] };
-  if (request === 'general_assistance' || !request) return { ...incident, location: knownLocation, target, request: request ?? 'general_assistance', missingFields: knownLocation ? ['追加確認'] : ['場所', '追加確認'] };
-  return { ...incident, location: knownLocation, target, request, urgency, missingFields: Array.from(fields).slice(0, 12) };
+  if (request === 'infant_supplies') return { ...incident, location: knownLocation, target, facts, request, urgency, missingFields: knownLocation ? [] : ['場所'] };
+  if (request === 'general_assistance' || !request) return { ...incident, location: knownLocation, target, facts, request: request ?? 'general_assistance', missingFields: knownLocation ? ['追加確認'] : ['場所', '追加確認'] };
+  return { ...incident, location: knownLocation, target, facts, request, urgency, missingFields: Array.from(fields).slice(0, 12) };
 }
 
 const conversationSystem = [

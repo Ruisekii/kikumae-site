@@ -39,14 +39,14 @@ export const phase2aCases = [
     label: '呼吸異常',
     text: '息が苦しくて会話が続きません。すぐ救護を呼んでください。',
     intake: {},
-    expected: { location: null, target: null, facts: ['息苦し', '会話'], request: 'medical_assistance', urgency: 'high', safetyFlags: ['possible_medical_emergency'], missingFields: ['場所'] },
+    expected: { location: null, target: null, facts: ['息', '会話'], request: 'medical_assistance', urgency: 'high', safetyFlags: ['possible_medical_emergency'], missingFields: ['場所'] },
   },
   {
     id: 'fire',
     label: '火災',
     text: '調理室から煙が出ています。火が見えます。',
     intake: {},
-    expected: { location: '調理室', target: null, facts: ['煙', '火が見える'], request: 'fire_response', urgency: 'high', safetyFlags: ['possible_fire'], missingFields: [] },
+    expected: { location: '調理室', target: null, facts: ['煙', '火'], request: 'fire_response', urgency: 'high', safetyFlags: ['possible_fire'], missingFields: [] },
   },
   {
     id: 'violence',

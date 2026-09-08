@@ -16,10 +16,10 @@
 ## 10件評価
 
 - QwenのHTTP成功: 10/10
-- Qwen期待JSON完全一致: 8/10
+- Qwen期待JSON完全一致: 9/10
 - local-rules期待JSON完全一致: 0/10
-- Qwen Incident Extraction: 平均22,896ms、最短20,388ms、最長26,831ms
-- Conversation: 平均8,705ms、最短7,999ms、最長9,606ms
+- Qwen Incident Extraction: 平均23,006ms、最短19,490ms、最長25,885ms
+- Conversation: 平均8,730ms、最短8,222ms、最長9,438ms
 
 評価ケースは飲料水不足、トイレ、乳児用品、高熱、意識異常、呼吸異常、火災、暴力、強い怒りだが非緊急の案件、情報不足の10件です。各ケースのlocal-rules結果・Qwen結果・期待JSONは `phase2a-evaluation-latest.json` と同名Markdownに保存しています。
 

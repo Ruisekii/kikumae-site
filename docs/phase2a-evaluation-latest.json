@@ -1,33 +1,33 @@
 {
-  "generatedAt": "2026-09-08T00:47:55.678Z",
+  "generatedAt": "2026-09-08T01:08:00.416Z",
   "baseUrl": "http://localhost:3000",
   "model": "qwen3.5:4b",
   "caseCount": 10,
-  "qwenExact": 8,
+  "qwenExact": 9,
   "localRulesExact": 0,
   "qwenElapsedMs": [
-    20654,
-    24254,
-    24466,
-    26831,
-    23840,
-    22166,
-    21532,
-    20388,
-    22868,
-    21959
+    24228,
+    23946,
+    24309,
+    25885,
+    23033,
+    22040,
+    21815,
+    22406,
+    22910,
+    19490
   ],
   "conversationElapsedMs": [
-    8613,
-    8538,
-    9552,
-    9606,
-    7999,
-    8566,
-    8135,
-    9091,
-    8896,
-    8056
+    8973,
+    8222,
+    8576,
+    9438,
+    8224,
+    8731,
+    8398,
+    9388,
+    8992,
+    8360
   ],
   "results": [
     {
@@ -72,7 +72,7 @@
             "残量"
           ]
         },
-        "elapsedMs": 187,
+        "elapsedMs": 257,
         "score": {
           "passed": 4,
           "total": 6,
@@ -89,8 +89,9 @@
             "ageGroup": null
           },
           "facts": [
-            "昨日から水がありません。",
-            "4人で、飲み水はほとんど残っていません。"
+            "4人いる",
+            "昨日から水がない",
+            "飲み水の残量がほとんどない"
           ],
           "request": "water_supply",
           "urgency": "medium",
@@ -99,6 +100,10 @@
             "場所"
           ],
           "askedFields": [
+            "場所",
+            "人数",
+            "残量",
+            "最後に受け取った時刻",
             "追加確認"
           ],
           "originalText": [
@@ -107,7 +112,7 @@
           "confidence": 0.95,
           "category": null
         },
-        "elapsedMs": 20654,
+        "elapsedMs": 24228,
         "status": 200,
         "aiMode": "model-gateway",
         "score": {
@@ -118,11 +123,11 @@
       },
       "conversation": {
         "result": {
-          "reply": "水がないとのこと、心配です。今、どの避難所におられますか？",
+          "reply": "水がないとのこと、心配です。今、どの建物や部屋で困られていますか？",
           "nextField": "場所",
           "requiresConfirmation": true
         },
-        "elapsedMs": 8613,
+        "elapsedMs": 8973,
         "status": 200,
         "aiMode": "model-gateway"
       }
@@ -169,17 +174,16 @@
       "qwen": {
         "result": {
           "language": "ja",
-          "location": null,
+          "location": "北トイレ",
           "target": null,
           "facts": [
-            "北トイレが詰まっている"
+            "トイレが詰まっている",
+            "使用できない"
           ],
           "request": "toilet_assistance",
           "urgency": "medium",
           "safetyFlags": [],
-          "missingFields": [
-            "場所"
-          ],
+          "missingFields": [],
           "askedFields": [
             "場所",
             "人数",
@@ -193,22 +197,22 @@
           "confidence": 0.95,
           "category": null
         },
-        "elapsedMs": 24254,
+        "elapsedMs": 23946,
         "status": 200,
         "aiMode": "model-gateway",
         "score": {
-          "passed": 4,
+          "passed": 6,
           "total": 6,
-          "exact": false
+          "exact": true
         }
       },
       "conversation": {
         "result": {
-          "reply": "北トイレが使えないですね。避難所の場所を確認しますか？",
+          "reply": "北トイレが使えないですね。避難所の場所を教えてください。",
           "nextField": "場所",
           "requiresConfirmation": true
         },
-        "elapsedMs": 8538,
+        "elapsedMs": 8222,
         "status": 200,
         "aiMode": "model-gateway"
       }
@@ -253,7 +257,7 @@
             "場所"
           ]
         },
-        "elapsedMs": 89,
+        "elapsedMs": 93,
         "score": {
           "passed": 2,
           "total": 6,
@@ -270,7 +274,6 @@
             "ageGroup": "生後3か月"
           },
           "facts": [
-            "生後3か月の赤ちゃんがいる",
             "おむつが不足している",
             "今日中に必要である"
           ],
@@ -289,13 +292,13 @@
           "confidence": 0.95,
           "category": null
         },
-        "elapsedMs": 24466,
+        "elapsedMs": 24309,
         "status": 200,
         "aiMode": "model-gateway",
         "score": {
-          "passed": 6,
+          "passed": 5,
           "total": 6,
-          "exact": true
+          "exact": false
         }
       },
       "conversation": {
@@ -304,7 +307,7 @@
           "nextField": "場所",
           "requiresConfirmation": true
         },
-        "elapsedMs": 9552,
+        "elapsedMs": 8576,
         "status": 200,
         "aiMode": "model-gateway"
       }
@@ -350,7 +353,7 @@
             "最後に受け取った時刻"
           ]
         },
-        "elapsedMs": 1504,
+        "elapsedMs": 95,
         "score": {
           "passed": 1,
           "total": 6,
@@ -367,8 +370,8 @@
             "ageGroup": null
           },
           "facts": [
-            "39度の高熱がある",
-            "ぐったりしている（意識・体力の低下）"
+            "子供が39度の高熱を持っている",
+            "子供がぐったりしている（意識・体力の低下）"
           ],
           "request": "medical_assistance",
           "urgency": "high",
@@ -382,10 +385,10 @@
           "originalText": [
             "何回言っても誰も来ないんですけど！子供が39度あってぐったりしてるんです！"
           ],
-          "confidence": 0.85,
+          "confidence": 0.95,
           "category": null
         },
-        "elapsedMs": 26831,
+        "elapsedMs": 25885,
         "status": 200,
         "aiMode": "model-gateway",
         "score": {
@@ -400,7 +403,7 @@
           "nextField": "場所",
           "requiresConfirmation": false
         },
-        "elapsedMs": 9606,
+        "elapsedMs": 9438,
         "status": 200,
         "aiMode": "model-gateway"
       }
@@ -444,7 +447,7 @@
             "場所"
           ]
         },
-        "elapsedMs": 95,
+        "elapsedMs": 76,
         "score": {
           "passed": 2,
           "total": 6,
@@ -479,7 +482,7 @@
           "confidence": 0.85,
           "category": null
         },
-        "elapsedMs": 23840,
+        "elapsedMs": 23033,
         "status": 200,
         "aiMode": "model-gateway",
         "score": {
@@ -494,7 +497,7 @@
           "nextField": "場所",
           "requiresConfirmation": true
         },
-        "elapsedMs": 7999,
+        "elapsedMs": 8224,
         "status": 200,
         "aiMode": "model-gateway"
       }
@@ -507,7 +510,7 @@
         "location": null,
         "target": null,
         "facts": [
-          "息苦し",
+          "息",
           "会話"
         ],
         "request": "medical_assistance",
@@ -533,7 +536,7 @@
             "場所"
           ]
         },
-        "elapsedMs": 84,
+        "elapsedMs": 97,
         "score": {
           "passed": 1,
           "total": 5,
@@ -546,7 +549,8 @@
           "location": null,
           "target": null,
           "facts": [
-            "息が苦しい"
+            "息が苦しい",
+            "会話が続かない"
           ],
           "request": "medical_assistance",
           "urgency": "high",
@@ -563,13 +567,13 @@
           "confidence": 0.95,
           "category": null
         },
-        "elapsedMs": 22166,
+        "elapsedMs": 22040,
         "status": 200,
         "aiMode": "model-gateway",
         "score": {
-          "passed": 4,
+          "passed": 5,
           "total": 5,
-          "exact": false
+          "exact": true
         }
       },
       "conversation": {
@@ -578,7 +582,7 @@
           "nextField": "場所",
           "requiresConfirmation": false
         },
-        "elapsedMs": 8566,
+        "elapsedMs": 8731,
         "status": 200,
         "aiMode": "model-gateway"
       }
@@ -592,7 +596,7 @@
         "target": null,
         "facts": [
           "煙",
-          "火が見える"
+          "火"
         ],
         "request": "fire_response",
         "urgency": "high",
@@ -617,7 +621,7 @@
             "場所"
           ]
         },
-        "elapsedMs": 132,
+        "elapsedMs": 90,
         "score": {
           "passed": 2,
           "total": 6,
@@ -646,7 +650,7 @@
           "confidence": 0.95,
           "category": null
         },
-        "elapsedMs": 21532,
+        "elapsedMs": 21815,
         "status": 200,
         "aiMode": "model-gateway",
         "score": {
@@ -661,7 +665,7 @@
           "nextField": "場所",
           "requiresConfirmation": false
         },
-        "elapsedMs": 8135,
+        "elapsedMs": 8398,
         "status": 200,
         "aiMode": "model-gateway"
       }
@@ -700,7 +704,7 @@
             "場所"
           ]
         },
-        "elapsedMs": 84,
+        "elapsedMs": 110,
         "score": {
           "passed": 1,
           "total": 5,
@@ -731,7 +735,7 @@
           "confidence": null,
           "category": null
         },
-        "elapsedMs": 20388,
+        "elapsedMs": 22406,
         "status": 200,
         "aiMode": "model-gateway",
         "score": {
@@ -746,7 +750,7 @@
           "nextField": "場所",
           "requiresConfirmation": false
         },
-        "elapsedMs": 9091,
+        "elapsedMs": 9388,
         "status": 200,
         "aiMode": "model-gateway"
       }
@@ -788,7 +792,7 @@
             "最後に受け取った時刻"
           ]
         },
-        "elapsedMs": 76,
+        "elapsedMs": 85,
         "score": {
           "passed": 2,
           "total": 5,
@@ -825,7 +829,7 @@
           "confidence": null,
           "category": null
         },
-        "elapsedMs": 22868,
+        "elapsedMs": 22910,
         "status": 200,
         "aiMode": "model-gateway",
         "score": {
@@ -840,7 +844,7 @@
           "nextField": "場所",
           "requiresConfirmation": true
         },
-        "elapsedMs": 8896,
+        "elapsedMs": 8992,
         "status": 200,
         "aiMode": "model-gateway"
       }
@@ -875,7 +879,7 @@
             "場所"
           ]
         },
-        "elapsedMs": 128,
+        "elapsedMs": 80,
         "score": {
           "passed": 2,
           "total": 5,
@@ -897,20 +901,14 @@
             "場所",
             "追加確認"
           ],
-          "askedFields": [
-            "場所",
-            "人数",
-            "残量",
-            "最後に受け取った時刻",
-            "追加確認"
-          ],
+          "askedFields": [],
           "originalText": [
             "困っています。どうしたらいいですか。"
           ],
           "confidence": null,
           "category": null
         },
-        "elapsedMs": 21959,
+        "elapsedMs": 19490,
         "status": 200,
         "aiMode": "model-gateway",
         "score": {
@@ -921,11 +919,11 @@
       },
       "conversation": {
         "result": {
-          "reply": "お困りのこと、承知いたしました。",
+          "reply": "お困りのこと、承知しました。",
           "nextField": "場所",
           "requiresConfirmation": true
         },
-        "elapsedMs": 8056,
+        "elapsedMs": 8360,
         "status": 200,
         "aiMode": "model-gateway"
       }
