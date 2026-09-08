@@ -55,6 +55,8 @@ Phase 2B re-evaluates the fixed 110 cases with stage telemetry and separates the
 
 Phase 2D removed 4B from the mandatory resident path. Phase 2E further separates roles: Conversation listens and asks at most one missing item, Safety Guard runs independently, and the staff-facing organization card is generated from original text, Safety, resident selections, and validated Incident state. Qwen4B remains an optional asynchronous enrichment lane; it does not replace the original text or staff confirmation. See `docs/design-evolution.md` and `docs/phase2e-final-report.md`.
 
+Phase 2F adds a fixed 100-case synthetic stress/effectiveness evaluation and an A/B human-evaluation protocol. The public fallback lane and local Qwen lane are reported separately. This is an evaluation scaffold, not evidence that staff psychological burden has already been reduced; no participant data has been collected. See `docs/phase2f-final-report.md`, `docs/phase2f-human-evaluation-protocol.md`, and the JSON artifacts under `docs/`.
+
 ## Candidate next adapters
 
 - Conversation: Qwen3.5-2B with thinking disabled for low latency (current Phase 2B/2C role).

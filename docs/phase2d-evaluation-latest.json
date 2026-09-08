@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-09-08T14:50:42.328Z",
+  "generatedAt": "2026-09-08T15:42:29.644Z",
   "baseUrl": "http://localhost:3000",
   "fixedCaseCount": 20,
   "gate": {
@@ -18,21 +18,21 @@
   },
   "latencyMs": {
     "safetyAndCardFirst": {
-      "p50": 55,
-      "p95": 68,
-      "max": 171
+      "p50": 97,
+      "p95": 522,
+      "max": 1362
     },
     "conversation": {
       "count": 6,
-      "p50": 5908,
-      "p95": 25445,
-      "max": 25445
+      "p50": 6109,
+      "p95": 16494,
+      "max": 16494
     },
     "conditionalExtraction": {
       "count": 1,
-      "p50": 54528,
-      "p95": 54528,
-      "max": 54528
+      "p50": 12617,
+      "p95": 12617,
+      "max": 12617
     }
   },
   "conversation": [
@@ -40,14 +40,14 @@
       "id": "water-structured",
       "result": {
         "status": 200,
-        "elapsedMs": 25445,
+        "elapsedMs": 16494,
         "payload": {
           "ok": true,
           "aiMode": "model-gateway",
           "runtimeMode": "auto",
           "provider": "openai-compatible",
           "selectedLanguage": "ja",
-          "reply": "体育館Aで4人が困っています。",
+          "reply": "体育館Aで4人が困っているのは大変です。",
           "nextField": null,
           "requiresConfirmation": true,
           "safety": {
@@ -62,13 +62,13 @@
             "preprocessingMs": 0,
             "modelTimings": {
               "requestBuildMs": 0,
-              "httpHeadersMs": 23735,
-              "firstTokenMs": 23741,
-              "promptUntilFirstTokenMs": 6,
-              "generationMs": 1642,
-              "bodyReadMs": 1648,
+              "httpHeadersMs": 10380,
+              "firstTokenMs": 10381,
+              "promptUntilFirstTokenMs": 1,
+              "generationMs": 5755,
+              "bodyReadMs": 5756,
               "jsonParseMs": 0,
-              "totalMs": 25383,
+              "totalMs": 16136,
               "stream": true,
               "promptEvalMs": null,
               "generationEvalMs": null,
@@ -78,7 +78,7 @@
               "promptTokens": null,
               "completionTokens": null
             },
-            "totalMs": 25385,
+            "totalMs": 16137,
             "fallback": false
           }
         }
@@ -88,7 +88,7 @@
       "id": "food-structured",
       "result": {
         "status": 200,
-        "elapsedMs": 6125,
+        "elapsedMs": 2384,
         "payload": {
           "ok": true,
           "aiMode": "model-gateway",
@@ -110,13 +110,13 @@
             "preprocessingMs": 0,
             "modelTimings": {
               "requestBuildMs": 0,
-              "httpHeadersMs": 4237,
-              "firstTokenMs": 4240,
-              "promptUntilFirstTokenMs": 3,
-              "generationMs": 1796,
-              "bodyReadMs": 1799,
+              "httpHeadersMs": 551,
+              "firstTokenMs": 552,
+              "promptUntilFirstTokenMs": 1,
+              "generationMs": 1737,
+              "bodyReadMs": 1738,
               "jsonParseMs": 0,
-              "totalMs": 6036,
+              "totalMs": 2289,
               "stream": true,
               "promptEvalMs": null,
               "generationEvalMs": null,
@@ -126,7 +126,7 @@
               "promptTokens": null,
               "completionTokens": null
             },
-            "totalMs": 6036,
+            "totalMs": 2289,
             "fallback": false
           }
         }
@@ -136,7 +136,7 @@
       "id": "blanket-structured",
       "result": {
         "status": 200,
-        "elapsedMs": 6116,
+        "elapsedMs": 1936,
         "payload": {
           "ok": true,
           "aiMode": "model-gateway",
@@ -158,13 +158,13 @@
             "preprocessingMs": 0,
             "modelTimings": {
               "requestBuildMs": 0,
-              "httpHeadersMs": 4196,
-              "firstTokenMs": 4197,
+              "httpHeadersMs": 322,
+              "firstTokenMs": 323,
               "promptUntilFirstTokenMs": 1,
-              "generationMs": 1822,
-              "bodyReadMs": 1823,
-              "jsonParseMs": 0,
-              "totalMs": 6019,
+              "generationMs": 1540,
+              "bodyReadMs": 1541,
+              "jsonParseMs": 1,
+              "totalMs": 1864,
               "stream": true,
               "promptEvalMs": null,
               "generationEvalMs": null,
@@ -174,7 +174,7 @@
               "promptTokens": null,
               "completionTokens": null
             },
-            "totalMs": 6019,
+            "totalMs": 1864,
             "fallback": false
           }
         }
@@ -184,14 +184,14 @@
       "id": "toilet-structured",
       "result": {
         "status": 200,
-        "elapsedMs": 5908,
+        "elapsedMs": 6109,
         "payload": {
           "ok": true,
           "aiMode": "model-gateway",
           "runtimeMode": "auto",
           "provider": "openai-compatible",
           "selectedLanguage": "ja",
-          "reply": "北トイレが使えなくなりました。",
+          "reply": "北トイレが使えません。",
           "nextField": null,
           "requiresConfirmation": true,
           "safety": {
@@ -202,17 +202,17 @@
             "stage": "conversation",
             "model": "qwen3.5:2b",
             "promptVariant": "full",
-            "safetyGuardMs": 1,
+            "safetyGuardMs": 0,
             "preprocessingMs": 0,
             "modelTimings": {
               "requestBuildMs": 0,
-              "httpHeadersMs": 4194,
-              "firstTokenMs": 4195,
+              "httpHeadersMs": 4843,
+              "firstTokenMs": 4844,
               "promptUntilFirstTokenMs": 1,
-              "generationMs": 1656,
-              "bodyReadMs": 1657,
+              "generationMs": 1168,
+              "bodyReadMs": 1169,
               "jsonParseMs": 0,
-              "totalMs": 5851,
+              "totalMs": 6012,
               "stream": true,
               "promptEvalMs": null,
               "generationEvalMs": null,
@@ -222,7 +222,7 @@
               "promptTokens": null,
               "completionTokens": null
             },
-            "totalMs": 5853,
+            "totalMs": 6012,
             "fallback": false
           }
         }
@@ -232,7 +232,7 @@
       "id": "medicine-structured",
       "result": {
         "status": 200,
-        "elapsedMs": 5687,
+        "elapsedMs": 6116,
         "payload": {
           "ok": true,
           "aiMode": "model-gateway",
@@ -256,13 +256,13 @@
             "preprocessingMs": 0,
             "modelTimings": {
               "requestBuildMs": 0,
-              "httpHeadersMs": 4092,
-              "firstTokenMs": 4092,
-              "promptUntilFirstTokenMs": 0,
-              "generationMs": 1525,
-              "bodyReadMs": 1525,
+              "httpHeadersMs": 4747,
+              "firstTokenMs": 4749,
+              "promptUntilFirstTokenMs": 2,
+              "generationMs": 1300,
+              "bodyReadMs": 1302,
               "jsonParseMs": 0,
-              "totalMs": 5617,
+              "totalMs": 6049,
               "stream": true,
               "promptEvalMs": null,
               "generationEvalMs": null,
@@ -272,7 +272,7 @@
               "promptTokens": null,
               "completionTokens": null
             },
-            "totalMs": 5619,
+            "totalMs": 6049,
             "fallback": false
           }
         }
@@ -282,7 +282,7 @@
       "id": "pet-structured",
       "result": {
         "status": 200,
-        "elapsedMs": 5648,
+        "elapsedMs": 7423,
         "payload": {
           "ok": true,
           "aiMode": "model-gateway",
@@ -303,14 +303,14 @@
             "safetyGuardMs": 0,
             "preprocessingMs": 0,
             "modelTimings": {
-              "requestBuildMs": 1,
-              "httpHeadersMs": 3912,
-              "firstTokenMs": 3913,
-              "promptUntilFirstTokenMs": 1,
-              "generationMs": 1669,
-              "bodyReadMs": 1670,
+              "requestBuildMs": 0,
+              "httpHeadersMs": 5114,
+              "firstTokenMs": 5114,
+              "promptUntilFirstTokenMs": 0,
+              "generationMs": 2179,
+              "bodyReadMs": 2179,
               "jsonParseMs": 0,
-              "totalMs": 5582,
+              "totalMs": 7293,
               "stream": true,
               "promptEvalMs": null,
               "generationEvalMs": null,
@@ -320,7 +320,7 @@
               "promptTokens": null,
               "completionTokens": null
             },
-            "totalMs": 5582,
+            "totalMs": 7293,
             "fallback": false
           }
         }
@@ -332,7 +332,7 @@
       "id": "pet-structured",
       "result": {
         "status": 200,
-        "elapsedMs": 54528,
+        "elapsedMs": 12617,
         "payload": {
           "ok": true,
           "aiMode": "model-gateway",
@@ -376,13 +376,13 @@
             "preprocessingMs": 0,
             "modelTimings": {
               "requestBuildMs": 0,
-              "httpHeadersMs": 39380,
-              "firstTokenMs": 39382,
-              "promptUntilFirstTokenMs": 2,
-              "generationMs": 14990,
-              "bodyReadMs": 14992,
+              "httpHeadersMs": 606,
+              "firstTokenMs": 607,
+              "promptUntilFirstTokenMs": 1,
+              "generationMs": 11862,
+              "bodyReadMs": 11863,
               "jsonParseMs": 0,
-              "totalMs": 54372,
+              "totalMs": 12469,
               "stream": true,
               "promptEvalMs": null,
               "generationEvalMs": null,
@@ -392,8 +392,8 @@
               "promptTokens": null,
               "completionTokens": null
             },
-            "normalizationMs": 4,
-            "totalMs": 54377,
+            "normalizationMs": 0,
+            "totalMs": 12470,
             "fallback": false
           }
         }
@@ -412,7 +412,7 @@
       },
       "result": {
         "status": 200,
-        "elapsedMs": 171,
+        "elapsedMs": 522,
         "payload": {
           "ok": true,
           "aiMode": "deterministic-triage",
@@ -459,7 +459,7 @@
             "promptVariant": "full",
             "safetyGuardMs": 0,
             "preprocessingMs": 0,
-            "totalMs": 2,
+            "totalMs": 25,
             "fallback": false
           }
         }
@@ -484,7 +484,7 @@
       },
       "result": {
         "status": 200,
-        "elapsedMs": 49,
+        "elapsedMs": 1362,
         "payload": {
           "ok": true,
           "aiMode": "deterministic-triage",
@@ -531,9 +531,9 @@
             "stage": "triage",
             "model": null,
             "promptVariant": "full",
-            "safetyGuardMs": 1,
+            "safetyGuardMs": 0,
             "preprocessingMs": 0,
-            "totalMs": 1,
+            "totalMs": 433,
             "fallback": false
           }
         }
@@ -558,7 +558,7 @@
       },
       "result": {
         "status": 200,
-        "elapsedMs": 55,
+        "elapsedMs": 203,
         "payload": {
           "ok": true,
           "aiMode": "deterministic-triage",
@@ -628,7 +628,7 @@
       },
       "result": {
         "status": 200,
-        "elapsedMs": 51,
+        "elapsedMs": 373,
         "payload": {
           "ok": true,
           "aiMode": "deterministic-triage",
@@ -671,7 +671,7 @@
             "stage": "triage",
             "model": null,
             "promptVariant": "full",
-            "safetyGuardMs": 0,
+            "safetyGuardMs": 1,
             "preprocessingMs": 0,
             "totalMs": 1,
             "fallback": false
@@ -697,7 +697,7 @@
       },
       "result": {
         "status": 200,
-        "elapsedMs": 68,
+        "elapsedMs": 389,
         "payload": {
           "ok": true,
           "aiMode": "deterministic-triage",
@@ -768,7 +768,7 @@
       },
       "result": {
         "status": 200,
-        "elapsedMs": 53,
+        "elapsedMs": 241,
         "payload": {
           "ok": true,
           "aiMode": "deterministic-triage",
@@ -842,7 +842,7 @@
       },
       "result": {
         "status": 200,
-        "elapsedMs": 57,
+        "elapsedMs": 327,
         "payload": {
           "ok": true,
           "aiMode": "deterministic-triage",
@@ -915,7 +915,7 @@
       },
       "result": {
         "status": 200,
-        "elapsedMs": 47,
+        "elapsedMs": 219,
         "payload": {
           "ok": true,
           "aiMode": "deterministic-triage",
@@ -993,7 +993,7 @@
       },
       "result": {
         "status": 200,
-        "elapsedMs": 60,
+        "elapsedMs": 255,
         "payload": {
           "ok": true,
           "aiMode": "deterministic-triage",
@@ -1069,7 +1069,7 @@
       },
       "result": {
         "status": 200,
-        "elapsedMs": 56,
+        "elapsedMs": 96,
         "payload": {
           "ok": true,
           "aiMode": "deterministic-triage",
@@ -1139,7 +1139,7 @@
       },
       "result": {
         "status": 200,
-        "elapsedMs": 58,
+        "elapsedMs": 72,
         "payload": {
           "ok": true,
           "aiMode": "deterministic-triage",
@@ -1185,7 +1185,7 @@
             "promptVariant": "full",
             "safetyGuardMs": 0,
             "preprocessingMs": 0,
-            "totalMs": 0,
+            "totalMs": 1,
             "fallback": false
           }
         }
@@ -1211,7 +1211,7 @@
       },
       "result": {
         "status": 200,
-        "elapsedMs": 46,
+        "elapsedMs": 97,
         "payload": {
           "ok": true,
           "aiMode": "deterministic-triage",
@@ -1267,7 +1267,7 @@
             "promptVariant": "full",
             "safetyGuardMs": 0,
             "preprocessingMs": 0,
-            "totalMs": 1,
+            "totalMs": 0,
             "fallback": false
           }
         }
@@ -1293,7 +1293,7 @@
       },
       "result": {
         "status": 200,
-        "elapsedMs": 55,
+        "elapsedMs": 62,
         "payload": {
           "ok": true,
           "aiMode": "deterministic-triage",
@@ -1374,7 +1374,7 @@
       },
       "result": {
         "status": 200,
-        "elapsedMs": 48,
+        "elapsedMs": 66,
         "payload": {
           "ok": true,
           "aiMode": "deterministic-triage",
@@ -1446,7 +1446,7 @@
       },
       "result": {
         "status": 200,
-        "elapsedMs": 54,
+        "elapsedMs": 100,
         "payload": {
           "ok": true,
           "aiMode": "deterministic-triage",
@@ -1518,7 +1518,7 @@
       },
       "result": {
         "status": 200,
-        "elapsedMs": 47,
+        "elapsedMs": 56,
         "payload": {
           "ok": true,
           "aiMode": "deterministic-triage",
@@ -1572,9 +1572,9 @@
             "stage": "triage",
             "model": null,
             "promptVariant": "full",
-            "safetyGuardMs": 0,
+            "safetyGuardMs": 1,
             "preprocessingMs": 0,
-            "totalMs": 0,
+            "totalMs": 1,
             "fallback": false
           }
         }
@@ -1599,7 +1599,7 @@
       },
       "result": {
         "status": 200,
-        "elapsedMs": 55,
+        "elapsedMs": 64,
         "payload": {
           "ok": true,
           "aiMode": "deterministic-triage",
@@ -1672,7 +1672,7 @@
       },
       "result": {
         "status": 200,
-        "elapsedMs": 56,
+        "elapsedMs": 68,
         "payload": {
           "ok": true,
           "aiMode": "deterministic-triage",
@@ -1742,7 +1742,7 @@
       },
       "result": {
         "status": 200,
-        "elapsedMs": 60,
+        "elapsedMs": 69,
         "payload": {
           "ok": true,
           "aiMode": "deterministic-triage",
@@ -1816,7 +1816,7 @@
       },
       "result": {
         "status": 200,
-        "elapsedMs": 55,
+        "elapsedMs": 62,
         "payload": {
           "ok": true,
           "aiMode": "deterministic-triage",
@@ -1861,9 +1861,9 @@
             "stage": "triage",
             "model": null,
             "promptVariant": "full",
-            "safetyGuardMs": 0,
+            "safetyGuardMs": 1,
             "preprocessingMs": 0,
-            "totalMs": 0,
+            "totalMs": 1,
             "fallback": false
           }
         }

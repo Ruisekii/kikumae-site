@@ -1,0 +1,217 @@
+{
+  "schemaVersion": "phase2f.v1",
+  "generatedAt": "2026-09-08T15:40:22.541Z",
+  "cases": 100,
+  "localEvaluation": {
+    "qwenModel": "qwen3.5:4b",
+    "qwenCases": 10,
+    "qwenSummary": {
+      "kind": "qwen",
+      "caseCount": 10,
+      "httpSuccess": 10,
+      "fieldMetrics": {
+        "facts": {
+          "hits": 15,
+          "required": 22,
+          "retentionRate": 0.6818181818181818
+        },
+        "context": {
+          "hits": 6,
+          "required": 6,
+          "retentionRate": 1
+        },
+        "request": {
+          "correct": 10,
+          "total": 10,
+          "accuracy": 1
+        },
+        "emotion": {
+          "supported": false,
+          "reason": "Incident Extraction schema has no emotionalState field"
+        },
+        "uncertainty": {
+          "expected": 0,
+          "preserved": 10,
+          "collapse": 0
+        },
+        "correctionHandling": {
+          "expected": 1,
+          "correct": 0,
+          "accuracy": 0
+        }
+      },
+      "safety": {
+        "criticalCases": 3,
+        "truePositive": 3,
+        "falseNegative": 0,
+        "falsePositive": 0,
+        "recall": 1,
+        "precision": 1,
+        "expectedLabelHitRate": 1
+      },
+      "hallucination": {
+        "count": 5,
+        "ratePerCase": 0.4
+      },
+      "omission": {
+        "importantFactsOmitted": 7,
+        "rate": 0.3181818181818182
+      },
+      "contradiction": {
+        "cases": 0,
+        "rate": 0
+      },
+      "latencyMs": {
+        "p50": 23907,
+        "p95": 30179,
+        "max": 30179
+      },
+      "evidenceAnchoredRate": null
+    },
+    "fallbackSummary": {
+      "kind": "fallback",
+      "caseCount": 100,
+      "httpSuccess": 100,
+      "fieldMetrics": {
+        "facts": {
+          "hits": 137,
+          "required": 241,
+          "retentionRate": 0.5684647302904564
+        },
+        "context": {
+          "hits": 19,
+          "required": 32,
+          "retentionRate": 0.59375
+        },
+        "request": {
+          "correct": 89,
+          "total": 100,
+          "accuracy": 0.89
+        },
+        "emotion": {
+          "supported": true,
+          "expectedCases": 31,
+          "detectedCases": 26,
+          "expectedHitCases": 21,
+          "recall": 0.6774193548387096,
+          "falsePositiveCases": 1
+        },
+        "uncertainty": {
+          "expectedCases": 11,
+          "preservedCases": 8,
+          "preservedRate": 0.7272727272727273,
+          "collapseCases": 0
+        },
+        "correctionHandling": {
+          "expected": 8,
+          "correct": 7,
+          "accuracy": 0.875
+        }
+      },
+      "safety": {
+        "criticalCases": 26,
+        "truePositive": 26,
+        "falseNegative": 0,
+        "falsePositive": 0,
+        "recall": 1,
+        "precision": 1,
+        "expectedLabelHitRate": 0.9615384615384616
+      },
+      "hallucination": {
+        "count": 0,
+        "ratePerCase": 0
+      },
+      "omission": {
+        "importantFactsOmitted": 104,
+        "rate": 0.4315352697095436
+      },
+      "contradiction": {
+        "cases": 0,
+        "rate": 0
+      },
+      "latencyMs": {
+        "p50": 72,
+        "p95": 124,
+        "max": 170
+      },
+      "evidenceAnchoredRate": 1
+    }
+  },
+  "publicDemo": {
+    "mode": "fallback",
+    "source": "evidence-bound staff organization",
+    "summary": {
+      "kind": "fallback",
+      "caseCount": 100,
+      "httpSuccess": 100,
+      "fieldMetrics": {
+        "facts": {
+          "hits": 137,
+          "required": 241,
+          "retentionRate": 0.5684647302904564
+        },
+        "context": {
+          "hits": 19,
+          "required": 32,
+          "retentionRate": 0.59375
+        },
+        "request": {
+          "correct": 89,
+          "total": 100,
+          "accuracy": 0.89
+        },
+        "emotion": {
+          "supported": true,
+          "expectedCases": 31,
+          "detectedCases": 26,
+          "expectedHitCases": 21,
+          "recall": 0.6774193548387096,
+          "falsePositiveCases": 1
+        },
+        "uncertainty": {
+          "expectedCases": 11,
+          "preservedCases": 8,
+          "preservedRate": 0.7272727272727273,
+          "collapseCases": 0
+        },
+        "correctionHandling": {
+          "expected": 8,
+          "correct": 7,
+          "accuracy": 0.875
+        }
+      },
+      "safety": {
+        "criticalCases": 26,
+        "truePositive": 26,
+        "falseNegative": 0,
+        "falsePositive": 0,
+        "recall": 1,
+        "precision": 1,
+        "expectedLabelHitRate": 0.9615384615384616
+      },
+      "hallucination": {
+        "count": 0,
+        "ratePerCase": 0
+      },
+      "omission": {
+        "importantFactsOmitted": 104,
+        "rate": 0.4315352697095436
+      },
+      "contradiction": {
+        "cases": 0,
+        "rate": 0
+      },
+      "latencyMs": {
+        "p50": 72,
+        "p95": 124,
+        "max": 170
+      },
+      "evidenceAnchoredRate": 1
+    }
+  },
+  "caveats": {
+    "fallback": "Phase 2E evidence-bound staff organization, equivalent to the public demo processing lane.",
+    "qwen": "Qwen is evaluated as optional Incident Extraction. Its schema does not contain emotionalState, so emotion quality is not claimed for this lane.",
+    "hallucination": "Heuristic metric: evidence anchors for fallback and conservative alias checks for Qwen. It is not a human semantic adjudication."
+  }
+}

@@ -1,0 +1,4172 @@
+{
+  "schemaVersion": "phase2f.human-plan.v1",
+  "generatedAt": "2026-09-08T15:37:26.747Z",
+  "seed": 20260909,
+  "caseCount": 100,
+  "sets": {
+    "X": [
+      "water-08",
+      "ordinary-04",
+      "emotion-02",
+      "medical-02",
+      "boundary-08",
+      "boundary-02",
+      "multi-10",
+      "boundary-04",
+      "ordinary-06",
+      "ordinary-10",
+      "supplies-06",
+      "emotion-10",
+      "medical-10",
+      "emotion-06",
+      "ordinary-07",
+      "multi-07",
+      "supplies-10",
+      "boundary-07",
+      "multi-08",
+      "boundary-05",
+      "toilet-06",
+      "toilet-01",
+      "boundary-01",
+      "correction-02",
+      "ordinary-01",
+      "safety-02",
+      "toilet-08",
+      "safety-03",
+      "water-09",
+      "toilet-03",
+      "supplies-07",
+      "toilet-02",
+      "water-07",
+      "supplies-04",
+      "medical-03",
+      "toilet-05",
+      "safety-09",
+      "safety-07",
+      "safety-08",
+      "safety-04",
+      "supplies-01",
+      "water-04",
+      "emotion-04",
+      "correction-03",
+      "correction-06",
+      "boundary-10",
+      "emotion-01",
+      "emotion-03",
+      "emotion-07",
+      "boundary-03"
+    ],
+    "Y": [
+      "ordinary-05",
+      "safety-06",
+      "ordinary-03",
+      "multi-02",
+      "toilet-04",
+      "correction-04",
+      "water-05",
+      "medical-05",
+      "multi-09",
+      "correction-07",
+      "emotion-05",
+      "supplies-08",
+      "toilet-09",
+      "water-10",
+      "correction-05",
+      "correction-08",
+      "safety-01",
+      "multi-01",
+      "boundary-06",
+      "multi-05",
+      "water-03",
+      "correction-10",
+      "ordinary-02",
+      "ordinary-09",
+      "ordinary-08",
+      "supplies-09",
+      "medical-06",
+      "safety-10",
+      "medical-08",
+      "water-02",
+      "toilet-10",
+      "water-01",
+      "medical-09",
+      "medical-01",
+      "supplies-02",
+      "water-06",
+      "safety-05",
+      "supplies-03",
+      "medical-07",
+      "supplies-05",
+      "toilet-07",
+      "medical-04",
+      "multi-04",
+      "correction-01",
+      "multi-06",
+      "boundary-09",
+      "correction-09",
+      "multi-03",
+      "emotion-09",
+      "emotion-08"
+    ]
+  },
+  "slots": [
+    {
+      "slot": "pilot-01",
+      "population": "Pilot",
+      "group": "Group 1",
+      "cases": [
+        {
+          "order": 1,
+          "caseId": "correction-10",
+          "condition": "B"
+        },
+        {
+          "order": 2,
+          "caseId": "water-07",
+          "condition": "A"
+        },
+        {
+          "order": 3,
+          "caseId": "correction-03",
+          "condition": "A"
+        },
+        {
+          "order": 4,
+          "caseId": "water-06",
+          "condition": "B"
+        },
+        {
+          "order": 5,
+          "caseId": "supplies-01",
+          "condition": "A"
+        },
+        {
+          "order": 6,
+          "caseId": "toilet-04",
+          "condition": "B"
+        },
+        {
+          "order": 7,
+          "caseId": "safety-06",
+          "condition": "B"
+        },
+        {
+          "order": 8,
+          "caseId": "ordinary-06",
+          "condition": "A"
+        },
+        {
+          "order": 9,
+          "caseId": "medical-08",
+          "condition": "B"
+        },
+        {
+          "order": 10,
+          "caseId": "correction-04",
+          "condition": "B"
+        },
+        {
+          "order": 11,
+          "caseId": "correction-07",
+          "condition": "B"
+        },
+        {
+          "order": 12,
+          "caseId": "water-03",
+          "condition": "B"
+        },
+        {
+          "order": 13,
+          "caseId": "safety-01",
+          "condition": "B"
+        },
+        {
+          "order": 14,
+          "caseId": "ordinary-02",
+          "condition": "B"
+        },
+        {
+          "order": 15,
+          "caseId": "medical-09",
+          "condition": "B"
+        },
+        {
+          "order": 16,
+          "caseId": "emotion-06",
+          "condition": "A"
+        },
+        {
+          "order": 17,
+          "caseId": "boundary-02",
+          "condition": "A"
+        },
+        {
+          "order": 18,
+          "caseId": "multi-02",
+          "condition": "B"
+        },
+        {
+          "order": 19,
+          "caseId": "correction-02",
+          "condition": "A"
+        },
+        {
+          "order": 20,
+          "caseId": "correction-06",
+          "condition": "A"
+        },
+        {
+          "order": 21,
+          "caseId": "boundary-01",
+          "condition": "A"
+        },
+        {
+          "order": 22,
+          "caseId": "toilet-06",
+          "condition": "A"
+        },
+        {
+          "order": 23,
+          "caseId": "water-04",
+          "condition": "A"
+        },
+        {
+          "order": 24,
+          "caseId": "medical-03",
+          "condition": "A"
+        },
+        {
+          "order": 25,
+          "caseId": "emotion-05",
+          "condition": "B"
+        },
+        {
+          "order": 26,
+          "caseId": "boundary-03",
+          "condition": "A"
+        },
+        {
+          "order": 27,
+          "caseId": "water-08",
+          "condition": "A"
+        },
+        {
+          "order": 28,
+          "caseId": "ordinary-09",
+          "condition": "B"
+        },
+        {
+          "order": 29,
+          "caseId": "medical-10",
+          "condition": "A"
+        },
+        {
+          "order": 30,
+          "caseId": "supplies-08",
+          "condition": "B"
+        },
+        {
+          "order": 31,
+          "caseId": "emotion-04",
+          "condition": "A"
+        },
+        {
+          "order": 32,
+          "caseId": "boundary-06",
+          "condition": "B"
+        },
+        {
+          "order": 33,
+          "caseId": "ordinary-07",
+          "condition": "A"
+        },
+        {
+          "order": 34,
+          "caseId": "multi-09",
+          "condition": "B"
+        },
+        {
+          "order": 35,
+          "caseId": "multi-01",
+          "condition": "B"
+        },
+        {
+          "order": 36,
+          "caseId": "correction-05",
+          "condition": "B"
+        },
+        {
+          "order": 37,
+          "caseId": "ordinary-04",
+          "condition": "A"
+        },
+        {
+          "order": 38,
+          "caseId": "medical-06",
+          "condition": "B"
+        },
+        {
+          "order": 39,
+          "caseId": "boundary-04",
+          "condition": "A"
+        },
+        {
+          "order": 40,
+          "caseId": "boundary-07",
+          "condition": "A"
+        },
+        {
+          "order": 41,
+          "caseId": "medical-01",
+          "condition": "B"
+        },
+        {
+          "order": 42,
+          "caseId": "toilet-02",
+          "condition": "A"
+        },
+        {
+          "order": 43,
+          "caseId": "ordinary-08",
+          "condition": "B"
+        },
+        {
+          "order": 44,
+          "caseId": "ordinary-05",
+          "condition": "B"
+        },
+        {
+          "order": 45,
+          "caseId": "emotion-01",
+          "condition": "A"
+        },
+        {
+          "order": 46,
+          "caseId": "medical-04",
+          "condition": "B"
+        },
+        {
+          "order": 47,
+          "caseId": "toilet-01",
+          "condition": "A"
+        },
+        {
+          "order": 48,
+          "caseId": "emotion-02",
+          "condition": "A"
+        },
+        {
+          "order": 49,
+          "caseId": "ordinary-10",
+          "condition": "A"
+        },
+        {
+          "order": 50,
+          "caseId": "water-09",
+          "condition": "A"
+        },
+        {
+          "order": 51,
+          "caseId": "correction-08",
+          "condition": "B"
+        },
+        {
+          "order": 52,
+          "caseId": "supplies-07",
+          "condition": "A"
+        },
+        {
+          "order": 53,
+          "caseId": "medical-05",
+          "condition": "B"
+        },
+        {
+          "order": 54,
+          "caseId": "water-05",
+          "condition": "B"
+        },
+        {
+          "order": 55,
+          "caseId": "safety-08",
+          "condition": "A"
+        },
+        {
+          "order": 56,
+          "caseId": "water-10",
+          "condition": "B"
+        },
+        {
+          "order": 57,
+          "caseId": "toilet-05",
+          "condition": "A"
+        },
+        {
+          "order": 58,
+          "caseId": "ordinary-03",
+          "condition": "B"
+        },
+        {
+          "order": 59,
+          "caseId": "medical-02",
+          "condition": "A"
+        },
+        {
+          "order": 60,
+          "caseId": "safety-03",
+          "condition": "A"
+        },
+        {
+          "order": 61,
+          "caseId": "supplies-06",
+          "condition": "A"
+        },
+        {
+          "order": 62,
+          "caseId": "boundary-10",
+          "condition": "A"
+        },
+        {
+          "order": 63,
+          "caseId": "multi-07",
+          "condition": "A"
+        },
+        {
+          "order": 64,
+          "caseId": "emotion-10",
+          "condition": "A"
+        },
+        {
+          "order": 65,
+          "caseId": "boundary-05",
+          "condition": "A"
+        },
+        {
+          "order": 66,
+          "caseId": "multi-04",
+          "condition": "B"
+        },
+        {
+          "order": 67,
+          "caseId": "supplies-03",
+          "condition": "B"
+        },
+        {
+          "order": 68,
+          "caseId": "supplies-10",
+          "condition": "A"
+        },
+        {
+          "order": 69,
+          "caseId": "boundary-08",
+          "condition": "A"
+        },
+        {
+          "order": 70,
+          "caseId": "emotion-09",
+          "condition": "B"
+        },
+        {
+          "order": 71,
+          "caseId": "toilet-09",
+          "condition": "B"
+        },
+        {
+          "order": 72,
+          "caseId": "multi-10",
+          "condition": "A"
+        },
+        {
+          "order": 73,
+          "caseId": "medical-07",
+          "condition": "B"
+        },
+        {
+          "order": 74,
+          "caseId": "toilet-07",
+          "condition": "B"
+        },
+        {
+          "order": 75,
+          "caseId": "multi-08",
+          "condition": "A"
+        },
+        {
+          "order": 76,
+          "caseId": "ordinary-01",
+          "condition": "A"
+        },
+        {
+          "order": 77,
+          "caseId": "safety-07",
+          "condition": "A"
+        },
+        {
+          "order": 78,
+          "caseId": "supplies-05",
+          "condition": "B"
+        },
+        {
+          "order": 79,
+          "caseId": "safety-10",
+          "condition": "B"
+        },
+        {
+          "order": 80,
+          "caseId": "boundary-09",
+          "condition": "B"
+        },
+        {
+          "order": 81,
+          "caseId": "safety-02",
+          "condition": "A"
+        },
+        {
+          "order": 82,
+          "caseId": "supplies-09",
+          "condition": "B"
+        },
+        {
+          "order": 83,
+          "caseId": "toilet-08",
+          "condition": "A"
+        },
+        {
+          "order": 84,
+          "caseId": "toilet-10",
+          "condition": "B"
+        },
+        {
+          "order": 85,
+          "caseId": "supplies-04",
+          "condition": "A"
+        },
+        {
+          "order": 86,
+          "caseId": "toilet-03",
+          "condition": "A"
+        },
+        {
+          "order": 87,
+          "caseId": "supplies-02",
+          "condition": "B"
+        },
+        {
+          "order": 88,
+          "caseId": "correction-01",
+          "condition": "B"
+        },
+        {
+          "order": 89,
+          "caseId": "safety-04",
+          "condition": "A"
+        },
+        {
+          "order": 90,
+          "caseId": "multi-03",
+          "condition": "B"
+        },
+        {
+          "order": 91,
+          "caseId": "correction-09",
+          "condition": "B"
+        },
+        {
+          "order": 92,
+          "caseId": "water-02",
+          "condition": "B"
+        },
+        {
+          "order": 93,
+          "caseId": "safety-09",
+          "condition": "A"
+        },
+        {
+          "order": 94,
+          "caseId": "multi-06",
+          "condition": "B"
+        },
+        {
+          "order": 95,
+          "caseId": "emotion-07",
+          "condition": "A"
+        },
+        {
+          "order": 96,
+          "caseId": "emotion-08",
+          "condition": "B"
+        },
+        {
+          "order": 97,
+          "caseId": "emotion-03",
+          "condition": "A"
+        },
+        {
+          "order": 98,
+          "caseId": "safety-05",
+          "condition": "B"
+        },
+        {
+          "order": 99,
+          "caseId": "multi-05",
+          "condition": "B"
+        },
+        {
+          "order": 100,
+          "caseId": "water-01",
+          "condition": "B"
+        }
+      ]
+    },
+    {
+      "slot": "pilot-02",
+      "population": "Pilot",
+      "group": "Group 2",
+      "cases": [
+        {
+          "order": 1,
+          "caseId": "correction-10",
+          "condition": "A"
+        },
+        {
+          "order": 2,
+          "caseId": "water-07",
+          "condition": "B"
+        },
+        {
+          "order": 3,
+          "caseId": "correction-03",
+          "condition": "B"
+        },
+        {
+          "order": 4,
+          "caseId": "water-06",
+          "condition": "A"
+        },
+        {
+          "order": 5,
+          "caseId": "supplies-01",
+          "condition": "B"
+        },
+        {
+          "order": 6,
+          "caseId": "toilet-04",
+          "condition": "A"
+        },
+        {
+          "order": 7,
+          "caseId": "safety-06",
+          "condition": "A"
+        },
+        {
+          "order": 8,
+          "caseId": "ordinary-06",
+          "condition": "B"
+        },
+        {
+          "order": 9,
+          "caseId": "medical-08",
+          "condition": "A"
+        },
+        {
+          "order": 10,
+          "caseId": "correction-04",
+          "condition": "A"
+        },
+        {
+          "order": 11,
+          "caseId": "correction-07",
+          "condition": "A"
+        },
+        {
+          "order": 12,
+          "caseId": "water-03",
+          "condition": "A"
+        },
+        {
+          "order": 13,
+          "caseId": "safety-01",
+          "condition": "A"
+        },
+        {
+          "order": 14,
+          "caseId": "ordinary-02",
+          "condition": "A"
+        },
+        {
+          "order": 15,
+          "caseId": "medical-09",
+          "condition": "A"
+        },
+        {
+          "order": 16,
+          "caseId": "emotion-06",
+          "condition": "B"
+        },
+        {
+          "order": 17,
+          "caseId": "boundary-02",
+          "condition": "B"
+        },
+        {
+          "order": 18,
+          "caseId": "multi-02",
+          "condition": "A"
+        },
+        {
+          "order": 19,
+          "caseId": "correction-02",
+          "condition": "B"
+        },
+        {
+          "order": 20,
+          "caseId": "correction-06",
+          "condition": "B"
+        },
+        {
+          "order": 21,
+          "caseId": "boundary-01",
+          "condition": "B"
+        },
+        {
+          "order": 22,
+          "caseId": "toilet-06",
+          "condition": "B"
+        },
+        {
+          "order": 23,
+          "caseId": "water-04",
+          "condition": "B"
+        },
+        {
+          "order": 24,
+          "caseId": "medical-03",
+          "condition": "B"
+        },
+        {
+          "order": 25,
+          "caseId": "emotion-05",
+          "condition": "A"
+        },
+        {
+          "order": 26,
+          "caseId": "boundary-03",
+          "condition": "B"
+        },
+        {
+          "order": 27,
+          "caseId": "water-08",
+          "condition": "B"
+        },
+        {
+          "order": 28,
+          "caseId": "ordinary-09",
+          "condition": "A"
+        },
+        {
+          "order": 29,
+          "caseId": "medical-10",
+          "condition": "B"
+        },
+        {
+          "order": 30,
+          "caseId": "supplies-08",
+          "condition": "A"
+        },
+        {
+          "order": 31,
+          "caseId": "emotion-04",
+          "condition": "B"
+        },
+        {
+          "order": 32,
+          "caseId": "boundary-06",
+          "condition": "A"
+        },
+        {
+          "order": 33,
+          "caseId": "ordinary-07",
+          "condition": "B"
+        },
+        {
+          "order": 34,
+          "caseId": "multi-09",
+          "condition": "A"
+        },
+        {
+          "order": 35,
+          "caseId": "multi-01",
+          "condition": "A"
+        },
+        {
+          "order": 36,
+          "caseId": "correction-05",
+          "condition": "A"
+        },
+        {
+          "order": 37,
+          "caseId": "ordinary-04",
+          "condition": "B"
+        },
+        {
+          "order": 38,
+          "caseId": "medical-06",
+          "condition": "A"
+        },
+        {
+          "order": 39,
+          "caseId": "boundary-04",
+          "condition": "B"
+        },
+        {
+          "order": 40,
+          "caseId": "boundary-07",
+          "condition": "B"
+        },
+        {
+          "order": 41,
+          "caseId": "medical-01",
+          "condition": "A"
+        },
+        {
+          "order": 42,
+          "caseId": "toilet-02",
+          "condition": "B"
+        },
+        {
+          "order": 43,
+          "caseId": "ordinary-08",
+          "condition": "A"
+        },
+        {
+          "order": 44,
+          "caseId": "ordinary-05",
+          "condition": "A"
+        },
+        {
+          "order": 45,
+          "caseId": "emotion-01",
+          "condition": "B"
+        },
+        {
+          "order": 46,
+          "caseId": "medical-04",
+          "condition": "A"
+        },
+        {
+          "order": 47,
+          "caseId": "toilet-01",
+          "condition": "B"
+        },
+        {
+          "order": 48,
+          "caseId": "emotion-02",
+          "condition": "B"
+        },
+        {
+          "order": 49,
+          "caseId": "ordinary-10",
+          "condition": "B"
+        },
+        {
+          "order": 50,
+          "caseId": "water-09",
+          "condition": "B"
+        },
+        {
+          "order": 51,
+          "caseId": "correction-08",
+          "condition": "A"
+        },
+        {
+          "order": 52,
+          "caseId": "supplies-07",
+          "condition": "B"
+        },
+        {
+          "order": 53,
+          "caseId": "medical-05",
+          "condition": "A"
+        },
+        {
+          "order": 54,
+          "caseId": "water-05",
+          "condition": "A"
+        },
+        {
+          "order": 55,
+          "caseId": "safety-08",
+          "condition": "B"
+        },
+        {
+          "order": 56,
+          "caseId": "water-10",
+          "condition": "A"
+        },
+        {
+          "order": 57,
+          "caseId": "toilet-05",
+          "condition": "B"
+        },
+        {
+          "order": 58,
+          "caseId": "ordinary-03",
+          "condition": "A"
+        },
+        {
+          "order": 59,
+          "caseId": "medical-02",
+          "condition": "B"
+        },
+        {
+          "order": 60,
+          "caseId": "safety-03",
+          "condition": "B"
+        },
+        {
+          "order": 61,
+          "caseId": "supplies-06",
+          "condition": "B"
+        },
+        {
+          "order": 62,
+          "caseId": "boundary-10",
+          "condition": "B"
+        },
+        {
+          "order": 63,
+          "caseId": "multi-07",
+          "condition": "B"
+        },
+        {
+          "order": 64,
+          "caseId": "emotion-10",
+          "condition": "B"
+        },
+        {
+          "order": 65,
+          "caseId": "boundary-05",
+          "condition": "B"
+        },
+        {
+          "order": 66,
+          "caseId": "multi-04",
+          "condition": "A"
+        },
+        {
+          "order": 67,
+          "caseId": "supplies-03",
+          "condition": "A"
+        },
+        {
+          "order": 68,
+          "caseId": "supplies-10",
+          "condition": "B"
+        },
+        {
+          "order": 69,
+          "caseId": "boundary-08",
+          "condition": "B"
+        },
+        {
+          "order": 70,
+          "caseId": "emotion-09",
+          "condition": "A"
+        },
+        {
+          "order": 71,
+          "caseId": "toilet-09",
+          "condition": "A"
+        },
+        {
+          "order": 72,
+          "caseId": "multi-10",
+          "condition": "B"
+        },
+        {
+          "order": 73,
+          "caseId": "medical-07",
+          "condition": "A"
+        },
+        {
+          "order": 74,
+          "caseId": "toilet-07",
+          "condition": "A"
+        },
+        {
+          "order": 75,
+          "caseId": "multi-08",
+          "condition": "B"
+        },
+        {
+          "order": 76,
+          "caseId": "ordinary-01",
+          "condition": "B"
+        },
+        {
+          "order": 77,
+          "caseId": "safety-07",
+          "condition": "B"
+        },
+        {
+          "order": 78,
+          "caseId": "supplies-05",
+          "condition": "A"
+        },
+        {
+          "order": 79,
+          "caseId": "safety-10",
+          "condition": "A"
+        },
+        {
+          "order": 80,
+          "caseId": "boundary-09",
+          "condition": "A"
+        },
+        {
+          "order": 81,
+          "caseId": "safety-02",
+          "condition": "B"
+        },
+        {
+          "order": 82,
+          "caseId": "supplies-09",
+          "condition": "A"
+        },
+        {
+          "order": 83,
+          "caseId": "toilet-08",
+          "condition": "B"
+        },
+        {
+          "order": 84,
+          "caseId": "toilet-10",
+          "condition": "A"
+        },
+        {
+          "order": 85,
+          "caseId": "supplies-04",
+          "condition": "B"
+        },
+        {
+          "order": 86,
+          "caseId": "toilet-03",
+          "condition": "B"
+        },
+        {
+          "order": 87,
+          "caseId": "supplies-02",
+          "condition": "A"
+        },
+        {
+          "order": 88,
+          "caseId": "correction-01",
+          "condition": "A"
+        },
+        {
+          "order": 89,
+          "caseId": "safety-04",
+          "condition": "B"
+        },
+        {
+          "order": 90,
+          "caseId": "multi-03",
+          "condition": "A"
+        },
+        {
+          "order": 91,
+          "caseId": "correction-09",
+          "condition": "A"
+        },
+        {
+          "order": 92,
+          "caseId": "water-02",
+          "condition": "A"
+        },
+        {
+          "order": 93,
+          "caseId": "safety-09",
+          "condition": "B"
+        },
+        {
+          "order": 94,
+          "caseId": "multi-06",
+          "condition": "A"
+        },
+        {
+          "order": 95,
+          "caseId": "emotion-07",
+          "condition": "B"
+        },
+        {
+          "order": 96,
+          "caseId": "emotion-08",
+          "condition": "A"
+        },
+        {
+          "order": 97,
+          "caseId": "emotion-03",
+          "condition": "B"
+        },
+        {
+          "order": 98,
+          "caseId": "safety-05",
+          "condition": "A"
+        },
+        {
+          "order": 99,
+          "caseId": "multi-05",
+          "condition": "A"
+        },
+        {
+          "order": 100,
+          "caseId": "water-01",
+          "condition": "A"
+        }
+      ]
+    },
+    {
+      "slot": "pilot-03",
+      "population": "Pilot",
+      "group": "Group 1",
+      "cases": [
+        {
+          "order": 1,
+          "caseId": "correction-10",
+          "condition": "B"
+        },
+        {
+          "order": 2,
+          "caseId": "water-07",
+          "condition": "A"
+        },
+        {
+          "order": 3,
+          "caseId": "correction-03",
+          "condition": "A"
+        },
+        {
+          "order": 4,
+          "caseId": "water-06",
+          "condition": "B"
+        },
+        {
+          "order": 5,
+          "caseId": "supplies-01",
+          "condition": "A"
+        },
+        {
+          "order": 6,
+          "caseId": "toilet-04",
+          "condition": "B"
+        },
+        {
+          "order": 7,
+          "caseId": "safety-06",
+          "condition": "B"
+        },
+        {
+          "order": 8,
+          "caseId": "ordinary-06",
+          "condition": "A"
+        },
+        {
+          "order": 9,
+          "caseId": "medical-08",
+          "condition": "B"
+        },
+        {
+          "order": 10,
+          "caseId": "correction-04",
+          "condition": "B"
+        },
+        {
+          "order": 11,
+          "caseId": "correction-07",
+          "condition": "B"
+        },
+        {
+          "order": 12,
+          "caseId": "water-03",
+          "condition": "B"
+        },
+        {
+          "order": 13,
+          "caseId": "safety-01",
+          "condition": "B"
+        },
+        {
+          "order": 14,
+          "caseId": "ordinary-02",
+          "condition": "B"
+        },
+        {
+          "order": 15,
+          "caseId": "medical-09",
+          "condition": "B"
+        },
+        {
+          "order": 16,
+          "caseId": "emotion-06",
+          "condition": "A"
+        },
+        {
+          "order": 17,
+          "caseId": "boundary-02",
+          "condition": "A"
+        },
+        {
+          "order": 18,
+          "caseId": "multi-02",
+          "condition": "B"
+        },
+        {
+          "order": 19,
+          "caseId": "correction-02",
+          "condition": "A"
+        },
+        {
+          "order": 20,
+          "caseId": "correction-06",
+          "condition": "A"
+        },
+        {
+          "order": 21,
+          "caseId": "boundary-01",
+          "condition": "A"
+        },
+        {
+          "order": 22,
+          "caseId": "toilet-06",
+          "condition": "A"
+        },
+        {
+          "order": 23,
+          "caseId": "water-04",
+          "condition": "A"
+        },
+        {
+          "order": 24,
+          "caseId": "medical-03",
+          "condition": "A"
+        },
+        {
+          "order": 25,
+          "caseId": "emotion-05",
+          "condition": "B"
+        },
+        {
+          "order": 26,
+          "caseId": "boundary-03",
+          "condition": "A"
+        },
+        {
+          "order": 27,
+          "caseId": "water-08",
+          "condition": "A"
+        },
+        {
+          "order": 28,
+          "caseId": "ordinary-09",
+          "condition": "B"
+        },
+        {
+          "order": 29,
+          "caseId": "medical-10",
+          "condition": "A"
+        },
+        {
+          "order": 30,
+          "caseId": "supplies-08",
+          "condition": "B"
+        },
+        {
+          "order": 31,
+          "caseId": "emotion-04",
+          "condition": "A"
+        },
+        {
+          "order": 32,
+          "caseId": "boundary-06",
+          "condition": "B"
+        },
+        {
+          "order": 33,
+          "caseId": "ordinary-07",
+          "condition": "A"
+        },
+        {
+          "order": 34,
+          "caseId": "multi-09",
+          "condition": "B"
+        },
+        {
+          "order": 35,
+          "caseId": "multi-01",
+          "condition": "B"
+        },
+        {
+          "order": 36,
+          "caseId": "correction-05",
+          "condition": "B"
+        },
+        {
+          "order": 37,
+          "caseId": "ordinary-04",
+          "condition": "A"
+        },
+        {
+          "order": 38,
+          "caseId": "medical-06",
+          "condition": "B"
+        },
+        {
+          "order": 39,
+          "caseId": "boundary-04",
+          "condition": "A"
+        },
+        {
+          "order": 40,
+          "caseId": "boundary-07",
+          "condition": "A"
+        },
+        {
+          "order": 41,
+          "caseId": "medical-01",
+          "condition": "B"
+        },
+        {
+          "order": 42,
+          "caseId": "toilet-02",
+          "condition": "A"
+        },
+        {
+          "order": 43,
+          "caseId": "ordinary-08",
+          "condition": "B"
+        },
+        {
+          "order": 44,
+          "caseId": "ordinary-05",
+          "condition": "B"
+        },
+        {
+          "order": 45,
+          "caseId": "emotion-01",
+          "condition": "A"
+        },
+        {
+          "order": 46,
+          "caseId": "medical-04",
+          "condition": "B"
+        },
+        {
+          "order": 47,
+          "caseId": "toilet-01",
+          "condition": "A"
+        },
+        {
+          "order": 48,
+          "caseId": "emotion-02",
+          "condition": "A"
+        },
+        {
+          "order": 49,
+          "caseId": "ordinary-10",
+          "condition": "A"
+        },
+        {
+          "order": 50,
+          "caseId": "water-09",
+          "condition": "A"
+        },
+        {
+          "order": 51,
+          "caseId": "correction-08",
+          "condition": "B"
+        },
+        {
+          "order": 52,
+          "caseId": "supplies-07",
+          "condition": "A"
+        },
+        {
+          "order": 53,
+          "caseId": "medical-05",
+          "condition": "B"
+        },
+        {
+          "order": 54,
+          "caseId": "water-05",
+          "condition": "B"
+        },
+        {
+          "order": 55,
+          "caseId": "safety-08",
+          "condition": "A"
+        },
+        {
+          "order": 56,
+          "caseId": "water-10",
+          "condition": "B"
+        },
+        {
+          "order": 57,
+          "caseId": "toilet-05",
+          "condition": "A"
+        },
+        {
+          "order": 58,
+          "caseId": "ordinary-03",
+          "condition": "B"
+        },
+        {
+          "order": 59,
+          "caseId": "medical-02",
+          "condition": "A"
+        },
+        {
+          "order": 60,
+          "caseId": "safety-03",
+          "condition": "A"
+        },
+        {
+          "order": 61,
+          "caseId": "supplies-06",
+          "condition": "A"
+        },
+        {
+          "order": 62,
+          "caseId": "boundary-10",
+          "condition": "A"
+        },
+        {
+          "order": 63,
+          "caseId": "multi-07",
+          "condition": "A"
+        },
+        {
+          "order": 64,
+          "caseId": "emotion-10",
+          "condition": "A"
+        },
+        {
+          "order": 65,
+          "caseId": "boundary-05",
+          "condition": "A"
+        },
+        {
+          "order": 66,
+          "caseId": "multi-04",
+          "condition": "B"
+        },
+        {
+          "order": 67,
+          "caseId": "supplies-03",
+          "condition": "B"
+        },
+        {
+          "order": 68,
+          "caseId": "supplies-10",
+          "condition": "A"
+        },
+        {
+          "order": 69,
+          "caseId": "boundary-08",
+          "condition": "A"
+        },
+        {
+          "order": 70,
+          "caseId": "emotion-09",
+          "condition": "B"
+        },
+        {
+          "order": 71,
+          "caseId": "toilet-09",
+          "condition": "B"
+        },
+        {
+          "order": 72,
+          "caseId": "multi-10",
+          "condition": "A"
+        },
+        {
+          "order": 73,
+          "caseId": "medical-07",
+          "condition": "B"
+        },
+        {
+          "order": 74,
+          "caseId": "toilet-07",
+          "condition": "B"
+        },
+        {
+          "order": 75,
+          "caseId": "multi-08",
+          "condition": "A"
+        },
+        {
+          "order": 76,
+          "caseId": "ordinary-01",
+          "condition": "A"
+        },
+        {
+          "order": 77,
+          "caseId": "safety-07",
+          "condition": "A"
+        },
+        {
+          "order": 78,
+          "caseId": "supplies-05",
+          "condition": "B"
+        },
+        {
+          "order": 79,
+          "caseId": "safety-10",
+          "condition": "B"
+        },
+        {
+          "order": 80,
+          "caseId": "boundary-09",
+          "condition": "B"
+        },
+        {
+          "order": 81,
+          "caseId": "safety-02",
+          "condition": "A"
+        },
+        {
+          "order": 82,
+          "caseId": "supplies-09",
+          "condition": "B"
+        },
+        {
+          "order": 83,
+          "caseId": "toilet-08",
+          "condition": "A"
+        },
+        {
+          "order": 84,
+          "caseId": "toilet-10",
+          "condition": "B"
+        },
+        {
+          "order": 85,
+          "caseId": "supplies-04",
+          "condition": "A"
+        },
+        {
+          "order": 86,
+          "caseId": "toilet-03",
+          "condition": "A"
+        },
+        {
+          "order": 87,
+          "caseId": "supplies-02",
+          "condition": "B"
+        },
+        {
+          "order": 88,
+          "caseId": "correction-01",
+          "condition": "B"
+        },
+        {
+          "order": 89,
+          "caseId": "safety-04",
+          "condition": "A"
+        },
+        {
+          "order": 90,
+          "caseId": "multi-03",
+          "condition": "B"
+        },
+        {
+          "order": 91,
+          "caseId": "correction-09",
+          "condition": "B"
+        },
+        {
+          "order": 92,
+          "caseId": "water-02",
+          "condition": "B"
+        },
+        {
+          "order": 93,
+          "caseId": "safety-09",
+          "condition": "A"
+        },
+        {
+          "order": 94,
+          "caseId": "multi-06",
+          "condition": "B"
+        },
+        {
+          "order": 95,
+          "caseId": "emotion-07",
+          "condition": "A"
+        },
+        {
+          "order": 96,
+          "caseId": "emotion-08",
+          "condition": "B"
+        },
+        {
+          "order": 97,
+          "caseId": "emotion-03",
+          "condition": "A"
+        },
+        {
+          "order": 98,
+          "caseId": "safety-05",
+          "condition": "B"
+        },
+        {
+          "order": 99,
+          "caseId": "multi-05",
+          "condition": "B"
+        },
+        {
+          "order": 100,
+          "caseId": "water-01",
+          "condition": "B"
+        }
+      ]
+    },
+    {
+      "slot": "pilot-04",
+      "population": "Pilot",
+      "group": "Group 2",
+      "cases": [
+        {
+          "order": 1,
+          "caseId": "correction-10",
+          "condition": "A"
+        },
+        {
+          "order": 2,
+          "caseId": "water-07",
+          "condition": "B"
+        },
+        {
+          "order": 3,
+          "caseId": "correction-03",
+          "condition": "B"
+        },
+        {
+          "order": 4,
+          "caseId": "water-06",
+          "condition": "A"
+        },
+        {
+          "order": 5,
+          "caseId": "supplies-01",
+          "condition": "B"
+        },
+        {
+          "order": 6,
+          "caseId": "toilet-04",
+          "condition": "A"
+        },
+        {
+          "order": 7,
+          "caseId": "safety-06",
+          "condition": "A"
+        },
+        {
+          "order": 8,
+          "caseId": "ordinary-06",
+          "condition": "B"
+        },
+        {
+          "order": 9,
+          "caseId": "medical-08",
+          "condition": "A"
+        },
+        {
+          "order": 10,
+          "caseId": "correction-04",
+          "condition": "A"
+        },
+        {
+          "order": 11,
+          "caseId": "correction-07",
+          "condition": "A"
+        },
+        {
+          "order": 12,
+          "caseId": "water-03",
+          "condition": "A"
+        },
+        {
+          "order": 13,
+          "caseId": "safety-01",
+          "condition": "A"
+        },
+        {
+          "order": 14,
+          "caseId": "ordinary-02",
+          "condition": "A"
+        },
+        {
+          "order": 15,
+          "caseId": "medical-09",
+          "condition": "A"
+        },
+        {
+          "order": 16,
+          "caseId": "emotion-06",
+          "condition": "B"
+        },
+        {
+          "order": 17,
+          "caseId": "boundary-02",
+          "condition": "B"
+        },
+        {
+          "order": 18,
+          "caseId": "multi-02",
+          "condition": "A"
+        },
+        {
+          "order": 19,
+          "caseId": "correction-02",
+          "condition": "B"
+        },
+        {
+          "order": 20,
+          "caseId": "correction-06",
+          "condition": "B"
+        },
+        {
+          "order": 21,
+          "caseId": "boundary-01",
+          "condition": "B"
+        },
+        {
+          "order": 22,
+          "caseId": "toilet-06",
+          "condition": "B"
+        },
+        {
+          "order": 23,
+          "caseId": "water-04",
+          "condition": "B"
+        },
+        {
+          "order": 24,
+          "caseId": "medical-03",
+          "condition": "B"
+        },
+        {
+          "order": 25,
+          "caseId": "emotion-05",
+          "condition": "A"
+        },
+        {
+          "order": 26,
+          "caseId": "boundary-03",
+          "condition": "B"
+        },
+        {
+          "order": 27,
+          "caseId": "water-08",
+          "condition": "B"
+        },
+        {
+          "order": 28,
+          "caseId": "ordinary-09",
+          "condition": "A"
+        },
+        {
+          "order": 29,
+          "caseId": "medical-10",
+          "condition": "B"
+        },
+        {
+          "order": 30,
+          "caseId": "supplies-08",
+          "condition": "A"
+        },
+        {
+          "order": 31,
+          "caseId": "emotion-04",
+          "condition": "B"
+        },
+        {
+          "order": 32,
+          "caseId": "boundary-06",
+          "condition": "A"
+        },
+        {
+          "order": 33,
+          "caseId": "ordinary-07",
+          "condition": "B"
+        },
+        {
+          "order": 34,
+          "caseId": "multi-09",
+          "condition": "A"
+        },
+        {
+          "order": 35,
+          "caseId": "multi-01",
+          "condition": "A"
+        },
+        {
+          "order": 36,
+          "caseId": "correction-05",
+          "condition": "A"
+        },
+        {
+          "order": 37,
+          "caseId": "ordinary-04",
+          "condition": "B"
+        },
+        {
+          "order": 38,
+          "caseId": "medical-06",
+          "condition": "A"
+        },
+        {
+          "order": 39,
+          "caseId": "boundary-04",
+          "condition": "B"
+        },
+        {
+          "order": 40,
+          "caseId": "boundary-07",
+          "condition": "B"
+        },
+        {
+          "order": 41,
+          "caseId": "medical-01",
+          "condition": "A"
+        },
+        {
+          "order": 42,
+          "caseId": "toilet-02",
+          "condition": "B"
+        },
+        {
+          "order": 43,
+          "caseId": "ordinary-08",
+          "condition": "A"
+        },
+        {
+          "order": 44,
+          "caseId": "ordinary-05",
+          "condition": "A"
+        },
+        {
+          "order": 45,
+          "caseId": "emotion-01",
+          "condition": "B"
+        },
+        {
+          "order": 46,
+          "caseId": "medical-04",
+          "condition": "A"
+        },
+        {
+          "order": 47,
+          "caseId": "toilet-01",
+          "condition": "B"
+        },
+        {
+          "order": 48,
+          "caseId": "emotion-02",
+          "condition": "B"
+        },
+        {
+          "order": 49,
+          "caseId": "ordinary-10",
+          "condition": "B"
+        },
+        {
+          "order": 50,
+          "caseId": "water-09",
+          "condition": "B"
+        },
+        {
+          "order": 51,
+          "caseId": "correction-08",
+          "condition": "A"
+        },
+        {
+          "order": 52,
+          "caseId": "supplies-07",
+          "condition": "B"
+        },
+        {
+          "order": 53,
+          "caseId": "medical-05",
+          "condition": "A"
+        },
+        {
+          "order": 54,
+          "caseId": "water-05",
+          "condition": "A"
+        },
+        {
+          "order": 55,
+          "caseId": "safety-08",
+          "condition": "B"
+        },
+        {
+          "order": 56,
+          "caseId": "water-10",
+          "condition": "A"
+        },
+        {
+          "order": 57,
+          "caseId": "toilet-05",
+          "condition": "B"
+        },
+        {
+          "order": 58,
+          "caseId": "ordinary-03",
+          "condition": "A"
+        },
+        {
+          "order": 59,
+          "caseId": "medical-02",
+          "condition": "B"
+        },
+        {
+          "order": 60,
+          "caseId": "safety-03",
+          "condition": "B"
+        },
+        {
+          "order": 61,
+          "caseId": "supplies-06",
+          "condition": "B"
+        },
+        {
+          "order": 62,
+          "caseId": "boundary-10",
+          "condition": "B"
+        },
+        {
+          "order": 63,
+          "caseId": "multi-07",
+          "condition": "B"
+        },
+        {
+          "order": 64,
+          "caseId": "emotion-10",
+          "condition": "B"
+        },
+        {
+          "order": 65,
+          "caseId": "boundary-05",
+          "condition": "B"
+        },
+        {
+          "order": 66,
+          "caseId": "multi-04",
+          "condition": "A"
+        },
+        {
+          "order": 67,
+          "caseId": "supplies-03",
+          "condition": "A"
+        },
+        {
+          "order": 68,
+          "caseId": "supplies-10",
+          "condition": "B"
+        },
+        {
+          "order": 69,
+          "caseId": "boundary-08",
+          "condition": "B"
+        },
+        {
+          "order": 70,
+          "caseId": "emotion-09",
+          "condition": "A"
+        },
+        {
+          "order": 71,
+          "caseId": "toilet-09",
+          "condition": "A"
+        },
+        {
+          "order": 72,
+          "caseId": "multi-10",
+          "condition": "B"
+        },
+        {
+          "order": 73,
+          "caseId": "medical-07",
+          "condition": "A"
+        },
+        {
+          "order": 74,
+          "caseId": "toilet-07",
+          "condition": "A"
+        },
+        {
+          "order": 75,
+          "caseId": "multi-08",
+          "condition": "B"
+        },
+        {
+          "order": 76,
+          "caseId": "ordinary-01",
+          "condition": "B"
+        },
+        {
+          "order": 77,
+          "caseId": "safety-07",
+          "condition": "B"
+        },
+        {
+          "order": 78,
+          "caseId": "supplies-05",
+          "condition": "A"
+        },
+        {
+          "order": 79,
+          "caseId": "safety-10",
+          "condition": "A"
+        },
+        {
+          "order": 80,
+          "caseId": "boundary-09",
+          "condition": "A"
+        },
+        {
+          "order": 81,
+          "caseId": "safety-02",
+          "condition": "B"
+        },
+        {
+          "order": 82,
+          "caseId": "supplies-09",
+          "condition": "A"
+        },
+        {
+          "order": 83,
+          "caseId": "toilet-08",
+          "condition": "B"
+        },
+        {
+          "order": 84,
+          "caseId": "toilet-10",
+          "condition": "A"
+        },
+        {
+          "order": 85,
+          "caseId": "supplies-04",
+          "condition": "B"
+        },
+        {
+          "order": 86,
+          "caseId": "toilet-03",
+          "condition": "B"
+        },
+        {
+          "order": 87,
+          "caseId": "supplies-02",
+          "condition": "A"
+        },
+        {
+          "order": 88,
+          "caseId": "correction-01",
+          "condition": "A"
+        },
+        {
+          "order": 89,
+          "caseId": "safety-04",
+          "condition": "B"
+        },
+        {
+          "order": 90,
+          "caseId": "multi-03",
+          "condition": "A"
+        },
+        {
+          "order": 91,
+          "caseId": "correction-09",
+          "condition": "A"
+        },
+        {
+          "order": 92,
+          "caseId": "water-02",
+          "condition": "A"
+        },
+        {
+          "order": 93,
+          "caseId": "safety-09",
+          "condition": "B"
+        },
+        {
+          "order": 94,
+          "caseId": "multi-06",
+          "condition": "A"
+        },
+        {
+          "order": 95,
+          "caseId": "emotion-07",
+          "condition": "B"
+        },
+        {
+          "order": 96,
+          "caseId": "emotion-08",
+          "condition": "A"
+        },
+        {
+          "order": 97,
+          "caseId": "emotion-03",
+          "condition": "B"
+        },
+        {
+          "order": 98,
+          "caseId": "safety-05",
+          "condition": "A"
+        },
+        {
+          "order": 99,
+          "caseId": "multi-05",
+          "condition": "A"
+        },
+        {
+          "order": 100,
+          "caseId": "water-01",
+          "condition": "A"
+        }
+      ]
+    },
+    {
+      "slot": "practitioner-01",
+      "population": "Professional / practitioner",
+      "group": "Group 1",
+      "cases": [
+        {
+          "order": 1,
+          "caseId": "correction-10",
+          "condition": "B"
+        },
+        {
+          "order": 2,
+          "caseId": "water-07",
+          "condition": "A"
+        },
+        {
+          "order": 3,
+          "caseId": "correction-03",
+          "condition": "A"
+        },
+        {
+          "order": 4,
+          "caseId": "water-06",
+          "condition": "B"
+        },
+        {
+          "order": 5,
+          "caseId": "supplies-01",
+          "condition": "A"
+        },
+        {
+          "order": 6,
+          "caseId": "toilet-04",
+          "condition": "B"
+        },
+        {
+          "order": 7,
+          "caseId": "safety-06",
+          "condition": "B"
+        },
+        {
+          "order": 8,
+          "caseId": "ordinary-06",
+          "condition": "A"
+        },
+        {
+          "order": 9,
+          "caseId": "medical-08",
+          "condition": "B"
+        },
+        {
+          "order": 10,
+          "caseId": "correction-04",
+          "condition": "B"
+        },
+        {
+          "order": 11,
+          "caseId": "correction-07",
+          "condition": "B"
+        },
+        {
+          "order": 12,
+          "caseId": "water-03",
+          "condition": "B"
+        },
+        {
+          "order": 13,
+          "caseId": "safety-01",
+          "condition": "B"
+        },
+        {
+          "order": 14,
+          "caseId": "ordinary-02",
+          "condition": "B"
+        },
+        {
+          "order": 15,
+          "caseId": "medical-09",
+          "condition": "B"
+        },
+        {
+          "order": 16,
+          "caseId": "emotion-06",
+          "condition": "A"
+        },
+        {
+          "order": 17,
+          "caseId": "boundary-02",
+          "condition": "A"
+        },
+        {
+          "order": 18,
+          "caseId": "multi-02",
+          "condition": "B"
+        },
+        {
+          "order": 19,
+          "caseId": "correction-02",
+          "condition": "A"
+        },
+        {
+          "order": 20,
+          "caseId": "correction-06",
+          "condition": "A"
+        },
+        {
+          "order": 21,
+          "caseId": "boundary-01",
+          "condition": "A"
+        },
+        {
+          "order": 22,
+          "caseId": "toilet-06",
+          "condition": "A"
+        },
+        {
+          "order": 23,
+          "caseId": "water-04",
+          "condition": "A"
+        },
+        {
+          "order": 24,
+          "caseId": "medical-03",
+          "condition": "A"
+        },
+        {
+          "order": 25,
+          "caseId": "emotion-05",
+          "condition": "B"
+        },
+        {
+          "order": 26,
+          "caseId": "boundary-03",
+          "condition": "A"
+        },
+        {
+          "order": 27,
+          "caseId": "water-08",
+          "condition": "A"
+        },
+        {
+          "order": 28,
+          "caseId": "ordinary-09",
+          "condition": "B"
+        },
+        {
+          "order": 29,
+          "caseId": "medical-10",
+          "condition": "A"
+        },
+        {
+          "order": 30,
+          "caseId": "supplies-08",
+          "condition": "B"
+        },
+        {
+          "order": 31,
+          "caseId": "emotion-04",
+          "condition": "A"
+        },
+        {
+          "order": 32,
+          "caseId": "boundary-06",
+          "condition": "B"
+        },
+        {
+          "order": 33,
+          "caseId": "ordinary-07",
+          "condition": "A"
+        },
+        {
+          "order": 34,
+          "caseId": "multi-09",
+          "condition": "B"
+        },
+        {
+          "order": 35,
+          "caseId": "multi-01",
+          "condition": "B"
+        },
+        {
+          "order": 36,
+          "caseId": "correction-05",
+          "condition": "B"
+        },
+        {
+          "order": 37,
+          "caseId": "ordinary-04",
+          "condition": "A"
+        },
+        {
+          "order": 38,
+          "caseId": "medical-06",
+          "condition": "B"
+        },
+        {
+          "order": 39,
+          "caseId": "boundary-04",
+          "condition": "A"
+        },
+        {
+          "order": 40,
+          "caseId": "boundary-07",
+          "condition": "A"
+        },
+        {
+          "order": 41,
+          "caseId": "medical-01",
+          "condition": "B"
+        },
+        {
+          "order": 42,
+          "caseId": "toilet-02",
+          "condition": "A"
+        },
+        {
+          "order": 43,
+          "caseId": "ordinary-08",
+          "condition": "B"
+        },
+        {
+          "order": 44,
+          "caseId": "ordinary-05",
+          "condition": "B"
+        },
+        {
+          "order": 45,
+          "caseId": "emotion-01",
+          "condition": "A"
+        },
+        {
+          "order": 46,
+          "caseId": "medical-04",
+          "condition": "B"
+        },
+        {
+          "order": 47,
+          "caseId": "toilet-01",
+          "condition": "A"
+        },
+        {
+          "order": 48,
+          "caseId": "emotion-02",
+          "condition": "A"
+        },
+        {
+          "order": 49,
+          "caseId": "ordinary-10",
+          "condition": "A"
+        },
+        {
+          "order": 50,
+          "caseId": "water-09",
+          "condition": "A"
+        },
+        {
+          "order": 51,
+          "caseId": "correction-08",
+          "condition": "B"
+        },
+        {
+          "order": 52,
+          "caseId": "supplies-07",
+          "condition": "A"
+        },
+        {
+          "order": 53,
+          "caseId": "medical-05",
+          "condition": "B"
+        },
+        {
+          "order": 54,
+          "caseId": "water-05",
+          "condition": "B"
+        },
+        {
+          "order": 55,
+          "caseId": "safety-08",
+          "condition": "A"
+        },
+        {
+          "order": 56,
+          "caseId": "water-10",
+          "condition": "B"
+        },
+        {
+          "order": 57,
+          "caseId": "toilet-05",
+          "condition": "A"
+        },
+        {
+          "order": 58,
+          "caseId": "ordinary-03",
+          "condition": "B"
+        },
+        {
+          "order": 59,
+          "caseId": "medical-02",
+          "condition": "A"
+        },
+        {
+          "order": 60,
+          "caseId": "safety-03",
+          "condition": "A"
+        },
+        {
+          "order": 61,
+          "caseId": "supplies-06",
+          "condition": "A"
+        },
+        {
+          "order": 62,
+          "caseId": "boundary-10",
+          "condition": "A"
+        },
+        {
+          "order": 63,
+          "caseId": "multi-07",
+          "condition": "A"
+        },
+        {
+          "order": 64,
+          "caseId": "emotion-10",
+          "condition": "A"
+        },
+        {
+          "order": 65,
+          "caseId": "boundary-05",
+          "condition": "A"
+        },
+        {
+          "order": 66,
+          "caseId": "multi-04",
+          "condition": "B"
+        },
+        {
+          "order": 67,
+          "caseId": "supplies-03",
+          "condition": "B"
+        },
+        {
+          "order": 68,
+          "caseId": "supplies-10",
+          "condition": "A"
+        },
+        {
+          "order": 69,
+          "caseId": "boundary-08",
+          "condition": "A"
+        },
+        {
+          "order": 70,
+          "caseId": "emotion-09",
+          "condition": "B"
+        },
+        {
+          "order": 71,
+          "caseId": "toilet-09",
+          "condition": "B"
+        },
+        {
+          "order": 72,
+          "caseId": "multi-10",
+          "condition": "A"
+        },
+        {
+          "order": 73,
+          "caseId": "medical-07",
+          "condition": "B"
+        },
+        {
+          "order": 74,
+          "caseId": "toilet-07",
+          "condition": "B"
+        },
+        {
+          "order": 75,
+          "caseId": "multi-08",
+          "condition": "A"
+        },
+        {
+          "order": 76,
+          "caseId": "ordinary-01",
+          "condition": "A"
+        },
+        {
+          "order": 77,
+          "caseId": "safety-07",
+          "condition": "A"
+        },
+        {
+          "order": 78,
+          "caseId": "supplies-05",
+          "condition": "B"
+        },
+        {
+          "order": 79,
+          "caseId": "safety-10",
+          "condition": "B"
+        },
+        {
+          "order": 80,
+          "caseId": "boundary-09",
+          "condition": "B"
+        },
+        {
+          "order": 81,
+          "caseId": "safety-02",
+          "condition": "A"
+        },
+        {
+          "order": 82,
+          "caseId": "supplies-09",
+          "condition": "B"
+        },
+        {
+          "order": 83,
+          "caseId": "toilet-08",
+          "condition": "A"
+        },
+        {
+          "order": 84,
+          "caseId": "toilet-10",
+          "condition": "B"
+        },
+        {
+          "order": 85,
+          "caseId": "supplies-04",
+          "condition": "A"
+        },
+        {
+          "order": 86,
+          "caseId": "toilet-03",
+          "condition": "A"
+        },
+        {
+          "order": 87,
+          "caseId": "supplies-02",
+          "condition": "B"
+        },
+        {
+          "order": 88,
+          "caseId": "correction-01",
+          "condition": "B"
+        },
+        {
+          "order": 89,
+          "caseId": "safety-04",
+          "condition": "A"
+        },
+        {
+          "order": 90,
+          "caseId": "multi-03",
+          "condition": "B"
+        },
+        {
+          "order": 91,
+          "caseId": "correction-09",
+          "condition": "B"
+        },
+        {
+          "order": 92,
+          "caseId": "water-02",
+          "condition": "B"
+        },
+        {
+          "order": 93,
+          "caseId": "safety-09",
+          "condition": "A"
+        },
+        {
+          "order": 94,
+          "caseId": "multi-06",
+          "condition": "B"
+        },
+        {
+          "order": 95,
+          "caseId": "emotion-07",
+          "condition": "A"
+        },
+        {
+          "order": 96,
+          "caseId": "emotion-08",
+          "condition": "B"
+        },
+        {
+          "order": 97,
+          "caseId": "emotion-03",
+          "condition": "A"
+        },
+        {
+          "order": 98,
+          "caseId": "safety-05",
+          "condition": "B"
+        },
+        {
+          "order": 99,
+          "caseId": "multi-05",
+          "condition": "B"
+        },
+        {
+          "order": 100,
+          "caseId": "water-01",
+          "condition": "B"
+        }
+      ]
+    },
+    {
+      "slot": "practitioner-02",
+      "population": "Professional / practitioner",
+      "group": "Group 2",
+      "cases": [
+        {
+          "order": 1,
+          "caseId": "correction-10",
+          "condition": "A"
+        },
+        {
+          "order": 2,
+          "caseId": "water-07",
+          "condition": "B"
+        },
+        {
+          "order": 3,
+          "caseId": "correction-03",
+          "condition": "B"
+        },
+        {
+          "order": 4,
+          "caseId": "water-06",
+          "condition": "A"
+        },
+        {
+          "order": 5,
+          "caseId": "supplies-01",
+          "condition": "B"
+        },
+        {
+          "order": 6,
+          "caseId": "toilet-04",
+          "condition": "A"
+        },
+        {
+          "order": 7,
+          "caseId": "safety-06",
+          "condition": "A"
+        },
+        {
+          "order": 8,
+          "caseId": "ordinary-06",
+          "condition": "B"
+        },
+        {
+          "order": 9,
+          "caseId": "medical-08",
+          "condition": "A"
+        },
+        {
+          "order": 10,
+          "caseId": "correction-04",
+          "condition": "A"
+        },
+        {
+          "order": 11,
+          "caseId": "correction-07",
+          "condition": "A"
+        },
+        {
+          "order": 12,
+          "caseId": "water-03",
+          "condition": "A"
+        },
+        {
+          "order": 13,
+          "caseId": "safety-01",
+          "condition": "A"
+        },
+        {
+          "order": 14,
+          "caseId": "ordinary-02",
+          "condition": "A"
+        },
+        {
+          "order": 15,
+          "caseId": "medical-09",
+          "condition": "A"
+        },
+        {
+          "order": 16,
+          "caseId": "emotion-06",
+          "condition": "B"
+        },
+        {
+          "order": 17,
+          "caseId": "boundary-02",
+          "condition": "B"
+        },
+        {
+          "order": 18,
+          "caseId": "multi-02",
+          "condition": "A"
+        },
+        {
+          "order": 19,
+          "caseId": "correction-02",
+          "condition": "B"
+        },
+        {
+          "order": 20,
+          "caseId": "correction-06",
+          "condition": "B"
+        },
+        {
+          "order": 21,
+          "caseId": "boundary-01",
+          "condition": "B"
+        },
+        {
+          "order": 22,
+          "caseId": "toilet-06",
+          "condition": "B"
+        },
+        {
+          "order": 23,
+          "caseId": "water-04",
+          "condition": "B"
+        },
+        {
+          "order": 24,
+          "caseId": "medical-03",
+          "condition": "B"
+        },
+        {
+          "order": 25,
+          "caseId": "emotion-05",
+          "condition": "A"
+        },
+        {
+          "order": 26,
+          "caseId": "boundary-03",
+          "condition": "B"
+        },
+        {
+          "order": 27,
+          "caseId": "water-08",
+          "condition": "B"
+        },
+        {
+          "order": 28,
+          "caseId": "ordinary-09",
+          "condition": "A"
+        },
+        {
+          "order": 29,
+          "caseId": "medical-10",
+          "condition": "B"
+        },
+        {
+          "order": 30,
+          "caseId": "supplies-08",
+          "condition": "A"
+        },
+        {
+          "order": 31,
+          "caseId": "emotion-04",
+          "condition": "B"
+        },
+        {
+          "order": 32,
+          "caseId": "boundary-06",
+          "condition": "A"
+        },
+        {
+          "order": 33,
+          "caseId": "ordinary-07",
+          "condition": "B"
+        },
+        {
+          "order": 34,
+          "caseId": "multi-09",
+          "condition": "A"
+        },
+        {
+          "order": 35,
+          "caseId": "multi-01",
+          "condition": "A"
+        },
+        {
+          "order": 36,
+          "caseId": "correction-05",
+          "condition": "A"
+        },
+        {
+          "order": 37,
+          "caseId": "ordinary-04",
+          "condition": "B"
+        },
+        {
+          "order": 38,
+          "caseId": "medical-06",
+          "condition": "A"
+        },
+        {
+          "order": 39,
+          "caseId": "boundary-04",
+          "condition": "B"
+        },
+        {
+          "order": 40,
+          "caseId": "boundary-07",
+          "condition": "B"
+        },
+        {
+          "order": 41,
+          "caseId": "medical-01",
+          "condition": "A"
+        },
+        {
+          "order": 42,
+          "caseId": "toilet-02",
+          "condition": "B"
+        },
+        {
+          "order": 43,
+          "caseId": "ordinary-08",
+          "condition": "A"
+        },
+        {
+          "order": 44,
+          "caseId": "ordinary-05",
+          "condition": "A"
+        },
+        {
+          "order": 45,
+          "caseId": "emotion-01",
+          "condition": "B"
+        },
+        {
+          "order": 46,
+          "caseId": "medical-04",
+          "condition": "A"
+        },
+        {
+          "order": 47,
+          "caseId": "toilet-01",
+          "condition": "B"
+        },
+        {
+          "order": 48,
+          "caseId": "emotion-02",
+          "condition": "B"
+        },
+        {
+          "order": 49,
+          "caseId": "ordinary-10",
+          "condition": "B"
+        },
+        {
+          "order": 50,
+          "caseId": "water-09",
+          "condition": "B"
+        },
+        {
+          "order": 51,
+          "caseId": "correction-08",
+          "condition": "A"
+        },
+        {
+          "order": 52,
+          "caseId": "supplies-07",
+          "condition": "B"
+        },
+        {
+          "order": 53,
+          "caseId": "medical-05",
+          "condition": "A"
+        },
+        {
+          "order": 54,
+          "caseId": "water-05",
+          "condition": "A"
+        },
+        {
+          "order": 55,
+          "caseId": "safety-08",
+          "condition": "B"
+        },
+        {
+          "order": 56,
+          "caseId": "water-10",
+          "condition": "A"
+        },
+        {
+          "order": 57,
+          "caseId": "toilet-05",
+          "condition": "B"
+        },
+        {
+          "order": 58,
+          "caseId": "ordinary-03",
+          "condition": "A"
+        },
+        {
+          "order": 59,
+          "caseId": "medical-02",
+          "condition": "B"
+        },
+        {
+          "order": 60,
+          "caseId": "safety-03",
+          "condition": "B"
+        },
+        {
+          "order": 61,
+          "caseId": "supplies-06",
+          "condition": "B"
+        },
+        {
+          "order": 62,
+          "caseId": "boundary-10",
+          "condition": "B"
+        },
+        {
+          "order": 63,
+          "caseId": "multi-07",
+          "condition": "B"
+        },
+        {
+          "order": 64,
+          "caseId": "emotion-10",
+          "condition": "B"
+        },
+        {
+          "order": 65,
+          "caseId": "boundary-05",
+          "condition": "B"
+        },
+        {
+          "order": 66,
+          "caseId": "multi-04",
+          "condition": "A"
+        },
+        {
+          "order": 67,
+          "caseId": "supplies-03",
+          "condition": "A"
+        },
+        {
+          "order": 68,
+          "caseId": "supplies-10",
+          "condition": "B"
+        },
+        {
+          "order": 69,
+          "caseId": "boundary-08",
+          "condition": "B"
+        },
+        {
+          "order": 70,
+          "caseId": "emotion-09",
+          "condition": "A"
+        },
+        {
+          "order": 71,
+          "caseId": "toilet-09",
+          "condition": "A"
+        },
+        {
+          "order": 72,
+          "caseId": "multi-10",
+          "condition": "B"
+        },
+        {
+          "order": 73,
+          "caseId": "medical-07",
+          "condition": "A"
+        },
+        {
+          "order": 74,
+          "caseId": "toilet-07",
+          "condition": "A"
+        },
+        {
+          "order": 75,
+          "caseId": "multi-08",
+          "condition": "B"
+        },
+        {
+          "order": 76,
+          "caseId": "ordinary-01",
+          "condition": "B"
+        },
+        {
+          "order": 77,
+          "caseId": "safety-07",
+          "condition": "B"
+        },
+        {
+          "order": 78,
+          "caseId": "supplies-05",
+          "condition": "A"
+        },
+        {
+          "order": 79,
+          "caseId": "safety-10",
+          "condition": "A"
+        },
+        {
+          "order": 80,
+          "caseId": "boundary-09",
+          "condition": "A"
+        },
+        {
+          "order": 81,
+          "caseId": "safety-02",
+          "condition": "B"
+        },
+        {
+          "order": 82,
+          "caseId": "supplies-09",
+          "condition": "A"
+        },
+        {
+          "order": 83,
+          "caseId": "toilet-08",
+          "condition": "B"
+        },
+        {
+          "order": 84,
+          "caseId": "toilet-10",
+          "condition": "A"
+        },
+        {
+          "order": 85,
+          "caseId": "supplies-04",
+          "condition": "B"
+        },
+        {
+          "order": 86,
+          "caseId": "toilet-03",
+          "condition": "B"
+        },
+        {
+          "order": 87,
+          "caseId": "supplies-02",
+          "condition": "A"
+        },
+        {
+          "order": 88,
+          "caseId": "correction-01",
+          "condition": "A"
+        },
+        {
+          "order": 89,
+          "caseId": "safety-04",
+          "condition": "B"
+        },
+        {
+          "order": 90,
+          "caseId": "multi-03",
+          "condition": "A"
+        },
+        {
+          "order": 91,
+          "caseId": "correction-09",
+          "condition": "A"
+        },
+        {
+          "order": 92,
+          "caseId": "water-02",
+          "condition": "A"
+        },
+        {
+          "order": 93,
+          "caseId": "safety-09",
+          "condition": "B"
+        },
+        {
+          "order": 94,
+          "caseId": "multi-06",
+          "condition": "A"
+        },
+        {
+          "order": 95,
+          "caseId": "emotion-07",
+          "condition": "B"
+        },
+        {
+          "order": 96,
+          "caseId": "emotion-08",
+          "condition": "A"
+        },
+        {
+          "order": 97,
+          "caseId": "emotion-03",
+          "condition": "B"
+        },
+        {
+          "order": 98,
+          "caseId": "safety-05",
+          "condition": "A"
+        },
+        {
+          "order": 99,
+          "caseId": "multi-05",
+          "condition": "A"
+        },
+        {
+          "order": 100,
+          "caseId": "water-01",
+          "condition": "A"
+        }
+      ]
+    },
+    {
+      "slot": "practitioner-03",
+      "population": "Professional / practitioner",
+      "group": "Group 1",
+      "cases": [
+        {
+          "order": 1,
+          "caseId": "correction-10",
+          "condition": "B"
+        },
+        {
+          "order": 2,
+          "caseId": "water-07",
+          "condition": "A"
+        },
+        {
+          "order": 3,
+          "caseId": "correction-03",
+          "condition": "A"
+        },
+        {
+          "order": 4,
+          "caseId": "water-06",
+          "condition": "B"
+        },
+        {
+          "order": 5,
+          "caseId": "supplies-01",
+          "condition": "A"
+        },
+        {
+          "order": 6,
+          "caseId": "toilet-04",
+          "condition": "B"
+        },
+        {
+          "order": 7,
+          "caseId": "safety-06",
+          "condition": "B"
+        },
+        {
+          "order": 8,
+          "caseId": "ordinary-06",
+          "condition": "A"
+        },
+        {
+          "order": 9,
+          "caseId": "medical-08",
+          "condition": "B"
+        },
+        {
+          "order": 10,
+          "caseId": "correction-04",
+          "condition": "B"
+        },
+        {
+          "order": 11,
+          "caseId": "correction-07",
+          "condition": "B"
+        },
+        {
+          "order": 12,
+          "caseId": "water-03",
+          "condition": "B"
+        },
+        {
+          "order": 13,
+          "caseId": "safety-01",
+          "condition": "B"
+        },
+        {
+          "order": 14,
+          "caseId": "ordinary-02",
+          "condition": "B"
+        },
+        {
+          "order": 15,
+          "caseId": "medical-09",
+          "condition": "B"
+        },
+        {
+          "order": 16,
+          "caseId": "emotion-06",
+          "condition": "A"
+        },
+        {
+          "order": 17,
+          "caseId": "boundary-02",
+          "condition": "A"
+        },
+        {
+          "order": 18,
+          "caseId": "multi-02",
+          "condition": "B"
+        },
+        {
+          "order": 19,
+          "caseId": "correction-02",
+          "condition": "A"
+        },
+        {
+          "order": 20,
+          "caseId": "correction-06",
+          "condition": "A"
+        },
+        {
+          "order": 21,
+          "caseId": "boundary-01",
+          "condition": "A"
+        },
+        {
+          "order": 22,
+          "caseId": "toilet-06",
+          "condition": "A"
+        },
+        {
+          "order": 23,
+          "caseId": "water-04",
+          "condition": "A"
+        },
+        {
+          "order": 24,
+          "caseId": "medical-03",
+          "condition": "A"
+        },
+        {
+          "order": 25,
+          "caseId": "emotion-05",
+          "condition": "B"
+        },
+        {
+          "order": 26,
+          "caseId": "boundary-03",
+          "condition": "A"
+        },
+        {
+          "order": 27,
+          "caseId": "water-08",
+          "condition": "A"
+        },
+        {
+          "order": 28,
+          "caseId": "ordinary-09",
+          "condition": "B"
+        },
+        {
+          "order": 29,
+          "caseId": "medical-10",
+          "condition": "A"
+        },
+        {
+          "order": 30,
+          "caseId": "supplies-08",
+          "condition": "B"
+        },
+        {
+          "order": 31,
+          "caseId": "emotion-04",
+          "condition": "A"
+        },
+        {
+          "order": 32,
+          "caseId": "boundary-06",
+          "condition": "B"
+        },
+        {
+          "order": 33,
+          "caseId": "ordinary-07",
+          "condition": "A"
+        },
+        {
+          "order": 34,
+          "caseId": "multi-09",
+          "condition": "B"
+        },
+        {
+          "order": 35,
+          "caseId": "multi-01",
+          "condition": "B"
+        },
+        {
+          "order": 36,
+          "caseId": "correction-05",
+          "condition": "B"
+        },
+        {
+          "order": 37,
+          "caseId": "ordinary-04",
+          "condition": "A"
+        },
+        {
+          "order": 38,
+          "caseId": "medical-06",
+          "condition": "B"
+        },
+        {
+          "order": 39,
+          "caseId": "boundary-04",
+          "condition": "A"
+        },
+        {
+          "order": 40,
+          "caseId": "boundary-07",
+          "condition": "A"
+        },
+        {
+          "order": 41,
+          "caseId": "medical-01",
+          "condition": "B"
+        },
+        {
+          "order": 42,
+          "caseId": "toilet-02",
+          "condition": "A"
+        },
+        {
+          "order": 43,
+          "caseId": "ordinary-08",
+          "condition": "B"
+        },
+        {
+          "order": 44,
+          "caseId": "ordinary-05",
+          "condition": "B"
+        },
+        {
+          "order": 45,
+          "caseId": "emotion-01",
+          "condition": "A"
+        },
+        {
+          "order": 46,
+          "caseId": "medical-04",
+          "condition": "B"
+        },
+        {
+          "order": 47,
+          "caseId": "toilet-01",
+          "condition": "A"
+        },
+        {
+          "order": 48,
+          "caseId": "emotion-02",
+          "condition": "A"
+        },
+        {
+          "order": 49,
+          "caseId": "ordinary-10",
+          "condition": "A"
+        },
+        {
+          "order": 50,
+          "caseId": "water-09",
+          "condition": "A"
+        },
+        {
+          "order": 51,
+          "caseId": "correction-08",
+          "condition": "B"
+        },
+        {
+          "order": 52,
+          "caseId": "supplies-07",
+          "condition": "A"
+        },
+        {
+          "order": 53,
+          "caseId": "medical-05",
+          "condition": "B"
+        },
+        {
+          "order": 54,
+          "caseId": "water-05",
+          "condition": "B"
+        },
+        {
+          "order": 55,
+          "caseId": "safety-08",
+          "condition": "A"
+        },
+        {
+          "order": 56,
+          "caseId": "water-10",
+          "condition": "B"
+        },
+        {
+          "order": 57,
+          "caseId": "toilet-05",
+          "condition": "A"
+        },
+        {
+          "order": 58,
+          "caseId": "ordinary-03",
+          "condition": "B"
+        },
+        {
+          "order": 59,
+          "caseId": "medical-02",
+          "condition": "A"
+        },
+        {
+          "order": 60,
+          "caseId": "safety-03",
+          "condition": "A"
+        },
+        {
+          "order": 61,
+          "caseId": "supplies-06",
+          "condition": "A"
+        },
+        {
+          "order": 62,
+          "caseId": "boundary-10",
+          "condition": "A"
+        },
+        {
+          "order": 63,
+          "caseId": "multi-07",
+          "condition": "A"
+        },
+        {
+          "order": 64,
+          "caseId": "emotion-10",
+          "condition": "A"
+        },
+        {
+          "order": 65,
+          "caseId": "boundary-05",
+          "condition": "A"
+        },
+        {
+          "order": 66,
+          "caseId": "multi-04",
+          "condition": "B"
+        },
+        {
+          "order": 67,
+          "caseId": "supplies-03",
+          "condition": "B"
+        },
+        {
+          "order": 68,
+          "caseId": "supplies-10",
+          "condition": "A"
+        },
+        {
+          "order": 69,
+          "caseId": "boundary-08",
+          "condition": "A"
+        },
+        {
+          "order": 70,
+          "caseId": "emotion-09",
+          "condition": "B"
+        },
+        {
+          "order": 71,
+          "caseId": "toilet-09",
+          "condition": "B"
+        },
+        {
+          "order": 72,
+          "caseId": "multi-10",
+          "condition": "A"
+        },
+        {
+          "order": 73,
+          "caseId": "medical-07",
+          "condition": "B"
+        },
+        {
+          "order": 74,
+          "caseId": "toilet-07",
+          "condition": "B"
+        },
+        {
+          "order": 75,
+          "caseId": "multi-08",
+          "condition": "A"
+        },
+        {
+          "order": 76,
+          "caseId": "ordinary-01",
+          "condition": "A"
+        },
+        {
+          "order": 77,
+          "caseId": "safety-07",
+          "condition": "A"
+        },
+        {
+          "order": 78,
+          "caseId": "supplies-05",
+          "condition": "B"
+        },
+        {
+          "order": 79,
+          "caseId": "safety-10",
+          "condition": "B"
+        },
+        {
+          "order": 80,
+          "caseId": "boundary-09",
+          "condition": "B"
+        },
+        {
+          "order": 81,
+          "caseId": "safety-02",
+          "condition": "A"
+        },
+        {
+          "order": 82,
+          "caseId": "supplies-09",
+          "condition": "B"
+        },
+        {
+          "order": 83,
+          "caseId": "toilet-08",
+          "condition": "A"
+        },
+        {
+          "order": 84,
+          "caseId": "toilet-10",
+          "condition": "B"
+        },
+        {
+          "order": 85,
+          "caseId": "supplies-04",
+          "condition": "A"
+        },
+        {
+          "order": 86,
+          "caseId": "toilet-03",
+          "condition": "A"
+        },
+        {
+          "order": 87,
+          "caseId": "supplies-02",
+          "condition": "B"
+        },
+        {
+          "order": 88,
+          "caseId": "correction-01",
+          "condition": "B"
+        },
+        {
+          "order": 89,
+          "caseId": "safety-04",
+          "condition": "A"
+        },
+        {
+          "order": 90,
+          "caseId": "multi-03",
+          "condition": "B"
+        },
+        {
+          "order": 91,
+          "caseId": "correction-09",
+          "condition": "B"
+        },
+        {
+          "order": 92,
+          "caseId": "water-02",
+          "condition": "B"
+        },
+        {
+          "order": 93,
+          "caseId": "safety-09",
+          "condition": "A"
+        },
+        {
+          "order": 94,
+          "caseId": "multi-06",
+          "condition": "B"
+        },
+        {
+          "order": 95,
+          "caseId": "emotion-07",
+          "condition": "A"
+        },
+        {
+          "order": 96,
+          "caseId": "emotion-08",
+          "condition": "B"
+        },
+        {
+          "order": 97,
+          "caseId": "emotion-03",
+          "condition": "A"
+        },
+        {
+          "order": 98,
+          "caseId": "safety-05",
+          "condition": "B"
+        },
+        {
+          "order": 99,
+          "caseId": "multi-05",
+          "condition": "B"
+        },
+        {
+          "order": 100,
+          "caseId": "water-01",
+          "condition": "B"
+        }
+      ]
+    },
+    {
+      "slot": "practitioner-04",
+      "population": "Professional / practitioner",
+      "group": "Group 2",
+      "cases": [
+        {
+          "order": 1,
+          "caseId": "correction-10",
+          "condition": "A"
+        },
+        {
+          "order": 2,
+          "caseId": "water-07",
+          "condition": "B"
+        },
+        {
+          "order": 3,
+          "caseId": "correction-03",
+          "condition": "B"
+        },
+        {
+          "order": 4,
+          "caseId": "water-06",
+          "condition": "A"
+        },
+        {
+          "order": 5,
+          "caseId": "supplies-01",
+          "condition": "B"
+        },
+        {
+          "order": 6,
+          "caseId": "toilet-04",
+          "condition": "A"
+        },
+        {
+          "order": 7,
+          "caseId": "safety-06",
+          "condition": "A"
+        },
+        {
+          "order": 8,
+          "caseId": "ordinary-06",
+          "condition": "B"
+        },
+        {
+          "order": 9,
+          "caseId": "medical-08",
+          "condition": "A"
+        },
+        {
+          "order": 10,
+          "caseId": "correction-04",
+          "condition": "A"
+        },
+        {
+          "order": 11,
+          "caseId": "correction-07",
+          "condition": "A"
+        },
+        {
+          "order": 12,
+          "caseId": "water-03",
+          "condition": "A"
+        },
+        {
+          "order": 13,
+          "caseId": "safety-01",
+          "condition": "A"
+        },
+        {
+          "order": 14,
+          "caseId": "ordinary-02",
+          "condition": "A"
+        },
+        {
+          "order": 15,
+          "caseId": "medical-09",
+          "condition": "A"
+        },
+        {
+          "order": 16,
+          "caseId": "emotion-06",
+          "condition": "B"
+        },
+        {
+          "order": 17,
+          "caseId": "boundary-02",
+          "condition": "B"
+        },
+        {
+          "order": 18,
+          "caseId": "multi-02",
+          "condition": "A"
+        },
+        {
+          "order": 19,
+          "caseId": "correction-02",
+          "condition": "B"
+        },
+        {
+          "order": 20,
+          "caseId": "correction-06",
+          "condition": "B"
+        },
+        {
+          "order": 21,
+          "caseId": "boundary-01",
+          "condition": "B"
+        },
+        {
+          "order": 22,
+          "caseId": "toilet-06",
+          "condition": "B"
+        },
+        {
+          "order": 23,
+          "caseId": "water-04",
+          "condition": "B"
+        },
+        {
+          "order": 24,
+          "caseId": "medical-03",
+          "condition": "B"
+        },
+        {
+          "order": 25,
+          "caseId": "emotion-05",
+          "condition": "A"
+        },
+        {
+          "order": 26,
+          "caseId": "boundary-03",
+          "condition": "B"
+        },
+        {
+          "order": 27,
+          "caseId": "water-08",
+          "condition": "B"
+        },
+        {
+          "order": 28,
+          "caseId": "ordinary-09",
+          "condition": "A"
+        },
+        {
+          "order": 29,
+          "caseId": "medical-10",
+          "condition": "B"
+        },
+        {
+          "order": 30,
+          "caseId": "supplies-08",
+          "condition": "A"
+        },
+        {
+          "order": 31,
+          "caseId": "emotion-04",
+          "condition": "B"
+        },
+        {
+          "order": 32,
+          "caseId": "boundary-06",
+          "condition": "A"
+        },
+        {
+          "order": 33,
+          "caseId": "ordinary-07",
+          "condition": "B"
+        },
+        {
+          "order": 34,
+          "caseId": "multi-09",
+          "condition": "A"
+        },
+        {
+          "order": 35,
+          "caseId": "multi-01",
+          "condition": "A"
+        },
+        {
+          "order": 36,
+          "caseId": "correction-05",
+          "condition": "A"
+        },
+        {
+          "order": 37,
+          "caseId": "ordinary-04",
+          "condition": "B"
+        },
+        {
+          "order": 38,
+          "caseId": "medical-06",
+          "condition": "A"
+        },
+        {
+          "order": 39,
+          "caseId": "boundary-04",
+          "condition": "B"
+        },
+        {
+          "order": 40,
+          "caseId": "boundary-07",
+          "condition": "B"
+        },
+        {
+          "order": 41,
+          "caseId": "medical-01",
+          "condition": "A"
+        },
+        {
+          "order": 42,
+          "caseId": "toilet-02",
+          "condition": "B"
+        },
+        {
+          "order": 43,
+          "caseId": "ordinary-08",
+          "condition": "A"
+        },
+        {
+          "order": 44,
+          "caseId": "ordinary-05",
+          "condition": "A"
+        },
+        {
+          "order": 45,
+          "caseId": "emotion-01",
+          "condition": "B"
+        },
+        {
+          "order": 46,
+          "caseId": "medical-04",
+          "condition": "A"
+        },
+        {
+          "order": 47,
+          "caseId": "toilet-01",
+          "condition": "B"
+        },
+        {
+          "order": 48,
+          "caseId": "emotion-02",
+          "condition": "B"
+        },
+        {
+          "order": 49,
+          "caseId": "ordinary-10",
+          "condition": "B"
+        },
+        {
+          "order": 50,
+          "caseId": "water-09",
+          "condition": "B"
+        },
+        {
+          "order": 51,
+          "caseId": "correction-08",
+          "condition": "A"
+        },
+        {
+          "order": 52,
+          "caseId": "supplies-07",
+          "condition": "B"
+        },
+        {
+          "order": 53,
+          "caseId": "medical-05",
+          "condition": "A"
+        },
+        {
+          "order": 54,
+          "caseId": "water-05",
+          "condition": "A"
+        },
+        {
+          "order": 55,
+          "caseId": "safety-08",
+          "condition": "B"
+        },
+        {
+          "order": 56,
+          "caseId": "water-10",
+          "condition": "A"
+        },
+        {
+          "order": 57,
+          "caseId": "toilet-05",
+          "condition": "B"
+        },
+        {
+          "order": 58,
+          "caseId": "ordinary-03",
+          "condition": "A"
+        },
+        {
+          "order": 59,
+          "caseId": "medical-02",
+          "condition": "B"
+        },
+        {
+          "order": 60,
+          "caseId": "safety-03",
+          "condition": "B"
+        },
+        {
+          "order": 61,
+          "caseId": "supplies-06",
+          "condition": "B"
+        },
+        {
+          "order": 62,
+          "caseId": "boundary-10",
+          "condition": "B"
+        },
+        {
+          "order": 63,
+          "caseId": "multi-07",
+          "condition": "B"
+        },
+        {
+          "order": 64,
+          "caseId": "emotion-10",
+          "condition": "B"
+        },
+        {
+          "order": 65,
+          "caseId": "boundary-05",
+          "condition": "B"
+        },
+        {
+          "order": 66,
+          "caseId": "multi-04",
+          "condition": "A"
+        },
+        {
+          "order": 67,
+          "caseId": "supplies-03",
+          "condition": "A"
+        },
+        {
+          "order": 68,
+          "caseId": "supplies-10",
+          "condition": "B"
+        },
+        {
+          "order": 69,
+          "caseId": "boundary-08",
+          "condition": "B"
+        },
+        {
+          "order": 70,
+          "caseId": "emotion-09",
+          "condition": "A"
+        },
+        {
+          "order": 71,
+          "caseId": "toilet-09",
+          "condition": "A"
+        },
+        {
+          "order": 72,
+          "caseId": "multi-10",
+          "condition": "B"
+        },
+        {
+          "order": 73,
+          "caseId": "medical-07",
+          "condition": "A"
+        },
+        {
+          "order": 74,
+          "caseId": "toilet-07",
+          "condition": "A"
+        },
+        {
+          "order": 75,
+          "caseId": "multi-08",
+          "condition": "B"
+        },
+        {
+          "order": 76,
+          "caseId": "ordinary-01",
+          "condition": "B"
+        },
+        {
+          "order": 77,
+          "caseId": "safety-07",
+          "condition": "B"
+        },
+        {
+          "order": 78,
+          "caseId": "supplies-05",
+          "condition": "A"
+        },
+        {
+          "order": 79,
+          "caseId": "safety-10",
+          "condition": "A"
+        },
+        {
+          "order": 80,
+          "caseId": "boundary-09",
+          "condition": "A"
+        },
+        {
+          "order": 81,
+          "caseId": "safety-02",
+          "condition": "B"
+        },
+        {
+          "order": 82,
+          "caseId": "supplies-09",
+          "condition": "A"
+        },
+        {
+          "order": 83,
+          "caseId": "toilet-08",
+          "condition": "B"
+        },
+        {
+          "order": 84,
+          "caseId": "toilet-10",
+          "condition": "A"
+        },
+        {
+          "order": 85,
+          "caseId": "supplies-04",
+          "condition": "B"
+        },
+        {
+          "order": 86,
+          "caseId": "toilet-03",
+          "condition": "B"
+        },
+        {
+          "order": 87,
+          "caseId": "supplies-02",
+          "condition": "A"
+        },
+        {
+          "order": 88,
+          "caseId": "correction-01",
+          "condition": "A"
+        },
+        {
+          "order": 89,
+          "caseId": "safety-04",
+          "condition": "B"
+        },
+        {
+          "order": 90,
+          "caseId": "multi-03",
+          "condition": "A"
+        },
+        {
+          "order": 91,
+          "caseId": "correction-09",
+          "condition": "A"
+        },
+        {
+          "order": 92,
+          "caseId": "water-02",
+          "condition": "A"
+        },
+        {
+          "order": 93,
+          "caseId": "safety-09",
+          "condition": "B"
+        },
+        {
+          "order": 94,
+          "caseId": "multi-06",
+          "condition": "A"
+        },
+        {
+          "order": 95,
+          "caseId": "emotion-07",
+          "condition": "B"
+        },
+        {
+          "order": 96,
+          "caseId": "emotion-08",
+          "condition": "A"
+        },
+        {
+          "order": 97,
+          "caseId": "emotion-03",
+          "condition": "B"
+        },
+        {
+          "order": 98,
+          "caseId": "safety-05",
+          "condition": "A"
+        },
+        {
+          "order": 99,
+          "caseId": "multi-05",
+          "condition": "A"
+        },
+        {
+          "order": 100,
+          "caseId": "water-01",
+          "condition": "A"
+        }
+      ]
+    }
+  ],
+  "responseCollectionStarted": false,
+  "note": "匿名の割り当てテンプレートのみ。参加者情報・回答は含まない。"
+}

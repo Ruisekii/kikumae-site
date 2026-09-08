@@ -30,6 +30,8 @@
     "eval:phase2d": "node scripts/phase2d-eval.mjs",
     "eval:phase2d:load": "node scripts/phase2d-load.mjs",
     "eval:phase2e": "node scripts/phase2e-eval.mjs",
+    "eval:phase2f": "node scripts/phase2f-eval.mjs",
+    "plan:phase2f:human": "node scripts/phase2f-human-plan.mjs",
     "lint": "eslint . --ignore-pattern dist --ignore-pattern .next"
   },
   "dependencies": {
