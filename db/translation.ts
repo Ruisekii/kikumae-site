@@ -13,7 +13,9 @@ export type StaffTranslation = {
 // Staff translation is not on the resident response path. Give the local
 // 4B model enough time to finish on CPU, while still failing closed to the
 // preserved original text instead of blocking the case indefinitely.
-const TRANSLATION_TIMEOUT_MS = 30_000;
+// Translation is staff-side enrichment. Never let a slow local model hold up
+// the resident's receipt; the original text is already safely persisted.
+const TRANSLATION_TIMEOUT_MS = 2_500;
 
 const ENGLISH_HINTS = new Set([
   'a', 'an', 'and', 'any', 'are', 'but', 'can', 'child', 'children', 'cold', 'do', 'does', 'drink', 'fever',

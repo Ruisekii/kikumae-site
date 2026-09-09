@@ -47,7 +47,15 @@ function canonicalState(value: unknown): CanonicalIncidentState {
     language: 'ja', location: null, target: null, facts: [], request: null, urgency: 'unknown',
     safetyFlags: [], missingFields: [], askedFields: [], originalText: [], confidence: null, category: null,
   };
-  return normalizeIncidentCandidate(value, base);
+  const source = record(value);
+  // The raw transcript is app-owned state, not model output. Preserve it
+  // explicitly before normalizing the untrusted structured fields; otherwise
+  // every API turn silently starts with an empty transcript and later turns
+  // can erase facts from earlier voice utterances.
+  const originalText = Array.isArray(source?.originalText)
+    ? source.originalText.filter((item): item is string => typeof item === 'string' && item.trim()).map((item) => item.trim().slice(0, 500)).slice(-12)
+    : [];
+  return normalizeIncidentCandidate(value, { ...base, originalText });
 }
 
 function guardConversationReply(value: string, language: ReturnType<typeof normalizeConversationLanguage>): string {
@@ -111,6 +119,7 @@ function explicitFacts(text: string): string[] {
   if (/子ども|こども|子供/.test(text)) add('子どもがいる');
   if (/家族/.test(text)) add('家族が避難している');
   if (/薬|インスリン|持病/.test(text)) add('薬・持病に関する相談');
+  if (/体調|具合|気分が悪|しんど|つらい/.test(text)) add('体調不良の訴え');
   if (/煙|けむり|火災|火事|燃え/.test(text)) add('煙または火');
   if (/殴|暴力|刃物|武器|物を投げ/.test(text)) add('安全上の危険');
   const fever = text.match(/(\d{2})\s*(?:度|℃)/);
@@ -145,7 +154,7 @@ function explicitTarget(text: string): CanonicalIncidentState['target'] | null {
 function requestFromText(text: string, safety: ReturnType<typeof detectSafetyFlags>): string | null {
   if (safety.flags.includes('火災・煙') || /煙|けむり|火災|火事|燃え/.test(text)) return 'fire_response';
   if (safety.flags.includes('暴力・武器') || /暴力|殴|刃物|武器|振り回|物を投げ/.test(text)) return 'safety_assistance';
-  if (safety.flags.some((flag) => /意識|呼吸|体調|出血|胸痛/.test(flag)) || /薬|インスリン|高熱|発熱|ぐったり|息|胸|けが|怪我|救護/.test(text)) return 'medical_assistance';
+  if (safety.flags.some((flag) => /意識|呼吸|体調|出血|胸痛/.test(flag)) || /薬|インスリン|体調|具合|気分が悪|しんど|つらい|高熱|発熱|ぐったり|息|胸|けが|怪我|救護/.test(text)) return 'medical_assistance';
   if (/トイレ/.test(text)) return 'toilet_assistance';
   if (/おむつ|ミルク|乳児|赤ちゃん/.test(text)) return 'infant_supplies';
   if (/水|飲料水|給水|水道/.test(text)) return 'water_supply';
@@ -179,7 +188,8 @@ function refineIncident(incident: CanonicalIncidentState, text: string, safety: 
     count,
     ageGroup: incident.target?.ageGroup ?? null,
   });
-  const facts = Array.from(new Set([...incident.facts.filter((fact) => supportedFact(fact, text)), ...explicitFacts(text)])).slice(0, 20);
+  const evidence = incident.originalText.join('\n') || text;
+  const facts = Array.from(new Set([...incident.facts.filter((fact) => supportedFact(fact, evidence)), ...explicitFacts(text)])).slice(0, 20);
   const urgency = incident.urgency !== 'unknown'
     ? request === 'toilet_assistance' && /詰まって|使えない|使用できない|壊れ/.test(text) && incident.urgency === 'low' ? 'medium' as const : incident.urgency
     : safety.immediate

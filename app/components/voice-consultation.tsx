@@ -141,7 +141,7 @@ export function VoiceConsultation({ initialIntake, onClose, onUseText, onDirectS
     try {
       const response = await fetch('/api/questions', {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ body, summary: buildIncidentCard(next), category: next.analysis?.category ?? 'その他', submissionKey: crypto.randomUUID(), selectedLanguage: conversationLanguage, conversation: messagesRef.current.map((message) => ({ role: message.role === 'ai' ? 'assistant' : 'user', originalText: message.originalText ?? message.text, originalLanguage: message.originalLanguage ?? conversationLanguage, messageId: message.messageId, createdAt: message.createdAt })), intake: intakeFromIncident(next), incident: canonicalFromIncident(next) }),
+      body: JSON.stringify({ body, summary: buildIncidentCard(next), category: next.category ?? next.analysis?.category ?? 'その他', submissionKey: crypto.randomUUID(), selectedLanguage: conversationLanguage, conversation: messagesRef.current.map((message) => ({ role: message.role === 'ai' ? 'assistant' : 'user', originalText: message.originalText ?? message.text, originalLanguage: message.originalLanguage ?? conversationLanguage, messageId: message.messageId, createdAt: message.createdAt })), intake: intakeFromIncident(next), incident: canonicalFromIncident(next) }),
       });
       const payload = await response.json() as { id?: number; checkUrl?: string; message?: string };
       if (!response.ok || typeof payload.id !== 'number' || !payload.checkUrl) { setStatus(payload.message ?? t('voice.sendError')); return null; }
@@ -222,7 +222,7 @@ export function VoiceConsultation({ initialIntake, onClose, onUseText, onDirectS
       : conversation.reply;
     // A normal voice turn always stops at a resident review step. The AI may
     // suggest a follow-up, but it can never silently send a non-urgent report.
-    setReply(reply, following, !safety.immediate && !following);
+    setReply(reply, following, conversation.requiresConfirmation && !safety.immediate && !following);
   }
 
   function startListening() {

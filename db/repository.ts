@@ -881,11 +881,16 @@ export async function createQuestion(body: string, requestedSummary = '', reques
   // Safety and incident extraction have already run against the original text.
   // Translation is an independent staff-display aid and must never become the
   // source of truth for those decisions.
-  const staffTranslation = await translateForStaff(body, selectedLanguage);
-  const storedConversationMessages = await translateConversationMessages(conversationMessages);
   const issueLocation = analysis.issueLocation || resolveShelterZoneId(analysis.location) || analysis.location;
   const reporterLocation = safeIntake.reporterLocation?.trim().slice(0, 120) ?? '';
-  const related = await listRelatedFaqs(aiSummary || body, 3, portalId, analysis.category);
+  // These are independent enrichment lanes. Run them together so translation
+  // latency cannot be added on top of conversation-message translation and FAQ
+  // lookup latency before the intake can be persisted.
+  const [staffTranslation, storedConversationMessages, related] = await Promise.all([
+    translateForStaff(body, selectedLanguage),
+    translateConversationMessages(conversationMessages),
+    listRelatedFaqs(aiSummary || body, 3, portalId, analysis.category),
+  ]);
   // 避難所案件では同カテゴリの承認済みFAQだけを回答案の根拠にする。
   // 以前は検索結果全体を連結していたため、例えばペット相談に
   // 医療FAQが混ざり、職員にも住民にも不適切な下書きが生成されていた。
@@ -950,7 +955,10 @@ export async function createQuestion(body: string, requestedSummary = '', reques
 }
 
 function urgencyRank(value: string): number {
-  return value === 'critical' ? 4 : value === 'high' ? 3 : value === 'normal' ? 2 : 1;
+  const normalized = value.trim().toLowerCase();
+  return normalized === 'critical' || normalized === '緊急' || normalized === '至急' ? 4
+    : normalized === 'high' || normalized === '高' ? 3
+      : normalized === 'normal' || normalized === '通常' || normalized === '中' ? 2 : 1;
 }
 
 function mergeList(left: string[], right: string[]): string[] {
@@ -1395,7 +1403,7 @@ export async function listIssuesForAdministratorPage(portalId: number | null = n
   const db = await initialise();
   const safePage = Math.max(1, Math.trunc(page) || 1); const safePageSize = Math.min(Math.max(Math.trunc(pageSize) || 100, 1), 100); const offset = (safePage - 1) * safePageSize;
   const scope = portalId === null ? 'portal_id IS NULL' : 'portal_id = ?';
-  const priority = "CASE COALESCE(NULLIF(urgency_confirmed, ''), urgency_candidate) WHEN 'critical' THEN 4 WHEN 'high' THEN 3 WHEN 'normal' THEN 2 ELSE 1 END";
+  const priority = "CASE LOWER(COALESCE(NULLIF(urgency_confirmed, ''), urgency_candidate)) WHEN 'critical' THEN 4 WHEN '緊急' THEN 4 WHEN '至急' THEN 4 WHEN 'high' THEN 3 WHEN '高' THEN 3 WHEN 'normal' THEN 2 WHEN '通常' THEN 2 WHEN '中' THEN 2 ELSE 1 END";
   const term = search.trim().slice(0, 80);
   const searchClause = term ? " AND (title LIKE ? OR summary LIKE ? OR request LIKE ? OR location LIKE ? OR category LIKE ? OR assigned_team LIKE ? OR assigned_user LIKE ?)" : '';
   const searchValues = term ? Array.from({ length: 7 }, () => `%${term}%`) : [];

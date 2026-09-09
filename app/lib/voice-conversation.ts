@@ -12,6 +12,7 @@ import { extractMultilingualIncidentHints } from './multilingual-incident';
 import {
   localizedEmergencyReply,
   localizedFieldQuestion,
+  localizedContinueReply,
   localizedReadyReply,
   localizedSafetyFallback,
   normalizeConversationLanguage,
@@ -209,11 +210,15 @@ export function extractIncident(text: string, state: IncidentState, intake: Shel
   const missing = new Set(analysis.missingInformation);
   if (!location) missing.add('場所');
   if (!target?.count && ['water_supply', 'food_supply', 'infant_supplies'].includes(request ?? '')) missing.add('人数');
+  const meaningfulFacts = (values: string[]) => values.filter((fact) => fact !== '困りごと：避難所での困りごと');
   const next = {
     ...state,
     location,
     target,
-    facts: mergeUnique([...analysis.facts, ...hints.facts]),
+    // A voice consultation may arrive in several short utterances. Keep facts
+    // already extracted from earlier turns instead of replacing them with the
+    // latest dominant category (for example, water followed by a health issue).
+    facts: mergeUnique([...meaningfulFacts(state.facts), ...meaningfulFacts(analysis.facts), ...hints.facts]),
     request,
     urgency: hints.urgent ? 'critical' : urgencyFromAnalysis(analysis, safety),
     safetyFlags: mergeUnique([...state.safetyFlags, ...safety.flags], 10),
@@ -274,6 +279,18 @@ export function buildIncidentCard(state: IncidentState): string {
   ].join('\n');
 }
 
+function hasActionableVoiceContent(text: string, state: IncidentState): boolean {
+  const normalized = text.trim();
+  const greetingOnly = /^(?:こんにちは|こんばんは|おはようございます?|もしもし|ありがとう|よろしくお願いします?)[。！!、\s]*$/i.test(normalized);
+  if (greetingOnly) return false;
+  return Boolean(
+    state.safetyFlags.length > 0
+    || (state.request && state.request !== 'general_assistance')
+    || (state.category && state.category !== 'その他')
+    || normalized.length >= 12,
+  );
+}
+
 function safeReply(text: string, language: ConversationLanguage = 'ja'): string {
   const forbidden = language === 'en'
     ? ['calm down', 'take a deep breath', "don't worry", 'you will be fine', "you're fine"]
@@ -293,10 +310,11 @@ export class LocalRulesConversationProvider implements ConversationProvider {
     // urgent case without a location gets an immediate follow-up prompt.
     const nextField = safety.immediate && !nextState.location && !nextState.askedFields.includes('場所') ? '場所' : null;
     const language = normalizeConversationLanguage(nextState.language);
+    const actionable = hasActionableVoiceContent(text, nextState);
     const reply = safety.immediate
       ? localizedEmergencyReply(language, Boolean(nextField))
-      : localizedReadyReply(language);
-    return { state: nextState, reply: safeReply(reply, language), nextField, safety, requiresConfirmation: !safety.immediate && !nextField };
+      : actionable ? localizedReadyReply(language) : localizedContinueReply(language);
+    return { state: nextState, reply: safeReply(reply, language), nextField, safety, requiresConfirmation: actionable && !safety.immediate && !nextField };
   }
 }
 
@@ -343,7 +361,10 @@ function stateFromCanonical(fallback: IncidentState, candidate: CanonicalInciden
       count: candidate.target.count ?? undefined,
       ageGroup: candidate.target.ageGroup ?? undefined,
     } : undefined,
-    facts: mergeUnique(candidate.facts),
+    // Deterministic user-evidence must survive an LLM response that only
+    // mentions the latest dominant topic. The model may add structure, but it
+    // must not erase earlier voice turns from the staff card.
+    facts: mergeUnique([...fallback.facts, ...candidate.facts]),
     request: candidate.request ?? undefined,
     urgency: candidate.urgency,
     safetyFlags: mergeUnique([...fallback.safetyFlags, ...candidate.safetyFlags, ...safety.flags], 10),
@@ -353,7 +374,7 @@ function stateFromCanonical(fallback: IncidentState, candidate: CanonicalInciden
     confidence: candidate.confidence ?? fallback.confidence,
     category: candidate.category ?? fallback.category,
     provenance: candidateProvenance,
-    structuredComplete: structuredComplete({ ...fallback, location: candidate.location ?? undefined, request: candidate.request ?? undefined, target: candidate.target ? { count: candidate.target.count ?? undefined, type: candidate.target.type ?? undefined, ageGroup: candidate.target.ageGroup ?? undefined } : undefined, facts: candidate.facts }),
+    structuredComplete: structuredComplete({ ...fallback, location: candidate.location ?? undefined, request: candidate.request ?? undefined, target: candidate.target ? { count: candidate.target.count ?? undefined, type: candidate.target.type ?? undefined, ageGroup: candidate.target.ageGroup ?? undefined } : undefined, facts: mergeUnique([...fallback.facts, ...candidate.facts]) }),
     fourBRequested: true,
     fourBStatus: 'completed',
   };
@@ -376,7 +397,10 @@ export class ApiConversationProvider implements ConversationProvider {
         ? modelField
         : fallback.nextField;
       return {
-        state,
+        // Return the deterministic state produced for this same turn. The
+        // model only supplies the resident-facing wording; it is not the
+        // source of truth for incident fields.
+        state: fallback.state,
         reply: safeReply(typeof result.reply === 'string' ? result.reply.trim().slice(0, 500) : fallback.reply, normalizeConversationLanguage(state.language)),
         nextField,
         safety: fallback.safety,

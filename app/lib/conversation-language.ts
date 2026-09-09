@@ -129,7 +129,11 @@ export function localizedEmergencyReply(language: ConversationLanguage, askLocat
 }
 
 export function localizedReadyReply(language: ConversationLanguage): string {
-  return language === 'en' ? 'We have the information we need. Please review what will be sent to shelter staff.' : language === 'zh' ? '必要的信息已经收齐。请确认将发送给工作人员的内容。' : language === 'ko' ? '필요한 정보가 모였습니다. 직원에게 보낼 내용을 확인해 주세요.' : '必要な情報がそろいました。職員へ伝える内容を確認してください。';
+  return language === 'en' ? 'I’ve noted what you said. You can keep speaking, or review what will be sent to shelter staff.' : language === 'zh' ? '我已经记下您说的内容。您可以继续说，也可以确认将发送给工作人员的内容。' : language === 'ko' ? '말씀하신 내용을 받았습니다. 계속 말하거나 직원에게 보낼 내용을 확인할 수 있습니다.' : 'ここまでのお話を受け取りました。続けて話すことも、職員へ送る内容を確認することもできます。';
+}
+
+export function localizedContinueReply(language: ConversationLanguage): string {
+  return language === 'en' ? 'Please tell us what is troubling you in your own words. We will only ask when something needs to be confirmed.' : language === 'zh' ? '请用您自己的话说说遇到了什么困难。只有需要确认时，我们才会提问。' : language === 'ko' ? '어려운 점을 편한 말로 계속 말씀해 주세요. 확인이 필요할 때만 질문하겠습니다.' : '困っていることを、そのまま続けて話してください。必要なときだけ確認します。';
 }
 
 export function localizedSafetyFallback(language: ConversationLanguage): string {
