@@ -1,0 +1,115 @@
+{
+  "schemaVersion": "phase2h.v1",
+  "generatedAt": "2026-09-08T16:35:27.022Z",
+  "baseUrl": "http://localhost:3000",
+  "literalNetworkSwitchOffPerformed": false,
+  "literalNetworkSwitchOffReason": "OS全体の通信遮断は、ユーザーの通信と他タスクへ影響するため実施していない。localhost監査と障害注入を別試験として記録する。",
+  "web": {
+    "status": 200,
+    "ok": true,
+    "externalSrcHref": [],
+    "hasShellText": true
+  },
+  "safety": {
+    "status": 200,
+    "body": {
+      "ok": true,
+      "aiMode": "safety-guard",
+      "runtimeMode": "auto",
+      "safety": {
+        "flags": [
+          "意識・呼吸の異常"
+        ],
+        "immediate": true
+      },
+      "telemetry": {
+        "stage": "extract",
+        "model": null,
+        "promptVariant": "full",
+        "safetyGuardMs": 0,
+        "preprocessingMs": 0,
+        "totalMs": 0,
+        "fallback": false
+      }
+    }
+  },
+  "audio": {
+    "asr": {
+      "provider": "BrowserASRProvider",
+      "implementation": "SpeechRecognition / webkitSpeechRecognition",
+      "processLocallyPropertyObserved": true,
+      "processLocallyValueUsedForTrustDecision": false,
+      "classification": "offline-not-proven",
+      "reason": "SpeechRecognitionの実装はブラウザ提供元に依存する。コードでprocessLocallyやローカル言語パックを確認できず、ネットワーク遮断実機試験も未実施。"
+    },
+    "tts": {
+      "provider": "BrowserTTSProvider",
+      "implementation": "SpeechSynthesis",
+      "classification": "offline-not-proven",
+      "reason": "OS/ブラウザの音声エンジンがオフラインで利用できるか、実機で確認していない。"
+    },
+    "vad": {
+      "provider": "BrowserVADProvider",
+      "implementation": "AudioContext + getUserMedia energy threshold",
+      "classification": "conditional-offline",
+      "reason": "ブラウザのマイク許可とAudioContextが必要。モデル型VADではない。"
+    }
+  },
+  "functions": [
+    {
+      "name": "Web UI",
+      "classification": "full-offline-local-ui",
+      "evidence": "localhost応答とHTML外部src/href監査"
+    },
+    {
+      "name": "Safety Guard",
+      "classification": "full-offline",
+      "evidence": "Safety-only APIをlocalhostで実行"
+    },
+    {
+      "name": "Conversation Qwen3.5 2B",
+      "classification": "conditional-offline",
+      "evidence": "同一PC/LANのOllamaが必要。停止時はlocal-rules fallback"
+    },
+    {
+      "name": "Incident Extraction Qwen3.5 4B",
+      "classification": "conditional-offline",
+      "evidence": "同一PC/LANのOllamaが必要。停止時はlocal-rules fallback"
+    },
+    {
+      "name": "外国語→日本語翻訳",
+      "classification": "conditional-offline",
+      "evidence": "ローカルLLMが必要。失敗時も原文を保持してfailedとする"
+    },
+    {
+      "name": "職員画面",
+      "classification": "conditional-offline",
+      "evidence": "ローカルWeb/DBでの動作経路はあるが、実機ネットワーク遮断は未実施"
+    }
+  ],
+  "draftPersistence": {
+    "localStorageDraft": true,
+    "restoresOnLoad": true,
+    "pendingSubmitQueue": false,
+    "classification": "conditional-offline",
+    "risk": "送信中に通信が切れた場合は下書き復元が中心で、永続的な送信待ちキュー・重複排除・再送確認は未実装。"
+  },
+  "accessibility": {
+    "publicControlsHaveTextOrAria": false,
+    "reducedMotionRulePresent": false,
+    "mobileBreakpointsPresent": true,
+    "largeTouchTargetEvidence": true,
+    "classification": "static-review-needed",
+    "limitations": "実機のVoiceOver/TalkBack、色覚、拡大表示、キーボードのみ操作は未実施。"
+  },
+  "securityHeaders": {
+    "cspPresent": true,
+    "frameDeny": true,
+    "microphonePermissionScope": true
+  },
+  "evidence": [
+    "docs/phase2c-offline-latest.json",
+    "docs/phase2c-faults-latest.json"
+  ],
+  "caveat": "このレポートはコード監査とlocalhost試験であり、ネットワーク断・マイク許可・OS音声エンジンの実機合格を意味しない。"
+}

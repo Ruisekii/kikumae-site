@@ -6,7 +6,7 @@ const values = (organization) => ['facts', 'requests', 'context', 'emotionalStat
 const has = (items, patterns = []) => patterns.length === 0 || patterns.every((pattern) => items.some((item) => pattern.test(item)));
 
 async function runCase(testCase, fault = '') {
-  const headers = { 'Content-Type': 'application/json', 'x-kikumae-eval-suite': 'phase2e' };
+  const headers = { 'Content-Type': 'application/json', 'x-kikumae-eval-suite': 'phase2e', 'cf-connecting-ip': `phase2e-${testCase.id}` };
   if (fault) headers['x-kikumae-eval-fault'] = fault;
   const started = performance.now();
   const response = await fetch(`${baseUrl}/api/ai/voice`, { method: 'POST', headers, body: JSON.stringify({ mode: 'organize', text: testCase.text, selectedLanguage: /I told|water|Please/i.test(testCase.text) ? 'en' : /我|饮用水/.test(testCase.text) ? 'zh' : /식수|아이/.test(testCase.text) ? 'ko' : 'ja', state: { language: 'ja', location: null, target: null, facts: [], request: null, urgency: 'unknown', safetyFlags: [], missingFields: [], askedFields: [], originalText: [testCase.text] }, intake: {} }) });

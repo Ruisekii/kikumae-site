@@ -6,6 +6,7 @@ import { conversationLanguageInstruction, localizedEmergencyReply, localizedSafe
 import { shouldRequestExtraction } from '../../../lib/voice-conversation';
 import type { ShelterIntake } from '../../../../db/local-ai';
 import { organizeStaffIncident } from '../../../lib/staff-organization';
+import { getAdminUser } from '../../../admin-auth';
 
 export const runtime = 'edge';
 
@@ -230,7 +231,8 @@ function telemetryBase(started: number, safetyStarted: number, safetyFinished: n
 
 export async function POST(request: Request): Promise<Response> {
   if (!sameOrigin(request)) return json({ message: 'この送信元は許可されていません。' }, 403);
-  const evaluationSuite = allowsEvaluationOverrides() && request.headers.get('x-kikumae-eval-suite') === 'phase2e';
+  const evaluationSuite = allowsEvaluationOverrides() && ['phase2e', 'phase2g', 'phase3b'].includes(request.headers.get('x-kikumae-eval-suite') ?? '');
+  if (evaluationSuite && !await getAdminUser(request)) return json({ message: '評価用エンドポイントではありません。' }, 404);
   if (!evaluationSuite && !await allowBurstShared(request, 'ai-voice-gateway', 30, 10 * 60 * 1000)) return json({ message: '音声相談の処理が多すぎます。少し時間をおいてください。' }, 429);
   try {
     const payload = record(JSON.parse(await readRequestText(request, MAX_REQUEST_BYTES)));
@@ -248,6 +250,13 @@ export async function POST(request: Request): Promise<Response> {
     const languageState = { ...parsedState, language: selectedLanguage };
     const state = languageState.originalText.at(-1) === text ? languageState : { ...languageState, originalText: [...languageState.originalText, text].slice(-12) };
     const providedIntake = intake(payload.intake);
+    // When the model lane is unavailable, retain a deterministic incident context
+    // for extraction callers. This is intentionally derived from the original text
+    // and Safety Guard; it is not an AI decision or a replacement for staff review.
+    const fallbackIncident = mode === 'extract'
+      ? { ...refineIncident(state, text, safety, providedIntake), safetyFlags: Array.from(new Set([...state.safetyFlags, ...safety.flags])) }
+      : null;
+    const fallbackContext = { originalText: state.originalText, ...(fallbackIncident ? { incident: fallbackIncident } : {}) };
     if (mode === 'triage') {
       const incident = { ...refineIncident(state, text, safety, providedIntake), safetyFlags: Array.from(new Set([...state.safetyFlags, ...safety.flags])) };
       const decision = shouldRequestExtraction(text, {
@@ -278,10 +287,11 @@ export async function POST(request: Request): Promise<Response> {
     if (allowsEvaluationOverrides() && request.headers.get('x-kikumae-safety-only') === '1') return json({ ok: true, aiMode: 'safety-guard', runtimeMode: status.mode, safety, telemetry: { ...baseTelemetry, totalMs: Math.round(performance.now() - started), fallback: false } });
     const injectedFault = allowsEvaluationOverrides() ? request.headers.get('x-kikumae-eval-fault') : null;
     if (injectedFault && ['ollama-down', 'conversation-down', 'extraction-down', 'timeout', 'invalid-json', 'network-disconnect'].includes(injectedFault)) {
-      return json({ ok: false, aiMode: 'local-rules', runtimeMode: status.mode, safety, telemetry: { ...baseTelemetry, totalMs: Math.round(performance.now() - started), fallback: true, fault: injectedFault }, reason: `EVAL_FAULT_${injectedFault}` });
+      return json({ ok: false, aiMode: 'local-rules', runtimeMode: status.mode, safety, ...fallbackContext, telemetry: { ...baseTelemetry, totalMs: Math.round(performance.now() - started), fallback: true, fault: injectedFault }, reason: `EVAL_FAULT_${injectedFault}` });
     }
-    if (status.mode === 'local-rules') return json({ ok: false, aiMode: 'local-rules', runtimeMode: status.mode, safety, telemetry: { ...baseTelemetry, totalMs: Math.round(performance.now() - started), fallback: true }, reason: 'LOCAL_RULES_MODE' }, 200);
-    if (!status.configured) return json({ ok: false, aiMode: 'local-rules', runtimeMode: status.mode, safety, telemetry: { ...baseTelemetry, totalMs: Math.round(performance.now() - started), fallback: true }, reason: 'MODEL_GATEWAY_NOT_CONFIGURED' }, 503);
+    if (status.mode === 'local-rules') return json({ ok: false, aiMode: 'local-rules', runtimeMode: status.mode, safety, ...fallbackContext, telemetry: { ...baseTelemetry, totalMs: Math.round(performance.now() - started), fallback: true }, reason: 'LOCAL_RULES_MODE' }, 200);
+    const roleConfigured = mode === 'conversation' ? status.conversationConfigured : status.extractionConfigured;
+    if (!roleConfigured) return json({ ok: false, aiMode: 'local-rules', runtimeMode: status.mode, safety, ...fallbackContext, telemetry: { ...baseTelemetry, totalMs: Math.round(performance.now() - started), fallback: true }, reason: 'MODEL_GATEWAY_NOT_CONFIGURED' }, 200);
     const context = JSON.stringify({ text, selectedLanguage, state, intake: providedIntake, safety }, null, 2);
     const requestedModel = request.headers.get('x-kikumae-eval-model')?.trim() ?? '';
     const modelOverride = allowsEvaluationOverrides() && /^[a-zA-Z0-9._:-]{1,100}$/.test(requestedModel) ? requestedModel : null;
@@ -289,19 +299,19 @@ export async function POST(request: Request): Promise<Response> {
     const promptOverride = allowsEvaluationOverrides() && (requestedPromptVariant === 'full' || requestedPromptVariant === 'compact') ? requestedPromptVariant : null;
     const model = modelOverride ?? (mode === 'conversation' ? status.conversationModel : status.extractionModel);
     const extractionPromptVariant = promptOverride ?? status.extractionPromptVariant;
-    if (!model) return json({ ok: false, aiMode: 'local-rules', runtimeMode: status.mode, safety, telemetry: { ...baseTelemetry, totalMs: Math.round(performance.now() - started), fallback: true }, reason: 'MODEL_NOT_CONFIGURED' }, 503);
+    if (!model) return json({ ok: false, aiMode: 'local-rules', runtimeMode: status.mode, safety, ...fallbackContext, telemetry: { ...baseTelemetry, totalMs: Math.round(performance.now() - started), fallback: true }, reason: 'MODEL_NOT_CONFIGURED' }, 503);
     const modelCall = () => requestModelJsonDetailed(
       model,
       mode === 'conversation' ? `${conversationSystem}\n${conversationLanguageInstruction(selectedLanguage)}` : extractionPromptVariant === 'compact' ? extractionSystemCompact : extractionSystem,
       context,
       mode === 'conversation' ? conversationJsonSchema : { type: 'json_schema', json_schema: { name: 'incident_state', strict: true, schema: incidentStateJsonSchema } },
-      { maxTokens: mode === 'conversation' ? 120 : 260 },
+      { maxTokens: mode === 'conversation' ? 120 : 260, role: mode === 'conversation' ? 'conversation' : 'extraction' },
     );
     let queued: { value: Awaited<ReturnType<typeof requestModelJsonDetailed>>; queueMs: number };
     try {
       queued = mode === 'extract' ? await withExtractionConcurrency(modelCall) : { value: await modelCall(), queueMs: 0 };
     } catch (error) {
-      return json({ ok: false, aiMode: 'local-rules', runtimeMode: status.mode, safety, telemetry: { ...baseTelemetry, model, totalMs: Math.round(performance.now() - started), fallback: true, queueMs: mode === 'extract' ? null : 0 }, reason: error instanceof Error ? error.message : 'MODEL_GATEWAY_FAILED' }, 200);
+      return json({ ok: false, aiMode: 'local-rules', runtimeMode: status.mode, safety, ...fallbackContext, telemetry: { ...baseTelemetry, model, totalMs: Math.round(performance.now() - started), fallback: true, queueMs: mode === 'extract' ? null : 0 }, reason: error instanceof Error ? error.message : 'MODEL_GATEWAY_FAILED' }, 200);
     }
     const modelResult = queued.value;
     const result = modelResult.result;

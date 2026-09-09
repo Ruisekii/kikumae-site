@@ -1,6 +1,6 @@
 'use client';
 
-import { FormEvent, useEffect, useMemo, useRef, useState } from 'react';
+import { FormEvent, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import Link from 'next/link';
 import type { Faq, RelatedFaq } from '../../db/repository';
 import { generateShelterAnalysis, searchFaqs, shelterFollowUp } from '../../db/local-ai';
@@ -8,17 +8,21 @@ import { LocationSelector } from './shelter-map';
 import { appendConsultHistory } from './consult-history';
 import { ShelterHomeBoard } from './shelter-home-board';
 import { VoiceConsultation } from './voice-consultation';
-import { UserHeader, translatedCategoryKey, translatedChoiceKey, translatedDetailKey, translatedShelterCategoryKey, translatedZoneKey, translateUserFaq, useUserI18n } from '../user-i18n';
+import { UserHeader, localizeUserGeneratedSummary, translatedCategoryKey, translatedChoiceKey, translatedDetailKey, translatedShelterCategoryKey, translatedZoneKey, translateUserFaq, useUserI18n } from '../user-i18n';
 
 type Intake = { location: string; issueLocation: string; reporterLocation: string; peopleCount: string; resourceRemaining: string; lastReceivedAt: string; additionalDetails: string };
 type Analysis = { title: string; overview: string; facts: string[]; emotion: string; missingInformation: string[]; urgencyCandidate: string; urgentReview: boolean; category: string; location: string; issueLocation: string; peopleCount: string; resourceRemaining: string; lastReceivedAt: string };
 type Preview = { body: string; summary: string; category: string; related: RelatedFaq[]; analysis: Analysis; followUp: { question: string; options: string[] } | null; submissionKey: string };
 type ChatMessage = { from: 'ai' | 'person'; text: string };
+type PendingSubmission = { savedAt: number; body: string; summary: string; category: string; submissionKey: string; selectedLanguage: string; conversation: Array<{ role: 'user'; originalText: string; originalLanguage: string }>; intake: Intake; safetySnapshot: { urgentReview: boolean; urgencyCandidate: string; facts: string[] } };
 type SupplementKey = 'location' | 'peopleCount' | 'resourceRemaining' | 'lastReceivedAt' | 'additionalDetails';
 type SupplementField = { key: SupplementKey; label: string; kind: 'choice' | 'select' | 'location' | 'stepper'; options?: string[]; help?: string };
 type IntakeStep = 'category' | 'detail' | 'faq' | 'location' | 'people' | 'supplement' | 'confirm' | 'freeText';
 type SavedDraft = { savedAt?: number; input?: string; originalBody?: string; contextBody?: string; intake?: Intake; chatOpen?: boolean; intakeOpen?: boolean; intakeStep?: IntakeStep; selectedCategoryId?: string; selectedDetail?: string; selectedLocation?: string; selectedPeople?: string; intakeNote?: string; messages?: ChatMessage[]; preview?: Preview | null; faqDecision?: boolean; readyToSubmit?: boolean; showSupplementSheet?: boolean };
 type Props = { faqs: Faq[] };
+
+const PENDING_SUBMISSIONS_KEY = 'kikumae-pending-submissions-v1';
+const PENDING_SUBMISSION_MAX_AGE_MS = 24 * 60 * 60 * 1000;
 
 type IntakeCategory = {
   id: string;
@@ -92,6 +96,7 @@ type ReceptionFlowProps = {
   questionId: number | null;
   emergencyOpen: boolean;
   voiceOpen: boolean;
+  offline: boolean;
   onChooseCategory: (category: IntakeCategory) => void;
   onChooseDetail: (detail: string) => void;
   onChooseLocation: (location: string) => void;
@@ -126,8 +131,9 @@ function ConsultCancelAction({ onStartOver }: { onStartOver: () => void }) {
   </>;
 }
 
-function ReceptionFlow({ faqs, intakeStep, selectedCategory, selectedDetail, selectedLocation, selectedPeople, intakeNote, intake, preview, faqDecision, readyToSubmit, supplementValues, input, status, busy, checkUrl, questionId, emergencyOpen, voiceOpen, onChooseCategory, onChooseDetail, onChooseLocation, onChoosePeople, onSetIntakeStep, onSetIntakeNote, onSetInput, onSetSupplementValue, onChangeQuantity, onFaqResult, onConfirmSupplements, onSubmit, onSubmitFreeText, onStartOver, onCopyUrl, onOpenEmergency, onCloseEmergency, onSubmitEmergency, onOpenVoice, onUseText, onDirectStaff }: ReceptionFlowProps) {
+function ReceptionFlow({ faqs, intakeStep, selectedCategory, selectedDetail, selectedLocation, selectedPeople, intakeNote, intake, preview, faqDecision, readyToSubmit, supplementValues, input, status, busy, checkUrl, questionId, emergencyOpen, voiceOpen, offline, onChooseCategory, onChooseDetail, onChooseLocation, onChoosePeople, onSetIntakeStep, onSetIntakeNote, onSetInput, onSetSupplementValue, onChangeQuantity, onFaqResult, onConfirmSupplements, onSubmit, onSubmitFreeText, onStartOver, onCopyUrl, onOpenEmergency, onCloseEmergency, onSubmitEmergency, onOpenVoice, onUseText, onDirectStaff }: ReceptionFlowProps) {
   const { t, language } = useUserI18n();
+  const offlineMessage = t('messages.offlineQueued', { defaultValue: language === 'en' ? 'Your message is saved on this device and will be sent when the connection returns.' : language === 'zh' ? '内容已保存在此设备上，网络恢复后会自动尝试发送。' : language === 'ko' ? '내용은 이 기기에 저장되며 연결이 복구되면 자동으로 다시 보냅니다.' : '通信が切れています。入力内容はこの端末に保存され、通信が戻ると送信を試みます。' });
   const fields = preview ? supplementFields(preview.analysis, preview.body, intake) : [];
   const locationValue = intake.location || selectedLocation;
   const locationLabel = locationValue ? (translatedZoneKey(locationValue) ? t(translatedZoneKey(locationValue)!) : locationValue) : t('reception.unspecified');
@@ -138,8 +144,9 @@ function ReceptionFlow({ faqs, intakeStep, selectedCategory, selectedDetail, sel
   const stages = ['status.received', 'status.reviewing', 'status.fieldChecking', 'status.inProgress', 'status.resolved'];
   const detailProgress = intakeStep === 'category' || intakeStep === 'freeText' ? '' : intakeStep === 'confirm' ? 'done' : 'current';
   return <main className="evac-theme reception-app">
-    <UserHeader brand="◌ イセキ避難所" brandHref="/#reception-top" faqHref="#reception-faq" brandAria={t('reception.brandAria')} />
+    <UserHeader brand={`◌ ${t('shelter.name')}`} brandHref="/#reception-top" faqHref="#reception-faq" brandAria={t('reception.brandAria')} />
     <section className="reception-shell" id="reception-top">
+      {offline && <p className="offline-notice" role="status">{offlineMessage}</p>}
       {!checkUrl && <button className="reception-emergency-link" type="button" onClick={onOpenEmergency}><span aria-hidden="true">🚨</span> {t('reception.emergency')}</button>}
       {!checkUrl && !emergencyOpen && <div className="reception-progress" aria-label={t('reception.progressAria')}><span className={intakeStep === 'category' ? 'current' : 'done'}>{t('reception.progressIssues')}</span><i>→</i><span className={detailProgress}>{t('reception.progressDetail')}</span><i>→</i><span className={intakeStep === 'confirm' ? 'current' : ''}>{t('reception.progressConfirm')}</span>{intakeStep !== 'category' && <small>{t('reception.progressAlmost')}</small>}</div>}
       {emergencyOpen && !checkUrl ? <section className="reception-step reception-emergency-panel" aria-labelledby="emergency-title"><button className="reception-back" type="button" onClick={onCloseEmergency}>← {t('reception.emergencyBack')}</button><p className="eyebrow">{t('reception.emergencyEyebrow')}</p><h1 id="emergency-title">{t('reception.emergencyTitle')}</h1><div className="emergency-instruction"><strong>{t('reception.emergencyCondition')}</strong><p>{t('reception.emergencyInstruction')}</p></div><button className="button emergency-primary" type="button" disabled={busy} onClick={onSubmitEmergency}>{busy ? t('reception.emergencySending') : t('reception.emergencySend')}</button><p className="emergency-note">{t('reception.emergencyNote')}</p></section> : <>
@@ -148,7 +155,7 @@ function ReceptionFlow({ faqs, intakeStep, selectedCategory, selectedDetail, sel
       {intakeStep === 'faq' && !checkUrl && <section className="reception-step" aria-labelledby="faq-step-title"><p className="eyebrow">{t('reception.faqEyebrow')}</p><h1 id="faq-step-title">{t('reception.faqTitle')}</h1>{preview?.related.length && !faqDecision ? <div className="reception-faq-card"><p className="reception-faq-label">{t('reception.faqFound')}</p>{preview.related.slice(0, 2).map((faq) => { const translatedFaq = translateUserFaq(faq, language); return <article key={faq.id}><h2>{translatedFaq.question}</h2><p>{translatedFaq.answer}</p></article>; })}<div className="reception-faq-actions"><button className="button secondary" type="button" onClick={() => onFaqResult(true)}>{t('reception.faqSolved')}</button><button className="button accent" type="button" onClick={() => onFaqResult(false)}>{t('reception.faqStill')}</button></div></div> : faqDecision && !preview ? <div className="reception-resolved"><span aria-hidden="true">✓</span><h2>{t('reception.faqResolved')}</h2><p>{t('reception.faqNoSend')}</p><button className="button secondary" type="button" onClick={onStartOver}>{t('reception.faqOther')}</button></div> : <div className="reception-no-faq"><h2>{t('reception.forwardTitle')}</h2><p>{busy ? t('reception.forwardBusy') : t('reception.forwardLead')}</p>{!busy && <button className="button accent" type="button" onClick={() => onSetIntakeStep(fields.length ? 'supplement' : 'confirm')}>{t('reception.next')}</button>}</div>}</section>}
       {intakeStep === 'supplement' && preview && !checkUrl && <section className="reception-step" aria-labelledby="supplement-title"><p className="eyebrow">{t('reception.supplementEyebrow')}</p><h1 id="supplement-title">{t('reception.supplementTitle')}</h1><p className="reception-lead">{t('reception.supplementLead')}</p><div className="reception-supplement-list">{fields.map((field) => <div className="reception-field" key={field.key}><label>{t(field.key === 'location' ? 'field.locationLabel' : field.key === 'peopleCount' ? 'field.peopleLabel' : field.key === 'resourceRemaining' ? (/毛布|枚/.test(preview.body) ? 'field.resourceBlanketLabel' : 'field.resourceLabel') : field.key === 'lastReceivedAt' ? 'field.lastReceivedLabel' : 'field.additionalLabel')}</label>{field.kind === 'location' && <LocationSelector value={supplementValues.location ?? ''} onChange={(zoneId) => onSetSupplementValue('location', zoneId)} />}{field.kind === 'select' && <select value={supplementValues[field.key] ?? ''} onChange={(event) => onSetSupplementValue(field.key, event.target.value)}><option value="">{t('reception.selectPrompt')}</option>{field.options?.map((option) => <option key={option}>{translatedChoiceKey(option) ? t(translatedChoiceKey(option)!) : option}</option>)}</select>}{field.kind === 'choice' && <div className="reception-choice-grid">{field.options?.map((option) => <button className={supplementValues[field.key] === option ? 'selected' : ''} type="button" key={option} onClick={() => onSetSupplementValue(field.key, option)} aria-pressed={supplementValues[field.key] === option}>{translatedChoiceKey(option) ? t(translatedChoiceKey(option)!) : option}</button>)}</div>}{field.kind === 'stepper' && <div className="reception-stepper"><button type="button" onClick={() => onChangeQuantity(-1)} aria-label={t('reception.quantityDecrease')}>−</button><strong>{supplementValues[field.key] ?? '1'}{language === 'ja' ? '枚' : ''}</strong><button type="button" onClick={() => onChangeQuantity(1)} aria-label={t('reception.quantityIncrease')}>＋</button></div>}{field.help && <p>{field.key === 'location' ? t('field.locationHelp') : field.key === 'resourceRemaining' ? t('field.resourceBlanketHelp') : field.help}</p>}</div>)}</div><button className="button accent reception-next" type="button" onClick={onConfirmSupplements}>{t('reception.supplementNext')}</button></section>}
       {intakeStep === 'freeText' && !checkUrl && <section className="reception-step" aria-labelledby="free-text-title"><button className="reception-back" type="button" onClick={() => onSetIntakeStep('category')}>← {t('reception.freeTextBack')}</button><p className="eyebrow">{t('reception.freeTextEyebrow')}</p><h1 id="free-text-title">{t('reception.freeTextTitle')}</h1><p className="reception-lead">{t('reception.freeTextLead')}</p><textarea className="reception-free-text" value={input} onChange={(event) => onSetInput(event.target.value)} placeholder={t('reception.freeTextPlaceholder')} maxLength={500} autoFocus /><button className="button accent reception-next" type="button" disabled={!input.trim() || busy} onClick={onSubmitFreeText}>{busy ? t('reception.forwardBusy') : t('reception.freeTextCheck')}</button></section>}
-      {intakeStep === 'confirm' && preview && !checkUrl && <section className="reception-step" aria-labelledby="confirm-title"><p className="eyebrow">{t('reception.confirmEyebrow')}</p><h1 id="confirm-title">{t('reception.confirmTitle')}</h1><dl className="reception-summary"><div><dt>{t('reception.summaryCategory')}</dt><dd>{selectedCategory ? t(translatedCategoryKey(selectedCategory.id)) : previewCategoryLabel}</dd></div><div><dt>{t('reception.summaryIssue')}</dt><dd>{selectedDetail && selectedCategory ? (translatedDetailKey(selectedCategory.id, selectedDetail) ? t(translatedDetailKey(selectedCategory.id, selectedDetail)!) : selectedDetail) : preview.analysis.title}</dd></div><div><dt>{t('reception.summaryLocation')}</dt><dd>{locationLabel}</dd></div><div><dt>{t('reception.summaryPeople')}</dt><dd>{peopleLabel}</dd></div><div><dt>{t('reception.summaryNote')}</dt><dd>{intakeNote || t('reception.none')}</dd></div></dl><label className="reception-note-label">{t('reception.noteLabel')}<textarea value={intakeNote} onChange={(event) => onSetIntakeNote(event.target.value)} placeholder={t('reception.notePlaceholder')} maxLength={500} /></label><div className="reception-confirm-actions"><button className="button secondary" type="button" onClick={() => onSetIntakeStep('detail')}>{t('reception.edit')}</button><button className="button accent" type="button" disabled={busy || !readyToSubmit} onClick={onSubmit}>{busy ? t('reception.sending') : t('reception.send')}</button></div></section>}
+      {intakeStep === 'confirm' && preview && !checkUrl && <section className="reception-step" aria-labelledby="confirm-title"><p className="eyebrow">{t('reception.confirmEyebrow')}</p><h1 id="confirm-title">{t('reception.confirmTitle')}</h1><dl className="reception-summary"><div><dt>{t('reception.summaryCategory')}</dt><dd>{selectedCategory ? t(translatedCategoryKey(selectedCategory.id)) : previewCategoryLabel}</dd></div><div><dt>{t('reception.summaryIssue')}</dt><dd>{selectedDetail && selectedCategory ? (translatedDetailKey(selectedCategory.id, selectedDetail) ? t(translatedDetailKey(selectedCategory.id, selectedDetail)!) : selectedDetail) : localizeUserGeneratedSummary(preview.analysis.title, preview.category, language)}</dd></div><div><dt>{t('reception.summaryLocation')}</dt><dd>{locationLabel}</dd></div><div><dt>{t('reception.summaryPeople')}</dt><dd>{peopleLabel}</dd></div><div><dt>{t('reception.summaryNote')}</dt><dd>{intakeNote || t('reception.none')}</dd></div></dl><label className="reception-note-label">{t('reception.noteLabel')}<textarea value={intakeNote} onChange={(event) => onSetIntakeNote(event.target.value)} placeholder={t('reception.notePlaceholder')} maxLength={500} /></label><div className="reception-confirm-actions"><button className="button secondary" type="button" onClick={() => onSetIntakeStep('detail')}>{t('reception.edit')}</button><button className="button accent" type="button" disabled={busy || !readyToSubmit} onClick={onSubmit}>{busy ? t('reception.sending') : t('reception.send')}</button></div></section>}
       </>}
       {checkUrl && <section className="reception-step reception-complete" aria-labelledby="complete-title"><p className="eyebrow">{t('reception.completeEyebrow')}</p><h1 id="complete-title">{t('reception.completeTitle')}</h1><p>{t('reception.completeLead')}</p>{questionId != null && <p className="reception-id">{t('reception.receiptNumber')} <strong>#{String(questionId).padStart(4, '0')}</strong></p>}<ol className="reception-status-timeline" aria-label={t('reception.statusAria')}>{stages.map((stage, index) => <li className={`${index <= stageIndex ? 'done' : ''} ${index === stageIndex ? 'current' : ''}`} key={stage}><span aria-hidden="true">{index <= stageIndex ? '✓' : '○'}</span><strong>{t(stage)}</strong></li>)}</ol><div className="reception-url-box"><input id="check-url-text" readOnly value={checkUrl} onFocus={(event) => event.currentTarget.select()} aria-label={t('reception.urlAria')} /><button className="button secondary" type="button" onClick={onCopyUrl}>{t('reception.copyUrl')}</button></div><Link className="button accent reception-next" href={checkUrl}>{t('reception.viewStatus')}</Link><button className="reception-text-button" type="button" onClick={onStartOver}>{t('reception.newConsult')}</button></section>}
       {!checkUrl && !emergencyOpen && !busy && intakeStep !== 'category' && <ConsultCancelAction onStartOver={onStartOver} />}
@@ -159,7 +166,7 @@ function ReceptionFlow({ faqs, intakeStep, selectedCategory, selectedDetail, sel
 }
 
 export function KikumaeClient({ faqs }: Props) {
-  const { t } = useUserI18n();
+  const { t, language } = useUserI18n();
   const [query, setQuery] = useState('');
   const [chatOpen, setChatOpen] = useState(false);
   const [intakeOpen, setIntakeOpen] = useState(true);
@@ -189,10 +196,57 @@ export function KikumaeClient({ faqs }: Props) {
   const [offline, setOffline] = useState(false);
   const submitLockRef = useRef(false);
   const previewRequestRef = useRef(0);
+  const offlineQueuedMessage = t('messages.offlineQueued', { defaultValue: language === 'en' ? 'Your message is saved on this device and will be sent when the connection returns.' : language === 'zh' ? '内容已保存在此设备上，网络恢复后会自动尝试发送。' : language === 'ko' ? '내용은 이 기기에 저장되며 연결이 복구되면 자동으로 다시 보냅니다.' : '通信が切れているため、入力内容を保存しました。通信が戻ると自動で送信を試みます。' });
+
+  function readPendingSubmissions(): PendingSubmission[] {
+    try {
+      const value = JSON.parse(localStorage.getItem(PENDING_SUBMISSIONS_KEY) ?? '[]');
+      const parsed = Array.isArray(value) ? value : [];
+      const fresh = parsed.filter((item): item is PendingSubmission => Boolean(item && typeof item === 'object' && typeof item.submissionKey === 'string' && typeof item.body === 'string' && typeof item.savedAt === 'number' && Date.now() - item.savedAt < PENDING_SUBMISSION_MAX_AGE_MS));
+      if (fresh.length !== parsed.length) writePendingSubmissions(fresh);
+      return fresh;
+    } catch { return []; }
+  }
+
+  function writePendingSubmissions(items: PendingSubmission[]) {
+    try { localStorage.setItem(PENDING_SUBMISSIONS_KEY, JSON.stringify(items.slice(-10))); } catch { /* 共用端末や容量不足では既存の下書き経路を使う */ }
+  }
+
+  function queueSubmission(submission: PendingSubmission) {
+    const current = readPendingSubmissions().filter((item) => item.submissionKey !== submission.submissionKey);
+    writePendingSubmissions([...current, submission]);
+  }
+
+  function removeQueuedSubmission(submissionKey: string) {
+    writePendingSubmissions(readPendingSubmissions().filter((item) => item.submissionKey !== submissionKey));
+  }
+
+  const flushPendingSubmissions = useCallback(async () => {
+    if (!navigator.onLine) return;
+    let pending = readPendingSubmissions();
+    for (const submission of pending) {
+      try {
+        const response = await fetch('/api/questions', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(submission), signal: AbortSignal.timeout(15000) });
+        if (response.status === 409) { pending = pending.filter((item) => item.submissionKey !== submission.submissionKey); writePendingSubmissions(pending); continue; }
+        if (!response.ok) continue;
+        const payload = await response.json() as { checkUrl?: string; id?: number };
+        pending = pending.filter((item) => item.submissionKey !== submission.submissionKey);
+        writePendingSubmissions(pending);
+        const url = payload.checkUrl ?? '';
+        const id = typeof payload.id === 'number' ? payload.id : null;
+        if (url) setCheckUrl(url);
+        setQuestionId(id);
+        setReadyToSubmit(false);
+        setStatus(t('messages.received', { id: id != null ? ` #${String(id).padStart(4, '0')}` : '' }));
+        if (id != null && url) { try { appendConsultHistory({ id, checkUrl: url, title: submission.category, savedAt: Date.now() }); } catch { /* 履歴保存はベストエフォート */ } }
+      } catch { /* 次回onlineイベントまたは再読み込みで再送する */ }
+    }
+  }, [t]);
 
   useEffect(() => {
-    const updateConnection = () => setOffline(!navigator.onLine);
+    const updateConnection = () => { const nextOffline = !navigator.onLine; setOffline(nextOffline); if (!nextOffline) void flushPendingSubmissions(); };
     updateConnection(); window.addEventListener('online', updateConnection); window.addEventListener('offline', updateConnection);
+    const retryTimer = window.setInterval(() => { void flushPendingSubmissions(); }, 30000);
     const restoreTimer = window.setTimeout(() => {
       try {
         const saved = localStorage.getItem('kikumae-shelter-draft');
@@ -202,8 +256,8 @@ export function KikumaeClient({ faqs }: Props) {
         if (draft.input) setInput(draft.input); if (draft.originalBody) setOriginalBody(draft.originalBody); if (draft.contextBody) setContextBody(draft.contextBody); if (draft.intake) setIntake({ ...emptyIntake, ...draft.intake }); if (draft.chatOpen) setChatOpen(true); if (draft.intakeOpen) { setIntakeOpen(true); setIntakeStep(draft.intakeStep ?? 'category'); setSelectedCategory(INTAKE_CATEGORIES.find((category) => category.id === draft.selectedCategoryId) ?? null); setSelectedDetail(draft.selectedDetail ?? ''); setSelectedLocation(draft.selectedLocation ?? ''); setSelectedPeople(draft.selectedPeople ?? ''); setIntakeNote(draft.intakeNote ?? ''); } if (draft.messages?.length) setMessages(draft.messages); if (draft.preview) setPreview(draft.preview); if (draft.faqDecision) setFaqDecision(true); if (draft.readyToSubmit) setReadyToSubmit(true); if (draft.showSupplementSheet) setShowSupplementSheet(true);
       } catch { /* 下書きの復元は利用できる場合だけ行う */ }
     }, 0);
-    return () => { window.clearTimeout(restoreTimer); window.removeEventListener('online', updateConnection); window.removeEventListener('offline', updateConnection); };
-  }, []);
+    return () => { window.clearTimeout(restoreTimer); window.clearInterval(retryTimer); window.removeEventListener('online', updateConnection); window.removeEventListener('offline', updateConnection); };
+  }, [flushPendingSubmissions]);
 
   useEffect(() => {
     const timer = window.setTimeout(() => {
@@ -363,15 +417,19 @@ export function KikumaeClient({ faqs }: Props) {
   async function submitQuestion() {
     if (!preview || busy || submitLockRef.current) return;
     submitLockRef.current = true; previewRequestRef.current += 1; setBusy(true); setStatus(t('messages.delivering'));
+    const pendingSubmission: PendingSubmission = { savedAt: Date.now(), body: originalBody, summary: preview.summary, category: preview.category, submissionKey: preview.submissionKey, selectedLanguage: language, conversation: [{ role: 'user', originalText: originalBody, originalLanguage: language }], intake, safetySnapshot: { urgentReview: preview.analysis.urgentReview, urgencyCandidate: preview.analysis.urgencyCandidate, facts: preview.analysis.facts.slice(0, 20) } };
+    queueSubmission(pendingSubmission);
     try {
-      const response = await fetch('/api/questions', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ body: originalBody, summary: preview.summary, category: preview.category, submissionKey: preview.submissionKey, selectedLanguage: language, conversation: [{ role: 'user', originalText: originalBody, originalLanguage: language }], intake }), signal: AbortSignal.timeout(15000) });
+      const response = await fetch('/api/questions', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(pendingSubmission), signal: AbortSignal.timeout(15000) });
       const payload = await response.json() as { message?: string; checkUrl?: string; id?: number };
-      if (!response.ok) { setStatus(t('errors.deliver')); return; }
+      if (response.status === 409) { removeQueuedSubmission(pendingSubmission.submissionKey); setStatus(payload.message ?? t('errors.deliver')); return; }
+      if (!response.ok) { setStatus(offline ? offlineQueuedMessage : t('errors.deliver')); return; }
       const url = payload.checkUrl ?? ''; const id = typeof payload.id === 'number' ? payload.id : null;
+      removeQueuedSubmission(pendingSubmission.submissionKey);
       setCheckUrl(url); setQuestionId(id); setReadyToSubmit(false); setStatus(t('reception.receivedHint')); addMessage({ from: 'ai', text: t('messages.received', { id: id != null ? ` #${String(id).padStart(4, '0')}` : '' }) });
       if (id != null && url) { try { appendConsultHistory({ id, checkUrl: url, title: preview.category, savedAt: Date.now() }); } catch { /* 履歴保存はベストエフォート */ } }
       try { localStorage.removeItem('kikumae-shelter-draft'); } catch { /* 下書きは利用できる場合だけ消去 */ }
-    } catch (error) { setStatus(error instanceof Error && error.name === 'TimeoutError' ? t('errors.previewSlow') : t('errors.connection')); }
+    } catch { setStatus(offlineQueuedMessage); }
     finally { submitLockRef.current = false; setBusy(false); }
   }
 
@@ -379,15 +437,19 @@ export function KikumaeClient({ faqs }: Props) {
     if (busy || submitLockRef.current) return;
     submitLockRef.current = true; previewRequestRef.current += 1; setBusy(true); setStatus(t('messages.emergencySending'));
     const body = '【緊急】命に関わる・今すぐ助けが必要です。近くの職員への即時対応をお願いします。';
+    const pendingSubmission: PendingSubmission = { savedAt: Date.now(), body, summary: '緊急のため、職員による即時確認が必要です。', category: 'その他', submissionKey: crypto.randomUUID(), selectedLanguage: language, conversation: [{ role: 'user', originalText: body, originalLanguage: language }], intake: { ...emptyIntake, additionalDetails: '近くの職員にも直接声をかけてください。' }, safetySnapshot: { urgentReview: true, urgencyCandidate: '高', facts: ['緊急のため即時確認が必要'] } };
+    queueSubmission(pendingSubmission);
     try {
-      const response = await fetch('/api/questions', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ body, summary: '緊急のため、職員による即時確認が必要です。', category: 'その他', selectedLanguage: language, submissionKey: crypto.randomUUID(), intake: { ...emptyIntake, additionalDetails: '近くの職員にも直接声をかけてください。' } }), signal: AbortSignal.timeout(15000) });
+      const response = await fetch('/api/questions', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(pendingSubmission), signal: AbortSignal.timeout(15000) });
       const payload = await response.json() as { message?: string; checkUrl?: string; id?: number };
-      if (!response.ok) { setStatus(t('errors.emergencyDeliver')); return; }
+      if (response.status === 409) { removeQueuedSubmission(pendingSubmission.submissionKey); setStatus(payload.message ?? t('errors.emergencyDeliver')); return; }
+      if (!response.ok) { setStatus(offline ? offlineQueuedMessage : t('errors.emergencyDeliver')); return; }
       const url = payload.checkUrl ?? ''; const id = typeof payload.id === 'number' ? payload.id : null;
+      removeQueuedSubmission(pendingSubmission.submissionKey);
       setCheckUrl(url); setQuestionId(id); setEmergencyOpen(false); setStatus(t('reception.emergencyReceived')); addMessage({ from: 'ai', text: t('messages.emergencyReceived') });
       if (id != null && url) { try { appendConsultHistory({ id, checkUrl: url, title: '緊急の相談', savedAt: Date.now() }); } catch { /* 履歴保存はベストエフォート */ } }
       try { localStorage.removeItem('kikumae-shelter-draft'); } catch { /* 下書きは利用できる場合だけ消去 */ }
-    } catch (error) { setStatus(error instanceof Error && error.name === 'TimeoutError' ? t('reception.emergencyTimeout') : t('errors.emergencyConnection')); }
+    } catch { setStatus(offlineQueuedMessage); }
     finally { submitLockRef.current = false; setBusy(false); }
   }
 
@@ -400,6 +462,6 @@ export function KikumaeClient({ faqs }: Props) {
     setStatus(t('errors.copyManual'));
   }
 
-  return <ReceptionFlow faqs={faqs} intakeStep={intakeStep} selectedCategory={selectedCategory} selectedDetail={selectedDetail} selectedLocation={selectedLocation} selectedPeople={selectedPeople} intakeNote={intakeNote} intake={intake} preview={preview} faqDecision={faqDecision} readyToSubmit={readyToSubmit} supplementValues={supplementValues} input={input} status={status} busy={busy} checkUrl={checkUrl} questionId={questionId} emergencyOpen={emergencyOpen} voiceOpen={voiceOpen} onChooseCategory={chooseCategory} onChooseDetail={(detail) => { void chooseDetail(detail); }} onChooseLocation={chooseLocation} onChoosePeople={choosePeople} onSetIntakeStep={setIntakeStep} onSetIntakeNote={setIntakeNote} onSetInput={setInput} onSetSupplementValue={setSupplementValue} onChangeQuantity={changeQuantity} onFaqResult={(resolved) => { void faqResult(resolved); }} onConfirmSupplements={confirmSupplements} onSubmit={() => { void submitStructuredIntake(); }} onSubmitFreeText={() => { void submitFreeText(); }} onStartOver={beginChat} onCopyUrl={() => { void copyCheckUrl(); }} onOpenEmergency={() => { setStatus(''); setEmergencyOpen(true); }} onCloseEmergency={() => setEmergencyOpen(false)} onSubmitEmergency={() => { void submitEmergency(); }} onOpenVoice={openVoice} onUseText={useTextConsultation} onDirectStaff={directStaffFromVoice} />;
+  return <ReceptionFlow faqs={faqs} intakeStep={intakeStep} selectedCategory={selectedCategory} selectedDetail={selectedDetail} selectedLocation={selectedLocation} selectedPeople={selectedPeople} intakeNote={intakeNote} intake={intake} preview={preview} faqDecision={faqDecision} readyToSubmit={readyToSubmit} supplementValues={supplementValues} input={input} status={status} busy={busy} checkUrl={checkUrl} questionId={questionId} emergencyOpen={emergencyOpen} voiceOpen={voiceOpen} offline={offline} onChooseCategory={chooseCategory} onChooseDetail={(detail) => { void chooseDetail(detail); }} onChooseLocation={chooseLocation} onChoosePeople={choosePeople} onSetIntakeStep={setIntakeStep} onSetIntakeNote={setIntakeNote} onSetInput={setInput} onSetSupplementValue={setSupplementValue} onChangeQuantity={changeQuantity} onFaqResult={(resolved) => { void faqResult(resolved); }} onConfirmSupplements={confirmSupplements} onSubmit={() => { void submitStructuredIntake(); }} onSubmitFreeText={() => { void submitFreeText(); }} onStartOver={beginChat} onCopyUrl={() => { void copyCheckUrl(); }} onOpenEmergency={() => { setStatus(''); setEmergencyOpen(true); }} onCloseEmergency={() => setEmergencyOpen(false)} onSubmitEmergency={() => { void submitEmergency(); }} onOpenVoice={openVoice} onUseText={useTextConsultation} onDirectStaff={directStaffFromVoice} />;
 
 }

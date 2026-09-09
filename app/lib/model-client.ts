@@ -28,7 +28,11 @@ export type VoiceModelResponse = {
 
 export async function requestVoiceModel(payload: VoiceModelRequest): Promise<VoiceModelResponse> {
   const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), 120000);
+  // Conversation is a resident-facing lane. If the local gateway is not
+  // reachable, return to the deterministic provider quickly instead of
+  // showing a stalled conversation for two minutes. Extraction is deliberately
+  // slower and runs in the background, so it keeps the server-side budget.
+  const timeout = setTimeout(() => controller.abort(), payload.mode === 'conversation' ? 15000 : 180000);
   try {
     const response = await fetch('/api/ai/voice', {
       method: 'POST',

@@ -32,6 +32,7 @@ Required runtime secrets/configuration:
 - `AI_EXTRACTION_MODEL`
 - `AI_MODEL_API_KEY` when the gateway requires it
 - `AI_MODEL_TIMEOUT_MS` (optional; local evaluation uses `120000` milliseconds)
+- `AI_CONVERSATION_TIMEOUT_MS` (optional; resident-facing Conversation defaults to `15000` milliseconds so an unavailable gateway quickly falls back)
 - `AI_MODEL_MAX_TOKENS` (optional gateway default; the route uses 120 for Conversation and 260 for Extraction)
 - `AI_MODEL_STREAMING` (optional; defaults to streaming and records first-token/generation timings)
 - `AI_EXTRACTION_PROMPT_VARIANT` (`full` or `compact`; default `full`)

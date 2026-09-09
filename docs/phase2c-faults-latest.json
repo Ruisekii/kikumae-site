@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-09-08T11:30:13.208Z",
+  "generatedAt": "2026-09-08T16:35:27.642Z",
   "baseUrl": "http://localhost:3000",
   "rows": [
     {
@@ -16,6 +16,9 @@
           "flags": [],
           "immediate": false
         },
+        "originalText": [
+          "水がありません。"
+        ],
         "telemetry": {
           "stage": "conversation",
           "model": null,
@@ -42,6 +45,30 @@
         "safety": {
           "flags": [],
           "immediate": false
+        },
+        "originalText": [
+          "体育館Aで水がありません。"
+        ],
+        "incident": {
+          "language": "ja",
+          "location": "体育館",
+          "target": null,
+          "facts": [
+            "水",
+            "飲料水・給水の不足または案内"
+          ],
+          "request": "water_supply",
+          "urgency": "medium",
+          "safetyFlags": [],
+          "missingFields": [
+            "人数"
+          ],
+          "askedFields": [],
+          "originalText": [
+            "体育館Aで水がありません。"
+          ],
+          "confidence": null,
+          "category": null
         },
         "telemetry": {
           "stage": "extract",
@@ -70,6 +97,9 @@
           "flags": [],
           "immediate": false
         },
+        "originalText": [
+          "水がありません。"
+        ],
         "telemetry": {
           "stage": "conversation",
           "model": null,
@@ -96,6 +126,30 @@
         "safety": {
           "flags": [],
           "immediate": false
+        },
+        "originalText": [
+          "体育館Aで水がありません。"
+        ],
+        "incident": {
+          "language": "ja",
+          "location": "体育館",
+          "target": null,
+          "facts": [
+            "水",
+            "飲料水・給水の不足または案内"
+          ],
+          "request": "water_supply",
+          "urgency": "medium",
+          "safetyFlags": [],
+          "missingFields": [
+            "人数"
+          ],
+          "askedFields": [],
+          "originalText": [
+            "体育館Aで水がありません。"
+          ],
+          "confidence": null,
+          "category": null
         },
         "telemetry": {
           "stage": "extract",
@@ -124,6 +178,9 @@
           "flags": [],
           "immediate": false
         },
+        "originalText": [
+          "水がありません。"
+        ],
         "telemetry": {
           "stage": "conversation",
           "model": null,
@@ -150,6 +207,30 @@
         "safety": {
           "flags": [],
           "immediate": false
+        },
+        "originalText": [
+          "体育館Aで水がありません。"
+        ],
+        "incident": {
+          "language": "ja",
+          "location": "体育館",
+          "target": null,
+          "facts": [
+            "水",
+            "飲料水・給水の不足または案内"
+          ],
+          "request": "water_supply",
+          "urgency": "medium",
+          "safetyFlags": [],
+          "missingFields": [
+            "人数"
+          ],
+          "askedFields": [],
+          "originalText": [
+            "体育館Aで水がありません。"
+          ],
+          "confidence": null,
+          "category": null
         },
         "telemetry": {
           "stage": "extract",
@@ -178,13 +259,16 @@
           "flags": [],
           "immediate": false
         },
+        "originalText": [
+          "水がありません。"
+        ],
         "telemetry": {
           "stage": "conversation",
           "model": null,
           "promptVariant": "full",
-          "safetyGuardMs": 0,
+          "safetyGuardMs": 1,
           "preprocessingMs": 0,
-          "totalMs": 0,
+          "totalMs": 1,
           "fallback": true,
           "fault": "timeout"
         },
@@ -204,6 +288,30 @@
         "safety": {
           "flags": [],
           "immediate": false
+        },
+        "originalText": [
+          "体育館Aで水がありません。"
+        ],
+        "incident": {
+          "language": "ja",
+          "location": "体育館",
+          "target": null,
+          "facts": [
+            "水",
+            "飲料水・給水の不足または案内"
+          ],
+          "request": "water_supply",
+          "urgency": "medium",
+          "safetyFlags": [],
+          "missingFields": [
+            "人数"
+          ],
+          "askedFields": [],
+          "originalText": [
+            "体育館Aで水がありません。"
+          ],
+          "confidence": null,
+          "category": null
         },
         "telemetry": {
           "stage": "extract",
@@ -232,6 +340,9 @@
           "flags": [],
           "immediate": false
         },
+        "originalText": [
+          "水がありません。"
+        ],
         "telemetry": {
           "stage": "conversation",
           "model": null,
@@ -258,6 +369,30 @@
         "safety": {
           "flags": [],
           "immediate": false
+        },
+        "originalText": [
+          "体育館Aで水がありません。"
+        ],
+        "incident": {
+          "language": "ja",
+          "location": "体育館",
+          "target": null,
+          "facts": [
+            "水",
+            "飲料水・給水の不足または案内"
+          ],
+          "request": "water_supply",
+          "urgency": "medium",
+          "safetyFlags": [],
+          "missingFields": [
+            "人数"
+          ],
+          "askedFields": [],
+          "originalText": [
+            "体育館Aで水がありません。"
+          ],
+          "confidence": null,
+          "category": null
         },
         "telemetry": {
           "stage": "extract",
@@ -286,6 +421,9 @@
           "flags": [],
           "immediate": false
         },
+        "originalText": [
+          "水がありません。"
+        ],
         "telemetry": {
           "stage": "conversation",
           "model": null,
@@ -312,6 +450,30 @@
         "safety": {
           "flags": [],
           "immediate": false
+        },
+        "originalText": [
+          "体育館Aで水がありません。"
+        ],
+        "incident": {
+          "language": "ja",
+          "location": "体育館",
+          "target": null,
+          "facts": [
+            "水",
+            "飲料水・給水の不足または案内"
+          ],
+          "request": "water_supply",
+          "urgency": "medium",
+          "safetyFlags": [],
+          "missingFields": [
+            "人数"
+          ],
+          "askedFields": [],
+          "originalText": [
+            "体育館Aで水がありません。"
+          ],
+          "confidence": null,
+          "category": null
         },
         "telemetry": {
           "stage": "extract",

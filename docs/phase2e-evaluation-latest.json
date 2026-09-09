@@ -1,7 +1,7 @@
 {
   "metrics": {
     "schemaVersion": "phase2e.v1",
-    "generatedAt": "2026-09-08T15:40:11.473Z",
+    "generatedAt": "2026-09-08T16:08:11.337Z",
     "cases": 25,
     "successful": 25,
     "failed": 0,
@@ -16,9 +16,9 @@
     "emotionalFactSeparationRate": 1,
     "anchoredEvidenceRate": 1,
     "latencyMs": {
-      "p50": 77,
-      "p95": 132,
-      "max": 304
+      "p50": 49,
+      "p95": 61,
+      "max": 97
     },
     "organizationFault": {
       "aiMode": "organization-fallback",
@@ -39,7 +39,7 @@
       "noSafetyHit": true,
       "separationHit": true,
       "anchored": true,
-      "elapsedMs": 304,
+      "elapsedMs": 97,
       "aiMode": "evidence-bound-organizer",
       "organization": {
         "schemaVersion": "phase2e.v1",
@@ -49,7 +49,7 @@
           "messageId": "eval:organization",
           "originalText": "何回言っても誰も来ないんですけど！昨日から水が全然なくて、子ども2人がいます。早く持ってきてください！",
           "originalLanguage": "ja",
-          "createdAt": 1788882009521
+          "createdAt": 1788883690091
         },
         "facts": [
           {
@@ -179,7 +179,7 @@
         "missingInformation": [],
         "mode": "evidence-bound",
         "status": "complete",
-        "organizedAt": 1788882009521
+        "organizedAt": 1788883690091
       }
     },
     {
@@ -194,7 +194,7 @@
       "noSafetyHit": true,
       "separationHit": true,
       "anchored": true,
-      "elapsedMs": 79,
+      "elapsedMs": 50,
       "aiMode": "evidence-bound-organizer",
       "organization": {
         "schemaVersion": "phase2e.v1",
@@ -204,7 +204,7 @@
           "messageId": "eval:organization",
           "originalText": "職員は何をしているんですか。食事が来ないままです。朝から何も食べていません。",
           "originalLanguage": "ja",
-          "createdAt": 1788882009595
+          "createdAt": 1788883690145
         },
         "facts": [
           {
@@ -268,7 +268,7 @@
         "missingInformation": [],
         "mode": "evidence-bound",
         "status": "complete",
-        "organizedAt": 1788882009596
+        "organizedAt": 1788883690145
       }
     },
     {
@@ -283,7 +283,7 @@
       "noSafetyHit": true,
       "separationHit": true,
       "anchored": true,
-      "elapsedMs": 100,
+      "elapsedMs": 50,
       "aiMode": "evidence-bound-organizer",
       "organization": {
         "schemaVersion": "phase2e.v1",
@@ -293,7 +293,7 @@
           "messageId": "eval:organization",
           "originalText": "さっきも伝えましたが、毛布が足りません。また同じことを言わせるんですか。",
           "originalLanguage": "ja",
-          "createdAt": 1788882009692
+          "createdAt": 1788883690197
         },
         "facts": [
           {
@@ -374,7 +374,7 @@
         "missingInformation": [],
         "mode": "evidence-bound",
         "status": "complete",
-        "organizedAt": 1788882009692
+        "organizedAt": 1788883690197
       }
     },
     {
@@ -389,7 +389,7 @@
       "noSafetyHit": true,
       "separationHit": true,
       "anchored": true,
-      "elapsedMs": 89,
+      "elapsedMs": 51,
       "aiMode": "evidence-bound-organizer",
       "organization": {
         "schemaVersion": "phase2e.v1",
@@ -399,7 +399,7 @@
           "messageId": "eval:organization",
           "originalText": "体育館の北側だったと思うのですが、昨日の夜からトイレが詰まっていて、南側も混んでいるし、子どもを連れて移動するのも大変で、どうしたらいいか分かりません。",
           "originalLanguage": "ja",
-          "createdAt": 1788882009769
+          "createdAt": 1788883690246
         },
         "facts": [
           {
@@ -521,7 +521,7 @@
         "missingInformation": [],
         "mode": "evidence-bound",
         "status": "complete",
-        "organizedAt": 1788882009769
+        "organizedAt": 1788883690246
       }
     },
     {
@@ -536,7 +536,7 @@
       "noSafetyHit": true,
       "separationHit": true,
       "anchored": true,
-      "elapsedMs": 96,
+      "elapsedMs": 48,
       "aiMode": "evidence-bound-organizer",
       "organization": {
         "schemaVersion": "phase2e.v1",
@@ -546,7 +546,7 @@
           "messageId": "eval:organization",
           "originalText": "怖くて泣きそうです。赤ちゃんのミルクがもうありません。どうしたらいいですか。",
           "originalLanguage": "ja",
-          "createdAt": 1788882009892
+          "createdAt": 1788883690295
         },
         "facts": [
           {
@@ -617,7 +617,7 @@
         "missingInformation": [],
         "mode": "evidence-bound",
         "status": "complete",
-        "organizedAt": 1788882009892
+        "organizedAt": 1788883690295
       }
     },
     {
@@ -632,7 +632,7 @@
       "noSafetyHit": true,
       "separationHit": true,
       "anchored": true,
-      "elapsedMs": 66,
+      "elapsedMs": 45,
       "aiMode": "evidence-bound-organizer",
       "organization": {
         "schemaVersion": "phase2e.v1",
@@ -642,7 +642,7 @@
           "messageId": "eval:organization",
           "originalText": "素晴らしい対応ですね、何時間待てば水をもらえるんでしょう。",
           "originalLanguage": "ja",
-          "createdAt": 1788882009956
+          "createdAt": 1788883690341
         },
         "facts": [
           {
@@ -691,7 +691,7 @@
         "missingInformation": [],
         "mode": "evidence-bound",
         "status": "complete",
-        "organizedAt": 1788882009956
+        "organizedAt": 1788883690341
       }
     },
     {
@@ -706,7 +706,7 @@
       "noSafetyHit": true,
       "separationHit": true,
       "anchored": true,
-      "elapsedMs": 66,
+      "elapsedMs": 49,
       "aiMode": "evidence-bound-organizer",
       "organization": {
         "schemaVersion": "phase2e.v1",
@@ -716,7 +716,7 @@
           "messageId": "eval:organization",
           "originalText": "いい加減にしてください！何度言えば食料の配布時間を教えてくれるんですか。",
           "originalLanguage": "ja",
-          "createdAt": 1788882010022
+          "createdAt": 1788883690390
         },
         "facts": [
           {
@@ -804,7 +804,7 @@
         "missingInformation": [],
         "mode": "evidence-bound",
         "status": "complete",
-        "organizedAt": 1788882010022
+        "organizedAt": 1788883690390
       }
     },
     {
@@ -819,7 +819,7 @@
       "noSafetyHit": true,
       "separationHit": true,
       "anchored": true,
-      "elapsedMs": 83,
+      "elapsedMs": 51,
       "aiMode": "evidence-bound-organizer",
       "organization": {
         "schemaVersion": "phase2e.v1",
@@ -829,7 +829,7 @@
           "messageId": "eval:organization",
           "originalText": "子どもが熱っぽい気がします。高熱かもしれませんが、体温はまだ測れていません。",
           "originalLanguage": "ja",
-          "createdAt": 1788882010106
+          "createdAt": 1788883690440
         },
         "facts": [
           {
@@ -910,7 +910,7 @@
         "missingInformation": [],
         "mode": "evidence-bound",
         "status": "complete",
-        "organizedAt": 1788882010106
+        "organizedAt": 1788883690440
       }
     },
     {
@@ -925,7 +925,7 @@
       "noSafetyHit": true,
       "separationHit": true,
       "anchored": true,
-      "elapsedMs": 55,
+      "elapsedMs": 52,
       "aiMode": "evidence-bound-organizer",
       "organization": {
         "schemaVersion": "phase2e.v1",
@@ -935,7 +935,7 @@
           "messageId": "eval:organization",
           "originalText": "何回呼んでも誰も来ない！子供が39度あってぐったりしているんです！",
           "originalLanguage": "ja",
-          "createdAt": 1788882010158
+          "createdAt": 1788883690491
         },
         "facts": [
           {
@@ -1024,7 +1024,7 @@
         "missingInformation": [],
         "mode": "evidence-bound",
         "status": "complete",
-        "organizedAt": 1788882010158
+        "organizedAt": 1788883690491
       }
     },
     {
@@ -1039,7 +1039,7 @@
       "noSafetyHit": true,
       "separationHit": true,
       "anchored": true,
-      "elapsedMs": 67,
+      "elapsedMs": 49,
       "aiMode": "evidence-bound-organizer",
       "organization": {
         "schemaVersion": "phase2e.v1",
@@ -1049,7 +1049,7 @@
           "messageId": "eval:organization",
           "originalText": "母が意識はありますが、呼吸が苦しいと言っています。救護所に来てもらえますか。",
           "originalLanguage": "ja",
-          "createdAt": 1788882010219
+          "createdAt": 1788883690542
         },
         "facts": [
           {
@@ -1106,7 +1106,7 @@
         "missingInformation": [],
         "mode": "evidence-bound",
         "status": "complete",
-        "organizedAt": 1788882010219
+        "organizedAt": 1788883690542
       }
     },
     {
@@ -1121,7 +1121,7 @@
       "noSafetyHit": true,
       "separationHit": true,
       "anchored": true,
-      "elapsedMs": 77,
+      "elapsedMs": 48,
       "aiMode": "evidence-bound-organizer",
       "organization": {
         "schemaVersion": "phase2e.v1",
@@ -1131,7 +1131,7 @@
           "messageId": "eval:organization",
           "originalText": "調理室から煙が出て火が見えます。すぐ確認してください。",
           "originalLanguage": "ja",
-          "createdAt": 1788882010300
+          "createdAt": 1788883690590
         },
         "facts": [
           {
@@ -1181,7 +1181,7 @@
         "missingInformation": [],
         "mode": "evidence-bound",
         "status": "complete",
-        "organizedAt": 1788882010300
+        "organizedAt": 1788883690590
       }
     },
     {
@@ -1196,7 +1196,7 @@
       "noSafetyHit": true,
       "separationHit": true,
       "anchored": true,
-      "elapsedMs": 62,
+      "elapsedMs": 45,
       "aiMode": "evidence-bound-organizer",
       "organization": {
         "schemaVersion": "phase2e.v1",
@@ -1206,7 +1206,7 @@
           "messageId": "eval:organization",
           "originalText": "火事ではありませんが、焦げたにおいがして不安です。調理室を見てもらえますか。",
           "originalLanguage": "ja",
-          "createdAt": 1788882010369
+          "createdAt": 1788883690637
         },
         "facts": [
           {
@@ -1277,7 +1277,7 @@
         "missingInformation": [],
         "mode": "evidence-bound",
         "status": "complete",
-        "organizedAt": 1788882010369
+        "organizedAt": 1788883690637
       }
     },
     {
@@ -1292,7 +1292,7 @@
       "noSafetyHit": true,
       "separationHit": true,
       "anchored": true,
-      "elapsedMs": 70,
+      "elapsedMs": 47,
       "aiMode": "evidence-bound-organizer",
       "organization": {
         "schemaVersion": "phase2e.v1",
@@ -1302,7 +1302,7 @@
           "messageId": "eval:organization",
           "originalText": "隣の人に殴られそうです。怖いので助けてください。体育館入口です。",
           "originalLanguage": "ja",
-          "createdAt": 1788882010431
+          "createdAt": 1788883690683
         },
         "facts": [
           {
@@ -1381,7 +1381,7 @@
         "missingInformation": [],
         "mode": "evidence-bound",
         "status": "complete",
-        "organizedAt": 1788882010431
+        "organizedAt": 1788883690683
       }
     },
     {
@@ -1396,7 +1396,7 @@
       "noSafetyHit": true,
       "separationHit": true,
       "anchored": true,
-      "elapsedMs": 89,
+      "elapsedMs": 54,
       "aiMode": "evidence-bound-organizer",
       "organization": {
         "schemaVersion": "phase2e.v1",
@@ -1406,7 +1406,7 @@
           "messageId": "eval:organization",
           "originalText": "隣の人と少し言い合いになっただけで、暴力はありません。職員に話を聞いてほしいです。",
           "originalLanguage": "ja",
-          "createdAt": 1788882010502
+          "createdAt": 1788883690734
         },
         "facts": [
           {
@@ -1462,7 +1462,7 @@
         "missingInformation": [],
         "mode": "evidence-bound",
         "status": "complete",
-        "organizedAt": 1788882010502
+        "organizedAt": 1788883690734
       }
     },
     {
@@ -1477,7 +1477,7 @@
       "noSafetyHit": true,
       "separationHit": true,
       "anchored": true,
-      "elapsedMs": 50,
+      "elapsedMs": 61,
       "aiMode": "evidence-bound-organizer",
       "organization": {
         "schemaVersion": "phase2e.v1",
@@ -1487,7 +1487,7 @@
           "messageId": "eval:organization",
           "originalText": "もう最悪です。これでは死んじゃいますよ。水の配布が遅すぎます。",
           "originalLanguage": "ja",
-          "createdAt": 1788882010577
+          "createdAt": 1788883690797
         },
         "facts": [
           {
@@ -1559,7 +1559,7 @@
         "missingInformation": [],
         "mode": "evidence-bound",
         "status": "complete",
-        "organizedAt": 1788882010577
+        "organizedAt": 1788883690797
       }
     },
     {
@@ -1574,7 +1574,7 @@
       "noSafetyHit": true,
       "separationHit": true,
       "anchored": true,
-      "elapsedMs": 75,
+      "elapsedMs": 58,
       "aiMode": "evidence-bound-organizer",
       "organization": {
         "schemaVersion": "phase2e.v1",
@@ -1584,7 +1584,7 @@
           "messageId": "eval:organization",
           "originalText": "I told you three times. There is no drinking water since this morning, and my child is thirsty. Please help us.",
           "originalLanguage": "en",
-          "createdAt": 1788882010652
+          "createdAt": 1788883690856
         },
         "facts": [
           {
@@ -1686,7 +1686,7 @@
         "missingInformation": [],
         "mode": "evidence-bound",
         "status": "complete",
-        "organizedAt": 1788882010652
+        "organizedAt": 1788883690856
       }
     },
     {
@@ -1701,7 +1701,7 @@
       "noSafetyHit": true,
       "separationHit": true,
       "anchored": true,
-      "elapsedMs": 83,
+      "elapsedMs": 49,
       "aiMode": "evidence-bound-organizer",
       "organization": {
         "schemaVersion": "phase2e.v1",
@@ -1711,7 +1711,7 @@
           "messageId": "eval:organization",
           "originalText": "我已经说了好几次，饮用水没有了，孩子也很渴，请尽快补充。",
           "originalLanguage": "zh",
-          "createdAt": 1788882010726
+          "createdAt": 1788883690905
         },
         "facts": [
           {
@@ -1792,7 +1792,7 @@
         "missingInformation": [],
         "mode": "evidence-bound",
         "status": "complete",
-        "organizedAt": 1788882010726
+        "organizedAt": 1788883690905
       }
     },
     {
@@ -1807,7 +1807,7 @@
       "noSafetyHit": true,
       "separationHit": true,
       "anchored": true,
-      "elapsedMs": 80,
+      "elapsedMs": 46,
       "aiMode": "evidence-bound-organizer",
       "organization": {
         "schemaVersion": "phase2e.v1",
@@ -1817,7 +1817,7 @@
           "messageId": "eval:organization",
           "originalText": "몇 번이나 말했는데 식수가 없습니다. 아이가 있고 너무 불안합니다. 빨리 도와주세요.",
           "originalLanguage": "ko",
-          "createdAt": 1788882010807
+          "createdAt": 1788883690952
         },
         "facts": [
           {
@@ -1898,7 +1898,7 @@
         "missingInformation": [],
         "mode": "evidence-bound",
         "status": "complete",
-        "organizedAt": 1788882010807
+        "organizedAt": 1788883690952
       }
     },
     {
@@ -1913,7 +1913,7 @@
       "noSafetyHit": true,
       "separationHit": true,
       "anchored": true,
-      "elapsedMs": 90,
+      "elapsedMs": 47,
       "aiMode": "evidence-bound-organizer",
       "organization": {
         "schemaVersion": "phase2e.v1",
@@ -1923,7 +1923,7 @@
           "messageId": "eval:organization",
           "originalText": "毛布が4枚足りません。大人2人と子ども2人です。体育館南側で、今夜必要です。",
           "originalLanguage": "ja",
-          "createdAt": 1788882010900
+          "createdAt": 1788883690999
         },
         "facts": [
           {
@@ -2028,7 +2028,7 @@
         "missingInformation": [],
         "mode": "evidence-bound",
         "status": "complete",
-        "organizedAt": 1788882010900
+        "organizedAt": 1788883690999
       }
     },
     {
@@ -2043,7 +2043,7 @@
       "noSafetyHit": true,
       "separationHit": true,
       "anchored": true,
-      "elapsedMs": 58,
+      "elapsedMs": 46,
       "aiMode": "evidence-bound-organizer",
       "organization": {
         "schemaVersion": "phase2e.v1",
@@ -2053,7 +2053,7 @@
           "messageId": "eval:organization",
           "originalText": "北トイレが朝から使えません。場所は体育館の北側です。",
           "originalLanguage": "ja",
-          "createdAt": 1788882010963
+          "createdAt": 1788883691046
         },
         "facts": [
           {
@@ -2144,7 +2144,7 @@
         "missingInformation": [],
         "mode": "evidence-bound",
         "status": "complete",
-        "organizedAt": 1788882010963
+        "organizedAt": 1788883691046
       }
     },
     {
@@ -2159,7 +2159,7 @@
       "noSafetyHit": true,
       "separationHit": true,
       "anchored": true,
-      "elapsedMs": 132,
+      "elapsedMs": 49,
       "aiMode": "evidence-bound-organizer",
       "organization": {
         "schemaVersion": "phase2e.v1",
@@ -2169,7 +2169,7 @@
           "messageId": "eval:organization",
           "originalText": "糖尿病の薬が今夜で切れます。救護所で相談したいです。",
           "originalLanguage": "ja",
-          "createdAt": 1788882011089
+          "createdAt": 1788883691093
         },
         "facts": [
           {
@@ -2247,7 +2247,7 @@
         "missingInformation": [],
         "mode": "evidence-bound",
         "status": "complete",
-        "organizedAt": 1788882011089
+        "organizedAt": 1788883691093
       }
     },
     {
@@ -2262,7 +2262,7 @@
       "noSafetyHit": true,
       "separationHit": true,
       "anchored": true,
-      "elapsedMs": 75,
+      "elapsedMs": 45,
       "aiMode": "evidence-bound-organizer",
       "organization": {
         "schemaVersion": "phase2e.v1",
@@ -2272,7 +2272,7 @@
           "messageId": "eval:organization",
           "originalText": "スマートフォンを充電できる場所を教えてください。",
           "originalLanguage": "ja",
-          "createdAt": 1788882011172
+          "createdAt": 1788883691141
         },
         "facts": [
           {
@@ -2306,7 +2306,7 @@
         "missingInformation": [],
         "mode": "evidence-bound",
         "status": "complete",
-        "organizedAt": 1788882011172
+        "organizedAt": 1788883691141
       }
     },
     {
@@ -2321,7 +2321,7 @@
       "noSafetyHit": true,
       "separationHit": true,
       "anchored": true,
-      "elapsedMs": 49,
+      "elapsedMs": 46,
       "aiMode": "evidence-bound-organizer",
       "organization": {
         "schemaVersion": "phase2e.v1",
@@ -2331,7 +2331,7 @@
           "messageId": "eval:organization",
           "originalText": "ペットを連れてきました。過ごせる場所とルールを教えてください。",
           "originalLanguage": "ja",
-          "createdAt": 1788882011220
+          "createdAt": 1788883691186
         },
         "facts": [
           {
@@ -2365,7 +2365,7 @@
         "missingInformation": [],
         "mode": "evidence-bound",
         "status": "complete",
-        "organizedAt": 1788882011220
+        "organizedAt": 1788883691186
       }
     },
     {
@@ -2380,7 +2380,7 @@
       "noSafetyHit": true,
       "separationHit": true,
       "anchored": true,
-      "elapsedMs": 88,
+      "elapsedMs": 48,
       "aiMode": "evidence-bound-organizer",
       "organization": {
         "schemaVersion": "phase2e.v1",
@@ -2390,7 +2390,7 @@
           "messageId": "eval:organization",
           "originalText": "困っています。",
           "originalLanguage": "ja",
-          "createdAt": 1788882011308
+          "createdAt": 1788883691234
         },
         "facts": [
           {
@@ -2425,7 +2425,7 @@
         "missingInformation": [],
         "mode": "evidence-bound",
         "status": "complete",
-        "organizedAt": 1788882011308
+        "organizedAt": 1788883691234
       }
     },
     {
@@ -2440,7 +2440,7 @@
       "noSafetyHit": true,
       "separationHit": true,
       "anchored": true,
-      "elapsedMs": 63,
+      "elapsedMs": 45,
       "aiMode": "evidence-bound-organizer",
       "organization": {
         "schemaVersion": "phase2e.v1",
@@ -2450,7 +2450,7 @@
           "messageId": "eval:organization",
           "originalText": "最初は水がないと思いましたが、今は少しあります。ただ、子どもがいて今日中に追加の水が必要です。",
           "originalLanguage": "ja",
-          "createdAt": 1788882011356
+          "createdAt": 1788883691279
         },
         "facts": [
           {
@@ -2543,7 +2543,7 @@
         "missingInformation": [],
         "mode": "evidence-bound",
         "status": "complete",
-        "organizedAt": 1788882011356
+        "organizedAt": 1788883691279
       }
     }
   ],
@@ -2560,7 +2560,7 @@
         "messageId": "eval:organization",
         "originalText": "何回言っても誰も来ないんですけど！昨日から水が全然なくて、子ども2人がいます。早く持ってきてください！",
         "originalLanguage": "ja",
-        "createdAt": 1788882011462
+        "createdAt": 1788883691326
       },
       "facts": [
         {
@@ -2690,7 +2690,7 @@
       "missingInformation": [],
       "mode": "fallback",
       "status": "fallback",
-      "organizedAt": 1788882011462
+      "organizedAt": 1788883691326
     },
     "safety": {
       "flags": [],
@@ -2705,7 +2705,7 @@
       "totalMs": 0,
       "fallback": true
     },
-    "elapsedMs": 90,
+    "elapsedMs": 48,
     "httpStatus": 200
   }
 }

@@ -11,6 +11,8 @@ import {
   searchFaqs,
   combinedSimilarity,
   generateShelterAnalysis,
+  buildServerCanonicalIncident,
+  sanitizeShelterIntake,
   buildShelterIssueTitle,
   isGenericShelterIssueTitle,
   redactSensitiveInformation,
@@ -857,17 +859,24 @@ export async function listRelatedFaqs(query: string, limit = 3, portalId: number
 export async function createQuestion(body: string, requestedSummary = '', requestedCategory = '', portalId: number | null = null, submissionKey = '', intake: ShelterIntake = {}, structuredIncident?: StructuredIncident, conversationMessages: ConversationMessageInput[] = [], selectedLanguage = ''): Promise<SubmittedQuestion> {
   const db = await initialise();
   const createdAt = Date.now();
+  const safeIntake = sanitizeShelterIntake(intake);
+  // Kept in the signature for backwards-compatible callers, but never trust
+  // a browser-supplied incident as the persisted canonical record.
+  void structuredIncident;
   const submissionKeyHash = submissionKey ? await hashCheckToken(submissionKey) : null;
   if (submissionKeyHash) {
     const duplicate = await db.prepare('SELECT id FROM questions WHERE submission_key_hash = ? LIMIT 1').bind(submissionKeyHash).first<{ id: number }>();
     if (duplicate) throw new Error('QUESTION_DUPLICATE');
   }
-  const shelterAnalysis = portalId === null ? generateShelterAnalysis(body, intake) : null;
+  const shelterAnalysis = portalId === null ? generateShelterAnalysis(body, safeIntake) : null;
+  // The browser-provided incident is untrusted. Rebuild the canonical record
+  // from raw text, allowlisted intake choices, and server-side safety rules.
+  const canonicalIncident = shelterAnalysis ? buildServerCanonicalIncident(body, safeIntake, selectedLanguage || 'ja') : undefined;
   const canonicalSummary = shelterAnalysis?.overview ?? generateLocalSummary(body);
   const aiSummary = requestedSummary.trim().slice(0, 300) || canonicalSummary;
   const category = categorizeQuestion(body, requestedCategory);
-  const analysis = structuredIncident && shelterAnalysis
-    ? applyStructuredIncident(shelterAnalysis, structuredIncident)
+  const analysis = canonicalIncident && shelterAnalysis
+    ? applyStructuredIncident(shelterAnalysis, canonicalIncident)
     : shelterAnalysis ?? generateShelterAnalysis(body, intake);
   // Safety and incident extraction have already run against the original text.
   // Translation is an independent staff-display aid and must never become the
@@ -875,7 +884,7 @@ export async function createQuestion(body: string, requestedSummary = '', reques
   const staffTranslation = await translateForStaff(body, selectedLanguage);
   const storedConversationMessages = await translateConversationMessages(conversationMessages);
   const issueLocation = analysis.issueLocation || resolveShelterZoneId(analysis.location) || analysis.location;
-  const reporterLocation = intake.reporterLocation?.trim().slice(0, 120) ?? '';
+  const reporterLocation = safeIntake.reporterLocation?.trim().slice(0, 120) ?? '';
   const related = await listRelatedFaqs(aiSummary || body, 3, portalId, analysis.category);
   // 避難所案件では同カテゴリの承認済みFAQだけを回答案の根拠にする。
   // 以前は検索結果全体を連結していたため、例えばペット相談に
@@ -914,11 +923,11 @@ export async function createQuestion(body: string, requestedSummary = '', reques
   const displayBody = redactSensitiveInformation(body);
   const result = await db.prepare("INSERT INTO questions (body, body_original, ai_summary, summary_edited, category, status, workflow_status, title, location, people_count, resource_remaining, last_received_at, fact_summary, emotion_summary, missing_information, urgency_candidate, urgent_review, request_text, affected_people, vulnerable_people, emotional_intensity, contains_abusive_language, urgency_confidence, grouping_confidence, display_body, contact_type, answer_draft, answer_alternatives, answer_grounds, portal_id, check_token_hash, check_token_expires_at, submission_key_hash, created_at, conversation_messages) VALUES (?, ?, ?, ?, ?, 'open', 'received', ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'anonymous', ?, ?, ?, ?, ?, ?, ?, ?, ?)").bind(body, body, aiSummary, aiSummary !== canonicalSummary ? 1 : 0, category, analysis.title, analysis.location, analysis.peopleCount, analysis.resourceRemaining, analysis.lastReceivedAt, JSON.stringify(analysis.facts), analysis.emotion, JSON.stringify(analysis.missingInformation), analysis.urgencyCandidate, analysis.urgentReview ? 1 : 0, analysis.request, analysis.affectedPeople, JSON.stringify(analysis.vulnerablePeople), analysis.emotionalIntensity, analysis.containsAbusiveLanguage ? 1 : 0, analysis.urgencyConfidence, 1, displayBody, draft, JSON.stringify(alternatives), JSON.stringify(answerGrounds), portalId, await hashCheckToken(checkToken), checkTokenExpiresAt, submissionKeyHash, createdAt, JSON.stringify(storedConversationMessages)).run();
   const id = Number(result.meta.last_row_id);
-  if (structuredIncident) await db.prepare('UPDATE questions SET structured_incident = ? WHERE id = ?').bind(JSON.stringify(structuredIncident), id).run();
+  if (canonicalIncident) await db.prepare('UPDATE questions SET structured_incident = ? WHERE id = ?').bind(JSON.stringify(canonicalIncident), id).run();
   await db.prepare('UPDATE questions SET original_language = ?, translated_text_ja = ?, translation_status = ? WHERE id = ?')
     .bind(staffTranslation.originalLanguage, staffTranslation.translatedTextJa, staffTranslation.translationStatus, id).run();
   const originalMessageId = `question:${id}`;
-  const staffOrganization = organizeStaffIncident({ body, originalLanguage: staffTranslation.originalLanguage, messageId: originalMessageId, createdAt, intake, structuredIncident, analysis });
+  const staffOrganization = organizeStaffIncident({ body, originalLanguage: staffTranslation.originalLanguage, messageId: originalMessageId, createdAt, intake: safeIntake, structuredIncident: canonicalIncident, analysis });
   await db.prepare('UPDATE questions SET original_message_id = ?, staff_organization = ? WHERE id = ?').bind(originalMessageId, JSON.stringify(staffOrganization), id).run();
   await db.prepare('UPDATE questions SET issue_location = ?, reporter_location = ? WHERE id = ?').bind(issueLocation, reporterLocation, id).run();
   await db.prepare("INSERT INTO case_updates (question_id, status, message, is_public, actor_user_id, created_at) VALUES (?, 'received', ?, 1, NULL, ?)").bind(id, '相談を受け付けました。避難所スタッフが内容を確認します。', createdAt).run();
@@ -936,7 +945,7 @@ export async function createQuestion(body: string, requestedSummary = '', reques
     urgencyConfirmed: null, urgentReview: analysis.urgentReview, faqResolved: null, similarGroupId: null, similarGroupTitle: '', similarCount: 0,
     assigneeName: '', internalNote: '', firstConfirmedAt: null, resolvedAt: null, updates: [{ id: 0, status: 'received', message: '相談を受け付けました。避難所スタッフが内容を確認します。', isPublic: true, createdAt }], similarQuestions: [], candidate: null, checkToken,
     request: analysis.request, affectedPeople: analysis.affectedPeople, vulnerablePeople: analysis.vulnerablePeople, emotionalIntensity: analysis.emotionalIntensity,
-    containsAbusiveLanguage: analysis.containsAbusiveLanguage, aiConfidence: { urgency: analysis.urgencyConfidence, grouping: 1, vulnerablePeople: analysis.vulnerablePeople[0] === '不明' ? 0.42 : 0.76 }, displayBody, originalMessageId, staffOrganization,
+    containsAbusiveLanguage: analysis.containsAbusiveLanguage, aiConfidence: { urgency: analysis.urgencyConfidence, grouping: 1, vulnerablePeople: analysis.vulnerablePeople[0] === '不明' ? 0.42 : 0.76 }, displayBody, originalMessageId, staffOrganization, structuredIncident: canonicalIncident,
   };
 }
 
@@ -1242,17 +1251,29 @@ export async function getQuestionByCheckToken(token: string): Promise<SubmittedQ
  * The check token is the same bearer secret used by the private status page, so
  * the resident can add a location or other missing field without logging in.
  */
-export async function updateQuestionFromPublicToken(token: string, body: string, intake: ShelterIntake, structuredIncident?: StructuredIncident, conversationMessages: ConversationMessageInput[] = [], selectedLanguage = ''): Promise<SubmittedQuestion | null> {
+export async function updateQuestionFromPublicToken(token: string, body: string, intake: ShelterIntake, _untrustedStructuredIncident?: StructuredIncident, _untrustedConversationMessages: ConversationMessageInput[] = [], selectedLanguage = ''): Promise<SubmittedQuestion | null> {
   if (!/^[0-9a-f-]{32,80}$/i.test(token) || !body.trim() || body.trim().length > 500) return null;
   const current = await getQuestionByCheckToken(token);
   if (!current) return null;
+  void _untrustedStructuredIncident;
+  void _untrustedConversationMessages;
   const db = await initialise();
-  const baseAnalysis = generateShelterAnalysis(body, intake);
-  const analysis = structuredIncident ? applyStructuredIncident(baseAnalysis, structuredIncident) : baseAnalysis;
-  // Keep follow-up safety/extraction on the original text; translation is only
-  // a separate staff-reading aid.
-  const staffTranslation = await translateForStaff(body, selectedLanguage);
-  const storedConversationMessages = await translateConversationMessages(conversationMessages);
+  const safeIntake = sanitizeShelterIntake(intake);
+  const appendedText = body.trim();
+  const priorUserMessages = (current.conversationMessages ?? [])
+    .filter((message) => message.role === 'user' && message.originalText.trim() && message.originalText.trim() !== current.bodyOriginal.trim())
+    .map((message) => message.originalText.trim());
+  const combinedBody = [current.bodyOriginal.trim(), ...priorUserMessages, appendedText].filter(Boolean).join('\n').slice(0, 2000);
+  const canonicalIncident = buildServerCanonicalIncident(combinedBody, safeIntake, selectedLanguage || current.originalLanguage || 'ja');
+  const baseAnalysis = generateShelterAnalysis(combinedBody, safeIntake);
+  const analysis = applyStructuredIncident(baseAnalysis, canonicalIncident);
+  // Keep follow-up safety/extraction on the original and appended resident
+  // text; translation is only a separate staff-reading aid.
+  const now = Date.now();
+  const newMessage: ConversationMessageInput = { role: 'user', originalText: appendedText, originalLanguage: selectedLanguage || current.originalLanguage, messageId: `${current.originalMessageId || `question:${current.id}`}:followup:${crypto.randomUUID()}`, createdAt: now };
+  const translatedNewMessage = await translateConversationMessages([newMessage]);
+  const storedConversationMessages = [...(current.conversationMessages ?? []), ...translatedNewMessage].slice(-24);
+  const staffTranslation = await translateForStaff(combinedBody, selectedLanguage || current.originalLanguage);
   const faqs = await readPublishedFaqs(db, null);
   const related = searchFaqs(`${analysis.title} ${analysis.request} ${analysis.facts.join(' ')}`, faqs.filter((faq) => faq.category === analysis.category), 3);
   const context = {
@@ -1265,29 +1286,25 @@ export async function updateQuestionFromPublicToken(token: string, body: string,
     missingInformation: analysis.missingInformation,
     urgentReview: analysis.urgentReview,
   };
-  const draft = generateShelterReplyDraft(context, body, related);
-  const now = Date.now();
-  await db.prepare(`UPDATE questions SET body = ?, body_original = ?, ai_summary = ?, summary_edited = 0, category = ?, title = ?,
+  const draft = generateShelterReplyDraft(context, combinedBody, related);
+  await db.prepare(`UPDATE questions SET body = ?, ai_summary = ?, summary_edited = 0, category = ?, title = ?,
     location = ?, issue_location = ?, people_count = ?, resource_remaining = ?, last_received_at = ?, fact_summary = ?, emotion_summary = ?,
     missing_information = ?, urgency_candidate = ?, urgent_review = ?, request_text = ?, affected_people = ?, vulnerable_people = ?,
     emotional_intensity = ?, contains_abusive_language = ?, urgency_confidence = ?, display_body = ?,
     answer_draft = CASE WHEN status = 'open' AND answer_body IS NULL THEN ? ELSE answer_draft END
     WHERE id = ? AND portal_id IS NULL`).bind(
-    body.trim(), body.trim(), analysis.overview, analysis.category, analysis.title, analysis.location, analysis.issueLocation,
+    combinedBody, analysis.overview, analysis.category, analysis.title, analysis.location, analysis.issueLocation,
     analysis.peopleCount, analysis.resourceRemaining, analysis.lastReceivedAt, JSON.stringify(analysis.facts), analysis.emotion,
     JSON.stringify(analysis.missingInformation), analysis.urgencyCandidate, analysis.urgentReview ? 1 : 0, analysis.request,
     analysis.affectedPeople, JSON.stringify(analysis.vulnerablePeople), analysis.emotionalIntensity, analysis.containsAbusiveLanguage ? 1 : 0,
-    analysis.urgencyConfidence, redactSensitiveInformation(body), draft, current.id,
+    analysis.urgencyConfidence, redactSensitiveInformation(combinedBody), draft, current.id,
   ).run();
   await db.prepare('UPDATE questions SET original_language = ?, translated_text_ja = ?, translation_status = ? WHERE id = ?')
     .bind(staffTranslation.originalLanguage, staffTranslation.translatedTextJa, staffTranslation.translationStatus, current.id).run();
-  if (structuredIncident) await db.prepare('UPDATE questions SET structured_incident = ? WHERE id = ?').bind(JSON.stringify(structuredIncident), current.id).run();
+  await db.prepare('UPDATE questions SET structured_incident = ?, conversation_messages = ? WHERE id = ?').bind(JSON.stringify(canonicalIncident), JSON.stringify(storedConversationMessages), current.id).run();
   const originalMessageId = current.originalMessageId || `question:${current.id}`;
-  const staffOrganization = organizeStaffIncident({ body: body.trim(), originalLanguage: staffTranslation.originalLanguage, messageId: originalMessageId, createdAt: current.createdAt, intake, structuredIncident, analysis });
+  const staffOrganization = organizeStaffIncident({ body: combinedBody, originalLanguage: staffTranslation.originalLanguage, messageId: originalMessageId, createdAt: current.createdAt, intake: safeIntake, structuredIncident: canonicalIncident, analysis });
   await db.prepare('UPDATE questions SET original_message_id = ?, staff_organization = ? WHERE id = ?').bind(originalMessageId, JSON.stringify(staffOrganization), current.id).run();
-  if (storedConversationMessages.length) {
-    await db.prepare('UPDATE questions SET conversation_messages = ? WHERE id = ?').bind(JSON.stringify(storedConversationMessages), current.id).run();
-  }
   if (current.issueId) {
     await db.prepare(`UPDATE issues SET title = ?, summary = ?, request = ?, category = ?, location = ?, issue_location = ?,
       affected_people = ?, vulnerable_people = ?, urgency_candidate = ?, updated_at = ?, version = version + 1 WHERE id = ? AND portal_id IS NULL`)

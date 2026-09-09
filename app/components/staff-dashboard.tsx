@@ -267,7 +267,7 @@ function translationSource(report: Issue['reports'][number]) {
 }
 
 function provenanceSourceLabel(source: string): string {
-  return ({ user_selection: '本人の選択', user_text: '本人の文章', safety_rule: 'Safety Guard', llm_extraction: 'AI抽出', staff_edit: '職員修正' } as Record<string, string>)[source] ?? source;
+  return ({ user_selection: '本人の選択', user_text: '本人の文章', server_rule: 'サーバー整理', safety_rule: 'Safety Guard', llm_extraction: 'AI抽出', staff_edit: '職員修正' } as Record<string, string>)[source] ?? source;
 }
 
 function provenanceValue(value: unknown): string {
@@ -296,7 +296,7 @@ function StructuredTruthPanel({ issue }: { issue: Issue }) {
 }
 
 function organizationSourceLabel(source: OrganizationItem['source']): string {
-  return ({ user_selection: '本人の選択', user_text: '本人の記載', safety_rule: 'Safety Guard', ai_organized: '整理AIの候補', llm_extraction: 'LLM抽出候補', staff_edit: '職員修正' } as Record<string, string>)[source] ?? source;
+  return ({ user_selection: '本人の選択', user_text: '本人の記載', server_rule: 'サーバー整理', safety_rule: 'Safety Guard', ai_organized: '整理AIの候補', llm_extraction: 'LLM抽出候補', staff_edit: '職員修正' } as Record<string, string>)[source] ?? source;
 }
 
 function StaffOrganizationPanel({ issue }: { issue: Issue }) {
@@ -310,7 +310,7 @@ function StaffOrganizationPanel({ issue }: { issue: Issue }) {
     ['不確かな点', organization.uncertainPoints],
     ['Safety検出', organization.safetySignals],
   ];
-  return <section className="staff-organization-panel" aria-label="職員向け整理カード"><div className="section-card-heading"><div><span className="analysis-label">職員向け整理カード</span><h3>{organization.title}</h3></div><small>{organization.mode === 'fallback' ? 'Fallback' : '証拠付き整理'}・{organization.original.originalLanguage.toUpperCase()}</small></div><p className="structured-truth-note">原文を削除せず、本人の記載・Safety検出・整理AI候補を分けています。候補は職員が確認して確定します。</p><div className="organization-sections">{sections.map(([label, items]) => items.length ? <section key={label}><strong>{label}</strong><ul>{items.map((entry) => <li key={`${label}-${entry.value}-${entry.messageId}`}><span>{entry.value}</span><small>{entry.confirmed ? '確認済み' : '候補'}・{organizationSourceLabel(entry.source)}{entry.uncertain ? '・不確実' : ''}・根拠「{entry.evidence}」</small></li>)}</ul></section> : null)}</div>{organization.missingInformation.length > 0 && <div className="organization-missing"><strong>確認が必要</strong><span>{organization.missingInformation.join('、')}</span></div>}<small className="organization-source-note">原文ID：{organization.original.messageId}・受付時刻：{dateLabel(organization.original.createdAt)}</small></section>;
+  return <section className="staff-organization-panel" aria-label="職員向け整理カード"><div className="section-card-heading"><div><span className="analysis-label">職員向け整理カード</span><h3>{organization.title}</h3></div><small>{organization.mode === 'fallback' ? 'Fallback' : '証拠付き整理'}・{organization.original.originalLanguage.toUpperCase()}</small></div><p className="structured-truth-note">原文を削除せず、本人の記載・Safety検出・整理AI候補を分けています。候補は職員が確認して確定します。</p><div className="organization-sections">{sections.map(([label, items]) => items.length ? <section key={label}><strong>{label}</strong><ul>{items.map((entry) => <li key={`${label}-${entry.value}-${entry.messageId}`}><span>{entry.value}</span><small>{entry.confirmed ? '確認済み' : '候補'}・{organizationSourceLabel(entry.source)}{entry.uncertain ? '・不確実' : ''}・{entry.evidence ? `根拠「${entry.evidence}」${entry.evidenceStatus === 'token' ? '（一部一致）' : ''}` : '根拠未特定（原文で確認）'}</small></li>)}</ul></section> : null)}</div>{organization.missingInformation.length > 0 && <div className="organization-missing"><strong>確認が必要</strong><span>{organization.missingInformation.join('、')}</span></div>}<small className="organization-source-note">原文ID：{organization.original.messageId}・受付時刻：{dateLabel(organization.original.createdAt)}</small></section>;
 }
 
 function IssueSummary({ issue, mapIssues, onOriginalViewed, onMerge, onSelectIssue, onBack, onNext, busy }: { issue: Issue; mapIssues: Issue[]; onOriginalViewed: () => void; onMerge: (candidateId: number, action: MergeAction) => Promise<void>; onSelectIssue: (issue: Issue) => void; onBack: () => void; onNext: () => void; busy: boolean }) {

@@ -10,6 +10,7 @@
 import type { Faq, RelatedFaq } from './repository';
 import { resolveShelterZoneId, shelterLocationLabel } from '../lib/shelter-map-data';
 import type { FourBStatus, IncidentProvenance } from '../app/lib/incident-schema';
+import { detectSafetyFlags } from '../app/lib/safety-guard';
 
 export type AiFaq = Faq;
 export type AiRelatedFaq = RelatedFaq;
@@ -71,6 +72,84 @@ export type ShelterAnalysis = {
   resourceRemaining: string;
   lastReceivedAt: string;
 };
+
+const ALLOWED_PEOPLE_CHOICES = new Set(['1人', '2〜5人', '6〜10人', '6人以上', '11人以上', 'わからない']);
+const ALLOWED_RESOURCE_CHOICES = new Set(['ほとんどない', '少しある', 'まだある', 'わからない']);
+const ALLOWED_TIME_CHOICES = new Set(['今すぐ', '数時間以内', '今日中', '急がない', 'わからない', '今日', '昨日', 'それより前']);
+
+/**
+ * Public intake is untrusted browser data. Keep only values that the resident
+ * UI can legitimately produce; free-form facts must still come from raw text.
+ */
+export function sanitizeShelterIntake(input: ShelterIntake = {}): ShelterIntake {
+  const locationCandidate = typeof input.location === 'string' ? input.location.trim().slice(0, 80) : '';
+  const locationId = resolveShelterZoneId(locationCandidate);
+  const safePeople = typeof input.peopleCount === 'string' ? input.peopleCount.trim() : '';
+  const safeResource = typeof input.resourceRemaining === 'string' ? input.resourceRemaining.trim() : '';
+  const safeTime = typeof input.lastReceivedAt === 'string' ? input.lastReceivedAt.trim() : '';
+  const safeQuantity = /^(?:[1-9]|[1-9][0-9])枚$/.test(safeResource) ? safeResource : '';
+  return {
+    location: locationId ? shelterLocationLabel(locationId) : '',
+    issueLocation: locationId ? locationId : '',
+    reporterLocation: locationId ? locationId : '',
+    peopleCount: ALLOWED_PEOPLE_CHOICES.has(safePeople) || /^(?:[1-9]|[1-9][0-9])人$/.test(safePeople) ? safePeople : '',
+    resourceRemaining: ALLOWED_RESOURCE_CHOICES.has(safeResource) ? safeResource : safeQuantity,
+    lastReceivedAt: ALLOWED_TIME_CHOICES.has(safeTime) ? safeTime : '',
+    additionalDetails: typeof input.additionalDetails === 'string' ? input.additionalDetails.trim().slice(0, 120) : '',
+  };
+}
+
+function countFromPeopleLabel(value: string): number | null {
+  const match = value.match(/^(\d{1,2})人$/);
+  return match ? Number(match[1]) : null;
+}
+
+function safetyFlagCodes(labels: string[]): string[] {
+  return Array.from(new Set(labels.flatMap((label) => {
+    if (label.includes('火災')) return ['possible_fire'];
+    if (label.includes('暴力')) return ['possible_violence'];
+    if (label.includes('自傷')) return ['possible_self_harm'];
+    if (label.includes('意識') || label.includes('胸') || label.includes('体調') || label.includes('出血') || label.includes('閉じ込め')) return ['possible_medical_emergency'];
+    return [];
+  })));
+}
+
+/**
+ * Build the persisted incident only from server-side text/rules. A browser
+ * supplied structuredIncident is deliberately not accepted here.
+ */
+export function buildServerCanonicalIncident(body: string, intake: ShelterIntake = {}, language = 'ja'): StructuredIncident {
+  const safeIntake = sanitizeShelterIntake(intake);
+  const analysis = generateShelterAnalysis(body, safeIntake);
+  const safety = detectSafetyFlags(body);
+  const count = countFromPeopleLabel(analysis.peopleCount);
+  const vulnerable = analysis.vulnerablePeople.find((item) => item !== '不明');
+  const urgency = safety.immediate || analysis.urgentReview ? 'critical' : analysis.urgencyCandidate === '高' ? 'high' : analysis.urgencyCandidate === '中' ? 'medium' : 'normal';
+  const sourceFor = (value: unknown, source: 'user_selection' | 'user_text' | 'server_rule' | 'safety_rule', confirmed = false, messageId: string | null = null) => ({ value, source, confirmed, messageId, evidence: source === 'server_rule' ? null : body });
+  return {
+    language: language.slice(0, 12) || 'ja',
+    location: analysis.location || null,
+    target: count || vulnerable ? { type: vulnerable?.includes('子ども') ? 'child' : vulnerable?.includes('乳児') ? 'infant' : null, count, ageGroup: vulnerable ?? null } : null,
+    facts: analysis.facts.filter((fact) => !fact.startsWith('相談分類：')).slice(0, 20),
+    request: analysis.request || null,
+    urgency,
+    safetyFlags: safetyFlagCodes(safety.flags),
+    missingFields: analysis.missingInformation.slice(0, 12),
+    confidence: null,
+    category: analysis.category,
+    provenance: {
+      ...(analysis.location ? { location: sourceFor(analysis.location, safeIntake.location ? 'user_selection' : 'server_rule', Boolean(safeIntake.location)) } : {}),
+      ...((count || vulnerable) ? { target: sourceFor({ count, ageGroup: vulnerable ?? null }, safeIntake.peopleCount ? 'user_selection' : 'server_rule', Boolean(safeIntake.peopleCount)) } : {}),
+      ...(analysis.request ? { request: sourceFor(analysis.request, 'server_rule') } : {}),
+      ...(analysis.facts.length ? { facts: analysis.facts.slice(0, 20).map((fact) => sourceFor(fact, 'server_rule')) } : {}),
+      ...(safety.flags.length ? { safetyFlags: sourceFor(safetyFlagCodes(safety.flags), 'safety_rule') } : {}),
+      urgency: sourceFor(urgency, safety.flags.length ? 'safety_rule' : 'server_rule'),
+    },
+    structuredComplete: analysis.missingInformation.length === 0,
+    fourBRequested: false,
+    fourBStatus: 'not_needed',
+  };
+}
 
 const PUNCTUATION = /[\s、。・!！?？「」『』()（）\[\]【】,.:;〜~ー\-]/g;
 const KEYWORD_RE = /[一-龥]{2,}|[ァ-ヴー]{2,}|[a-zA-Z]{3,}/g;

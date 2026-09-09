@@ -2,7 +2,7 @@
 
 import { FormEvent, useEffect, useState } from 'react';
 import Link from 'next/link';
-import { clearConsultHistory, loadConsultHistory, type ConsultHistoryEntry } from './consult-history';
+import { clearResidentDeviceData, loadConsultHistory, type ConsultHistoryEntry } from './consult-history';
 import { translateUserIssueTitle, UserHeader, useUserI18n } from '../user-i18n';
 
 type StatusRecord = { id: number; title: string; workflowStatus: string; updatedAt: number; assigneeName: string; firstConfirmedAt: number | null };
@@ -97,7 +97,7 @@ export function QuestionStatusLookup() {
   }
 
   return <main className="evac-theme public-page status-lookup-page">
-    <UserHeader brand="◌ イセキ避難所" brandHref="/" faqHref="/#reception-faq" statusHref="/questions" />
+    <UserHeader brand={`◌ ${t('shelter.name')}`} brandHref="/" faqHref="/#reception-faq" statusHref="/questions" />
     <section className="status-lookup-card">
       <p className="eyebrow">{t('statusLookup.eyebrow')}</p>
       <h1>{t('statusLookup.title')}</h1>
@@ -115,7 +115,7 @@ export function QuestionStatusLookup() {
             <div className="device-history-card-bottom"><time dateTime={new Date(entry.status?.updatedAt ?? entry.savedAt).toISOString()}>{entry.unavailable ? t('statusLookup.savedPage') : t('statusLookup.lastUpdated', { time: formatStatusTime(new Date(entry.status?.updatedAt ?? entry.savedAt), language, { month: 'numeric', day: 'numeric', hour: 'numeric', minute: '2-digit' }) })}</time><a className="button secondary" href={entry.checkUrl}>{t('statusLookup.details')}</a></div>
           </li>;
         })}</ul>
-        <button className="text-button" type="button" onClick={() => { clearConsultHistory(); setHistory([]); }}>{t('statusLookup.clear')}</button>
+        <button className="text-button" type="button" onClick={() => { clearResidentDeviceData(); setHistory([]); }}>{t('statusLookup.clear')}</button>
       </div> : <div className="device-history-empty"><strong>{t('statusLookup.emptyTitle')}</strong><p>{t('statusLookup.emptyLead')}</p><Link className="button accent" href="/">{t('statusLookup.chooseIssue')}</Link></div>}
       <details className="status-advanced-lookup">
         <summary>{t('statusLookup.advanced')}</summary>

@@ -9,14 +9,16 @@ import { safetyGuard, type SafetyResult } from './safety-guard';
 import { extractMultilingualIncidentHints } from './multilingual-incident';
 
 /** 職員向け整理カードの出所。原文の証拠を必ず保持する。 */
-export type OrganizationSource = 'user_selection' | 'user_text' | 'safety_rule' | 'ai_organized' | 'llm_extraction' | 'staff_edit';
+export type OrganizationSource = 'user_selection' | 'user_text' | 'server_rule' | 'safety_rule' | 'ai_organized' | 'llm_extraction' | 'staff_edit';
+export type EvidenceStatus = 'exact' | 'token' | 'not_found';
 
 export type OrganizationItem = {
   value: string;
   source: OrganizationSource;
   confirmed: boolean;
   uncertain?: boolean;
-  evidence: string;
+  evidence: string | null;
+  evidenceStatus: EvidenceStatus;
   messageId: string;
 };
 
@@ -51,22 +53,22 @@ export type StaffOrganizationInput = {
   mode?: 'evidence-bound' | 'llm-enriched' | 'fallback';
 };
 
-function evidenceFor(value: string, body: string): string {
-  if (value && body.includes(value)) return value;
+function evidenceFor(value: string, body: string): { evidence: string | null; evidenceStatus: EvidenceStatus } {
+  if (value && body.includes(value)) return { evidence: value, evidenceStatus: 'exact' };
   const term = value.split(/[・、：:／/\s]+/).find((candidate) => candidate.length >= 2 && body.includes(candidate));
-  return term || body.slice(0, 120);
+  return term ? { evidence: term, evidenceStatus: 'token' } : { evidence: null, evidenceStatus: 'not_found' };
 }
 
 function sourceFor(value: string, structured: StructuredIncident | undefined, field: keyof NonNullable<StructuredIncident['provenance']>): OrganizationSource {
   const source = structured?.provenance?.[field]?.source;
-  if (source === 'user_selection' || source === 'user_text' || source === 'safety_rule' || source === 'llm_extraction' || source === 'staff_edit') return source;
+  if (source === 'user_selection' || source === 'user_text' || source === 'server_rule' || source === 'safety_rule' || source === 'llm_extraction' || source === 'staff_edit') return source;
   return value ? 'ai_organized' : 'user_text';
 }
 
 function item(value: unknown, body: string, messageId: string, source: OrganizationSource = 'ai_organized', confirmed = false, uncertain = false): OrganizationItem | null {
   const text = typeof value === 'string' ? value.trim() : value == null ? '' : String(value).trim();
   if (!text) return null;
-  return { value: text.slice(0, 240), source, confirmed, ...(uncertain ? { uncertain: true } : {}), evidence: evidenceFor(text, body), messageId };
+  return { value: text.slice(0, 240), source, confirmed, ...(uncertain ? { uncertain: true } : {}), ...evidenceFor(text, body), messageId };
 }
 
 function unique(items: Array<OrganizationItem | null>): OrganizationItem[] {

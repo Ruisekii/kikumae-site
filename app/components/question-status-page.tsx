@@ -38,7 +38,7 @@ function formatStatusTime(value: Date, language: 'ja' | 'en' | 'zh' | 'ko', opti
 
 export function QuestionStatusMissing() {
   const { t } = useUserI18n();
-  return <main className="evac-theme public-page status-page"><UserHeader brand="◌ イセキ避難所" brandHref="/" faqHref="/#reception-faq" statusHref="/questions" /><section className="status-card"><h1>{t('statusPage.missingTitle')}</h1><p>{t('statusPage.missingLead')}</p><Link className="button primary" href="/">{t('statusPage.back')}</Link></section></main>;
+  return <main className="evac-theme public-page status-page"><UserHeader brand={`◌ ${t('shelter.name')}`} brandHref="/" faqHref="/#reception-faq" statusHref="/questions" /><section className="status-card"><h1>{t('statusPage.missingTitle')}</h1><p>{t('statusPage.missingLead')}</p><Link className="button primary" href="/">{t('statusPage.back')}</Link></section></main>;
 }
 
 export function QuestionStatusView({ question }: { question: PublicQuestion }) {
@@ -53,7 +53,7 @@ export function QuestionStatusView({ question }: { question: PublicQuestion }) {
     return key ? t(key) : message;
   };
   return <main className="evac-theme public-page status-page">
-    <UserHeader brand="◌ イセキ避難所" brandHref="/" faqHref="/#reception-faq" statusHref="/questions" />
+    <UserHeader brand={`◌ ${t('shelter.name')}`} brandHref="/" faqHref="/#reception-faq" statusHref="/questions" />
     <section className="status-card"><p className="eyebrow">{t('statusPage.eyebrow')}</p><div className="status-card-heading"><div><h1>{t('statusPage.title')}</h1><p>{t('statusPage.id')} <strong>#{String(question.id).padStart(4, '0')}</strong></p></div><span className={`status-badge ${question.urgentReview ? 'urgent' : ''}`}>{question.urgentReview ? t('statusPage.urgent') : currentStatusLabel}</span></div>
       <StatusLiveRefresh />
       {question.similarCount > 0 && <p className="group-notice">{t('statusPage.similar', { count: question.similarCount })}</p>}

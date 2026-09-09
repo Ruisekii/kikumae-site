@@ -4,7 +4,7 @@ export const INCIDENT_SCHEMA_VERSION = '1.0';
 
 export type CanonicalIncidentUrgency = 'unknown' | 'low' | 'normal' | 'medium' | 'high' | 'critical';
 
-export type IncidentSource = 'user_selection' | 'user_text' | 'safety_rule' | 'llm_extraction' | 'staff_edit';
+export type IncidentSource = 'user_selection' | 'user_text' | 'server_rule' | 'safety_rule' | 'llm_extraction' | 'staff_edit';
 
 export type IncidentFieldProvenance = {
   value: unknown;

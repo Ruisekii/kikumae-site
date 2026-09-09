@@ -67,7 +67,7 @@ export interface VADProvider {
 
 export interface ASRProvider {
   readonly supported: boolean;
-  start(callbacks: { onInterim: (text: string) => void; onFinal: (text: string) => void; onError: () => void; onEnd: () => void }): void;
+  start(callbacks: { onInterim: (text: string) => void; onFinal: (text: string) => void; onError: (reason?: string) => void; onEnd: () => void }): void;
   stop(): void;
   abort(): void;
 }
@@ -419,7 +419,7 @@ type SpeechWindow = Window & { SpeechRecognition?: new () => SpeechRecognitionLi
 
 export class BrowserASRProvider implements ASRProvider {
   private recognition: SpeechRecognitionLike | null = null;
-  private callbacks: { onInterim: (text: string) => void; onFinal: (text: string) => void; onError: () => void; onEnd: () => void } | null = null;
+  private callbacks: { onInterim: (text: string) => void; onFinal: (text: string) => void; onError: (reason?: string) => void; onEnd: () => void } | null = null;
   private restartTimer: ReturnType<typeof setTimeout> | null = null;
   private active = false;
   private endNotified = false;
@@ -432,7 +432,7 @@ export class BrowserASRProvider implements ASRProvider {
     this.supported = Boolean(speechWindow?.SpeechRecognition ?? speechWindow?.webkitSpeechRecognition);
   }
 
-  start(callbacks: { onInterim: (text: string) => void; onFinal: (text: string) => void; onError: () => void; onEnd: () => void }): void {
+  start(callbacks: { onInterim: (text: string) => void; onFinal: (text: string) => void; onError: (reason?: string) => void; onEnd: () => void }): void {
     if (!this.supported || typeof window === 'undefined') { callbacks.onError(); return; }
     this.abort();
     this.callbacks = callbacks;
@@ -469,10 +469,13 @@ export class BrowserASRProvider implements ASRProvider {
       if (finalText) this.callbacks?.onFinal(finalText);
     };
     recognition.onerror = (event) => {
-      const terminal = ['not-allowed', 'service-not-allowed', 'audio-capture'].includes(event?.error ?? '');
+      // Web Speech often reports an unavailable recognition service as
+      // `network`. Retrying forever leaves the resident on a microphone
+      // screen with no usable path, so offer the text path instead.
+      const terminal = ['not-allowed', 'service-not-allowed', 'audio-capture', 'network', 'language-not-supported'].includes(event?.error ?? '');
       if (terminal) {
         this.active = false;
-        this.callbacks?.onError();
+        this.callbacks?.onError(event?.error);
       }
       // no-speech and transient service errors are followed by onend, where the
       // recognizer is restarted without resetting the resident's session.

@@ -1,0 +1,6038 @@
+{
+  "schemaVersion": "stabilization.safety-blind.v1",
+  "generatedAt": "2026-09-09T01:14:57.253Z",
+  "synthetic": true,
+  "handLabelled": true,
+  "derivedVariants": true,
+  "caseCount": 372,
+  "baseSeedCount": 93,
+  "metrics": {
+    "httpSuccess": 372,
+    "truePositive": 200,
+    "trueNegative": 172,
+    "falsePositive": 0,
+    "falseNegative": 0,
+    "recall": 1,
+    "precision": 1,
+    "criticalFalseNegativeRate": 0
+  },
+  "cases": [
+    {
+      "id": "ja-01-v1-1",
+      "text": "息ができなくて話せません。",
+      "language": "ja",
+      "emergency": true,
+      "labels": [
+        "breathing"
+      ],
+      "sourceSeed": "positive:ja-01",
+      "httpStatus": 200,
+      "predicted": true,
+      "flags": [
+        "意識・呼吸の異常"
+      ],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "ja-01-v2-2",
+      "text": "息ができなくて話せません。 避難所で職員に伝えたいです。",
+      "language": "ja",
+      "emergency": true,
+      "labels": [
+        "breathing"
+      ],
+      "sourceSeed": "positive:ja-01",
+      "httpStatus": 200,
+      "predicted": true,
+      "flags": [
+        "意識・呼吸の異常"
+      ],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "ja-01-v3-3",
+      "text": "息ができなくて話せません。 これは今の状況です。",
+      "language": "ja",
+      "emergency": true,
+      "labels": [
+        "breathing"
+      ],
+      "sourceSeed": "positive:ja-01",
+      "httpStatus": 200,
+      "predicted": true,
+      "flags": [
+        "意識・呼吸の異常"
+      ],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "ja-01-v4-4",
+      "text": "息ができなくて話せません。 できるだけ正確に確認してください。",
+      "language": "ja",
+      "emergency": true,
+      "labels": [
+        "breathing"
+      ],
+      "sourceSeed": "positive:ja-01",
+      "httpStatus": 200,
+      "predicted": true,
+      "flags": [
+        "意識・呼吸の異常"
+      ],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "ja-02-v1-5",
+      "text": "息が詰まって苦しいです。",
+      "language": "ja",
+      "emergency": true,
+      "labels": [
+        "breathing"
+      ],
+      "sourceSeed": "positive:ja-02",
+      "httpStatus": 200,
+      "predicted": true,
+      "flags": [
+        "意識・呼吸の異常"
+      ],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "ja-02-v2-6",
+      "text": "息が詰まって苦しいです。 避難所で職員に伝えたいです。",
+      "language": "ja",
+      "emergency": true,
+      "labels": [
+        "breathing"
+      ],
+      "sourceSeed": "positive:ja-02",
+      "httpStatus": 200,
+      "predicted": true,
+      "flags": [
+        "意識・呼吸の異常"
+      ],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "ja-02-v3-7",
+      "text": "息が詰まって苦しいです。 これは今の状況です。",
+      "language": "ja",
+      "emergency": true,
+      "labels": [
+        "breathing"
+      ],
+      "sourceSeed": "positive:ja-02",
+      "httpStatus": 200,
+      "predicted": true,
+      "flags": [
+        "意識・呼吸の異常"
+      ],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "ja-02-v4-8",
+      "text": "息が詰まって苦しいです。 できるだけ正確に確認してください。",
+      "language": "ja",
+      "emergency": true,
+      "labels": [
+        "breathing"
+      ],
+      "sourceSeed": "positive:ja-02",
+      "httpStatus": 200,
+      "predicted": true,
+      "flags": [
+        "意識・呼吸の異常"
+      ],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "ja-03-v1-9",
+      "text": "呼吸が止まりそうです。",
+      "language": "ja",
+      "emergency": true,
+      "labels": [
+        "breathing"
+      ],
+      "sourceSeed": "positive:ja-03",
+      "httpStatus": 200,
+      "predicted": true,
+      "flags": [
+        "意識・呼吸の異常"
+      ],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "ja-03-v2-10",
+      "text": "呼吸が止まりそうです。 避難所で職員に伝えたいです。",
+      "language": "ja",
+      "emergency": true,
+      "labels": [
+        "breathing"
+      ],
+      "sourceSeed": "positive:ja-03",
+      "httpStatus": 200,
+      "predicted": true,
+      "flags": [
+        "意識・呼吸の異常"
+      ],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "ja-03-v3-11",
+      "text": "呼吸が止まりそうです。 これは今の状況です。",
+      "language": "ja",
+      "emergency": true,
+      "labels": [
+        "breathing"
+      ],
+      "sourceSeed": "positive:ja-03",
+      "httpStatus": 200,
+      "predicted": true,
+      "flags": [
+        "意識・呼吸の異常"
+      ],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "ja-03-v4-12",
+      "text": "呼吸が止まりそうです。 できるだけ正確に確認してください。",
+      "language": "ja",
+      "emergency": true,
+      "labels": [
+        "breathing"
+      ],
+      "sourceSeed": "positive:ja-03",
+      "httpStatus": 200,
+      "predicted": true,
+      "flags": [
+        "意識・呼吸の異常"
+      ],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "ja-04-v1-13",
+      "text": "意識が遠のきそうです。",
+      "language": "ja",
+      "emergency": true,
+      "labels": [
+        "awareness"
+      ],
+      "sourceSeed": "positive:ja-04",
+      "httpStatus": 200,
+      "predicted": true,
+      "flags": [
+        "意識・呼吸の異常"
+      ],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "ja-04-v2-14",
+      "text": "意識が遠のきそうです。 避難所で職員に伝えたいです。",
+      "language": "ja",
+      "emergency": true,
+      "labels": [
+        "awareness"
+      ],
+      "sourceSeed": "positive:ja-04",
+      "httpStatus": 200,
+      "predicted": true,
+      "flags": [
+        "意識・呼吸の異常"
+      ],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "ja-04-v3-15",
+      "text": "意識が遠のきそうです。 これは今の状況です。",
+      "language": "ja",
+      "emergency": true,
+      "labels": [
+        "awareness"
+      ],
+      "sourceSeed": "positive:ja-04",
+      "httpStatus": 200,
+      "predicted": true,
+      "flags": [
+        "意識・呼吸の異常"
+      ],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "ja-04-v4-16",
+      "text": "意識が遠のきそうです。 できるだけ正確に確認してください。",
+      "language": "ja",
+      "emergency": true,
+      "labels": [
+        "awareness"
+      ],
+      "sourceSeed": "positive:ja-04",
+      "httpStatus": 200,
+      "predicted": true,
+      "flags": [
+        "意識・呼吸の異常"
+      ],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "ja-05-v1-17",
+      "text": "呼びかけても反応がありません。",
+      "language": "ja",
+      "emergency": true,
+      "labels": [
+        "awareness"
+      ],
+      "sourceSeed": "positive:ja-05",
+      "httpStatus": 200,
+      "predicted": true,
+      "flags": [
+        "意識・呼吸の異常"
+      ],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "ja-05-v2-18",
+      "text": "呼びかけても反応がありません。 避難所で職員に伝えたいです。",
+      "language": "ja",
+      "emergency": true,
+      "labels": [
+        "awareness"
+      ],
+      "sourceSeed": "positive:ja-05",
+      "httpStatus": 200,
+      "predicted": true,
+      "flags": [
+        "意識・呼吸の異常"
+      ],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "ja-05-v3-19",
+      "text": "呼びかけても反応がありません。 これは今の状況です。",
+      "language": "ja",
+      "emergency": true,
+      "labels": [
+        "awareness"
+      ],
+      "sourceSeed": "positive:ja-05",
+      "httpStatus": 200,
+      "predicted": true,
+      "flags": [
+        "意識・呼吸の異常"
+      ],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "ja-05-v4-20",
+      "text": "呼びかけても反応がありません。 できるだけ正確に確認してください。",
+      "language": "ja",
+      "emergency": true,
+      "labels": [
+        "awareness"
+      ],
+      "sourceSeed": "positive:ja-05",
+      "httpStatus": 200,
+      "predicted": true,
+      "flags": [
+        "意識・呼吸の異常"
+      ],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "ja-06-v1-21",
+      "text": "顔色が悪く、反応がありません。",
+      "language": "ja",
+      "emergency": true,
+      "labels": [
+        "awareness"
+      ],
+      "sourceSeed": "positive:ja-06",
+      "httpStatus": 200,
+      "predicted": true,
+      "flags": [
+        "意識・呼吸の異常"
+      ],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "ja-06-v2-22",
+      "text": "顔色が悪く、反応がありません。 避難所で職員に伝えたいです。",
+      "language": "ja",
+      "emergency": true,
+      "labels": [
+        "awareness"
+      ],
+      "sourceSeed": "positive:ja-06",
+      "httpStatus": 200,
+      "predicted": true,
+      "flags": [
+        "意識・呼吸の異常"
+      ],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "ja-06-v3-23",
+      "text": "顔色が悪く、反応がありません。 これは今の状況です。",
+      "language": "ja",
+      "emergency": true,
+      "labels": [
+        "awareness"
+      ],
+      "sourceSeed": "positive:ja-06",
+      "httpStatus": 200,
+      "predicted": true,
+      "flags": [
+        "意識・呼吸の異常"
+      ],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "ja-06-v4-24",
+      "text": "顔色が悪く、反応がありません。 できるだけ正確に確認してください。",
+      "language": "ja",
+      "emergency": true,
+      "labels": [
+        "awareness"
+      ],
+      "sourceSeed": "positive:ja-06",
+      "httpStatus": 200,
+      "predicted": true,
+      "flags": [
+        "意識・呼吸の異常"
+      ],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "ja-07-v1-25",
+      "text": "39度の熱があり、ぐったりしています。",
+      "language": "ja",
+      "emergency": true,
+      "labels": [
+        "medical"
+      ],
+      "sourceSeed": "positive:ja-07",
+      "httpStatus": 200,
+      "predicted": true,
+      "flags": [
+        "重大な体調変化"
+      ],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "ja-07-v2-26",
+      "text": "39度の熱があり、ぐったりしています。 避難所で職員に伝えたいです。",
+      "language": "ja",
+      "emergency": true,
+      "labels": [
+        "medical"
+      ],
+      "sourceSeed": "positive:ja-07",
+      "httpStatus": 200,
+      "predicted": true,
+      "flags": [
+        "重大な体調変化"
+      ],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "ja-07-v3-27",
+      "text": "39度の熱があり、ぐったりしています。 これは今の状況です。",
+      "language": "ja",
+      "emergency": true,
+      "labels": [
+        "medical"
+      ],
+      "sourceSeed": "positive:ja-07",
+      "httpStatus": 200,
+      "predicted": true,
+      "flags": [
+        "重大な体調変化"
+      ],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "ja-07-v4-28",
+      "text": "39度の熱があり、ぐったりしています。 できるだけ正確に確認してください。",
+      "language": "ja",
+      "emergency": true,
+      "labels": [
+        "medical"
+      ],
+      "sourceSeed": "positive:ja-07",
+      "httpStatus": 200,
+      "predicted": true,
+      "flags": [
+        "重大な体調変化"
+      ],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "ja-08-v1-29",
+      "text": "40℃で倒れました。",
+      "language": "ja",
+      "emergency": true,
+      "labels": [
+        "medical"
+      ],
+      "sourceSeed": "positive:ja-08",
+      "httpStatus": 200,
+      "predicted": true,
+      "flags": [
+        "重大な体調変化"
+      ],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "ja-08-v2-30",
+      "text": "40℃で倒れました。 避難所で職員に伝えたいです。",
+      "language": "ja",
+      "emergency": true,
+      "labels": [
+        "medical"
+      ],
+      "sourceSeed": "positive:ja-08",
+      "httpStatus": 200,
+      "predicted": true,
+      "flags": [
+        "重大な体調変化"
+      ],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "ja-08-v3-31",
+      "text": "40℃で倒れました。 これは今の状況です。",
+      "language": "ja",
+      "emergency": true,
+      "labels": [
+        "medical"
+      ],
+      "sourceSeed": "positive:ja-08",
+      "httpStatus": 200,
+      "predicted": true,
+      "flags": [
+        "重大な体調変化"
+      ],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "ja-08-v4-32",
+      "text": "40℃で倒れました。 できるだけ正確に確認してください。",
+      "language": "ja",
+      "emergency": true,
+      "labels": [
+        "medical"
+      ],
+      "sourceSeed": "positive:ja-08",
+      "httpStatus": 200,
+      "predicted": true,
+      "flags": [
+        "重大な体調変化"
+      ],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "ja-09-v1-33",
+      "text": "けいれんが止まりません。",
+      "language": "ja",
+      "emergency": true,
+      "labels": [
+        "medical"
+      ],
+      "sourceSeed": "positive:ja-09",
+      "httpStatus": 200,
+      "predicted": true,
+      "flags": [
+        "重大な体調変化"
+      ],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "ja-09-v2-34",
+      "text": "けいれんが止まりません。 避難所で職員に伝えたいです。",
+      "language": "ja",
+      "emergency": true,
+      "labels": [
+        "medical"
+      ],
+      "sourceSeed": "positive:ja-09",
+      "httpStatus": 200,
+      "predicted": true,
+      "flags": [
+        "重大な体調変化"
+      ],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "ja-09-v3-35",
+      "text": "けいれんが止まりません。 これは今の状況です。",
+      "language": "ja",
+      "emergency": true,
+      "labels": [
+        "medical"
+      ],
+      "sourceSeed": "positive:ja-09",
+      "httpStatus": 200,
+      "predicted": true,
+      "flags": [
+        "重大な体調変化"
+      ],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "ja-09-v4-36",
+      "text": "けいれんが止まりません。 できるだけ正確に確認してください。",
+      "language": "ja",
+      "emergency": true,
+      "labels": [
+        "medical"
+      ],
+      "sourceSeed": "positive:ja-09",
+      "httpStatus": 200,
+      "predicted": true,
+      "flags": [
+        "重大な体調変化"
+      ],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "ja-10-v1-37",
+      "text": "血が止まりません。",
+      "language": "ja",
+      "emergency": true,
+      "labels": [
+        "bleeding"
+      ],
+      "sourceSeed": "positive:ja-10",
+      "httpStatus": 200,
+      "predicted": true,
+      "flags": [
+        "大量出血"
+      ],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "ja-10-v2-38",
+      "text": "血が止まりません。 避難所で職員に伝えたいです。",
+      "language": "ja",
+      "emergency": true,
+      "labels": [
+        "bleeding"
+      ],
+      "sourceSeed": "positive:ja-10",
+      "httpStatus": 200,
+      "predicted": true,
+      "flags": [
+        "大量出血"
+      ],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "ja-10-v3-39",
+      "text": "血が止まりません。 これは今の状況です。",
+      "language": "ja",
+      "emergency": true,
+      "labels": [
+        "bleeding"
+      ],
+      "sourceSeed": "positive:ja-10",
+      "httpStatus": 200,
+      "predicted": true,
+      "flags": [
+        "大量出血"
+      ],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "ja-10-v4-40",
+      "text": "血が止まりません。 できるだけ正確に確認してください。",
+      "language": "ja",
+      "emergency": true,
+      "labels": [
+        "bleeding"
+      ],
+      "sourceSeed": "positive:ja-10",
+      "httpStatus": 200,
+      "predicted": true,
+      "flags": [
+        "大量出血"
+      ],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "ja-11-v1-41",
+      "text": "胸を強く締め付けられるように痛いです。",
+      "language": "ja",
+      "emergency": true,
+      "labels": [
+        "medical"
+      ],
+      "sourceSeed": "positive:ja-11",
+      "httpStatus": 200,
+      "predicted": true,
+      "flags": [
+        "強い胸痛"
+      ],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "ja-11-v2-42",
+      "text": "胸を強く締め付けられるように痛いです。 避難所で職員に伝えたいです。",
+      "language": "ja",
+      "emergency": true,
+      "labels": [
+        "medical"
+      ],
+      "sourceSeed": "positive:ja-11",
+      "httpStatus": 200,
+      "predicted": true,
+      "flags": [
+        "強い胸痛"
+      ],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "ja-11-v3-43",
+      "text": "胸を強く締め付けられるように痛いです。 これは今の状況です。",
+      "language": "ja",
+      "emergency": true,
+      "labels": [
+        "medical"
+      ],
+      "sourceSeed": "positive:ja-11",
+      "httpStatus": 200,
+      "predicted": true,
+      "flags": [
+        "強い胸痛"
+      ],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "ja-11-v4-44",
+      "text": "胸を強く締め付けられるように痛いです。 できるだけ正確に確認してください。",
+      "language": "ja",
+      "emergency": true,
+      "labels": [
+        "medical"
+      ],
+      "sourceSeed": "positive:ja-11",
+      "httpStatus": 200,
+      "predicted": true,
+      "flags": [
+        "強い胸痛"
+      ],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "ja-12-v1-45",
+      "text": "今にも火がつきそうです。",
+      "language": "ja",
+      "emergency": true,
+      "labels": [
+        "fire"
+      ],
+      "sourceSeed": "positive:ja-12",
+      "httpStatus": 200,
+      "predicted": true,
+      "flags": [
+        "火災・煙"
+      ],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "ja-12-v2-46",
+      "text": "今にも火がつきそうです。 避難所で職員に伝えたいです。",
+      "language": "ja",
+      "emergency": true,
+      "labels": [
+        "fire"
+      ],
+      "sourceSeed": "positive:ja-12",
+      "httpStatus": 200,
+      "predicted": true,
+      "flags": [
+        "火災・煙"
+      ],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "ja-12-v3-47",
+      "text": "今にも火がつきそうです。 これは今の状況です。",
+      "language": "ja",
+      "emergency": true,
+      "labels": [
+        "fire"
+      ],
+      "sourceSeed": "positive:ja-12",
+      "httpStatus": 200,
+      "predicted": true,
+      "flags": [
+        "火災・煙"
+      ],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "ja-12-v4-48",
+      "text": "今にも火がつきそうです。 できるだけ正確に確認してください。",
+      "language": "ja",
+      "emergency": true,
+      "labels": [
+        "fire"
+      ],
+      "sourceSeed": "positive:ja-12",
+      "httpStatus": 200,
+      "predicted": true,
+      "flags": [
+        "火災・煙"
+      ],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "ja-13-v1-49",
+      "text": "調理室から焦げた臭いがします。",
+      "language": "ja",
+      "emergency": true,
+      "labels": [
+        "fire"
+      ],
+      "sourceSeed": "positive:ja-13",
+      "httpStatus": 200,
+      "predicted": true,
+      "flags": [
+        "火災・煙"
+      ],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "ja-13-v2-50",
+      "text": "調理室から焦げた臭いがします。 避難所で職員に伝えたいです。",
+      "language": "ja",
+      "emergency": true,
+      "labels": [
+        "fire"
+      ],
+      "sourceSeed": "positive:ja-13",
+      "httpStatus": 200,
+      "predicted": true,
+      "flags": [
+        "火災・煙"
+      ],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "ja-13-v3-51",
+      "text": "調理室から焦げた臭いがします。 これは今の状況です。",
+      "language": "ja",
+      "emergency": true,
+      "labels": [
+        "fire"
+      ],
+      "sourceSeed": "positive:ja-13",
+      "httpStatus": 200,
+      "predicted": true,
+      "flags": [
+        "火災・煙"
+      ],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "ja-13-v4-52",
+      "text": "調理室から焦げた臭いがします。 できるだけ正確に確認してください。",
+      "language": "ja",
+      "emergency": true,
+      "labels": [
+        "fire"
+      ],
+      "sourceSeed": "positive:ja-13",
+      "httpStatus": 200,
+      "predicted": true,
+      "flags": [
+        "火災・煙"
+      ],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "ja-14-v1-53",
+      "text": "体育館の外で煙が見えます。",
+      "language": "ja",
+      "emergency": true,
+      "labels": [
+        "fire"
+      ],
+      "sourceSeed": "positive:ja-14",
+      "httpStatus": 200,
+      "predicted": true,
+      "flags": [
+        "火災・煙"
+      ],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "ja-14-v2-54",
+      "text": "体育館の外で煙が見えます。 避難所で職員に伝えたいです。",
+      "language": "ja",
+      "emergency": true,
+      "labels": [
+        "fire"
+      ],
+      "sourceSeed": "positive:ja-14",
+      "httpStatus": 200,
+      "predicted": true,
+      "flags": [
+        "火災・煙"
+      ],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "ja-14-v3-55",
+      "text": "体育館の外で煙が見えます。 これは今の状況です。",
+      "language": "ja",
+      "emergency": true,
+      "labels": [
+        "fire"
+      ],
+      "sourceSeed": "positive:ja-14",
+      "httpStatus": 200,
+      "predicted": true,
+      "flags": [
+        "火災・煙"
+      ],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "ja-14-v4-56",
+      "text": "体育館の外で煙が見えます。 できるだけ正確に確認してください。",
+      "language": "ja",
+      "emergency": true,
+      "labels": [
+        "fire"
+      ],
+      "sourceSeed": "positive:ja-14",
+      "httpStatus": 200,
+      "predicted": true,
+      "flags": [
+        "火災・煙"
+      ],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "ja-15-v1-57",
+      "text": "部屋に閉じ込められて出られません。",
+      "language": "ja",
+      "emergency": true,
+      "labels": [
+        "trapped"
+      ],
+      "sourceSeed": "positive:ja-15",
+      "httpStatus": 200,
+      "predicted": true,
+      "flags": [
+        "建物・閉じ込め"
+      ],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "ja-15-v2-58",
+      "text": "部屋に閉じ込められて出られません。 避難所で職員に伝えたいです。",
+      "language": "ja",
+      "emergency": true,
+      "labels": [
+        "trapped"
+      ],
+      "sourceSeed": "positive:ja-15",
+      "httpStatus": 200,
+      "predicted": true,
+      "flags": [
+        "建物・閉じ込め"
+      ],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "ja-15-v3-59",
+      "text": "部屋に閉じ込められて出られません。 これは今の状況です。",
+      "language": "ja",
+      "emergency": true,
+      "labels": [
+        "trapped"
+      ],
+      "sourceSeed": "positive:ja-15",
+      "httpStatus": 200,
+      "predicted": true,
+      "flags": [
+        "建物・閉じ込め"
+      ],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "ja-15-v4-60",
+      "text": "部屋に閉じ込められて出られません。 できるだけ正確に確認してください。",
+      "language": "ja",
+      "emergency": true,
+      "labels": [
+        "trapped"
+      ],
+      "sourceSeed": "positive:ja-15",
+      "httpStatus": 200,
+      "predicted": true,
+      "flags": [
+        "建物・閉じ込め"
+      ],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "ja-16-v1-61",
+      "text": "刃物を持った人がいます。",
+      "language": "ja",
+      "emergency": true,
+      "labels": [
+        "violence"
+      ],
+      "sourceSeed": "positive:ja-16",
+      "httpStatus": 200,
+      "predicted": true,
+      "flags": [
+        "暴力・武器"
+      ],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "ja-16-v2-62",
+      "text": "刃物を持った人がいます。 避難所で職員に伝えたいです。",
+      "language": "ja",
+      "emergency": true,
+      "labels": [
+        "violence"
+      ],
+      "sourceSeed": "positive:ja-16",
+      "httpStatus": 200,
+      "predicted": true,
+      "flags": [
+        "暴力・武器"
+      ],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "ja-16-v3-63",
+      "text": "刃物を持った人がいます。 これは今の状況です。",
+      "language": "ja",
+      "emergency": true,
+      "labels": [
+        "violence"
+      ],
+      "sourceSeed": "positive:ja-16",
+      "httpStatus": 200,
+      "predicted": true,
+      "flags": [
+        "暴力・武器"
+      ],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "ja-16-v4-64",
+      "text": "刃物を持った人がいます。 できるだけ正確に確認してください。",
+      "language": "ja",
+      "emergency": true,
+      "labels": [
+        "violence"
+      ],
+      "sourceSeed": "positive:ja-16",
+      "httpStatus": 200,
+      "predicted": true,
+      "flags": [
+        "暴力・武器"
+      ],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "ja-17-v1-65",
+      "text": "殴られそうで怖いです。",
+      "language": "ja",
+      "emergency": true,
+      "labels": [
+        "violence"
+      ],
+      "sourceSeed": "positive:ja-17",
+      "httpStatus": 200,
+      "predicted": true,
+      "flags": [
+        "暴力・武器"
+      ],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "ja-17-v2-66",
+      "text": "殴られそうで怖いです。 避難所で職員に伝えたいです。",
+      "language": "ja",
+      "emergency": true,
+      "labels": [
+        "violence"
+      ],
+      "sourceSeed": "positive:ja-17",
+      "httpStatus": 200,
+      "predicted": true,
+      "flags": [
+        "暴力・武器"
+      ],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "ja-17-v3-67",
+      "text": "殴られそうで怖いです。 これは今の状況です。",
+      "language": "ja",
+      "emergency": true,
+      "labels": [
+        "violence"
+      ],
+      "sourceSeed": "positive:ja-17",
+      "httpStatus": 200,
+      "predicted": true,
+      "flags": [
+        "暴力・武器"
+      ],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "ja-17-v4-68",
+      "text": "殴られそうで怖いです。 できるだけ正確に確認してください。",
+      "language": "ja",
+      "emergency": true,
+      "labels": [
+        "violence"
+      ],
+      "sourceSeed": "positive:ja-17",
+      "httpStatus": 200,
+      "predicted": true,
+      "flags": [
+        "暴力・武器"
+      ],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "ja-18-v1-69",
+      "text": "自分を傷つけてしまいそうです。",
+      "language": "ja",
+      "emergency": true,
+      "labels": [
+        "self_harm"
+      ],
+      "sourceSeed": "positive:ja-18",
+      "httpStatus": 200,
+      "predicted": true,
+      "flags": [
+        "自傷・他害"
+      ],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "ja-18-v2-70",
+      "text": "自分を傷つけてしまいそうです。 避難所で職員に伝えたいです。",
+      "language": "ja",
+      "emergency": true,
+      "labels": [
+        "self_harm"
+      ],
+      "sourceSeed": "positive:ja-18",
+      "httpStatus": 200,
+      "predicted": true,
+      "flags": [
+        "自傷・他害"
+      ],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "ja-18-v3-71",
+      "text": "自分を傷つけてしまいそうです。 これは今の状況です。",
+      "language": "ja",
+      "emergency": true,
+      "labels": [
+        "self_harm"
+      ],
+      "sourceSeed": "positive:ja-18",
+      "httpStatus": 200,
+      "predicted": true,
+      "flags": [
+        "自傷・他害"
+      ],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "ja-18-v4-72",
+      "text": "自分を傷つけてしまいそうです。 できるだけ正確に確認してください。",
+      "language": "ja",
+      "emergency": true,
+      "labels": [
+        "self_harm"
+      ],
+      "sourceSeed": "positive:ja-18",
+      "httpStatus": 200,
+      "predicted": true,
+      "flags": [
+        "自傷・他害"
+      ],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "ja-19-v1-73",
+      "text": "薬が今夜切れてしまいます。",
+      "language": "ja",
+      "emergency": true,
+      "labels": [
+        "medical"
+      ],
+      "sourceSeed": "positive:ja-19",
+      "httpStatus": 200,
+      "predicted": true,
+      "flags": [
+        "重大な体調変化"
+      ],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "ja-19-v2-74",
+      "text": "薬が今夜切れてしまいます。 避難所で職員に伝えたいです。",
+      "language": "ja",
+      "emergency": true,
+      "labels": [
+        "medical"
+      ],
+      "sourceSeed": "positive:ja-19",
+      "httpStatus": 200,
+      "predicted": true,
+      "flags": [
+        "重大な体調変化"
+      ],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "ja-19-v3-75",
+      "text": "薬が今夜切れてしまいます。 これは今の状況です。",
+      "language": "ja",
+      "emergency": true,
+      "labels": [
+        "medical"
+      ],
+      "sourceSeed": "positive:ja-19",
+      "httpStatus": 200,
+      "predicted": true,
+      "flags": [
+        "重大な体調変化"
+      ],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "ja-19-v4-76",
+      "text": "薬が今夜切れてしまいます。 できるだけ正確に確認してください。",
+      "language": "ja",
+      "emergency": true,
+      "labels": [
+        "medical"
+      ],
+      "sourceSeed": "positive:ja-19",
+      "httpStatus": 200,
+      "predicted": true,
+      "flags": [
+        "重大な体調変化"
+      ],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "ja-20-v1-77",
+      "text": "インスリンがありません。",
+      "language": "ja",
+      "emergency": true,
+      "labels": [
+        "medical"
+      ],
+      "sourceSeed": "positive:ja-20",
+      "httpStatus": 200,
+      "predicted": true,
+      "flags": [
+        "重大な体調変化"
+      ],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "ja-20-v2-78",
+      "text": "インスリンがありません。 避難所で職員に伝えたいです。",
+      "language": "ja",
+      "emergency": true,
+      "labels": [
+        "medical"
+      ],
+      "sourceSeed": "positive:ja-20",
+      "httpStatus": 200,
+      "predicted": true,
+      "flags": [
+        "重大な体調変化"
+      ],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "ja-20-v3-79",
+      "text": "インスリンがありません。 これは今の状況です。",
+      "language": "ja",
+      "emergency": true,
+      "labels": [
+        "medical"
+      ],
+      "sourceSeed": "positive:ja-20",
+      "httpStatus": 200,
+      "predicted": true,
+      "flags": [
+        "重大な体調変化"
+      ],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "ja-20-v4-80",
+      "text": "インスリンがありません。 できるだけ正確に確認してください。",
+      "language": "ja",
+      "emergency": true,
+      "labels": [
+        "medical"
+      ],
+      "sourceSeed": "positive:ja-20",
+      "httpStatus": 200,
+      "predicted": true,
+      "flags": [
+        "重大な体調変化"
+      ],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "ja-21-v1-81",
+      "text": "子どもが呼吸できず顔色が悪いです。",
+      "language": "ja",
+      "emergency": true,
+      "labels": [
+        "breathing",
+        "awareness"
+      ],
+      "sourceSeed": "positive:ja-21",
+      "httpStatus": 200,
+      "predicted": true,
+      "flags": [
+        "意識・呼吸の異常"
+      ],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "ja-21-v2-82",
+      "text": "子どもが呼吸できず顔色が悪いです。 避難所で職員に伝えたいです。",
+      "language": "ja",
+      "emergency": true,
+      "labels": [
+        "breathing",
+        "awareness"
+      ],
+      "sourceSeed": "positive:ja-21",
+      "httpStatus": 200,
+      "predicted": true,
+      "flags": [
+        "意識・呼吸の異常"
+      ],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "ja-21-v3-83",
+      "text": "子どもが呼吸できず顔色が悪いです。 これは今の状況です。",
+      "language": "ja",
+      "emergency": true,
+      "labels": [
+        "breathing",
+        "awareness"
+      ],
+      "sourceSeed": "positive:ja-21",
+      "httpStatus": 200,
+      "predicted": true,
+      "flags": [
+        "意識・呼吸の異常"
+      ],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "ja-21-v4-84",
+      "text": "子どもが呼吸できず顔色が悪いです。 できるだけ正確に確認してください。",
+      "language": "ja",
+      "emergency": true,
+      "labels": [
+        "breathing",
+        "awareness"
+      ],
+      "sourceSeed": "positive:ja-21",
+      "httpStatus": 200,
+      "predicted": true,
+      "flags": [
+        "意識・呼吸の異常"
+      ],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "ja-22-v1-85",
+      "text": "高齢の方が起きません。",
+      "language": "ja",
+      "emergency": true,
+      "labels": [
+        "awareness"
+      ],
+      "sourceSeed": "positive:ja-22",
+      "httpStatus": 200,
+      "predicted": true,
+      "flags": [
+        "重大な体調変化"
+      ],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "ja-22-v2-86",
+      "text": "高齢の方が起きません。 避難所で職員に伝えたいです。",
+      "language": "ja",
+      "emergency": true,
+      "labels": [
+        "awareness"
+      ],
+      "sourceSeed": "positive:ja-22",
+      "httpStatus": 200,
+      "predicted": true,
+      "flags": [
+        "重大な体調変化"
+      ],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "ja-22-v3-87",
+      "text": "高齢の方が起きません。 これは今の状況です。",
+      "language": "ja",
+      "emergency": true,
+      "labels": [
+        "awareness"
+      ],
+      "sourceSeed": "positive:ja-22",
+      "httpStatus": 200,
+      "predicted": true,
+      "flags": [
+        "重大な体調変化"
+      ],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "ja-22-v4-88",
+      "text": "高齢の方が起きません。 できるだけ正確に確認してください。",
+      "language": "ja",
+      "emergency": true,
+      "labels": [
+        "awareness"
+      ],
+      "sourceSeed": "positive:ja-22",
+      "httpStatus": 200,
+      "predicted": true,
+      "flags": [
+        "重大な体調変化"
+      ],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "ja-23-v1-89",
+      "text": "建物の壁が崩れて近づくと危険です。",
+      "language": "ja",
+      "emergency": true,
+      "labels": [
+        "trapped"
+      ],
+      "sourceSeed": "positive:ja-23",
+      "httpStatus": 200,
+      "predicted": true,
+      "flags": [
+        "建物・閉じ込め"
+      ],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "ja-23-v2-90",
+      "text": "建物の壁が崩れて近づくと危険です。 避難所で職員に伝えたいです。",
+      "language": "ja",
+      "emergency": true,
+      "labels": [
+        "trapped"
+      ],
+      "sourceSeed": "positive:ja-23",
+      "httpStatus": 200,
+      "predicted": true,
+      "flags": [
+        "建物・閉じ込め"
+      ],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "ja-23-v3-91",
+      "text": "建物の壁が崩れて近づくと危険です。 これは今の状況です。",
+      "language": "ja",
+      "emergency": true,
+      "labels": [
+        "trapped"
+      ],
+      "sourceSeed": "positive:ja-23",
+      "httpStatus": 200,
+      "predicted": true,
+      "flags": [
+        "建物・閉じ込め"
+      ],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "ja-23-v4-92",
+      "text": "建物の壁が崩れて近づくと危険です。 できるだけ正確に確認してください。",
+      "language": "ja",
+      "emergency": true,
+      "labels": [
+        "trapped"
+      ],
+      "sourceSeed": "positive:ja-23",
+      "httpStatus": 200,
+      "predicted": true,
+      "flags": [
+        "建物・閉じ込め"
+      ],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "ja-24-v1-93",
+      "text": "大けがで歩けません。",
+      "language": "ja",
+      "emergency": true,
+      "labels": [
+        "medical"
+      ],
+      "sourceSeed": "positive:ja-24",
+      "httpStatus": 200,
+      "predicted": true,
+      "flags": [
+        "重大な体調変化"
+      ],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "ja-24-v2-94",
+      "text": "大けがで歩けません。 避難所で職員に伝えたいです。",
+      "language": "ja",
+      "emergency": true,
+      "labels": [
+        "medical"
+      ],
+      "sourceSeed": "positive:ja-24",
+      "httpStatus": 200,
+      "predicted": true,
+      "flags": [
+        "重大な体調変化"
+      ],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "ja-24-v3-95",
+      "text": "大けがで歩けません。 これは今の状況です。",
+      "language": "ja",
+      "emergency": true,
+      "labels": [
+        "medical"
+      ],
+      "sourceSeed": "positive:ja-24",
+      "httpStatus": 200,
+      "predicted": true,
+      "flags": [
+        "重大な体調変化"
+      ],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "ja-24-v4-96",
+      "text": "大けがで歩けません。 できるだけ正確に確認してください。",
+      "language": "ja",
+      "emergency": true,
+      "labels": [
+        "medical"
+      ],
+      "sourceSeed": "positive:ja-24",
+      "httpStatus": 200,
+      "predicted": true,
+      "flags": [
+        "重大な体調変化"
+      ],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "en-01-v1-97",
+      "text": "I cannot breathe and cannot speak.",
+      "language": "en",
+      "emergency": true,
+      "labels": [
+        "breathing"
+      ],
+      "sourceSeed": "positive:en-01",
+      "httpStatus": 200,
+      "predicted": true,
+      "flags": [
+        "意識・呼吸の異常"
+      ],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "en-01-v2-98",
+      "text": "I cannot breathe and cannot speak. I want to tell shelter staff.",
+      "language": "en",
+      "emergency": true,
+      "labels": [
+        "breathing"
+      ],
+      "sourceSeed": "positive:en-01",
+      "httpStatus": 200,
+      "predicted": true,
+      "flags": [
+        "意識・呼吸の異常"
+      ],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "en-01-v3-99",
+      "text": "I cannot breathe and cannot speak. This is the current situation.",
+      "language": "en",
+      "emergency": true,
+      "labels": [
+        "breathing"
+      ],
+      "sourceSeed": "positive:en-01",
+      "httpStatus": 200,
+      "predicted": true,
+      "flags": [
+        "意識・呼吸の異常"
+      ],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "en-01-v4-100",
+      "text": "I cannot breathe and cannot speak. Please check it carefully.",
+      "language": "en",
+      "emergency": true,
+      "labels": [
+        "breathing"
+      ],
+      "sourceSeed": "positive:en-01",
+      "httpStatus": 200,
+      "predicted": true,
+      "flags": [
+        "意識・呼吸の異常"
+      ],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "en-02-v1-101",
+      "text": "He is not responding when we call him.",
+      "language": "en",
+      "emergency": true,
+      "labels": [
+        "awareness"
+      ],
+      "sourceSeed": "positive:en-02",
+      "httpStatus": 200,
+      "predicted": true,
+      "flags": [
+        "意識・呼吸の異常"
+      ],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "en-02-v2-102",
+      "text": "He is not responding when we call him. I want to tell shelter staff.",
+      "language": "en",
+      "emergency": true,
+      "labels": [
+        "awareness"
+      ],
+      "sourceSeed": "positive:en-02",
+      "httpStatus": 200,
+      "predicted": true,
+      "flags": [
+        "意識・呼吸の異常"
+      ],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "en-02-v3-103",
+      "text": "He is not responding when we call him. This is the current situation.",
+      "language": "en",
+      "emergency": true,
+      "labels": [
+        "awareness"
+      ],
+      "sourceSeed": "positive:en-02",
+      "httpStatus": 200,
+      "predicted": true,
+      "flags": [
+        "意識・呼吸の異常"
+      ],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "en-02-v4-104",
+      "text": "He is not responding when we call him. Please check it carefully.",
+      "language": "en",
+      "emergency": true,
+      "labels": [
+        "awareness"
+      ],
+      "sourceSeed": "positive:en-02",
+      "httpStatus": 200,
+      "predicted": true,
+      "flags": [
+        "意識・呼吸の異常"
+      ],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "en-03-v1-105",
+      "text": "She may have a high fever and is limp.",
+      "language": "en",
+      "emergency": true,
+      "labels": [
+        "medical"
+      ],
+      "sourceSeed": "positive:en-03",
+      "httpStatus": 200,
+      "predicted": true,
+      "flags": [
+        "重大な体調変化"
+      ],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "en-03-v2-106",
+      "text": "She may have a high fever and is limp. I want to tell shelter staff.",
+      "language": "en",
+      "emergency": true,
+      "labels": [
+        "medical"
+      ],
+      "sourceSeed": "positive:en-03",
+      "httpStatus": 200,
+      "predicted": true,
+      "flags": [
+        "重大な体調変化"
+      ],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "en-03-v3-107",
+      "text": "She may have a high fever and is limp. This is the current situation.",
+      "language": "en",
+      "emergency": true,
+      "labels": [
+        "medical"
+      ],
+      "sourceSeed": "positive:en-03",
+      "httpStatus": 200,
+      "predicted": true,
+      "flags": [
+        "重大な体調変化"
+      ],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "en-03-v4-108",
+      "text": "She may have a high fever and is limp. Please check it carefully.",
+      "language": "en",
+      "emergency": true,
+      "labels": [
+        "medical"
+      ],
+      "sourceSeed": "positive:en-03",
+      "httpStatus": 200,
+      "predicted": true,
+      "flags": [
+        "重大な体調変化"
+      ],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "en-04-v1-109",
+      "text": "There is smoke coming from the kitchen.",
+      "language": "en",
+      "emergency": true,
+      "labels": [
+        "fire"
+      ],
+      "sourceSeed": "positive:en-04",
+      "httpStatus": 200,
+      "predicted": true,
+      "flags": [
+        "火災・煙"
+      ],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "en-04-v2-110",
+      "text": "There is smoke coming from the kitchen. I want to tell shelter staff.",
+      "language": "en",
+      "emergency": true,
+      "labels": [
+        "fire"
+      ],
+      "sourceSeed": "positive:en-04",
+      "httpStatus": 200,
+      "predicted": true,
+      "flags": [
+        "火災・煙"
+      ],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "en-04-v3-111",
+      "text": "There is smoke coming from the kitchen. This is the current situation.",
+      "language": "en",
+      "emergency": true,
+      "labels": [
+        "fire"
+      ],
+      "sourceSeed": "positive:en-04",
+      "httpStatus": 200,
+      "predicted": true,
+      "flags": [
+        "火災・煙"
+      ],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "en-04-v4-112",
+      "text": "There is smoke coming from the kitchen. Please check it carefully.",
+      "language": "en",
+      "emergency": true,
+      "labels": [
+        "fire"
+      ],
+      "sourceSeed": "positive:en-04",
+      "httpStatus": 200,
+      "predicted": true,
+      "flags": [
+        "火災・煙"
+      ],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "en-05-v1-113",
+      "text": "Someone is threatening us with a knife.",
+      "language": "en",
+      "emergency": true,
+      "labels": [
+        "violence"
+      ],
+      "sourceSeed": "positive:en-05",
+      "httpStatus": 200,
+      "predicted": true,
+      "flags": [
+        "暴力・武器"
+      ],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "en-05-v2-114",
+      "text": "Someone is threatening us with a knife. I want to tell shelter staff.",
+      "language": "en",
+      "emergency": true,
+      "labels": [
+        "violence"
+      ],
+      "sourceSeed": "positive:en-05",
+      "httpStatus": 200,
+      "predicted": true,
+      "flags": [
+        "暴力・武器"
+      ],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "en-05-v3-115",
+      "text": "Someone is threatening us with a knife. This is the current situation.",
+      "language": "en",
+      "emergency": true,
+      "labels": [
+        "violence"
+      ],
+      "sourceSeed": "positive:en-05",
+      "httpStatus": 200,
+      "predicted": true,
+      "flags": [
+        "暴力・武器"
+      ],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "en-05-v4-116",
+      "text": "Someone is threatening us with a knife. Please check it carefully.",
+      "language": "en",
+      "emergency": true,
+      "labels": [
+        "violence"
+      ],
+      "sourceSeed": "positive:en-05",
+      "httpStatus": 200,
+      "predicted": true,
+      "flags": [
+        "暴力・武器"
+      ],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "en-06-v1-117",
+      "text": "I might hurt myself.",
+      "language": "en",
+      "emergency": true,
+      "labels": [
+        "self_harm"
+      ],
+      "sourceSeed": "positive:en-06",
+      "httpStatus": 200,
+      "predicted": true,
+      "flags": [
+        "自傷・他害"
+      ],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "en-06-v2-118",
+      "text": "I might hurt myself. I want to tell shelter staff.",
+      "language": "en",
+      "emergency": true,
+      "labels": [
+        "self_harm"
+      ],
+      "sourceSeed": "positive:en-06",
+      "httpStatus": 200,
+      "predicted": true,
+      "flags": [
+        "自傷・他害"
+      ],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "en-06-v3-119",
+      "text": "I might hurt myself. This is the current situation.",
+      "language": "en",
+      "emergency": true,
+      "labels": [
+        "self_harm"
+      ],
+      "sourceSeed": "positive:en-06",
+      "httpStatus": 200,
+      "predicted": true,
+      "flags": [
+        "自傷・他害"
+      ],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "en-06-v4-120",
+      "text": "I might hurt myself. Please check it carefully.",
+      "language": "en",
+      "emergency": true,
+      "labels": [
+        "self_harm"
+      ],
+      "sourceSeed": "positive:en-06",
+      "httpStatus": 200,
+      "predicted": true,
+      "flags": [
+        "自傷・他害"
+      ],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "en-07-v1-121",
+      "text": "We are trapped inside the room.",
+      "language": "en",
+      "emergency": true,
+      "labels": [
+        "trapped"
+      ],
+      "sourceSeed": "positive:en-07",
+      "httpStatus": 200,
+      "predicted": true,
+      "flags": [
+        "建物・閉じ込め"
+      ],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "en-07-v2-122",
+      "text": "We are trapped inside the room. I want to tell shelter staff.",
+      "language": "en",
+      "emergency": true,
+      "labels": [
+        "trapped"
+      ],
+      "sourceSeed": "positive:en-07",
+      "httpStatus": 200,
+      "predicted": true,
+      "flags": [
+        "建物・閉じ込め"
+      ],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "en-07-v3-123",
+      "text": "We are trapped inside the room. This is the current situation.",
+      "language": "en",
+      "emergency": true,
+      "labels": [
+        "trapped"
+      ],
+      "sourceSeed": "positive:en-07",
+      "httpStatus": 200,
+      "predicted": true,
+      "flags": [
+        "建物・閉じ込め"
+      ],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "en-07-v4-124",
+      "text": "We are trapped inside the room. Please check it carefully.",
+      "language": "en",
+      "emergency": true,
+      "labels": [
+        "trapped"
+      ],
+      "sourceSeed": "positive:en-07",
+      "httpStatus": 200,
+      "predicted": true,
+      "flags": [
+        "建物・閉じ込め"
+      ],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "en-08-v1-125",
+      "text": "The bleeding will not stop.",
+      "language": "en",
+      "emergency": true,
+      "labels": [
+        "bleeding"
+      ],
+      "sourceSeed": "positive:en-08",
+      "httpStatus": 200,
+      "predicted": true,
+      "flags": [
+        "大量出血"
+      ],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "en-08-v2-126",
+      "text": "The bleeding will not stop. I want to tell shelter staff.",
+      "language": "en",
+      "emergency": true,
+      "labels": [
+        "bleeding"
+      ],
+      "sourceSeed": "positive:en-08",
+      "httpStatus": 200,
+      "predicted": true,
+      "flags": [
+        "大量出血"
+      ],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "en-08-v3-127",
+      "text": "The bleeding will not stop. This is the current situation.",
+      "language": "en",
+      "emergency": true,
+      "labels": [
+        "bleeding"
+      ],
+      "sourceSeed": "positive:en-08",
+      "httpStatus": 200,
+      "predicted": true,
+      "flags": [
+        "大量出血"
+      ],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "en-08-v4-128",
+      "text": "The bleeding will not stop. Please check it carefully.",
+      "language": "en",
+      "emergency": true,
+      "labels": [
+        "bleeding"
+      ],
+      "sourceSeed": "positive:en-08",
+      "httpStatus": 200,
+      "predicted": true,
+      "flags": [
+        "大量出血"
+      ],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "en-09-v1-129",
+      "text": "His breathing has stopped.",
+      "language": "en",
+      "emergency": true,
+      "labels": [
+        "breathing"
+      ],
+      "sourceSeed": "positive:en-09",
+      "httpStatus": 200,
+      "predicted": true,
+      "flags": [
+        "意識・呼吸の異常"
+      ],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "en-09-v2-130",
+      "text": "His breathing has stopped. I want to tell shelter staff.",
+      "language": "en",
+      "emergency": true,
+      "labels": [
+        "breathing"
+      ],
+      "sourceSeed": "positive:en-09",
+      "httpStatus": 200,
+      "predicted": true,
+      "flags": [
+        "意識・呼吸の異常"
+      ],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "en-09-v3-131",
+      "text": "His breathing has stopped. This is the current situation.",
+      "language": "en",
+      "emergency": true,
+      "labels": [
+        "breathing"
+      ],
+      "sourceSeed": "positive:en-09",
+      "httpStatus": 200,
+      "predicted": true,
+      "flags": [
+        "意識・呼吸の異常"
+      ],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "en-09-v4-132",
+      "text": "His breathing has stopped. Please check it carefully.",
+      "language": "en",
+      "emergency": true,
+      "labels": [
+        "breathing"
+      ],
+      "sourceSeed": "positive:en-09",
+      "httpStatus": 200,
+      "predicted": true,
+      "flags": [
+        "意識・呼吸の異常"
+      ],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "en-10-v1-133",
+      "text": "The child is unconscious.",
+      "language": "en",
+      "emergency": true,
+      "labels": [
+        "awareness"
+      ],
+      "sourceSeed": "positive:en-10",
+      "httpStatus": 200,
+      "predicted": true,
+      "flags": [
+        "意識・呼吸の異常"
+      ],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "en-10-v2-134",
+      "text": "The child is unconscious. I want to tell shelter staff.",
+      "language": "en",
+      "emergency": true,
+      "labels": [
+        "awareness"
+      ],
+      "sourceSeed": "positive:en-10",
+      "httpStatus": 200,
+      "predicted": true,
+      "flags": [
+        "意識・呼吸の異常"
+      ],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "en-10-v3-135",
+      "text": "The child is unconscious. This is the current situation.",
+      "language": "en",
+      "emergency": true,
+      "labels": [
+        "awareness"
+      ],
+      "sourceSeed": "positive:en-10",
+      "httpStatus": 200,
+      "predicted": true,
+      "flags": [
+        "意識・呼吸の異常"
+      ],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "en-10-v4-136",
+      "text": "The child is unconscious. Please check it carefully.",
+      "language": "en",
+      "emergency": true,
+      "labels": [
+        "awareness"
+      ],
+      "sourceSeed": "positive:en-10",
+      "httpStatus": 200,
+      "predicted": true,
+      "flags": [
+        "意識・呼吸の異常"
+      ],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "zh-01-v1-137",
+      "text": "我喘不过气，不能说话。",
+      "language": "zh",
+      "emergency": true,
+      "labels": [
+        "breathing"
+      ],
+      "sourceSeed": "positive:zh-01",
+      "httpStatus": 200,
+      "predicted": true,
+      "flags": [
+        "意識・呼吸の異常"
+      ],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "zh-01-v2-138",
+      "text": "我喘不过气，不能说话。 我想告诉避难所工作人员。",
+      "language": "zh",
+      "emergency": true,
+      "labels": [
+        "breathing"
+      ],
+      "sourceSeed": "positive:zh-01",
+      "httpStatus": 200,
+      "predicted": true,
+      "flags": [
+        "意識・呼吸の異常"
+      ],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "zh-01-v3-139",
+      "text": "我喘不过气，不能说话。 这是现在的情况。",
+      "language": "zh",
+      "emergency": true,
+      "labels": [
+        "breathing"
+      ],
+      "sourceSeed": "positive:zh-01",
+      "httpStatus": 200,
+      "predicted": true,
+      "flags": [
+        "意識・呼吸の異常"
+      ],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "zh-01-v4-140",
+      "text": "我喘不过气，不能说话。 请准确确认。",
+      "language": "zh",
+      "emergency": true,
+      "labels": [
+        "breathing"
+      ],
+      "sourceSeed": "positive:zh-01",
+      "httpStatus": 200,
+      "predicted": true,
+      "flags": [
+        "意識・呼吸の異常"
+      ],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "zh-02-v1-141",
+      "text": "叫他也没有反应。",
+      "language": "zh",
+      "emergency": true,
+      "labels": [
+        "awareness"
+      ],
+      "sourceSeed": "positive:zh-02",
+      "httpStatus": 200,
+      "predicted": true,
+      "flags": [
+        "意識・呼吸の異常"
+      ],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "zh-02-v2-142",
+      "text": "叫他也没有反应。 我想告诉避难所工作人员。",
+      "language": "zh",
+      "emergency": true,
+      "labels": [
+        "awareness"
+      ],
+      "sourceSeed": "positive:zh-02",
+      "httpStatus": 200,
+      "predicted": true,
+      "flags": [
+        "意識・呼吸の異常"
+      ],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "zh-02-v3-143",
+      "text": "叫他也没有反应。 这是现在的情况。",
+      "language": "zh",
+      "emergency": true,
+      "labels": [
+        "awareness"
+      ],
+      "sourceSeed": "positive:zh-02",
+      "httpStatus": 200,
+      "predicted": true,
+      "flags": [
+        "意識・呼吸の異常"
+      ],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "zh-02-v4-144",
+      "text": "叫他也没有反应。 请准确确认。",
+      "language": "zh",
+      "emergency": true,
+      "labels": [
+        "awareness"
+      ],
+      "sourceSeed": "positive:zh-02",
+      "httpStatus": 200,
+      "predicted": true,
+      "flags": [
+        "意識・呼吸の異常"
+      ],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "zh-03-v1-145",
+      "text": "孩子高烧，身体没有力气。",
+      "language": "zh",
+      "emergency": true,
+      "labels": [
+        "medical"
+      ],
+      "sourceSeed": "positive:zh-03",
+      "httpStatus": 200,
+      "predicted": true,
+      "flags": [
+        "重大な体調変化"
+      ],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "zh-03-v2-146",
+      "text": "孩子高烧，身体没有力气。 我想告诉避难所工作人员。",
+      "language": "zh",
+      "emergency": true,
+      "labels": [
+        "medical"
+      ],
+      "sourceSeed": "positive:zh-03",
+      "httpStatus": 200,
+      "predicted": true,
+      "flags": [
+        "重大な体調変化"
+      ],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "zh-03-v3-147",
+      "text": "孩子高烧，身体没有力气。 这是现在的情况。",
+      "language": "zh",
+      "emergency": true,
+      "labels": [
+        "medical"
+      ],
+      "sourceSeed": "positive:zh-03",
+      "httpStatus": 200,
+      "predicted": true,
+      "flags": [
+        "重大な体調変化"
+      ],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "zh-03-v4-148",
+      "text": "孩子高烧，身体没有力气。 请准确确认。",
+      "language": "zh",
+      "emergency": true,
+      "labels": [
+        "medical"
+      ],
+      "sourceSeed": "positive:zh-03",
+      "httpStatus": 200,
+      "predicted": true,
+      "flags": [
+        "重大な体調変化"
+      ],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "zh-04-v1-149",
+      "text": "厨房里有烟。",
+      "language": "zh",
+      "emergency": true,
+      "labels": [
+        "fire"
+      ],
+      "sourceSeed": "positive:zh-04",
+      "httpStatus": 200,
+      "predicted": true,
+      "flags": [
+        "火災・煙"
+      ],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "zh-04-v2-150",
+      "text": "厨房里有烟。 我想告诉避难所工作人员。",
+      "language": "zh",
+      "emergency": true,
+      "labels": [
+        "fire"
+      ],
+      "sourceSeed": "positive:zh-04",
+      "httpStatus": 200,
+      "predicted": true,
+      "flags": [
+        "火災・煙"
+      ],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "zh-04-v3-151",
+      "text": "厨房里有烟。 这是现在的情况。",
+      "language": "zh",
+      "emergency": true,
+      "labels": [
+        "fire"
+      ],
+      "sourceSeed": "positive:zh-04",
+      "httpStatus": 200,
+      "predicted": true,
+      "flags": [
+        "火災・煙"
+      ],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "zh-04-v4-152",
+      "text": "厨房里有烟。 请准确确认。",
+      "language": "zh",
+      "emergency": true,
+      "labels": [
+        "fire"
+      ],
+      "sourceSeed": "positive:zh-04",
+      "httpStatus": 200,
+      "predicted": true,
+      "flags": [
+        "火災・煙"
+      ],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "zh-05-v1-153",
+      "text": "有人拿着刀威胁我们。",
+      "language": "zh",
+      "emergency": true,
+      "labels": [
+        "violence"
+      ],
+      "sourceSeed": "positive:zh-05",
+      "httpStatus": 200,
+      "predicted": true,
+      "flags": [
+        "暴力・武器"
+      ],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "zh-05-v2-154",
+      "text": "有人拿着刀威胁我们。 我想告诉避难所工作人员。",
+      "language": "zh",
+      "emergency": true,
+      "labels": [
+        "violence"
+      ],
+      "sourceSeed": "positive:zh-05",
+      "httpStatus": 200,
+      "predicted": true,
+      "flags": [
+        "暴力・武器"
+      ],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "zh-05-v3-155",
+      "text": "有人拿着刀威胁我们。 这是现在的情况。",
+      "language": "zh",
+      "emergency": true,
+      "labels": [
+        "violence"
+      ],
+      "sourceSeed": "positive:zh-05",
+      "httpStatus": 200,
+      "predicted": true,
+      "flags": [
+        "暴力・武器"
+      ],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "zh-05-v4-156",
+      "text": "有人拿着刀威胁我们。 请准确确认。",
+      "language": "zh",
+      "emergency": true,
+      "labels": [
+        "violence"
+      ],
+      "sourceSeed": "positive:zh-05",
+      "httpStatus": 200,
+      "predicted": true,
+      "flags": [
+        "暴力・武器"
+      ],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "zh-06-v1-157",
+      "text": "我可能会伤害自己。",
+      "language": "zh",
+      "emergency": true,
+      "labels": [
+        "self_harm"
+      ],
+      "sourceSeed": "positive:zh-06",
+      "httpStatus": 200,
+      "predicted": true,
+      "flags": [
+        "自傷・他害"
+      ],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "zh-06-v2-158",
+      "text": "我可能会伤害自己。 我想告诉避难所工作人员。",
+      "language": "zh",
+      "emergency": true,
+      "labels": [
+        "self_harm"
+      ],
+      "sourceSeed": "positive:zh-06",
+      "httpStatus": 200,
+      "predicted": true,
+      "flags": [
+        "自傷・他害"
+      ],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "zh-06-v3-159",
+      "text": "我可能会伤害自己。 这是现在的情况。",
+      "language": "zh",
+      "emergency": true,
+      "labels": [
+        "self_harm"
+      ],
+      "sourceSeed": "positive:zh-06",
+      "httpStatus": 200,
+      "predicted": true,
+      "flags": [
+        "自傷・他害"
+      ],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "zh-06-v4-160",
+      "text": "我可能会伤害自己。 请准确确认。",
+      "language": "zh",
+      "emergency": true,
+      "labels": [
+        "self_harm"
+      ],
+      "sourceSeed": "positive:zh-06",
+      "httpStatus": 200,
+      "predicted": true,
+      "flags": [
+        "自傷・他害"
+      ],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "zh-07-v1-161",
+      "text": "我们被困在房间里。",
+      "language": "zh",
+      "emergency": true,
+      "labels": [
+        "trapped"
+      ],
+      "sourceSeed": "positive:zh-07",
+      "httpStatus": 200,
+      "predicted": true,
+      "flags": [
+        "建物・閉じ込め"
+      ],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "zh-07-v2-162",
+      "text": "我们被困在房间里。 我想告诉避难所工作人员。",
+      "language": "zh",
+      "emergency": true,
+      "labels": [
+        "trapped"
+      ],
+      "sourceSeed": "positive:zh-07",
+      "httpStatus": 200,
+      "predicted": true,
+      "flags": [
+        "建物・閉じ込め"
+      ],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "zh-07-v3-163",
+      "text": "我们被困在房间里。 这是现在的情况。",
+      "language": "zh",
+      "emergency": true,
+      "labels": [
+        "trapped"
+      ],
+      "sourceSeed": "positive:zh-07",
+      "httpStatus": 200,
+      "predicted": true,
+      "flags": [
+        "建物・閉じ込め"
+      ],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "zh-07-v4-164",
+      "text": "我们被困在房间里。 请准确确认。",
+      "language": "zh",
+      "emergency": true,
+      "labels": [
+        "trapped"
+      ],
+      "sourceSeed": "positive:zh-07",
+      "httpStatus": 200,
+      "predicted": true,
+      "flags": [
+        "建物・閉じ込め"
+      ],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "zh-08-v1-165",
+      "text": "血止不住。",
+      "language": "zh",
+      "emergency": true,
+      "labels": [
+        "bleeding"
+      ],
+      "sourceSeed": "positive:zh-08",
+      "httpStatus": 200,
+      "predicted": true,
+      "flags": [
+        "大量出血"
+      ],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "zh-08-v2-166",
+      "text": "血止不住。 我想告诉避难所工作人员。",
+      "language": "zh",
+      "emergency": true,
+      "labels": [
+        "bleeding"
+      ],
+      "sourceSeed": "positive:zh-08",
+      "httpStatus": 200,
+      "predicted": true,
+      "flags": [
+        "大量出血"
+      ],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "zh-08-v3-167",
+      "text": "血止不住。 这是现在的情况。",
+      "language": "zh",
+      "emergency": true,
+      "labels": [
+        "bleeding"
+      ],
+      "sourceSeed": "positive:zh-08",
+      "httpStatus": 200,
+      "predicted": true,
+      "flags": [
+        "大量出血"
+      ],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "zh-08-v4-168",
+      "text": "血止不住。 请准确确认。",
+      "language": "zh",
+      "emergency": true,
+      "labels": [
+        "bleeding"
+      ],
+      "sourceSeed": "positive:zh-08",
+      "httpStatus": 200,
+      "predicted": true,
+      "flags": [
+        "大量出血"
+      ],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "ko-01-v1-169",
+      "text": "숨을 쉴 수 없고 말을 할 수 없습니다.",
+      "language": "ko",
+      "emergency": true,
+      "labels": [
+        "breathing"
+      ],
+      "sourceSeed": "positive:ko-01",
+      "httpStatus": 200,
+      "predicted": true,
+      "flags": [
+        "意識・呼吸の異常"
+      ],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "ko-01-v2-170",
+      "text": "숨을 쉴 수 없고 말을 할 수 없습니다. 대피소 직원에게 알리고 싶습니다.",
+      "language": "ko",
+      "emergency": true,
+      "labels": [
+        "breathing"
+      ],
+      "sourceSeed": "positive:ko-01",
+      "httpStatus": 200,
+      "predicted": true,
+      "flags": [
+        "意識・呼吸の異常"
+      ],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "ko-01-v3-171",
+      "text": "숨을 쉴 수 없고 말을 할 수 없습니다. 지금 상황입니다.",
+      "language": "ko",
+      "emergency": true,
+      "labels": [
+        "breathing"
+      ],
+      "sourceSeed": "positive:ko-01",
+      "httpStatus": 200,
+      "predicted": true,
+      "flags": [
+        "意識・呼吸の異常"
+      ],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "ko-01-v4-172",
+      "text": "숨을 쉴 수 없고 말을 할 수 없습니다. 정확히 확인해 주세요.",
+      "language": "ko",
+      "emergency": true,
+      "labels": [
+        "breathing"
+      ],
+      "sourceSeed": "positive:ko-01",
+      "httpStatus": 200,
+      "predicted": true,
+      "flags": [
+        "意識・呼吸の異常"
+      ],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "ko-02-v1-173",
+      "text": "불러도 반응이 없습니다.",
+      "language": "ko",
+      "emergency": true,
+      "labels": [
+        "awareness"
+      ],
+      "sourceSeed": "positive:ko-02",
+      "httpStatus": 200,
+      "predicted": true,
+      "flags": [
+        "意識・呼吸の異常"
+      ],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "ko-02-v2-174",
+      "text": "불러도 반응이 없습니다. 대피소 직원에게 알리고 싶습니다.",
+      "language": "ko",
+      "emergency": true,
+      "labels": [
+        "awareness"
+      ],
+      "sourceSeed": "positive:ko-02",
+      "httpStatus": 200,
+      "predicted": true,
+      "flags": [
+        "意識・呼吸の異常"
+      ],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "ko-02-v3-175",
+      "text": "불러도 반응이 없습니다. 지금 상황입니다.",
+      "language": "ko",
+      "emergency": true,
+      "labels": [
+        "awareness"
+      ],
+      "sourceSeed": "positive:ko-02",
+      "httpStatus": 200,
+      "predicted": true,
+      "flags": [
+        "意識・呼吸の異常"
+      ],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "ko-02-v4-176",
+      "text": "불러도 반응이 없습니다. 정확히 확인해 주세요.",
+      "language": "ko",
+      "emergency": true,
+      "labels": [
+        "awareness"
+      ],
+      "sourceSeed": "positive:ko-02",
+      "httpStatus": 200,
+      "predicted": true,
+      "flags": [
+        "意識・呼吸の異常"
+      ],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "ko-03-v1-177",
+      "text": "아이가 고열이고 축 처져 있습니다.",
+      "language": "ko",
+      "emergency": true,
+      "labels": [
+        "medical"
+      ],
+      "sourceSeed": "positive:ko-03",
+      "httpStatus": 200,
+      "predicted": true,
+      "flags": [
+        "重大な体調変化"
+      ],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "ko-03-v2-178",
+      "text": "아이가 고열이고 축 처져 있습니다. 대피소 직원에게 알리고 싶습니다.",
+      "language": "ko",
+      "emergency": true,
+      "labels": [
+        "medical"
+      ],
+      "sourceSeed": "positive:ko-03",
+      "httpStatus": 200,
+      "predicted": true,
+      "flags": [
+        "重大な体調変化"
+      ],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "ko-03-v3-179",
+      "text": "아이가 고열이고 축 처져 있습니다. 지금 상황입니다.",
+      "language": "ko",
+      "emergency": true,
+      "labels": [
+        "medical"
+      ],
+      "sourceSeed": "positive:ko-03",
+      "httpStatus": 200,
+      "predicted": true,
+      "flags": [
+        "重大な体調変化"
+      ],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "ko-03-v4-180",
+      "text": "아이가 고열이고 축 처져 있습니다. 정확히 확인해 주세요.",
+      "language": "ko",
+      "emergency": true,
+      "labels": [
+        "medical"
+      ],
+      "sourceSeed": "positive:ko-03",
+      "httpStatus": 200,
+      "predicted": true,
+      "flags": [
+        "重大な体調変化"
+      ],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "ko-04-v1-181",
+      "text": "주방에서 연기가 납니다.",
+      "language": "ko",
+      "emergency": true,
+      "labels": [
+        "fire"
+      ],
+      "sourceSeed": "positive:ko-04",
+      "httpStatus": 200,
+      "predicted": true,
+      "flags": [
+        "火災・煙"
+      ],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "ko-04-v2-182",
+      "text": "주방에서 연기가 납니다. 대피소 직원에게 알리고 싶습니다.",
+      "language": "ko",
+      "emergency": true,
+      "labels": [
+        "fire"
+      ],
+      "sourceSeed": "positive:ko-04",
+      "httpStatus": 200,
+      "predicted": true,
+      "flags": [
+        "火災・煙"
+      ],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "ko-04-v3-183",
+      "text": "주방에서 연기가 납니다. 지금 상황입니다.",
+      "language": "ko",
+      "emergency": true,
+      "labels": [
+        "fire"
+      ],
+      "sourceSeed": "positive:ko-04",
+      "httpStatus": 200,
+      "predicted": true,
+      "flags": [
+        "火災・煙"
+      ],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "ko-04-v4-184",
+      "text": "주방에서 연기가 납니다. 정확히 확인해 주세요.",
+      "language": "ko",
+      "emergency": true,
+      "labels": [
+        "fire"
+      ],
+      "sourceSeed": "positive:ko-04",
+      "httpStatus": 200,
+      "predicted": true,
+      "flags": [
+        "火災・煙"
+      ],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "ko-05-v1-185",
+      "text": "누군가 칼로 위협하고 있습니다.",
+      "language": "ko",
+      "emergency": true,
+      "labels": [
+        "violence"
+      ],
+      "sourceSeed": "positive:ko-05",
+      "httpStatus": 200,
+      "predicted": true,
+      "flags": [
+        "暴力・武器"
+      ],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "ko-05-v2-186",
+      "text": "누군가 칼로 위협하고 있습니다. 대피소 직원에게 알리고 싶습니다.",
+      "language": "ko",
+      "emergency": true,
+      "labels": [
+        "violence"
+      ],
+      "sourceSeed": "positive:ko-05",
+      "httpStatus": 200,
+      "predicted": true,
+      "flags": [
+        "暴力・武器"
+      ],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "ko-05-v3-187",
+      "text": "누군가 칼로 위협하고 있습니다. 지금 상황입니다.",
+      "language": "ko",
+      "emergency": true,
+      "labels": [
+        "violence"
+      ],
+      "sourceSeed": "positive:ko-05",
+      "httpStatus": 200,
+      "predicted": true,
+      "flags": [
+        "暴力・武器"
+      ],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "ko-05-v4-188",
+      "text": "누군가 칼로 위협하고 있습니다. 정확히 확인해 주세요.",
+      "language": "ko",
+      "emergency": true,
+      "labels": [
+        "violence"
+      ],
+      "sourceSeed": "positive:ko-05",
+      "httpStatus": 200,
+      "predicted": true,
+      "flags": [
+        "暴力・武器"
+      ],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "ko-06-v1-189",
+      "text": "제가 자신을 해칠 것 같습니다.",
+      "language": "ko",
+      "emergency": true,
+      "labels": [
+        "self_harm"
+      ],
+      "sourceSeed": "positive:ko-06",
+      "httpStatus": 200,
+      "predicted": true,
+      "flags": [
+        "自傷・他害"
+      ],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "ko-06-v2-190",
+      "text": "제가 자신을 해칠 것 같습니다. 대피소 직원에게 알리고 싶습니다.",
+      "language": "ko",
+      "emergency": true,
+      "labels": [
+        "self_harm"
+      ],
+      "sourceSeed": "positive:ko-06",
+      "httpStatus": 200,
+      "predicted": true,
+      "flags": [
+        "自傷・他害"
+      ],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "ko-06-v3-191",
+      "text": "제가 자신을 해칠 것 같습니다. 지금 상황입니다.",
+      "language": "ko",
+      "emergency": true,
+      "labels": [
+        "self_harm"
+      ],
+      "sourceSeed": "positive:ko-06",
+      "httpStatus": 200,
+      "predicted": true,
+      "flags": [
+        "自傷・他害"
+      ],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "ko-06-v4-192",
+      "text": "제가 자신을 해칠 것 같습니다. 정확히 확인해 주세요.",
+      "language": "ko",
+      "emergency": true,
+      "labels": [
+        "self_harm"
+      ],
+      "sourceSeed": "positive:ko-06",
+      "httpStatus": 200,
+      "predicted": true,
+      "flags": [
+        "自傷・他害"
+      ],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "ko-07-v1-193",
+      "text": "방 안에 갇혀 나갈 수 없습니다.",
+      "language": "ko",
+      "emergency": true,
+      "labels": [
+        "trapped"
+      ],
+      "sourceSeed": "positive:ko-07",
+      "httpStatus": 200,
+      "predicted": true,
+      "flags": [
+        "建物・閉じ込め"
+      ],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "ko-07-v2-194",
+      "text": "방 안에 갇혀 나갈 수 없습니다. 대피소 직원에게 알리고 싶습니다.",
+      "language": "ko",
+      "emergency": true,
+      "labels": [
+        "trapped"
+      ],
+      "sourceSeed": "positive:ko-07",
+      "httpStatus": 200,
+      "predicted": true,
+      "flags": [
+        "建物・閉じ込め"
+      ],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "ko-07-v3-195",
+      "text": "방 안에 갇혀 나갈 수 없습니다. 지금 상황입니다.",
+      "language": "ko",
+      "emergency": true,
+      "labels": [
+        "trapped"
+      ],
+      "sourceSeed": "positive:ko-07",
+      "httpStatus": 200,
+      "predicted": true,
+      "flags": [
+        "建物・閉じ込め"
+      ],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "ko-07-v4-196",
+      "text": "방 안에 갇혀 나갈 수 없습니다. 정확히 확인해 주세요.",
+      "language": "ko",
+      "emergency": true,
+      "labels": [
+        "trapped"
+      ],
+      "sourceSeed": "positive:ko-07",
+      "httpStatus": 200,
+      "predicted": true,
+      "flags": [
+        "建物・閉じ込め"
+      ],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "ko-08-v1-197",
+      "text": "피가 멈추지 않습니다.",
+      "language": "ko",
+      "emergency": true,
+      "labels": [
+        "bleeding"
+      ],
+      "sourceSeed": "positive:ko-08",
+      "httpStatus": 200,
+      "predicted": true,
+      "flags": [
+        "大量出血"
+      ],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "ko-08-v2-198",
+      "text": "피가 멈추지 않습니다. 대피소 직원에게 알리고 싶습니다.",
+      "language": "ko",
+      "emergency": true,
+      "labels": [
+        "bleeding"
+      ],
+      "sourceSeed": "positive:ko-08",
+      "httpStatus": 200,
+      "predicted": true,
+      "flags": [
+        "大量出血"
+      ],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "ko-08-v3-199",
+      "text": "피가 멈추지 않습니다. 지금 상황입니다.",
+      "language": "ko",
+      "emergency": true,
+      "labels": [
+        "bleeding"
+      ],
+      "sourceSeed": "positive:ko-08",
+      "httpStatus": 200,
+      "predicted": true,
+      "flags": [
+        "大量出血"
+      ],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "ko-08-v4-200",
+      "text": "피가 멈추지 않습니다. 정확히 확인해 주세요.",
+      "language": "ko",
+      "emergency": true,
+      "labels": [
+        "bleeding"
+      ],
+      "sourceSeed": "positive:ko-08",
+      "httpStatus": 200,
+      "predicted": true,
+      "flags": [
+        "大量出血"
+      ],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "ja-01-v1-201",
+      "text": "火事ではありません。煙ではなく湯気です。",
+      "language": "ja",
+      "emergency": false,
+      "labels": [],
+      "sourceSeed": "negative:ja-01",
+      "httpStatus": 200,
+      "predicted": false,
+      "flags": [],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "ja-01-v2-202",
+      "text": "火事ではありません。煙ではなく湯気です。 避難所で職員に伝えたいです。",
+      "language": "ja",
+      "emergency": false,
+      "labels": [],
+      "sourceSeed": "negative:ja-01",
+      "httpStatus": 200,
+      "predicted": false,
+      "flags": [],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "ja-01-v3-203",
+      "text": "火事ではありません。煙ではなく湯気です。 これは今の状況です。",
+      "language": "ja",
+      "emergency": false,
+      "labels": [],
+      "sourceSeed": "negative:ja-01",
+      "httpStatus": 200,
+      "predicted": false,
+      "flags": [],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "ja-01-v4-204",
+      "text": "火事ではありません。煙ではなく湯気です。 できるだけ正確に確認してください。",
+      "language": "ja",
+      "emergency": false,
+      "labels": [],
+      "sourceSeed": "negative:ja-01",
+      "httpStatus": 200,
+      "predicted": false,
+      "flags": [],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "ja-02-v1-205",
+      "text": "昨日は息苦しかったですが、今は大丈夫です。",
+      "language": "ja",
+      "emergency": false,
+      "labels": [],
+      "sourceSeed": "negative:ja-02",
+      "httpStatus": 200,
+      "predicted": false,
+      "flags": [],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "ja-02-v2-206",
+      "text": "昨日は息苦しかったですが、今は大丈夫です。 避難所で職員に伝えたいです。",
+      "language": "ja",
+      "emergency": false,
+      "labels": [],
+      "sourceSeed": "negative:ja-02",
+      "httpStatus": 200,
+      "predicted": false,
+      "flags": [],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "ja-02-v3-207",
+      "text": "昨日は息苦しかったですが、今は大丈夫です。 これは今の状況です。",
+      "language": "ja",
+      "emergency": false,
+      "labels": [],
+      "sourceSeed": "negative:ja-02",
+      "httpStatus": 200,
+      "predicted": false,
+      "flags": [],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "ja-02-v4-208",
+      "text": "昨日は息苦しかったですが、今は大丈夫です。 できるだけ正確に確認してください。",
+      "language": "ja",
+      "emergency": false,
+      "labels": [],
+      "sourceSeed": "negative:ja-02",
+      "httpStatus": 200,
+      "predicted": false,
+      "flags": [],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "ja-03-v1-209",
+      "text": "高熱ではありません。少し熱いだけです。",
+      "language": "ja",
+      "emergency": false,
+      "labels": [],
+      "sourceSeed": "negative:ja-03",
+      "httpStatus": 200,
+      "predicted": false,
+      "flags": [],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "ja-03-v2-210",
+      "text": "高熱ではありません。少し熱いだけです。 避難所で職員に伝えたいです。",
+      "language": "ja",
+      "emergency": false,
+      "labels": [],
+      "sourceSeed": "negative:ja-03",
+      "httpStatus": 200,
+      "predicted": false,
+      "flags": [],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "ja-03-v3-211",
+      "text": "高熱ではありません。少し熱いだけです。 これは今の状況です。",
+      "language": "ja",
+      "emergency": false,
+      "labels": [],
+      "sourceSeed": "negative:ja-03",
+      "httpStatus": 200,
+      "predicted": false,
+      "flags": [],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "ja-03-v4-212",
+      "text": "高熱ではありません。少し熱いだけです。 できるだけ正確に確認してください。",
+      "language": "ja",
+      "emergency": false,
+      "labels": [],
+      "sourceSeed": "negative:ja-03",
+      "httpStatus": 200,
+      "predicted": false,
+      "flags": [],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "ja-04-v1-213",
+      "text": "意識はあります。会話もできます。",
+      "language": "ja",
+      "emergency": false,
+      "labels": [],
+      "sourceSeed": "negative:ja-04",
+      "httpStatus": 200,
+      "predicted": false,
+      "flags": [],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "ja-04-v2-214",
+      "text": "意識はあります。会話もできます。 避難所で職員に伝えたいです。",
+      "language": "ja",
+      "emergency": false,
+      "labels": [],
+      "sourceSeed": "negative:ja-04",
+      "httpStatus": 200,
+      "predicted": false,
+      "flags": [],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "ja-04-v3-215",
+      "text": "意識はあります。会話もできます。 これは今の状況です。",
+      "language": "ja",
+      "emergency": false,
+      "labels": [],
+      "sourceSeed": "negative:ja-04",
+      "httpStatus": 200,
+      "predicted": false,
+      "flags": [],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "ja-04-v4-216",
+      "text": "意識はあります。会話もできます。 できるだけ正確に確認してください。",
+      "language": "ja",
+      "emergency": false,
+      "labels": [],
+      "sourceSeed": "negative:ja-04",
+      "httpStatus": 200,
+      "predicted": false,
+      "flags": [],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "ja-05-v1-217",
+      "text": "暴力ではありません。口論だけです。",
+      "language": "ja",
+      "emergency": false,
+      "labels": [],
+      "sourceSeed": "negative:ja-05",
+      "httpStatus": 200,
+      "predicted": false,
+      "flags": [],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "ja-05-v2-218",
+      "text": "暴力ではありません。口論だけです。 避難所で職員に伝えたいです。",
+      "language": "ja",
+      "emergency": false,
+      "labels": [],
+      "sourceSeed": "negative:ja-05",
+      "httpStatus": 200,
+      "predicted": false,
+      "flags": [],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "ja-05-v3-219",
+      "text": "暴力ではありません。口論だけです。 これは今の状況です。",
+      "language": "ja",
+      "emergency": false,
+      "labels": [],
+      "sourceSeed": "negative:ja-05",
+      "httpStatus": 200,
+      "predicted": false,
+      "flags": [],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "ja-05-v4-220",
+      "text": "暴力ではありません。口論だけです。 できるだけ正確に確認してください。",
+      "language": "ja",
+      "emergency": false,
+      "labels": [],
+      "sourceSeed": "negative:ja-05",
+      "httpStatus": 200,
+      "predicted": false,
+      "flags": [],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "ja-06-v1-221",
+      "text": "刃物はありません。包丁は調理に使っています。",
+      "language": "ja",
+      "emergency": false,
+      "labels": [],
+      "sourceSeed": "negative:ja-06",
+      "httpStatus": 200,
+      "predicted": false,
+      "flags": [],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "ja-06-v2-222",
+      "text": "刃物はありません。包丁は調理に使っています。 避難所で職員に伝えたいです。",
+      "language": "ja",
+      "emergency": false,
+      "labels": [],
+      "sourceSeed": "negative:ja-06",
+      "httpStatus": 200,
+      "predicted": false,
+      "flags": [],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "ja-06-v3-223",
+      "text": "刃物はありません。包丁は調理に使っています。 これは今の状況です。",
+      "language": "ja",
+      "emergency": false,
+      "labels": [],
+      "sourceSeed": "negative:ja-06",
+      "httpStatus": 200,
+      "predicted": false,
+      "flags": [],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "ja-06-v4-224",
+      "text": "刃物はありません。包丁は調理に使っています。 できるだけ正確に確認してください。",
+      "language": "ja",
+      "emergency": false,
+      "labels": [],
+      "sourceSeed": "negative:ja-06",
+      "httpStatus": 200,
+      "predicted": false,
+      "flags": [],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "ja-07-v1-225",
+      "text": "煙のように見えますが、舞台の演出です。",
+      "language": "ja",
+      "emergency": false,
+      "labels": [],
+      "sourceSeed": "negative:ja-07",
+      "httpStatus": 200,
+      "predicted": false,
+      "flags": [],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "ja-07-v2-226",
+      "text": "煙のように見えますが、舞台の演出です。 避難所で職員に伝えたいです。",
+      "language": "ja",
+      "emergency": false,
+      "labels": [],
+      "sourceSeed": "negative:ja-07",
+      "httpStatus": 200,
+      "predicted": false,
+      "flags": [],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "ja-07-v3-227",
+      "text": "煙のように見えますが、舞台の演出です。 これは今の状況です。",
+      "language": "ja",
+      "emergency": false,
+      "labels": [],
+      "sourceSeed": "negative:ja-07",
+      "httpStatus": 200,
+      "predicted": false,
+      "flags": [],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "ja-07-v4-228",
+      "text": "煙のように見えますが、舞台の演出です。 できるだけ正確に確認してください。",
+      "language": "ja",
+      "emergency": false,
+      "labels": [],
+      "sourceSeed": "negative:ja-07",
+      "httpStatus": 200,
+      "predicted": false,
+      "flags": [],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "ja-08-v1-229",
+      "text": "昨日の火事の話を聞きましたが、今は安全です。",
+      "language": "ja",
+      "emergency": false,
+      "labels": [],
+      "sourceSeed": "negative:ja-08",
+      "httpStatus": 200,
+      "predicted": false,
+      "flags": [],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "ja-08-v2-230",
+      "text": "昨日の火事の話を聞きましたが、今は安全です。 避難所で職員に伝えたいです。",
+      "language": "ja",
+      "emergency": false,
+      "labels": [],
+      "sourceSeed": "negative:ja-08",
+      "httpStatus": 200,
+      "predicted": false,
+      "flags": [],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "ja-08-v3-231",
+      "text": "昨日の火事の話を聞きましたが、今は安全です。 これは今の状況です。",
+      "language": "ja",
+      "emergency": false,
+      "labels": [],
+      "sourceSeed": "negative:ja-08",
+      "httpStatus": 200,
+      "predicted": false,
+      "flags": [],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "ja-08-v4-232",
+      "text": "昨日の火事の話を聞きましたが、今は安全です。 できるだけ正確に確認してください。",
+      "language": "ja",
+      "emergency": false,
+      "labels": [],
+      "sourceSeed": "negative:ja-08",
+      "httpStatus": 200,
+      "predicted": false,
+      "flags": [],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "ja-09-v1-233",
+      "text": "子どもは元気で、ぐったりしていません。",
+      "language": "ja",
+      "emergency": false,
+      "labels": [],
+      "sourceSeed": "negative:ja-09",
+      "httpStatus": 200,
+      "predicted": false,
+      "flags": [],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "ja-09-v2-234",
+      "text": "子どもは元気で、ぐったりしていません。 避難所で職員に伝えたいです。",
+      "language": "ja",
+      "emergency": false,
+      "labels": [],
+      "sourceSeed": "negative:ja-09",
+      "httpStatus": 200,
+      "predicted": false,
+      "flags": [],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "ja-09-v3-235",
+      "text": "子どもは元気で、ぐったりしていません。 これは今の状況です。",
+      "language": "ja",
+      "emergency": false,
+      "labels": [],
+      "sourceSeed": "negative:ja-09",
+      "httpStatus": 200,
+      "predicted": false,
+      "flags": [],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "ja-09-v4-236",
+      "text": "子どもは元気で、ぐったりしていません。 できるだけ正確に確認してください。",
+      "language": "ja",
+      "emergency": false,
+      "labels": [],
+      "sourceSeed": "negative:ja-09",
+      "httpStatus": 200,
+      "predicted": false,
+      "flags": [],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "ja-10-v1-237",
+      "text": "薬はまだ十分あります。",
+      "language": "ja",
+      "emergency": false,
+      "labels": [],
+      "sourceSeed": "negative:ja-10",
+      "httpStatus": 200,
+      "predicted": false,
+      "flags": [],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "ja-10-v2-238",
+      "text": "薬はまだ十分あります。 避難所で職員に伝えたいです。",
+      "language": "ja",
+      "emergency": false,
+      "labels": [],
+      "sourceSeed": "negative:ja-10",
+      "httpStatus": 200,
+      "predicted": false,
+      "flags": [],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "ja-10-v3-239",
+      "text": "薬はまだ十分あります。 これは今の状況です。",
+      "language": "ja",
+      "emergency": false,
+      "labels": [],
+      "sourceSeed": "negative:ja-10",
+      "httpStatus": 200,
+      "predicted": false,
+      "flags": [],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "ja-10-v4-240",
+      "text": "薬はまだ十分あります。 できるだけ正確に確認してください。",
+      "language": "ja",
+      "emergency": false,
+      "labels": [],
+      "sourceSeed": "negative:ja-10",
+      "httpStatus": 200,
+      "predicted": false,
+      "flags": [],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "ja-11-v1-241",
+      "text": "胸は痛くありません。",
+      "language": "ja",
+      "emergency": false,
+      "labels": [],
+      "sourceSeed": "negative:ja-11",
+      "httpStatus": 200,
+      "predicted": false,
+      "flags": [],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "ja-11-v2-242",
+      "text": "胸は痛くありません。 避難所で職員に伝えたいです。",
+      "language": "ja",
+      "emergency": false,
+      "labels": [],
+      "sourceSeed": "negative:ja-11",
+      "httpStatus": 200,
+      "predicted": false,
+      "flags": [],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "ja-11-v3-243",
+      "text": "胸は痛くありません。 これは今の状況です。",
+      "language": "ja",
+      "emergency": false,
+      "labels": [],
+      "sourceSeed": "negative:ja-11",
+      "httpStatus": 200,
+      "predicted": false,
+      "flags": [],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "ja-11-v4-244",
+      "text": "胸は痛くありません。 できるだけ正確に確認してください。",
+      "language": "ja",
+      "emergency": false,
+      "labels": [],
+      "sourceSeed": "negative:ja-11",
+      "httpStatus": 200,
+      "predicted": false,
+      "flags": [],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "ja-12-v1-245",
+      "text": "息苦しくはありませんが、少し不安です。",
+      "language": "ja",
+      "emergency": false,
+      "labels": [],
+      "sourceSeed": "negative:ja-12",
+      "httpStatus": 200,
+      "predicted": false,
+      "flags": [],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "ja-12-v2-246",
+      "text": "息苦しくはありませんが、少し不安です。 避難所で職員に伝えたいです。",
+      "language": "ja",
+      "emergency": false,
+      "labels": [],
+      "sourceSeed": "negative:ja-12",
+      "httpStatus": 200,
+      "predicted": false,
+      "flags": [],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "ja-12-v3-247",
+      "text": "息苦しくはありませんが、少し不安です。 これは今の状況です。",
+      "language": "ja",
+      "emergency": false,
+      "labels": [],
+      "sourceSeed": "negative:ja-12",
+      "httpStatus": 200,
+      "predicted": false,
+      "flags": [],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "ja-12-v4-248",
+      "text": "息苦しくはありませんが、少し不安です。 できるだけ正確に確認してください。",
+      "language": "ja",
+      "emergency": false,
+      "labels": [],
+      "sourceSeed": "negative:ja-12",
+      "httpStatus": 200,
+      "predicted": false,
+      "flags": [],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "ja-13-v1-249",
+      "text": "火事にならないように消火器を確認したいです。",
+      "language": "ja",
+      "emergency": false,
+      "labels": [],
+      "sourceSeed": "negative:ja-13",
+      "httpStatus": 200,
+      "predicted": false,
+      "flags": [],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "ja-13-v2-250",
+      "text": "火事にならないように消火器を確認したいです。 避難所で職員に伝えたいです。",
+      "language": "ja",
+      "emergency": false,
+      "labels": [],
+      "sourceSeed": "negative:ja-13",
+      "httpStatus": 200,
+      "predicted": false,
+      "flags": [],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "ja-13-v3-251",
+      "text": "火事にならないように消火器を確認したいです。 これは今の状況です。",
+      "language": "ja",
+      "emergency": false,
+      "labels": [],
+      "sourceSeed": "negative:ja-13",
+      "httpStatus": 200,
+      "predicted": false,
+      "flags": [],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "ja-13-v4-252",
+      "text": "火事にならないように消火器を確認したいです。 できるだけ正確に確認してください。",
+      "language": "ja",
+      "emergency": false,
+      "labels": [],
+      "sourceSeed": "negative:ja-13",
+      "httpStatus": 200,
+      "predicted": false,
+      "flags": [],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "ja-14-v1-253",
+      "text": "殴られてはいません。怖い言い方をされただけです。",
+      "language": "ja",
+      "emergency": false,
+      "labels": [],
+      "sourceSeed": "negative:ja-14",
+      "httpStatus": 200,
+      "predicted": false,
+      "flags": [],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "ja-14-v2-254",
+      "text": "殴られてはいません。怖い言い方をされただけです。 避難所で職員に伝えたいです。",
+      "language": "ja",
+      "emergency": false,
+      "labels": [],
+      "sourceSeed": "negative:ja-14",
+      "httpStatus": 200,
+      "predicted": false,
+      "flags": [],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "ja-14-v3-255",
+      "text": "殴られてはいません。怖い言い方をされただけです。 これは今の状況です。",
+      "language": "ja",
+      "emergency": false,
+      "labels": [],
+      "sourceSeed": "negative:ja-14",
+      "httpStatus": 200,
+      "predicted": false,
+      "flags": [],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "ja-14-v4-256",
+      "text": "殴られてはいません。怖い言い方をされただけです。 できるだけ正確に確認してください。",
+      "language": "ja",
+      "emergency": false,
+      "labels": [],
+      "sourceSeed": "negative:ja-14",
+      "httpStatus": 200,
+      "predicted": false,
+      "flags": [],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "ja-15-v1-257",
+      "text": "意識が遠のく映画を見ました。体調は問題ありません。",
+      "language": "ja",
+      "emergency": false,
+      "labels": [],
+      "sourceSeed": "negative:ja-15",
+      "httpStatus": 200,
+      "predicted": false,
+      "flags": [],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "ja-15-v2-258",
+      "text": "意識が遠のく映画を見ました。体調は問題ありません。 避難所で職員に伝えたいです。",
+      "language": "ja",
+      "emergency": false,
+      "labels": [],
+      "sourceSeed": "negative:ja-15",
+      "httpStatus": 200,
+      "predicted": false,
+      "flags": [],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "ja-15-v3-259",
+      "text": "意識が遠のく映画を見ました。体調は問題ありません。 これは今の状況です。",
+      "language": "ja",
+      "emergency": false,
+      "labels": [],
+      "sourceSeed": "negative:ja-15",
+      "httpStatus": 200,
+      "predicted": false,
+      "flags": [],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "ja-15-v4-260",
+      "text": "意識が遠のく映画を見ました。体調は問題ありません。 できるだけ正確に確認してください。",
+      "language": "ja",
+      "emergency": false,
+      "labels": [],
+      "sourceSeed": "negative:ja-15",
+      "httpStatus": 200,
+      "predicted": false,
+      "flags": [],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "ja-16-v1-261",
+      "text": "血が止まらないという話ではありません。",
+      "language": "ja",
+      "emergency": false,
+      "labels": [],
+      "sourceSeed": "negative:ja-16",
+      "httpStatus": 200,
+      "predicted": false,
+      "flags": [],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "ja-16-v2-262",
+      "text": "血が止まらないという話ではありません。 避難所で職員に伝えたいです。",
+      "language": "ja",
+      "emergency": false,
+      "labels": [],
+      "sourceSeed": "negative:ja-16",
+      "httpStatus": 200,
+      "predicted": false,
+      "flags": [],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "ja-16-v3-263",
+      "text": "血が止まらないという話ではありません。 これは今の状況です。",
+      "language": "ja",
+      "emergency": false,
+      "labels": [],
+      "sourceSeed": "negative:ja-16",
+      "httpStatus": 200,
+      "predicted": false,
+      "flags": [],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "ja-16-v4-264",
+      "text": "血が止まらないという話ではありません。 できるだけ正確に確認してください。",
+      "language": "ja",
+      "emergency": false,
+      "labels": [],
+      "sourceSeed": "negative:ja-16",
+      "httpStatus": 200,
+      "predicted": false,
+      "flags": [],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "ja-17-v1-265",
+      "text": "閉じ込められてはいません。扉は開きます。",
+      "language": "ja",
+      "emergency": false,
+      "labels": [],
+      "sourceSeed": "negative:ja-17",
+      "httpStatus": 200,
+      "predicted": false,
+      "flags": [],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "ja-17-v2-266",
+      "text": "閉じ込められてはいません。扉は開きます。 避難所で職員に伝えたいです。",
+      "language": "ja",
+      "emergency": false,
+      "labels": [],
+      "sourceSeed": "negative:ja-17",
+      "httpStatus": 200,
+      "predicted": false,
+      "flags": [],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "ja-17-v3-267",
+      "text": "閉じ込められてはいません。扉は開きます。 これは今の状況です。",
+      "language": "ja",
+      "emergency": false,
+      "labels": [],
+      "sourceSeed": "negative:ja-17",
+      "httpStatus": 200,
+      "predicted": false,
+      "flags": [],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "ja-17-v4-268",
+      "text": "閉じ込められてはいません。扉は開きます。 できるだけ正確に確認してください。",
+      "language": "ja",
+      "emergency": false,
+      "labels": [],
+      "sourceSeed": "negative:ja-17",
+      "httpStatus": 200,
+      "predicted": false,
+      "flags": [],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "ja-18-v1-269",
+      "text": "高熱の人はいません。体温計の説明を読みたいです。",
+      "language": "ja",
+      "emergency": false,
+      "labels": [],
+      "sourceSeed": "negative:ja-18",
+      "httpStatus": 200,
+      "predicted": false,
+      "flags": [],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "ja-18-v2-270",
+      "text": "高熱の人はいません。体温計の説明を読みたいです。 避難所で職員に伝えたいです。",
+      "language": "ja",
+      "emergency": false,
+      "labels": [],
+      "sourceSeed": "negative:ja-18",
+      "httpStatus": 200,
+      "predicted": false,
+      "flags": [],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "ja-18-v3-271",
+      "text": "高熱の人はいません。体温計の説明を読みたいです。 これは今の状況です。",
+      "language": "ja",
+      "emergency": false,
+      "labels": [],
+      "sourceSeed": "negative:ja-18",
+      "httpStatus": 200,
+      "predicted": false,
+      "flags": [],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "ja-18-v4-272",
+      "text": "高熱の人はいません。体温計の説明を読みたいです。 できるだけ正確に確認してください。",
+      "language": "ja",
+      "emergency": false,
+      "labels": [],
+      "sourceSeed": "negative:ja-18",
+      "httpStatus": 200,
+      "predicted": false,
+      "flags": [],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "ja-19-v1-273",
+      "text": "煙ではなく、外の霧です。",
+      "language": "ja",
+      "emergency": false,
+      "labels": [],
+      "sourceSeed": "negative:ja-19",
+      "httpStatus": 200,
+      "predicted": false,
+      "flags": [],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "ja-19-v2-274",
+      "text": "煙ではなく、外の霧です。 避難所で職員に伝えたいです。",
+      "language": "ja",
+      "emergency": false,
+      "labels": [],
+      "sourceSeed": "negative:ja-19",
+      "httpStatus": 200,
+      "predicted": false,
+      "flags": [],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "ja-19-v3-275",
+      "text": "煙ではなく、外の霧です。 これは今の状況です。",
+      "language": "ja",
+      "emergency": false,
+      "labels": [],
+      "sourceSeed": "negative:ja-19",
+      "httpStatus": 200,
+      "predicted": false,
+      "flags": [],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "ja-19-v4-276",
+      "text": "煙ではなく、外の霧です。 できるだけ正確に確認してください。",
+      "language": "ja",
+      "emergency": false,
+      "labels": [],
+      "sourceSeed": "negative:ja-19",
+      "httpStatus": 200,
+      "predicted": false,
+      "flags": [],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "ja-20-v1-277",
+      "text": "暴力や危険はありません。相談をしたいだけです。",
+      "language": "ja",
+      "emergency": false,
+      "labels": [],
+      "sourceSeed": "negative:ja-20",
+      "httpStatus": 200,
+      "predicted": false,
+      "flags": [],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "ja-20-v2-278",
+      "text": "暴力や危険はありません。相談をしたいだけです。 避難所で職員に伝えたいです。",
+      "language": "ja",
+      "emergency": false,
+      "labels": [],
+      "sourceSeed": "negative:ja-20",
+      "httpStatus": 200,
+      "predicted": false,
+      "flags": [],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "ja-20-v3-279",
+      "text": "暴力や危険はありません。相談をしたいだけです。 これは今の状況です。",
+      "language": "ja",
+      "emergency": false,
+      "labels": [],
+      "sourceSeed": "negative:ja-20",
+      "httpStatus": 200,
+      "predicted": false,
+      "flags": [],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "ja-20-v4-280",
+      "text": "暴力や危険はありません。相談をしたいだけです。 できるだけ正確に確認してください。",
+      "language": "ja",
+      "emergency": false,
+      "labels": [],
+      "sourceSeed": "negative:ja-20",
+      "httpStatus": 200,
+      "predicted": false,
+      "flags": [],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "en-01-v1-281",
+      "text": "There is no fire; it is steam.",
+      "language": "en",
+      "emergency": false,
+      "labels": [],
+      "sourceSeed": "negative:en-01",
+      "httpStatus": 200,
+      "predicted": false,
+      "flags": [],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "en-01-v2-282",
+      "text": "There is no fire; it is steam. I want to tell shelter staff.",
+      "language": "en",
+      "emergency": false,
+      "labels": [],
+      "sourceSeed": "negative:en-01",
+      "httpStatus": 200,
+      "predicted": false,
+      "flags": [],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "en-01-v3-283",
+      "text": "There is no fire; it is steam. This is the current situation.",
+      "language": "en",
+      "emergency": false,
+      "labels": [],
+      "sourceSeed": "negative:en-01",
+      "httpStatus": 200,
+      "predicted": false,
+      "flags": [],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "en-01-v4-284",
+      "text": "There is no fire; it is steam. Please check it carefully.",
+      "language": "en",
+      "emergency": false,
+      "labels": [],
+      "sourceSeed": "negative:en-01",
+      "httpStatus": 200,
+      "predicted": false,
+      "flags": [],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "en-02-v1-285",
+      "text": "I had trouble breathing yesterday, but I am fine now.",
+      "language": "en",
+      "emergency": false,
+      "labels": [],
+      "sourceSeed": "negative:en-02",
+      "httpStatus": 200,
+      "predicted": false,
+      "flags": [],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "en-02-v2-286",
+      "text": "I had trouble breathing yesterday, but I am fine now. I want to tell shelter staff.",
+      "language": "en",
+      "emergency": false,
+      "labels": [],
+      "sourceSeed": "negative:en-02",
+      "httpStatus": 200,
+      "predicted": false,
+      "flags": [],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "en-02-v3-287",
+      "text": "I had trouble breathing yesterday, but I am fine now. This is the current situation.",
+      "language": "en",
+      "emergency": false,
+      "labels": [],
+      "sourceSeed": "negative:en-02",
+      "httpStatus": 200,
+      "predicted": false,
+      "flags": [],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "en-02-v4-288",
+      "text": "I had trouble breathing yesterday, but I am fine now. Please check it carefully.",
+      "language": "en",
+      "emergency": false,
+      "labels": [],
+      "sourceSeed": "negative:en-02",
+      "httpStatus": 200,
+      "predicted": false,
+      "flags": [],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "en-03-v1-289",
+      "text": "She does not have a high fever.",
+      "language": "en",
+      "emergency": false,
+      "labels": [],
+      "sourceSeed": "negative:en-03",
+      "httpStatus": 200,
+      "predicted": false,
+      "flags": [],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "en-03-v2-290",
+      "text": "She does not have a high fever. I want to tell shelter staff.",
+      "language": "en",
+      "emergency": false,
+      "labels": [],
+      "sourceSeed": "negative:en-03",
+      "httpStatus": 200,
+      "predicted": false,
+      "flags": [],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "en-03-v3-291",
+      "text": "She does not have a high fever. This is the current situation.",
+      "language": "en",
+      "emergency": false,
+      "labels": [],
+      "sourceSeed": "negative:en-03",
+      "httpStatus": 200,
+      "predicted": false,
+      "flags": [],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "en-03-v4-292",
+      "text": "She does not have a high fever. Please check it carefully.",
+      "language": "en",
+      "emergency": false,
+      "labels": [],
+      "sourceSeed": "negative:en-03",
+      "httpStatus": 200,
+      "predicted": false,
+      "flags": [],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "en-04-v1-293",
+      "text": "He is conscious and speaking normally.",
+      "language": "en",
+      "emergency": false,
+      "labels": [],
+      "sourceSeed": "negative:en-04",
+      "httpStatus": 200,
+      "predicted": false,
+      "flags": [],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "en-04-v2-294",
+      "text": "He is conscious and speaking normally. I want to tell shelter staff.",
+      "language": "en",
+      "emergency": false,
+      "labels": [],
+      "sourceSeed": "negative:en-04",
+      "httpStatus": 200,
+      "predicted": false,
+      "flags": [],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "en-04-v3-295",
+      "text": "He is conscious and speaking normally. This is the current situation.",
+      "language": "en",
+      "emergency": false,
+      "labels": [],
+      "sourceSeed": "negative:en-04",
+      "httpStatus": 200,
+      "predicted": false,
+      "flags": [],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "en-04-v4-296",
+      "text": "He is conscious and speaking normally. Please check it carefully.",
+      "language": "en",
+      "emergency": false,
+      "labels": [],
+      "sourceSeed": "negative:en-04",
+      "httpStatus": 200,
+      "predicted": false,
+      "flags": [],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "en-05-v1-297",
+      "text": "There is no violence; it was only an argument.",
+      "language": "en",
+      "emergency": false,
+      "labels": [],
+      "sourceSeed": "negative:en-05",
+      "httpStatus": 200,
+      "predicted": false,
+      "flags": [],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "en-05-v2-298",
+      "text": "There is no violence; it was only an argument. I want to tell shelter staff.",
+      "language": "en",
+      "emergency": false,
+      "labels": [],
+      "sourceSeed": "negative:en-05",
+      "httpStatus": 200,
+      "predicted": false,
+      "flags": [],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "en-05-v3-299",
+      "text": "There is no violence; it was only an argument. This is the current situation.",
+      "language": "en",
+      "emergency": false,
+      "labels": [],
+      "sourceSeed": "negative:en-05",
+      "httpStatus": 200,
+      "predicted": false,
+      "flags": [],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "en-05-v4-300",
+      "text": "There is no violence; it was only an argument. Please check it carefully.",
+      "language": "en",
+      "emergency": false,
+      "labels": [],
+      "sourceSeed": "negative:en-05",
+      "httpStatus": 200,
+      "predicted": false,
+      "flags": [],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "en-06-v1-301",
+      "text": "The knife is not a weapon; it is for cooking.",
+      "language": "en",
+      "emergency": false,
+      "labels": [],
+      "sourceSeed": "negative:en-06",
+      "httpStatus": 200,
+      "predicted": false,
+      "flags": [],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "en-06-v2-302",
+      "text": "The knife is not a weapon; it is for cooking. I want to tell shelter staff.",
+      "language": "en",
+      "emergency": false,
+      "labels": [],
+      "sourceSeed": "negative:en-06",
+      "httpStatus": 200,
+      "predicted": false,
+      "flags": [],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "en-06-v3-303",
+      "text": "The knife is not a weapon; it is for cooking. This is the current situation.",
+      "language": "en",
+      "emergency": false,
+      "labels": [],
+      "sourceSeed": "negative:en-06",
+      "httpStatus": 200,
+      "predicted": false,
+      "flags": [],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "en-06-v4-304",
+      "text": "The knife is not a weapon; it is for cooking. Please check it carefully.",
+      "language": "en",
+      "emergency": false,
+      "labels": [],
+      "sourceSeed": "negative:en-06",
+      "httpStatus": 200,
+      "predicted": false,
+      "flags": [],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "en-07-v1-305",
+      "text": "The smoke is only a stage effect.",
+      "language": "en",
+      "emergency": false,
+      "labels": [],
+      "sourceSeed": "negative:en-07",
+      "httpStatus": 200,
+      "predicted": false,
+      "flags": [],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "en-07-v2-306",
+      "text": "The smoke is only a stage effect. I want to tell shelter staff.",
+      "language": "en",
+      "emergency": false,
+      "labels": [],
+      "sourceSeed": "negative:en-07",
+      "httpStatus": 200,
+      "predicted": false,
+      "flags": [],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "en-07-v3-307",
+      "text": "The smoke is only a stage effect. This is the current situation.",
+      "language": "en",
+      "emergency": false,
+      "labels": [],
+      "sourceSeed": "negative:en-07",
+      "httpStatus": 200,
+      "predicted": false,
+      "flags": [],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "en-07-v4-308",
+      "text": "The smoke is only a stage effect. Please check it carefully.",
+      "language": "en",
+      "emergency": false,
+      "labels": [],
+      "sourceSeed": "negative:en-07",
+      "httpStatus": 200,
+      "predicted": false,
+      "flags": [],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "en-08-v1-309",
+      "text": "No one is trapped; the door opens.",
+      "language": "en",
+      "emergency": false,
+      "labels": [],
+      "sourceSeed": "negative:en-08",
+      "httpStatus": 200,
+      "predicted": false,
+      "flags": [],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "en-08-v2-310",
+      "text": "No one is trapped; the door opens. I want to tell shelter staff.",
+      "language": "en",
+      "emergency": false,
+      "labels": [],
+      "sourceSeed": "negative:en-08",
+      "httpStatus": 200,
+      "predicted": false,
+      "flags": [],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "en-08-v3-311",
+      "text": "No one is trapped; the door opens. This is the current situation.",
+      "language": "en",
+      "emergency": false,
+      "labels": [],
+      "sourceSeed": "negative:en-08",
+      "httpStatus": 200,
+      "predicted": false,
+      "flags": [],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "en-08-v4-312",
+      "text": "No one is trapped; the door opens. Please check it carefully.",
+      "language": "en",
+      "emergency": false,
+      "labels": [],
+      "sourceSeed": "negative:en-08",
+      "httpStatus": 200,
+      "predicted": false,
+      "flags": [],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "en-09-v1-313",
+      "text": "The bleeding stopped and she is stable now.",
+      "language": "en",
+      "emergency": false,
+      "labels": [],
+      "sourceSeed": "negative:en-09",
+      "httpStatus": 200,
+      "predicted": false,
+      "flags": [],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "en-09-v2-314",
+      "text": "The bleeding stopped and she is stable now. I want to tell shelter staff.",
+      "language": "en",
+      "emergency": false,
+      "labels": [],
+      "sourceSeed": "negative:en-09",
+      "httpStatus": 200,
+      "predicted": false,
+      "flags": [],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "en-09-v3-315",
+      "text": "The bleeding stopped and she is stable now. This is the current situation.",
+      "language": "en",
+      "emergency": false,
+      "labels": [],
+      "sourceSeed": "negative:en-09",
+      "httpStatus": 200,
+      "predicted": false,
+      "flags": [],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "en-09-v4-316",
+      "text": "The bleeding stopped and she is stable now. Please check it carefully.",
+      "language": "en",
+      "emergency": false,
+      "labels": [],
+      "sourceSeed": "negative:en-09",
+      "httpStatus": 200,
+      "predicted": false,
+      "flags": [],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "en-10-v1-317",
+      "text": "The child is active and not limp.",
+      "language": "en",
+      "emergency": false,
+      "labels": [],
+      "sourceSeed": "negative:en-10",
+      "httpStatus": 200,
+      "predicted": false,
+      "flags": [],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "en-10-v2-318",
+      "text": "The child is active and not limp. I want to tell shelter staff.",
+      "language": "en",
+      "emergency": false,
+      "labels": [],
+      "sourceSeed": "negative:en-10",
+      "httpStatus": 200,
+      "predicted": false,
+      "flags": [],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "en-10-v3-319",
+      "text": "The child is active and not limp. This is the current situation.",
+      "language": "en",
+      "emergency": false,
+      "labels": [],
+      "sourceSeed": "negative:en-10",
+      "httpStatus": 200,
+      "predicted": false,
+      "flags": [],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "en-10-v4-320",
+      "text": "The child is active and not limp. Please check it carefully.",
+      "language": "en",
+      "emergency": false,
+      "labels": [],
+      "sourceSeed": "negative:en-10",
+      "httpStatus": 200,
+      "predicted": false,
+      "flags": [],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "zh-01-v1-321",
+      "text": "不是火灾，是水蒸气。",
+      "language": "zh",
+      "emergency": false,
+      "labels": [],
+      "sourceSeed": "negative:zh-01",
+      "httpStatus": 200,
+      "predicted": false,
+      "flags": [],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "zh-01-v2-322",
+      "text": "不是火灾，是水蒸气。 我想告诉避难所工作人员。",
+      "language": "zh",
+      "emergency": false,
+      "labels": [],
+      "sourceSeed": "negative:zh-01",
+      "httpStatus": 200,
+      "predicted": false,
+      "flags": [],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "zh-01-v3-323",
+      "text": "不是火灾，是水蒸气。 这是现在的情况。",
+      "language": "zh",
+      "emergency": false,
+      "labels": [],
+      "sourceSeed": "negative:zh-01",
+      "httpStatus": 200,
+      "predicted": false,
+      "flags": [],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "zh-01-v4-324",
+      "text": "不是火灾，是水蒸气。 请准确确认。",
+      "language": "zh",
+      "emergency": false,
+      "labels": [],
+      "sourceSeed": "negative:zh-01",
+      "httpStatus": 200,
+      "predicted": false,
+      "flags": [],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "zh-02-v1-325",
+      "text": "刚才呼吸困难，现在已经没事了。",
+      "language": "zh",
+      "emergency": false,
+      "labels": [],
+      "sourceSeed": "negative:zh-02",
+      "httpStatus": 200,
+      "predicted": false,
+      "flags": [],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "zh-02-v2-326",
+      "text": "刚才呼吸困难，现在已经没事了。 我想告诉避难所工作人员。",
+      "language": "zh",
+      "emergency": false,
+      "labels": [],
+      "sourceSeed": "negative:zh-02",
+      "httpStatus": 200,
+      "predicted": false,
+      "flags": [],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "zh-02-v3-327",
+      "text": "刚才呼吸困难，现在已经没事了。 这是现在的情况。",
+      "language": "zh",
+      "emergency": false,
+      "labels": [],
+      "sourceSeed": "negative:zh-02",
+      "httpStatus": 200,
+      "predicted": false,
+      "flags": [],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "zh-02-v4-328",
+      "text": "刚才呼吸困难，现在已经没事了。 请准确确认。",
+      "language": "zh",
+      "emergency": false,
+      "labels": [],
+      "sourceSeed": "negative:zh-02",
+      "httpStatus": 200,
+      "predicted": false,
+      "flags": [],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "zh-03-v1-329",
+      "text": "不是高热，只是觉得有点热。",
+      "language": "zh",
+      "emergency": false,
+      "labels": [],
+      "sourceSeed": "negative:zh-03",
+      "httpStatus": 200,
+      "predicted": false,
+      "flags": [],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "zh-03-v2-330",
+      "text": "不是高热，只是觉得有点热。 我想告诉避难所工作人员。",
+      "language": "zh",
+      "emergency": false,
+      "labels": [],
+      "sourceSeed": "negative:zh-03",
+      "httpStatus": 200,
+      "predicted": false,
+      "flags": [],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "zh-03-v3-331",
+      "text": "不是高热，只是觉得有点热。 这是现在的情况。",
+      "language": "zh",
+      "emergency": false,
+      "labels": [],
+      "sourceSeed": "negative:zh-03",
+      "httpStatus": 200,
+      "predicted": false,
+      "flags": [],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "zh-03-v4-332",
+      "text": "不是高热，只是觉得有点热。 请准确确认。",
+      "language": "zh",
+      "emergency": false,
+      "labels": [],
+      "sourceSeed": "negative:zh-03",
+      "httpStatus": 200,
+      "predicted": false,
+      "flags": [],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "zh-04-v1-333",
+      "text": "他有意识，也能正常说话。",
+      "language": "zh",
+      "emergency": false,
+      "labels": [],
+      "sourceSeed": "negative:zh-04",
+      "httpStatus": 200,
+      "predicted": false,
+      "flags": [],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "zh-04-v2-334",
+      "text": "他有意识，也能正常说话。 我想告诉避难所工作人员。",
+      "language": "zh",
+      "emergency": false,
+      "labels": [],
+      "sourceSeed": "negative:zh-04",
+      "httpStatus": 200,
+      "predicted": false,
+      "flags": [],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "zh-04-v3-335",
+      "text": "他有意识，也能正常说话。 这是现在的情况。",
+      "language": "zh",
+      "emergency": false,
+      "labels": [],
+      "sourceSeed": "negative:zh-04",
+      "httpStatus": 200,
+      "predicted": false,
+      "flags": [],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "zh-04-v4-336",
+      "text": "他有意识，也能正常说话。 请准确确认。",
+      "language": "zh",
+      "emergency": false,
+      "labels": [],
+      "sourceSeed": "negative:zh-04",
+      "httpStatus": 200,
+      "predicted": false,
+      "flags": [],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "zh-05-v1-337",
+      "text": "没有暴力，只是争吵。",
+      "language": "zh",
+      "emergency": false,
+      "labels": [],
+      "sourceSeed": "negative:zh-05",
+      "httpStatus": 200,
+      "predicted": false,
+      "flags": [],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "zh-05-v2-338",
+      "text": "没有暴力，只是争吵。 我想告诉避难所工作人员。",
+      "language": "zh",
+      "emergency": false,
+      "labels": [],
+      "sourceSeed": "negative:zh-05",
+      "httpStatus": 200,
+      "predicted": false,
+      "flags": [],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "zh-05-v3-339",
+      "text": "没有暴力，只是争吵。 这是现在的情况。",
+      "language": "zh",
+      "emergency": false,
+      "labels": [],
+      "sourceSeed": "negative:zh-05",
+      "httpStatus": 200,
+      "predicted": false,
+      "flags": [],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "zh-05-v4-340",
+      "text": "没有暴力，只是争吵。 请准确确认。",
+      "language": "zh",
+      "emergency": false,
+      "labels": [],
+      "sourceSeed": "negative:zh-05",
+      "httpStatus": 200,
+      "predicted": false,
+      "flags": [],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "zh-06-v1-341",
+      "text": "没有人被困，门可以打开。",
+      "language": "zh",
+      "emergency": false,
+      "labels": [],
+      "sourceSeed": "negative:zh-06",
+      "httpStatus": 200,
+      "predicted": false,
+      "flags": [],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "zh-06-v2-342",
+      "text": "没有人被困，门可以打开。 我想告诉避难所工作人员。",
+      "language": "zh",
+      "emergency": false,
+      "labels": [],
+      "sourceSeed": "negative:zh-06",
+      "httpStatus": 200,
+      "predicted": false,
+      "flags": [],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "zh-06-v3-343",
+      "text": "没有人被困，门可以打开。 这是现在的情况。",
+      "language": "zh",
+      "emergency": false,
+      "labels": [],
+      "sourceSeed": "negative:zh-06",
+      "httpStatus": 200,
+      "predicted": false,
+      "flags": [],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "zh-06-v4-344",
+      "text": "没有人被困，门可以打开。 请准确确认。",
+      "language": "zh",
+      "emergency": false,
+      "labels": [],
+      "sourceSeed": "negative:zh-06",
+      "httpStatus": 200,
+      "predicted": false,
+      "flags": [],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "zh-07-v1-345",
+      "text": "烟不是火灾，是外面的雾。",
+      "language": "zh",
+      "emergency": false,
+      "labels": [],
+      "sourceSeed": "negative:zh-07",
+      "httpStatus": 200,
+      "predicted": false,
+      "flags": [],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "zh-07-v2-346",
+      "text": "烟不是火灾，是外面的雾。 我想告诉避难所工作人员。",
+      "language": "zh",
+      "emergency": false,
+      "labels": [],
+      "sourceSeed": "negative:zh-07",
+      "httpStatus": 200,
+      "predicted": false,
+      "flags": [],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "zh-07-v3-347",
+      "text": "烟不是火灾，是外面的雾。 这是现在的情况。",
+      "language": "zh",
+      "emergency": false,
+      "labels": [],
+      "sourceSeed": "negative:zh-07",
+      "httpStatus": 200,
+      "predicted": false,
+      "flags": [],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "zh-07-v4-348",
+      "text": "烟不是火灾，是外面的雾。 请准确确认。",
+      "language": "zh",
+      "emergency": false,
+      "labels": [],
+      "sourceSeed": "negative:zh-07",
+      "httpStatus": 200,
+      "predicted": false,
+      "flags": [],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "ko-01-v1-349",
+      "text": "화재가 아닙니다. 수증기입니다.",
+      "language": "ko",
+      "emergency": false,
+      "labels": [],
+      "sourceSeed": "negative:ko-01",
+      "httpStatus": 200,
+      "predicted": false,
+      "flags": [],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "ko-01-v2-350",
+      "text": "화재가 아닙니다. 수증기입니다. 대피소 직원에게 알리고 싶습니다.",
+      "language": "ko",
+      "emergency": false,
+      "labels": [],
+      "sourceSeed": "negative:ko-01",
+      "httpStatus": 200,
+      "predicted": false,
+      "flags": [],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "ko-01-v3-351",
+      "text": "화재가 아닙니다. 수증기입니다. 지금 상황입니다.",
+      "language": "ko",
+      "emergency": false,
+      "labels": [],
+      "sourceSeed": "negative:ko-01",
+      "httpStatus": 200,
+      "predicted": false,
+      "flags": [],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "ko-01-v4-352",
+      "text": "화재가 아닙니다. 수증기입니다. 정확히 확인해 주세요.",
+      "language": "ko",
+      "emergency": false,
+      "labels": [],
+      "sourceSeed": "negative:ko-01",
+      "httpStatus": 200,
+      "predicted": false,
+      "flags": [],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "ko-02-v1-353",
+      "text": "아까 숨이 답답했지만 지금은 괜찮습니다.",
+      "language": "ko",
+      "emergency": false,
+      "labels": [],
+      "sourceSeed": "negative:ko-02",
+      "httpStatus": 200,
+      "predicted": false,
+      "flags": [],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "ko-02-v2-354",
+      "text": "아까 숨이 답답했지만 지금은 괜찮습니다. 대피소 직원에게 알리고 싶습니다.",
+      "language": "ko",
+      "emergency": false,
+      "labels": [],
+      "sourceSeed": "negative:ko-02",
+      "httpStatus": 200,
+      "predicted": false,
+      "flags": [],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "ko-02-v3-355",
+      "text": "아까 숨이 답답했지만 지금은 괜찮습니다. 지금 상황입니다.",
+      "language": "ko",
+      "emergency": false,
+      "labels": [],
+      "sourceSeed": "negative:ko-02",
+      "httpStatus": 200,
+      "predicted": false,
+      "flags": [],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "ko-02-v4-356",
+      "text": "아까 숨이 답답했지만 지금은 괜찮습니다. 정확히 확인해 주세요.",
+      "language": "ko",
+      "emergency": false,
+      "labels": [],
+      "sourceSeed": "negative:ko-02",
+      "httpStatus": 200,
+      "predicted": false,
+      "flags": [],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "ko-03-v1-357",
+      "text": "고열이 아닙니다.",
+      "language": "ko",
+      "emergency": false,
+      "labels": [],
+      "sourceSeed": "negative:ko-03",
+      "httpStatus": 200,
+      "predicted": false,
+      "flags": [],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "ko-03-v2-358",
+      "text": "고열이 아닙니다. 대피소 직원에게 알리고 싶습니다.",
+      "language": "ko",
+      "emergency": false,
+      "labels": [],
+      "sourceSeed": "negative:ko-03",
+      "httpStatus": 200,
+      "predicted": false,
+      "flags": [],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "ko-03-v3-359",
+      "text": "고열이 아닙니다. 지금 상황입니다.",
+      "language": "ko",
+      "emergency": false,
+      "labels": [],
+      "sourceSeed": "negative:ko-03",
+      "httpStatus": 200,
+      "predicted": false,
+      "flags": [],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "ko-03-v4-360",
+      "text": "고열이 아닙니다. 정확히 확인해 주세요.",
+      "language": "ko",
+      "emergency": false,
+      "labels": [],
+      "sourceSeed": "negative:ko-03",
+      "httpStatus": 200,
+      "predicted": false,
+      "flags": [],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "ko-04-v1-361",
+      "text": "의식이 있고 정상적으로 말합니다.",
+      "language": "ko",
+      "emergency": false,
+      "labels": [],
+      "sourceSeed": "negative:ko-04",
+      "httpStatus": 200,
+      "predicted": false,
+      "flags": [],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "ko-04-v2-362",
+      "text": "의식이 있고 정상적으로 말합니다. 대피소 직원에게 알리고 싶습니다.",
+      "language": "ko",
+      "emergency": false,
+      "labels": [],
+      "sourceSeed": "negative:ko-04",
+      "httpStatus": 200,
+      "predicted": false,
+      "flags": [],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "ko-04-v3-363",
+      "text": "의식이 있고 정상적으로 말합니다. 지금 상황입니다.",
+      "language": "ko",
+      "emergency": false,
+      "labels": [],
+      "sourceSeed": "negative:ko-04",
+      "httpStatus": 200,
+      "predicted": false,
+      "flags": [],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "ko-04-v4-364",
+      "text": "의식이 있고 정상적으로 말합니다. 정확히 확인해 주세요.",
+      "language": "ko",
+      "emergency": false,
+      "labels": [],
+      "sourceSeed": "negative:ko-04",
+      "httpStatus": 200,
+      "predicted": false,
+      "flags": [],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "ko-05-v1-365",
+      "text": "폭력은 없습니다. 말다툼뿐입니다.",
+      "language": "ko",
+      "emergency": false,
+      "labels": [],
+      "sourceSeed": "negative:ko-05",
+      "httpStatus": 200,
+      "predicted": false,
+      "flags": [],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "ko-05-v2-366",
+      "text": "폭력은 없습니다. 말다툼뿐입니다. 대피소 직원에게 알리고 싶습니다.",
+      "language": "ko",
+      "emergency": false,
+      "labels": [],
+      "sourceSeed": "negative:ko-05",
+      "httpStatus": 200,
+      "predicted": false,
+      "flags": [],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "ko-05-v3-367",
+      "text": "폭력은 없습니다. 말다툼뿐입니다. 지금 상황입니다.",
+      "language": "ko",
+      "emergency": false,
+      "labels": [],
+      "sourceSeed": "negative:ko-05",
+      "httpStatus": 200,
+      "predicted": false,
+      "flags": [],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "ko-05-v4-368",
+      "text": "폭력은 없습니다. 말다툼뿐입니다. 정확히 확인해 주세요.",
+      "language": "ko",
+      "emergency": false,
+      "labels": [],
+      "sourceSeed": "negative:ko-05",
+      "httpStatus": 200,
+      "predicted": false,
+      "flags": [],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "ko-06-v1-369",
+      "text": "방에 갇힌 것이 아니고 문이 열립니다.",
+      "language": "ko",
+      "emergency": false,
+      "labels": [],
+      "sourceSeed": "negative:ko-06",
+      "httpStatus": 200,
+      "predicted": false,
+      "flags": [],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "ko-06-v2-370",
+      "text": "방에 갇힌 것이 아니고 문이 열립니다. 대피소 직원에게 알리고 싶습니다.",
+      "language": "ko",
+      "emergency": false,
+      "labels": [],
+      "sourceSeed": "negative:ko-06",
+      "httpStatus": 200,
+      "predicted": false,
+      "flags": [],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "ko-06-v3-371",
+      "text": "방에 갇힌 것이 아니고 문이 열립니다. 지금 상황입니다.",
+      "language": "ko",
+      "emergency": false,
+      "labels": [],
+      "sourceSeed": "negative:ko-06",
+      "httpStatus": 200,
+      "predicted": false,
+      "flags": [],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    },
+    {
+      "id": "ko-06-v4-372",
+      "text": "방에 갇힌 것이 아니고 문이 열립니다. 정확히 확인해 주세요.",
+      "language": "ko",
+      "emergency": false,
+      "labels": [],
+      "sourceSeed": "negative:ko-06",
+      "httpStatus": 200,
+      "predicted": false,
+      "flags": [],
+      "ok": true,
+      "falseNegative": false,
+      "falsePositive": false
+    }
+  ],
+  "caveats": [
+    "Synthetic fixed development set; not a clinical or field validation.",
+    "Variants are controlled paraphrase/context expansions from labelled seeds and therefore are not independent observations.",
+    "False positives and false negatives require human review before any operational safety claim."
+  ]
+}

@@ -16,6 +16,18 @@ export const USER_LANGUAGE_OPTIONS: Array<{ value: UserLanguage; label: string }
 
 const LANGUAGE_STORAGE_KEY = 'kikumae-user-language';
 const LANGUAGE_TAGS: Record<UserLanguage, string> = { ja: 'ja', en: 'en', zh: 'zh-CN', ko: 'ko' };
+const LANGUAGE_PAGE_TITLES: Record<UserLanguage, string> = {
+  ja: 'イセキ避難所の相談窓口 | 声が届き、対応が見える',
+  en: 'Iseki Shelter consultation desk | Your voice reaches staff',
+  zh: '伊势木避难所咨询窗口 | 您的声音会被听见',
+  ko: '이세키 대피소 상담 창구 | 여러분의 목소리가 전달됩니다',
+};
+const LANGUAGE_PAGE_DESCRIPTIONS: Record<UserLanguage, string> = {
+  ja: 'イセキ避難所にいる方の声を受け止め、職員が事実を確認し、対応状況を返す避難所向け相談サービスです。',
+  en: 'A shelter consultation service where staff organize requests from people at Iseki Shelter and share response updates.',
+  zh: '为伊势木避难所提供咨询服务，工作人员会整理大家的需求并反馈处理进展。',
+  ko: '이세키 대피소에서 전해진 요청을 직원이 정리하고 대응 상황을 알려 드리는 상담 서비스입니다.',
+};
 
 const resources = {
   ja: { translation: {
@@ -225,7 +237,37 @@ const faqTranslations: Record<UserLanguage, Record<string, { question: string; a
 export function translateUserFaq<T extends { question: string; answer: string; category: string }>(faq: T, language: UserLanguage): T {
   const key = seededFaqKeys[faq.question];
   const translated = key ? faqTranslations[language][key] : undefined;
-  return translated ? { ...faq, ...translated } : faq;
+  if (translated) return { ...faq, ...translated };
+  if (language === 'ja') return faq;
+  const fallback = language === 'en'
+    ? { question: 'This guide is currently available in Japanese.', answer: 'Please ask a nearby staff member for help.', category: 'Information' }
+    : language === 'zh'
+      ? { question: '这份说明目前只有日语版本。', answer: '请向附近工作人员询问。', category: '信息' }
+      : { question: '이 안내는 현재 일본어로만 제공됩니다.', answer: '가까운 직원에게 문의해 주세요.', category: '안내' };
+  return { ...faq, ...fallback };
+}
+
+const GENERATED_JAPANESE = /[ぁ-んァ-ン一-龯]/u;
+const GENERATED_SUMMARY_LABELS: Record<string, Record<Exclude<UserLanguage, 'ja'>, string>> = {
+  '水・飲料': { en: 'Drinking water support', zh: '饮用水支持', ko: '식수 지원' },
+  '食料・物資': { en: 'Food and supplies support', zh: '食品和物资支持', ko: '식사와 물자 지원' },
+  '医療・薬': { en: 'Medical or medicine support', zh: '医疗或药物支持', ko: '의료 또는 약물 지원' },
+  'トイレ・衛生': { en: 'Toilet and hygiene support', zh: '厕所和卫生支持', ko: '화장실과 위생 지원' },
+  '設備・充電': { en: 'Shelter facilities or charging support', zh: '避难所设施或充电支持', ko: '대피소 시설 또는 충전 지원' },
+  'ペット': { en: 'Pet support', zh: '宠物支持', ko: '반려동물 지원' },
+  '安全・その他': { en: 'Safety support', zh: '安全支持', ko: '안전 지원' },
+  'その他': { en: 'Shelter support request', zh: '避难所支持请求', ko: '대피소 지원 요청' },
+};
+
+/** Generated analysis is canonical for staff, but resident-facing labels must not leak Japanese. */
+export function localizeUserGeneratedSummary(value: string, category: string, language: UserLanguage): string {
+  if (language === 'ja' || !GENERATED_JAPANESE.test(value)) return value;
+  return GENERATED_SUMMARY_LABELS[category]?.[language] ?? (language === 'en' ? 'Shelter support request' : language === 'zh' ? '避难所支持请求' : '대피소 지원 요청');
+}
+
+export function localizeShelterName(value: string, language: UserLanguage): string {
+  if (value.trim() !== 'イセキ避難所') return value;
+  return language === 'en' ? 'Iseki Shelter' : language === 'zh' ? '伊势木避难所' : language === 'ko' ? '이세키 대피소' : value;
 }
 
 function normalizeLanguage(value: string | undefined): UserLanguage {
@@ -280,6 +322,11 @@ for (const [language, values] of Object.entries({
 
 // Keep the reviewed Chinese emergency/help wording free of accidental mixed-language fragments.
 i18n.addResourceBundle('zh', 'translation', {
+  'shelter.name': '伊势木避难所',
+  'reception.brandAria': '返回伊势木避难所接待首页',
+  'reception.eyebrow': '避难所接待',
+  'reception.progressAria': '接待进度',
+  'reception.faqEyebrow': '确认所选内容',
   'reception.faqTitle': '这份说明可能解决问题吗？',
   'reception.faqFound': '找到相关说明',
   'reception.emergencyEyebrow': '紧急情况说明',
@@ -288,6 +335,13 @@ i18n.addResourceBundle('zh', 'translation', {
   'portal.related': '相关说明',
   'faq.untranslated': '原文说明',
 }, true, true);
+
+i18n.addResourceBundle('ja', 'translation', { 'shelter.name': 'イセキ避難所' }, true, true);
+i18n.addResourceBundle('en', 'translation', {
+  'shelter.name': 'Iseki Shelter',
+  'reception.completeEyebrow': 'Consultation received',
+}, true, true);
+i18n.addResourceBundle('ko', 'translation', { 'shelter.name': '이세키 대피소' }, true, true);
 
 export function useUserI18n() {
   const { t, i18n: instance } = useTranslation();
@@ -300,7 +354,11 @@ export function useUserI18n() {
   }, [instance]);
 
   useEffect(() => {
-    if (typeof document !== 'undefined') document.documentElement.lang = LANGUAGE_TAGS[language];
+    if (typeof document === 'undefined') return;
+    document.documentElement.lang = LANGUAGE_TAGS[language];
+    document.title = LANGUAGE_PAGE_TITLES[language];
+    const description = document.querySelector('meta[name="description"]');
+    if (description) description.setAttribute('content', LANGUAGE_PAGE_DESCRIPTIONS[language]);
   }, [language]);
 
   function setLanguage(next: UserLanguage) {

@@ -3,6 +3,8 @@ import { env } from 'cloudflare:workers';
 export type ModelRuntimeStatus = {
   mode: 'local-llm' | 'local-rules' | 'auto';
   configured: boolean;
+  conversationConfigured: boolean;
+  extractionConfigured: boolean;
   provider: 'openai-compatible' | 'not-configured';
   conversationModel: string | null;
   extractionModel: string | null;
@@ -30,9 +32,11 @@ export function allowsEvaluationOverrides(): boolean {
   return value('AI_ALLOW_EVAL_MODEL_OVERRIDE') === '1';
 }
 
-function timeoutMs(): number {
-  const configured = Number(value('AI_MODEL_TIMEOUT_MS'));
-  return Number.isFinite(configured) ? Math.max(3000, Math.min(180000, Math.round(configured))) : 120000;
+function timeoutMs(role: 'conversation' | 'extraction'): number {
+  const raw = role === 'conversation' ? value('AI_CONVERSATION_TIMEOUT_MS') : value('AI_MODEL_TIMEOUT_MS');
+  const roleSpecific = raw ? Number(raw) : Number.NaN;
+  if (Number.isFinite(roleSpecific)) return Math.max(3000, Math.min(role === 'conversation' ? 30000 : 180000, Math.round(roleSpecific)));
+  return role === 'conversation' ? 15000 : 120000;
 }
 
 export function getModelRuntimeStatus(): ModelRuntimeStatus {
@@ -41,9 +45,15 @@ export function getModelRuntimeStatus(): ModelRuntimeStatus {
   const conversationModel = value('AI_CONVERSATION_MODEL');
   const extractionModel = value('AI_EXTRACTION_MODEL');
   const translationModel = value('AI_TRANSLATION_MODEL') || conversationModel || extractionModel;
+  const conversationConfigured = mode !== 'local-rules' && Boolean(baseUrl && conversationModel);
+  const extractionConfigured = mode !== 'local-rules' && Boolean(baseUrl && extractionModel);
   return {
     mode,
-    configured: mode !== 'local-rules' && Boolean(baseUrl && conversationModel && extractionModel),
+    // A missing extraction model must not make the resident-facing
+    // conversation lane look disconnected.
+    configured: conversationConfigured || extractionConfigured,
+    conversationConfigured,
+    extractionConfigured,
     provider: baseUrl ? 'openai-compatible' : 'not-configured',
     conversationModel: conversationModel || null,
     extractionModel: extractionModel || null,
@@ -87,6 +97,7 @@ function extractJson(content: unknown): unknown {
 export type ModelRequestOptions = {
   maxTokens?: number;
   stream?: boolean;
+  role?: 'conversation' | 'extraction';
 };
 
 export type ModelRequestTimings = {
@@ -251,7 +262,7 @@ export async function requestModelJsonDetailed(
       ...(apiKey ? { Authorization: `Bearer ${apiKey}` } : {}),
     },
     body: requestBody,
-    signal: AbortSignal.timeout(timeoutMs()),
+    signal: AbortSignal.timeout(timeoutMs(options.role ?? 'extraction')),
   });
   if (!response.ok) throw new Error(`MODEL_GATEWAY_${response.status}`);
   const headersAt = performance.now();

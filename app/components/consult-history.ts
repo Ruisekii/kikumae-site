@@ -2,6 +2,7 @@ export type ConsultHistoryEntry = { id: number; checkUrl: string; title: string;
 
 const HISTORY_STORAGE_KEY = 'kikumae-consult-history';
 const HISTORY_MAX_AGE_MS = 7 * 24 * 60 * 60 * 1000;
+export const RESIDENT_DEVICE_STORAGE_KEYS = [HISTORY_STORAGE_KEY, 'kikumae-pending-submissions-v1', 'kikumae-shelter-draft'] as const;
 
 export function loadConsultHistory(): ConsultHistoryEntry[] {
   try {
@@ -38,5 +39,14 @@ export function clearConsultHistory() {
     window.localStorage.removeItem(HISTORY_STORAGE_KEY);
   } catch {
     /* 保存されていない場合は何もしない */
+  }
+}
+
+/** Clear resident-side traces before handing a shared device to another person. */
+export function clearResidentDeviceData() {
+  try {
+    for (const key of RESIDENT_DEVICE_STORAGE_KEYS) window.localStorage.removeItem(key);
+  } catch {
+    /* Shared/private browsers may deny storage access. */
   }
 }

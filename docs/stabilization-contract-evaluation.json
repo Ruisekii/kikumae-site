@@ -1,0 +1,43 @@
+{
+  "schemaVersion": "stabilization.contract.v1",
+  "generatedAt": "2026-09-09T01:16:55.213Z",
+  "checks": [
+    {
+      "id": "server-canonical-builder",
+      "pass": true
+    },
+    {
+      "id": "create-does-not-trust-incident",
+      "pass": true
+    },
+    {
+      "id": "followup-does-not-overwrite-original",
+      "pass": true
+    },
+    {
+      "id": "followup-rebuilds-from-original",
+      "pass": true
+    },
+    {
+      "id": "status-does-not-trust-incident",
+      "pass": true
+    },
+    {
+      "id": "evaluation-endpoint-admin-auth",
+      "pass": true
+    },
+    {
+      "id": "shared-device-clear-scope",
+      "pass": true
+    }
+  ],
+  "evaluationEndpoint": {
+    "status": 404,
+    "lockedWithoutEvaluationGate": true
+  },
+  "pass": true,
+  "caveats": [
+    "Source-contract checks verify that the trust boundary is wired; they do not replace a production authenticated integration test.",
+    "The endpoint lock assertion assumes the local environment has no evaluation override enabled."
+  ]
+}

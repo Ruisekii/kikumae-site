@@ -236,7 +236,7 @@ export function VoiceConsultation({ initialIntake, onClose, onUseText, onDirectS
     asrRef.current.start({
       onInterim: (text) => { if (mountedRef.current) { setInterimTranscript(text); setTurn('USER_SPEAKING'); } },
       onFinal: (text) => { listeningRef.current = false; asrRef.current.stop(); vadRef.current.stop(); if (text.trim()) void processTranscript(text.trim()); },
-      onError: () => { listeningRef.current = false; vadRef.current.stop(); if (mountedRef.current) { setTurn('ERROR'); setStatus(t('voice.recognitionError')); } },
+      onError: (reason) => { listeningRef.current = false; vadRef.current.stop(); if (mountedRef.current) { setTurn('ERROR'); setStatus(reason === 'network' || reason === 'service-not-allowed' ? t('voice.connectionError') : t('voice.recognitionError')); } },
       onEnd: () => { if (mountedRef.current) setTurn((current) => current === 'LISTENING' || current === 'USER_SPEAKING' ? 'IDLE' : current); },
     });
   }

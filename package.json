@@ -31,6 +31,11 @@
     "eval:phase2d:load": "node scripts/phase2d-load.mjs",
     "eval:phase2e": "node scripts/phase2e-eval.mjs",
     "eval:phase2f": "node scripts/phase2f-eval.mjs",
+    "eval:phase2g": "node scripts/phase2g-eval.mjs",
+    "eval:stabilization:safety": "node scripts/safety-blind-eval.mjs",
+    "eval:stabilization:evidence": "node scripts/evidence-eval.mjs",
+    "audit:phase2h": "node scripts/phase2h-audit.mjs",
+    "eval:phase3b": "node scripts/phase3b-resilience-eval.mjs",
     "plan:phase2f:human": "node scripts/phase2f-human-plan.mjs",
     "lint": "eslint . --ignore-pattern dist --ignore-pattern .next"
   },

@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-09-08T10:36:12.204Z",
+  "generatedAt": "2026-09-08T16:35:27.104Z",
   "baseUrl": "http://localhost:3000",
   "literalNetworkSwitchOffPerformed": false,
   "literalNetworkSwitchOffReason": "OS全体のネットワーク遮断は、利用者の通信・他タスクを壊すため、この評価では実施していません。localhost限定の静的監査とローカルSafety実機呼び出しを行い、完全オフライン合格とは判定していません。",

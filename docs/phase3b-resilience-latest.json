@@ -1,0 +1,188 @@
+{
+  "generatedAt": "2026-09-08T16:35:05.010Z",
+  "baseUrl": "http://localhost:3000",
+  "phase": "3B",
+  "scope": "本番データを変更しないローカル評価。AIレーン障害と決定的Safety/triageレーンを検証し、電源・DB・LAN等の実機障害は未実施として記録する。",
+  "gate": {
+    "simpleFaultOriginalAndSafetyPreserved": true,
+    "recoveryPreserved": true,
+    "safetyOnlyPreserved": true,
+    "overallPassed": false,
+    "reason": "AI障害レーンは通過したが、実機・DB・LAN・バックアップ等の評価が未実施のためPhase 3B Gateは未達"
+  },
+  "faultRows": [
+    {
+      "fault": "ollama-down",
+      "ordinary": {
+        "status": 200,
+        "fallback": true,
+        "originalPreserved": true,
+        "safetyPreserved": true
+      },
+      "emergency": {
+        "status": 200,
+        "fallback": true,
+        "originalPreserved": true,
+        "safetyPreserved": true,
+        "medicalSafetyPreserved": true
+      }
+    },
+    {
+      "fault": "conversation-down",
+      "ordinary": {
+        "status": 200,
+        "fallback": true,
+        "originalPreserved": true,
+        "safetyPreserved": true
+      },
+      "emergency": {
+        "status": 200,
+        "fallback": true,
+        "originalPreserved": true,
+        "safetyPreserved": true,
+        "medicalSafetyPreserved": true
+      }
+    },
+    {
+      "fault": "extraction-down",
+      "ordinary": {
+        "status": 200,
+        "fallback": true,
+        "originalPreserved": true,
+        "safetyPreserved": true
+      },
+      "emergency": {
+        "status": 200,
+        "fallback": true,
+        "originalPreserved": true,
+        "safetyPreserved": true,
+        "medicalSafetyPreserved": true
+      }
+    },
+    {
+      "fault": "timeout",
+      "ordinary": {
+        "status": 200,
+        "fallback": true,
+        "originalPreserved": true,
+        "safetyPreserved": true
+      },
+      "emergency": {
+        "status": 200,
+        "fallback": true,
+        "originalPreserved": true,
+        "safetyPreserved": true,
+        "medicalSafetyPreserved": true
+      }
+    },
+    {
+      "fault": "invalid-json",
+      "ordinary": {
+        "status": 200,
+        "fallback": true,
+        "originalPreserved": true,
+        "safetyPreserved": true
+      },
+      "emergency": {
+        "status": 200,
+        "fallback": true,
+        "originalPreserved": true,
+        "safetyPreserved": true,
+        "medicalSafetyPreserved": true
+      }
+    },
+    {
+      "fault": "network-disconnect",
+      "ordinary": {
+        "status": 200,
+        "fallback": true,
+        "originalPreserved": true,
+        "safetyPreserved": true
+      },
+      "emergency": {
+        "status": 200,
+        "fallback": true,
+        "originalPreserved": true,
+        "safetyPreserved": true,
+        "medicalSafetyPreserved": true
+      }
+    }
+  ],
+  "repeated": [
+    {
+      "cycle": 1,
+      "status": 200,
+      "originalPreserved": true,
+      "safetyPreserved": true,
+      "medicalSafetyPreserved": true
+    },
+    {
+      "cycle": 2,
+      "status": 200,
+      "originalPreserved": true,
+      "safetyPreserved": true,
+      "medicalSafetyPreserved": true
+    },
+    {
+      "cycle": 3,
+      "status": 200,
+      "originalPreserved": true,
+      "safetyPreserved": true,
+      "medicalSafetyPreserved": true
+    },
+    {
+      "cycle": 4,
+      "status": 200,
+      "originalPreserved": true,
+      "safetyPreserved": true,
+      "medicalSafetyPreserved": true
+    },
+    {
+      "cycle": 5,
+      "status": 200,
+      "originalPreserved": true,
+      "safetyPreserved": true,
+      "medicalSafetyPreserved": true
+    }
+  ],
+  "recovery": {
+    "status": 200,
+    "originalPreserved": true,
+    "safetyPreserved": true
+  },
+  "safetyOnly": {
+    "status": 200,
+    "safetyPreserved": true
+  },
+  "capabilityAudit": {
+    "originalPersistence": true,
+    "browserDraftRestore": true,
+    "draftRetainedOnSubmitFailure": true,
+    "pendingSendQueue": true,
+    "durableServerOutbox": false,
+    "databaseBackupRestore": false,
+    "multiDeviceConflictResolution": false,
+    "powerLossTestExecuted": false,
+    "dbRestartTestExecuted": false,
+    "lanDisconnectTestExecuted": false,
+    "browserCrashTestExecuted": false,
+    "diskFullTestExecuted": false,
+    "clockDriftTestExecuted": false
+  },
+  "untestedSystemFaults": [
+    "durableServerOutbox",
+    "databaseBackupRestore",
+    "multiDeviceConflictResolution",
+    "powerLossTestExecuted",
+    "dbRestartTestExecuted",
+    "lanDisconnectTestExecuted",
+    "browserCrashTestExecuted",
+    "diskFullTestExecuted",
+    "clockDriftTestExecuted"
+  ],
+  "limitations": [
+    "電源断・PC再起動・Ollama再起動・DB再起動・LAN切断復帰・ディスク容量不足・時刻ずれ・長時間稼働・複数端末は、このスクリプトでは代替していない。",
+    "ローカル下書きは確認できるが、送信待ちキューとサーバー側の耐久アウトボックスは未実装。",
+    "DBのバックアップ／復元手順と実機リカバリはPhase 3Aの設計段階に留まる。"
+  ]
+}
