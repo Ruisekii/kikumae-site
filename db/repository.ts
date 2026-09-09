@@ -190,6 +190,7 @@ export type Issue = {
   lastReportedAt: number;
   assignedTeam: string;
   assignedUser: string;
+  assignedAt: number | null;
   responseMessage: string;
   internalNote: string;
   estimatedResolutionTime: string;
@@ -311,7 +312,7 @@ async function initialiseDatabase(db: D1Database): Promise<D1Database> {
     db.prepare("CREATE TABLE IF NOT EXISTS case_updates (id INTEGER PRIMARY KEY AUTOINCREMENT, question_id INTEGER NOT NULL, status TEXT NOT NULL, message TEXT NOT NULL DEFAULT '', is_public INTEGER NOT NULL DEFAULT 1, actor_user_id TEXT, created_at INTEGER NOT NULL)"),
     db.prepare("CREATE TABLE IF NOT EXISTS similar_groups (id INTEGER PRIMARY KEY AUTOINCREMENT, title TEXT NOT NULL, category TEXT NOT NULL, location TEXT NOT NULL DEFAULT '', created_at INTEGER NOT NULL, updated_at INTEGER NOT NULL)"),
     db.prepare("CREATE TABLE IF NOT EXISTS question_events (id INTEGER PRIMARY KEY AUTOINCREMENT, question_id INTEGER, event_type TEXT NOT NULL, actor_user_id TEXT, detail TEXT NOT NULL DEFAULT '', created_at INTEGER NOT NULL)"),
-    db.prepare("CREATE TABLE IF NOT EXISTS issues (id INTEGER PRIMARY KEY AUTOINCREMENT, portal_id INTEGER, title TEXT NOT NULL, summary TEXT NOT NULL DEFAULT '', request TEXT NOT NULL DEFAULT '', category TEXT NOT NULL DEFAULT 'その他', location TEXT NOT NULL DEFAULT '', urgency_candidate TEXT NOT NULL DEFAULT 'normal', urgency_confirmed TEXT, status TEXT NOT NULL DEFAULT 'new', report_count INTEGER NOT NULL DEFAULT 0, affected_people TEXT NOT NULL DEFAULT '', vulnerable_people TEXT NOT NULL DEFAULT '[]', first_reported_at INTEGER NOT NULL, last_reported_at INTEGER NOT NULL, assigned_team TEXT NOT NULL DEFAULT '', assigned_user TEXT NOT NULL DEFAULT '', response_message TEXT NOT NULL DEFAULT '', estimated_resolution_time TEXT NOT NULL DEFAULT '', internal_note TEXT NOT NULL DEFAULT '', resolved_at INTEGER, created_at INTEGER NOT NULL, updated_at INTEGER NOT NULL, version INTEGER NOT NULL DEFAULT 1, grouping_confidence REAL NOT NULL DEFAULT 1, grouping_mode TEXT NOT NULL DEFAULT 'single')"),
+    db.prepare("CREATE TABLE IF NOT EXISTS issues (id INTEGER PRIMARY KEY AUTOINCREMENT, portal_id INTEGER, title TEXT NOT NULL, summary TEXT NOT NULL DEFAULT '', request TEXT NOT NULL DEFAULT '', category TEXT NOT NULL DEFAULT 'その他', location TEXT NOT NULL DEFAULT '', urgency_candidate TEXT NOT NULL DEFAULT 'normal', urgency_confirmed TEXT, status TEXT NOT NULL DEFAULT 'new', report_count INTEGER NOT NULL DEFAULT 0, affected_people TEXT NOT NULL DEFAULT '', vulnerable_people TEXT NOT NULL DEFAULT '[]', first_reported_at INTEGER NOT NULL, last_reported_at INTEGER NOT NULL, assigned_team TEXT NOT NULL DEFAULT '', assigned_user TEXT NOT NULL DEFAULT '', assigned_at INTEGER, response_message TEXT NOT NULL DEFAULT '', estimated_resolution_time TEXT NOT NULL DEFAULT '', internal_note TEXT NOT NULL DEFAULT '', resolved_at INTEGER, created_at INTEGER NOT NULL, updated_at INTEGER NOT NULL, version INTEGER NOT NULL DEFAULT 1, grouping_confidence REAL NOT NULL DEFAULT 1, grouping_mode TEXT NOT NULL DEFAULT 'single')"),
     db.prepare("CREATE TABLE IF NOT EXISTS issue_reports (issue_id INTEGER NOT NULL, question_id INTEGER NOT NULL UNIQUE, confidence REAL NOT NULL DEFAULT 1, link_type TEXT NOT NULL DEFAULT 'single', created_at INTEGER NOT NULL, updated_at INTEGER NOT NULL, PRIMARY KEY (issue_id, question_id))"),
     db.prepare("CREATE TABLE IF NOT EXISTS issue_responses (id INTEGER PRIMARY KEY AUTOINCREMENT, issue_id INTEGER NOT NULL, message TEXT NOT NULL, is_public INTEGER NOT NULL DEFAULT 1, actor_user_id TEXT, created_at INTEGER NOT NULL)"),
     db.prepare("CREATE TABLE IF NOT EXISTS staff_users (id INTEGER PRIMARY KEY AUTOINCREMENT, external_id TEXT NOT NULL UNIQUE, display_name TEXT NOT NULL, role TEXT NOT NULL DEFAULT 'staff', active INTEGER NOT NULL DEFAULT 1, last_seen_at INTEGER NOT NULL)"),
@@ -331,7 +332,7 @@ async function initialiseDatabase(db: D1Database): Promise<D1Database> {
 
   // Additive migrations are guarded by a marker so every public request does
   // not repeatedly attempt dozens of ALTER TABLE statements against D1.
-  const migrationMarker = await db.prepare("SELECT value FROM schema_meta WHERE key = 'schema_v2' LIMIT 1").first<{ value: string }>();
+  const migrationMarker = await db.prepare("SELECT value FROM schema_meta WHERE key = 'schema_v3' LIMIT 1").first<{ value: string }>();
   if (migrationMarker?.value !== 'ready') {
     for (const migration of [
       "ALTER TABLE faqs ADD COLUMN status TEXT NOT NULL DEFAULT 'published'",
@@ -385,13 +386,14 @@ async function initialiseDatabase(db: D1Database): Promise<D1Database> {
       "ALTER TABLE faqs ADD COLUMN source TEXT NOT NULL DEFAULT '避難所スタッフ'",
       "ALTER TABLE faqs ADD COLUMN expires_at INTEGER",
       "ALTER TABLE faqs ADD COLUMN verified INTEGER NOT NULL DEFAULT 1",
+      'ALTER TABLE issues ADD COLUMN assigned_at INTEGER',
     ]) await safeRun(db, migration);
     await safeRun(db, 'ALTER TABLE audit_logs ADD COLUMN portal_id INTEGER');
     await safeRun(db, 'CREATE INDEX IF NOT EXISTS audit_logs_portal_created_idx ON audit_logs (portal_id, created_at DESC)');
     await safeRun(db, 'CREATE INDEX IF NOT EXISTS questions_workflow_status_idx ON questions (workflow_status, created_at DESC)');
     await safeRun(db, 'UPDATE faqs SET created_at = updated_at WHERE created_at = 0');
     await safeRun(db, 'UPDATE questions SET body_original = body WHERE body_original IS NULL');
-    await db.prepare("INSERT OR REPLACE INTO schema_meta (key, value) VALUES ('schema_v2', 'ready')").run();
+    await db.prepare("INSERT OR REPLACE INTO schema_meta (key, value) VALUES ('schema_v3', 'ready')").run();
   }
   // schema_v2 was already marked complete on existing deployments before the
   // Report -> Issue fields were introduced. Keep those databases additive and
@@ -1326,7 +1328,7 @@ export async function updateQuestionFromPublicToken(token: string, body: string,
 }
 
 const ISSUE_SELECT = `SELECT id, portal_id, title, summary, request, category, location, issue_location, reporter_location, urgency_candidate, urgency_confirmed, status,
-  report_count, affected_people, vulnerable_people, first_reported_at, last_reported_at, assigned_team, assigned_user,
+  report_count, affected_people, vulnerable_people, first_reported_at, last_reported_at, assigned_team, assigned_user, assigned_at,
   response_message, estimated_resolution_time, internal_note, resolved_at, created_at, updated_at, version, grouping_confidence, grouping_mode
   FROM issues`;
 
@@ -1340,7 +1342,7 @@ function mapIssue(row: Record<string, unknown>): Issue {
     category: String(row.category ?? 'その他'), location: String(row.location ?? ''), issueLocation, reporterLocation: String(row.reporter_location ?? ''), urgency: urgency as UrgencyLevel, urgencyConfidence: Number(row.urgency_confidence ?? 0), urgencyConfirmed: confirmed,
     status: String(row.status ?? 'new') as Issue['status'], reportCount: Number(row.report_count ?? 0), affectedPeople: String(row.affected_people ?? ''),
     vulnerablePeople: vulnerable.length ? vulnerable : ['不明'], firstReportedAt: Number(row.first_reported_at ?? row.created_at ?? 0),
-    lastReportedAt: Number(row.last_reported_at ?? row.updated_at ?? 0), assignedTeam: String(row.assigned_team ?? ''), assignedUser: String(row.assigned_user ?? ''),
+    lastReportedAt: Number(row.last_reported_at ?? row.updated_at ?? 0), assignedTeam: String(row.assigned_team ?? ''), assignedUser: String(row.assigned_user ?? ''), assignedAt: row.assigned_at == null ? null : Number(row.assigned_at),
     responseMessage: String(row.response_message ?? ''), internalNote: String(row.internal_note ?? ''), estimatedResolutionTime: String(row.estimated_resolution_time ?? ''),
     resolvedAt: row.resolved_at == null ? null : Number(row.resolved_at), createdAt: Number(row.created_at ?? 0), updatedAt: Number(row.updated_at ?? 0),
     version: Number(row.version ?? 1), groupingConfidence: Number(row.grouping_confidence ?? 1), groupingMode: String(row.grouping_mode ?? 'single'),
@@ -1495,10 +1497,13 @@ export async function updateIssueWorkflow(issueId: number, status: string, messa
   if (expectedVersion != null && issue.version !== expectedVersion) throw new Error('ISSUE_CONFLICT');
   await ensureStaffUser(actorUserId, actorDisplayName);
   const now = Date.now(); const resolvedAt = status === 'resolved' || status === 'cannot_resolve' ? (issue.resolvedAt ?? now) : null;
-  const binds = [status, assignedTeam.trim().slice(0, 120), assignedUser.trim().slice(0, 120), normalizedUrgency || null, internalNote.trim().slice(0, 2000), resolvedAt, now, issueId];
+  const nextTeam = assignedTeam.trim().slice(0, 120);
+  const nextUser = assignedUser.trim().slice(0, 120);
+  const assignedAt = nextTeam || nextUser ? (issue.assignedAt ?? now) : null;
+  const binds = [status, nextTeam, nextUser, assignedAt, normalizedUrgency || null, internalNote.trim().slice(0, 2000), resolvedAt, now, issueId];
   const result = expectedVersion == null
-    ? await db.prepare(`UPDATE issues SET status = ?, assigned_team = ?, assigned_user = ?, urgency_confirmed = ?, internal_note = ?, resolved_at = ?, updated_at = ?, version = version + 1 WHERE id = ? AND portal_id IS NULL`).bind(...binds).run()
-    : await db.prepare(`UPDATE issues SET status = ?, assigned_team = ?, assigned_user = ?, urgency_confirmed = ?, internal_note = ?, resolved_at = ?, updated_at = ?, version = version + 1 WHERE id = ? AND portal_id IS NULL AND version = ?`).bind(...binds, expectedVersion).run();
+    ? await db.prepare(`UPDATE issues SET status = ?, assigned_team = ?, assigned_user = ?, assigned_at = ?, urgency_confirmed = ?, internal_note = ?, resolved_at = ?, updated_at = ?, version = version + 1 WHERE id = ? AND portal_id IS NULL`).bind(...binds).run()
+    : await db.prepare(`UPDATE issues SET status = ?, assigned_team = ?, assigned_user = ?, assigned_at = ?, urgency_confirmed = ?, internal_note = ?, resolved_at = ?, updated_at = ?, version = version + 1 WHERE id = ? AND portal_id IS NULL AND version = ?`).bind(...binds, expectedVersion).run();
   if (Number(result.meta.changes ?? 0) !== 1) throw new Error(expectedVersion == null ? 'ISSUE_UPDATE_FAILED' : 'ISSUE_CONFLICT');
   const mappedStatus = questionStatusForIssue(status);
   const publicMessage = message.trim().slice(0, 1000);
