@@ -343,6 +343,33 @@ i18n.addResourceBundle('en', 'translation', {
 }, true, true);
 i18n.addResourceBundle('ko', 'translation', { 'shelter.name': '이세키 대피소' }, true, true);
 
+// Voice is a free-form intake channel. Keep the copy explicit so residents
+// are not told that the system will interrogate them one question at a time.
+i18n.addResourceBundle('ja', 'translation', {
+  'voice.lead': '話したことをそのまま受け止め、必要な情報だけ整理します。AIの返事の途中でも話し始められます。',
+  'voice.welcome': '困っていることを、順番を気にせずそのまま話してください。必要なときだけ確認します。',
+  'voice.onlyOneQuestion': '必要なときだけ確認',
+  'voice.quickHint': '選択肢で答えにくいときは、そのまま話してください。',
+}, true, true);
+i18n.addResourceBundle('en', 'translation', {
+  'voice.lead': 'Say what is happening in your own words. We organize only what staff need, and you can speak while the AI is replying.',
+  'voice.welcome': 'Tell us what is troubling you in your own words. We will only ask if a detail is truly needed.',
+  'voice.onlyOneQuestion': 'Only if needed',
+  'voice.quickHint': 'If the choices do not fit, just keep speaking in your own words.',
+}, true, true);
+i18n.addResourceBundle('zh', 'translation', {
+  'voice.lead': '请用自己的话说出发生了什么。我们只整理工作人员需要的信息，AI回答时也可以继续说。',
+  'voice.welcome': '请按自己的方式说出困难。不确定时才会继续确认。',
+  'voice.onlyOneQuestion': '只在需要时确认',
+  'voice.quickHint': '如果选项不合适，请继续用自己的话说。',
+}, true, true);
+i18n.addResourceBundle('ko', 'translation', {
+  'voice.lead': '무슨 일이 있었는지 자신의 말로 이야기해 주세요. 직원에게 필요한 내용만 정리하며 AI가 말하는 중에도 계속 말씀할 수 있습니다.',
+  'voice.welcome': '어려운 점을 순서에 상관없이 자연스럽게 말해 주세요. 정말 필요한 경우에만 추가로 확인합니다.',
+  'voice.onlyOneQuestion': '필요할 때만 확인',
+  'voice.quickHint': '선택지가 맞지 않으면 자신의 말로 계속 이야기해 주세요.',
+}, true, true);
+
 export function useUserI18n() {
   const { t, i18n: instance } = useTranslation();
   const language = normalizeLanguage(instance.resolvedLanguage ?? instance.language);

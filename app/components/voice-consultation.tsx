@@ -16,7 +16,6 @@ import {
   intakeFromIncident,
   ApiConversationProvider,
   ApiIncidentExtractor,
-  nextMissingField,
   safetyGuard,
   shouldRequestExtraction,
   type IncidentField,
@@ -214,11 +213,16 @@ export function VoiceConsultation({ initialIntake, onClose, onUseText, onDirectS
     // Conversation is the resident-facing low-latency lane. Incident
     // Extraction is deliberately allowed to finish later and update staff.
     const conversation = await providerRef.current.respond(text, current, intakeFromIncident(current));
-    const following = conversation.nextField ?? nextMissingField(urgentState);
+    // A normal voice turn goes to review immediately. The provider may still
+    // request one explicit follow-up when it is genuinely needed, but the
+    // client must not manufacture a scripted question from every missing field.
+    const following = conversation.nextField;
     const reply = safety.immediate
       ? localizedEmergencyReply(conversationLanguage, Boolean(following))
       : conversation.reply;
-    setReply(reply, following, !safety.immediate && !following && conversation.requiresConfirmation);
+    // A normal voice turn always stops at a resident review step. The AI may
+    // suggest a follow-up, but it can never silently send a non-urgent report.
+    setReply(reply, following, !safety.immediate && !following);
   }
 
   function startListening() {
@@ -275,16 +279,10 @@ export function VoiceConsultation({ initialIntake, onClose, onUseText, onDirectS
     const localNext = applyIncidentAnswer(incidentRef.current, field, value);
     updateIncident(localNext);
     addMessage({ role: 'person', text: localizedFieldOptionLabel(value, conversationLanguage), originalText: localizedFieldOptionLabel(value, conversationLanguage), originalLanguage: conversationLanguage });
-    const following = nextMissingField(localNext);
     const saved = submissionRef.current;
     if (saved) void appendPublicUpdate(localNext, saved);
-    if (following) {
-      const question = fieldQuestion(following, localNext.category ?? 'その他', conversationLanguage);
-      setReply(question, following, false);
-    } else {
-      const reply = localizedReadyReply(conversationLanguage);
-      setReply(reply, null, !submissionRef.current);
-    }
+    const reply = localizedReadyReply(conversationLanguage);
+    setReply(reply, null, !submissionRef.current);
     startBackgroundExtraction(value, localNext, saved);
   }
 

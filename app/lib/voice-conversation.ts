@@ -10,7 +10,6 @@ import { safetyGuard, type SafetyResult } from './safety-guard';
 import { requestVoiceModel } from './model-client';
 import { extractMultilingualIncidentHints } from './multilingual-incident';
 import {
-  localizedAcknowledgement,
   localizedEmergencyReply,
   localizedFieldQuestion,
   localizedReadyReply,
@@ -86,7 +85,6 @@ export interface EmbeddingProvider {
   embed(text: string): Promise<number[]>;
 }
 
-const FIELD_ORDER: IncidentField[] = ['場所', '人数', '残量', '最後に受け取った時刻', '追加確認'];
 const FORBIDDEN_PHRASES = ['落ち着いてください', '深呼吸してください', '冷静になってください', 'お気持ちは完全に理解できます', '大丈夫です', '安心してください'];
 
 export { detectSafetyFlags, safetyGuard } from './safety-guard';
@@ -251,10 +249,6 @@ export function applyIncidentAnswer(state: IncidentState, field: IncidentField, 
   return { ...next, askedFields: mergeUnique([...next.askedFields, field], 10), provenance: provenanceByField, structuredComplete: structuredComplete(next) };
 }
 
-export function nextMissingField(state: IncidentState): IncidentField | null {
-  return FIELD_ORDER.find((field) => state.missingFields.includes(field) && !state.askedFields.includes(field)) ?? null;
-}
-
 export function fieldQuestion(field: IncidentField, category: ShelterCategory = 'その他', language: ConversationLanguage = 'ja'): string {
   if (field === '追加確認' && category !== 'トイレ・衛生') return localizedFieldQuestion(field, category, language);
   if (field === '追加確認') return localizedFieldQuestion(field, category, language);
@@ -266,10 +260,6 @@ export function fieldQuestion(field: IncidentField, category: ShelterCategory = 
 export function fieldOptions(field: IncidentField, category: ShelterCategory = 'その他'): string[] {
   if (field === '追加確認') return category === 'トイレ・衛生' ? ['使える', '使えない', 'わからない'] : ['意識はある', '呼吸が苦しい', '痛みがある', '薬が必要', 'わからない'];
   return shelterFollowUp(field, category).options;
-}
-
-function shortAcknowledgement(state: IncidentState): string {
-  return localizedAcknowledgement(normalizeConversationLanguage(state.language), state.safetyFlags.length > 0, state.urgency);
 }
 
 export function buildIncidentCard(state: IncidentState): string {
@@ -298,14 +288,14 @@ export class LocalRulesConversationProvider implements ConversationProvider {
   async respond(text: string, state: IncidentState, intake: ShelterIntake = {}): Promise<ConversationTurn> {
     const nextState = extractIncident(text, state, intake);
     const safety = safetyGuard.inspect(nextState.originalText.join('\n'));
-    const nextField = nextMissingField(nextState);
+    // The fallback must preserve the resident's free-form voice instead of
+    // turning every consultation into a scripted intake interview. Only an
+    // urgent case without a location gets an immediate follow-up prompt.
+    const nextField = safety.immediate && !nextState.location && !nextState.askedFields.includes('場所') ? '場所' : null;
     const language = normalizeConversationLanguage(nextState.language);
-    const question = nextField ? fieldQuestion(nextField, nextState.category ?? 'その他', language) : '';
     const reply = safety.immediate
       ? localizedEmergencyReply(language, Boolean(nextField))
-      : nextField
-        ? `${shortAcknowledgement(nextState)} ${question}`
-        : localizedReadyReply(language);
+      : localizedReadyReply(language);
     return { state: nextState, reply: safeReply(reply, language), nextField, safety, requiresConfirmation: !safety.immediate && !nextField };
   }
 }

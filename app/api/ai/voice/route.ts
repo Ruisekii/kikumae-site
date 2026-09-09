@@ -2,7 +2,7 @@ import { allowBurstShared, readRequestText } from '../../../../db/request-guard'
 import { incidentStateJsonSchema, normalizeIncidentCandidate, type CanonicalIncidentState } from '../../../lib/incident-schema';
 import { allowsEvaluationOverrides, getModelRuntimeStatus, requestModelJsonDetailed, withExtractionConcurrency } from '../../../lib/model-gateway';
 import { detectSafetyFlags } from '../../../lib/safety-guard';
-import { conversationLanguageInstruction, localizedEmergencyReply, localizedSafetyFallback, normalizeConversationLanguage } from '../../../lib/conversation-language';
+import { conversationLanguageInstruction, localizedEmergencyReply, localizedReadyReply, localizedSafetyFallback, normalizeConversationLanguage } from '../../../lib/conversation-language';
 import { shouldRequestExtraction } from '../../../lib/voice-conversation';
 import type { ShelterIntake } from '../../../../db/local-ai';
 import { organizeStaffIncident } from '../../../lib/staff-organization';
@@ -11,7 +11,6 @@ import { getAdminUser } from '../../../admin-auth';
 export const runtime = 'edge';
 
 const MAX_REQUEST_BYTES = 16000;
-const VALID_FIELDS = new Set(['場所', '人数', '残量', '最後に受け取った時刻', '追加確認']);
 const conversationJsonSchema = {
   type: 'json_schema',
   json_schema: {
@@ -58,6 +57,17 @@ function guardConversationReply(value: string, language: ReturnType<typeof norma
       : language === 'ko' ? ['진정하세요', '심호흡', '걱정하지 마세요', '괜찮습니다']
         : ['落ち着いてください', '深呼吸してください', '冷静になってください', '大丈夫です', '安心してください'];
   return forbidden.some((phrase) => value.toLocaleLowerCase().includes(phrase.toLocaleLowerCase())) ? localizedSafetyFallback(language) : value;
+}
+
+function containsScriptedFollowUp(value: string, language: ReturnType<typeof normalizeConversationLanguage>): boolean {
+  const patterns = language === 'en'
+    ? [/\bwhere\b/i, /\bhow many\b/i, /\bhow much\b/i, /\bwhen did\b/i, /\btell us where\b/i]
+    : language === 'zh'
+      ? [/在哪里/u, /几个人/u, /还剩多少/u, /什么时候/u, /请告诉我们.*位置/u]
+      : language === 'ko'
+        ? [/어디/u, /몇 명/u, /얼마나 남/u, /언제/u, /위치를 알려/u]
+        : [/どこ/u, /何人/u, /どのくらい/u, /いつ/u, /場所を教えて/u];
+  return patterns.some((pattern) => pattern.test(value));
 }
 
 function intake(value: unknown): ShelterIntake {
@@ -195,7 +205,7 @@ const conversationSystem = [
   '「落ち着いて」「大丈夫」「安心して」などの表現、説教、推測、職員の判断の代行は禁止です。',
   '必ず次のJSONだけを返してください。',
   '{"reply":"利用者へ返す短い文","nextField":"場所|人数|残量|最後に受け取った時刻|追加確認|null","requiresConfirmation":true}',
-  'nextFieldは、提示されたIncident StateのmissingFieldsから未確認の項目を最大1つだけ選びます。missingFieldsがまだ空の初回でも、文章から必要と判断できる項目を1つだけ選んでください。緊急・医療・火災・暴力は場所、それ以外の物資不足も原則として場所を最初に確認します。',
+  '原則としてnextFieldはnullにします。利用者の発話だけで職員へ届けられる場合は質問せず、requiresConfirmation=trueにします。nextFieldを選べるのは、その情報がないと今すぐ対応へ渡せない場合だけです。missingFieldsを機械的に埋める目的で質問してはいけません。緊急・医療・火災・暴力で場所が分からず、速報後に場所だけ必要な場合に限り、場所を1つだけ確認します。',
 ].join('\n');
 
 const extractionSystem = [
@@ -318,18 +328,16 @@ export async function POST(request: Request): Promise<Response> {
     const candidate = record(result);
     if (mode === 'conversation') {
       const reply = typeof candidate.reply === 'string' ? candidate.reply.trim().slice(0, 500) : '';
-      const requestedField = candidate.nextField === null || candidate.nextField === undefined ? null : String(candidate.nextField);
-      const missingFields = new Set(state.missingFields);
       const askedFields = new Set(state.askedFields);
       const safeEmergencyField = safety.immediate && !state.location && !askedFields.has('場所') ? '場所' : null;
-      const defaultField = missingFields.size === 0 && !state.location && !askedFields.has('場所') ? '場所' : null;
-      const nextField = requestedField && VALID_FIELDS.has(requestedField) && !askedFields.has(requestedField) && (missingFields.has(requestedField) || (requestedField === '場所' && !state.location))
-        ? requestedField
-        : safeEmergencyField ?? defaultField;
-      if (!reply || (requestedField !== null && !VALID_FIELDS.has(requestedField))) return json({ ok: false, aiMode: 'local-rules', safety, telemetry: { ...baseTelemetry, model, modelTimings: modelResult.timings, totalMs: Math.round(performance.now() - started), fallback: true }, reason: 'MODEL_OUTPUT_INVALID' }, 502);
+      // The resident-facing voice lane is intentionally not a form-filling
+      // interview. Normal turns go straight to review; only the independent
+      // Safety Lane may require the location immediately after an alert.
+      const nextField = safeEmergencyField;
+      if (!reply) return json({ ok: false, aiMode: 'local-rules', safety, telemetry: { ...baseTelemetry, model, modelTimings: modelResult.timings, totalMs: Math.round(performance.now() - started), fallback: true }, reason: 'MODEL_OUTPUT_INVALID' }, 502);
       const guardedReply = safety.immediate
         ? localizedEmergencyReply(selectedLanguage, nextField === '場所')
-        : guardConversationReply(reply, selectedLanguage);
+        : containsScriptedFollowUp(reply, selectedLanguage) ? localizedReadyReply(selectedLanguage) : guardConversationReply(reply, selectedLanguage);
       return json({ ok: true, aiMode: 'model-gateway', runtimeMode: status.mode, provider: status.provider, selectedLanguage, reply: guardedReply, nextField, requiresConfirmation: safety.immediate ? false : candidate.requiresConfirmation === true, safety, telemetry: { ...baseTelemetry, model, modelTimings: modelResult.timings, totalMs: Math.round(performance.now() - started), fallback: false } });
     }
     const normalizationStarted = performance.now();
