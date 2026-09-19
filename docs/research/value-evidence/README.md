@@ -9,6 +9,7 @@
 | `01-numbers-ledger.md` | 数字台帳。一次資料で確認した数字だけを出典付きで。推計・報道は明示 | 資料作成・説明の裏取り |
 | `02-roi-model.md` | 4レバーの計算式、既定値、4シナリオ、損益分岐、価格の許容帯、弱点 | 支払者への説明、社内の判断 |
 | `03-interview-quantification.md` | モデルの入力を埋める6つの数字の設問、反証、支払構造、記録テンプレート | 職員ヒアリング当日 |
+| `04-hearing-driven-redesign.md` | 3市ヒアリング（みよし9/11・豊田9/14・七尾9/18）の発言 → 要件 → 根拠 → 変更仕様。P0/P1/P2 と「作らないもの」 | Codex への実装指示、シート3・5・7の書き換え。読みやすい版 https://claude.ai/artifact/2Gv1Du7E6SJwbt7pCVBsN1 |
 | 計算機（Artifact） | 上のモデルをスライダーで動かせる1枚。根拠タイル付き。https://claude.ai/artifact/4nkKf4UWhrBhN2HmAQ6JFF | 面談・プレゼンでその場で再計算 |
 
 ## 30秒で言えること（すべて出典あり）
